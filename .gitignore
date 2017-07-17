@@ -1,3 +1,7 @@
+# Add git files
+.gitattributes
+.gitignore
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
