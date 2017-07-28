@@ -11,12 +11,14 @@ directly from the applicable steps, and also provides the option for you to send
 When the z/OS Migration book is updated in the future, so too will the corresponding Migration Workflow files be updated to match. 
 When in doubt, you can always check the level of the workflow to determine the corresponding level of the book. 
 
-
 If you would like to see a short demo on using the z/OS V2R1 migration workflow, visit the site IBM z/OSMF V2.1 Migration Workflow Demo on YouTube.
 
-The z/OS V2R3 Migration Workflow takes advantage of the new z/OSMF V2.1 Workflow enhancements. Before using this workflow, install
-APAR PI32163 (PTF UI90022); otherwise, validation errors will occur (message IZUWF0133E) during the workflow creation process.]
-To verify that the APAR is installed, click About in the upper-right corner of the z/OSMF Welcome page. 
+The z/OS V2R3 Migration Workflow takes advantage of the newer z/OSMF Workflow enhancement for Feedback. Before using this workflow,  minimally install these PTFs:
+
+* For z/OSMF V2.1:  PTF UI42016  (APAR PI69103)
+* For z/OSMF V2.2:  PTF UI40923  (APAR PI66845)
+
+Otherwise, validation errors will occur (message IZUWF0133E) during the workflow creation process. To see your z/OSMF Workflow level, click About in the upper-right corner of the z/OSMF Welcome page. 
 
 Migration Workflow Tips
 -----------------------
