@@ -27,11 +27,11 @@ Currently, you cannot copy an existing workflow into a new or existing workflow.
  If you are migrating from z/OS V2R1 to V2R2, transfer the following three files as binary using File Transfer Protocol (FTP), and store them in the same z/OS UNIX directory:
 * zosV2R1_to_V2R2_migration_workflow03.xml 
 * migration_feedback_gather_zos_v2r1.txt
-* HC_rexx.txt (21 KB)
+* HC_rexx.txt 
  
 If you are migrating from z/OS V1R13 to V2R2, transfer the following three files as binary using File Transfer Protocol (FTP), and store them in the same z/OS UNIX directory:
 * zosV1R13_to_V2R2_migration_workflow03.xml
 * migration_feedback_gather_zos_v1r13.txt 
-* HC_rexx.txt (21 KB)
+* HC_rexx.txt 
 
 We welcome any contributions or feedback on anything you find. Keep in mind, there are no warranties for any of the files or contributions that you find here. It is expected that you review what you are using in your environment. This tool is not supported by the IBM Service organization, but rather by the tool owner on a best-can-do basis. Please report any problems, suggestions, or comments to zosmig@us.ibm.com.
