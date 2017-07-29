@@ -1,0 +1,474 @@
+//*********************************************************************/
+//* Copyright 2017 IBM Corp.                                          */
+//*                                                                   */
+//* Licensed under the Apache License, Version 2.0 (the "License");   */
+//* you may not use this file except in compliance with the License.  */
+//* You may obtain a copy of the License at                           */
+//*                                                                   */
+//* http://www.apache.org/licenses/LICENSE-2.0                        */
+//*                                                                   */
+//* Unless required by applicable law or agreed to in writing, software*/
+//* distributed under the License is distributed on an "AS IS" BASIS, */
+//* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+//* See the License for the specific language governing permissions and */
+//* limitations under the License.                                   */
+//*********************************************************************/ 
+//*********************************************************************
+//*  STEP #1:      COPY STEP - IEBGENER -
+//*********************************************************************
+//GENER    EXEC PGM=IEBGENER
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD DUMMY
+//SYSUT1   DD DDNAME=TSOREXX
+//SYSUT2   DD DISP=(NEW,PASS),DSN=&&TMP(TSOREXX),
+//         UNIT=SYSALLDA,SPACE=(1024,(500,100,1)),
+//         DCB=(RECFM=FB,LRECL=1024,BLKSIZE=0)
+//TSOREXX  DD *,DLM=$$
+/*  rexx  */
+/*-------------------------------------------------------------------*/
+/*  CHANGE ACTIVITY:                                                 */
+/*  Flag   Person  Reason                                            */
+/*  ----   ------  --------------------------------------------------*/
+/*  1506   DJB     Support wild carded check names in which more than*/
+/*                 one check will be executed.                       */
+/*-------------------------------------------------------------------*/
+address "TSO"
+maxrc = 0                                                    /* 1506 */
+name = 'CONDIST'
+/*-------------------------------------------------------------------*/
+/*          Dynamically obtain the Health Checker Task ID            */
+/*-------------------------------------------------------------------*/
+call DISCOVER_STARTED_TASK_ID
+if maxrc = 0 then                                            /* 1506 */
+  call RUN_CHECK
+exit maxrc                                                   /* 1506 */
+ 
+/*-------------------------------------------------------------------*/
+/*                            RUN_CHECK                              */
+/*-------------------------------------------------------------------*/
+RUN_CHECK:
+/*-------------------------------------------------------------------*/
+/*                    Find current state of check                    */
+/*-------------------------------------------------------------------*/
+check_name = '${check}'
+started_task = taskid
+/*-------------------------------------------------------------------*/
+display_command = 'F 'started_task',DISPLAY,CHECK=('check_name'),DETAIL'
+run_command = 'F 'started_task',RUN,CHECK=('check_name')'
+activate_command = 'F 'started_task',ACTIVATE,CHECK=('check_name')'
+deactivate_command = 'F 'started_task',DEACTIVATE,CHECK=('check_name')'
+say;say ' Obtain the current state of Check 'check_name'.';say
+command = display_command
+say;say ' Issuing the following Operator command with cart value 'name;say
+say ' 'command;say
+xrc = XCON(name command)
+if xrc = 0 then do
+  statefound = 0
+  deleted_check = 0
+  /*-----------------------------------------------------------------*/
+  /* Locate STATE: in the output  or                                 */
+  /* Locate THERE ARE NO CHECKS THAT MEET THE SPECIFIED CRITERIA in  */
+  /* the output, which would indicate the Check has been DELETED.    */
+  /*-----------------------------------------------------------------*/
+  ck = 0                                                     /* 1506 */
+  statedone = 0                                              /* 1506 */
+  do xc = 1 to cons.0 while statedone = 0                    /* 1506 */
+    /*---------------------------------------------------------------*/
+    /* Keep looking through responses until we see End Command Resp  */
+    /* We are doing this so that if a wildcarded check name was used */
+    /* we can gather all responses from each check that was exectued.*/
+    /*---------------------------------------------------------------*/
+    if pos('End Command Response',cons.xc) > 0 then          /* 1506 */
+      statedone = 1                                          /* 1506 */
+    else if pos('STATE:',cons.xc) > 0 then do                /* 1506 */
+      ck = ck + 1                                            /* 1506 */
+      parse var cons.xc 'STATE:' statevals.ck                /* 1506 */
+      statevals.ck = word(statevals.ck,1)                    /* 1506 */
+      statefound = 1
+      staterecs.ck = cons.xc         /* save state and status record */
+      p = xc - 1                                             /* 1506 */
+      parse var cons.p 'CHECK('checkname.ck')'               /* 1506 */
+      checkname.0 = ck                                       /* 1506 */
+    end
+    else if pos('THERE ARE NO CHECKS THAT MEET',cons.xc) > 0 then do
+      deleted_check = 1
+      statedone = 1                                          /* 1506 */
+    end
+  end
+  if statefound = 1 then do                                  /* 1506 */
+    if checkname.0 > 1 then do
+      say;say ' There were 'checkname.0' Checks found in the initial command Response.'
+      say ' Each will be individually processed.';say
+    end
+    /*---------------------------------------------------------------*/
+    /* Support when checks are ran with wildcards. So for each check */
+    /* that was executed by the wildcarded check name get the        */
+    /* responses for each one.                                       */
+    /*---------------------------------------------------------------*/
+    do ck = 1 to checkname.0                                 /* 1506 */
+      call PROCESS_RESPONSE checkname.ck statevals.ck staterecs.ck /*1506*/
+      retcode.ck = xrc                                       /* 1506 */
+      maxrc = max(maxrc,xrc)                                 /* 1506 */
+    end                                                      /* 1506 */
+  end
+  else do
+    if deleted_check = 1 then do
+      /*-------------------------------------------------------------*/
+      /*                 The Check has been DELETED                  */
+      /*-------------------------------------------------------------*/
+      say;say ' The Check does not exist or has been Deleted.';say
+    end
+    else do
+      /*-------------------------------------------------------------*/
+      /*  The state of the check was not located in DISPLAY output   */
+      /*-------------------------------------------------------------*/
+      say;say ' Was unable to locate state of check in DISPLAY output.';say
+    end
+    xrc = 8
+  end
+end
+else do
+  /*-----------------------------------------------------------------*/
+  /*       XCON failed when obtaining current state of Check         */
+  /*-----------------------------------------------------------------*/
+  say;say ' XCON failed when obtaining the current state of Check';say
+  xrc = 8
+end
+maxrc = max(maxrc,xrc)                                       /* 1506 */
+say;say ' Exiting with return code 'maxrc;say                /* 1506 */
+return
+ 
+/*-------------------------------------------------------------------*/
+/*                               XCON                                */
+/*-------------------------------------------------------------------*/
+XCON:
+parse upper arg name cmd                  /* parse cmd arg uppercase */
+drop cons.
+/*-------------------------------------------------------------------*/
+/*   Use outtrap to capture any failing messages from consprof cmd   */
+/*   Put the results in an array called msgs.                        */
+/*-------------------------------------------------------------------*/
+x = outtrap('cons.')                       /* capture messages       */
+"CONSPROF SOLDISP(NO) SOLNUM(100) UNSOLDISPLAY(NO)"
+!rc = rc
+x = outtrap('off')                         /* close out outtrap      */
+if !rc = 0 then do                         /* console command good   */
+  drop cons.
+  cons.0 = 0                               /* message stem init      */
+  "console activate name("name")"          /* activate emcs console  */
+  !rc = rc
+  "console syscmd("cmd") cart("name")"
+  !rc = rc
+  address "TSO"                            /* switch to tso mode     */
+  /*-----------------------------------------------------------------*/
+  /*   Get text resulting from the console command we just entered   */
+  /*   Put the text in an array called cons.                         */
+  /*-----------------------------------------------------------------*/
+  !rc = GETMSG('cons.','sol',name,,10)
+  if !rc <> 0 then do
+    cons.1 = 'GETMSG failed to obtain console response.';say
+    cons.0 = 1
+    say;say ' 'cons.1;say
+    !rc = 8
+  end
+  "console deactivate"                     /* deactivate console     */
+end
+/*-------------------------------------------------------------------*/
+/* For a DISPLAY command start at record 2 since if you don't the    */
+/* rexx output terminates in zosmf STATUS->SYSTSPRT output.          */
+/*-------------------------------------------------------------------*/
+start = 1
+if pos(',DISPLAY,',cmd) > 0 then
+  start = 2
+say " ------------------ Command Response ------------------"
+do xc = start to cons.0
+  say ' 'cons.xc
+end
+xc = cons.0 + 1
+cons.xc = " ---------------- End Command Response ----------------"
+cons.0 = xc
+say " ---------------- End Command Response ----------------"
+return !rc
+ 
+/*-------------------------------------------------------------------*/
+/*                             WAITASEC                              */
+/*-------------------------------------------------------------------*/
+WAITASEC:
+arg waitsec
+waitdone = 0
+do while waitdone = 0
+  elapsed = time('E')
+  parse var elapsed ss '.' .
+  if ss > waitsec then
+    waitdone = 1
+end
+return
+ 
+/*-------------------------------------------------------------------*/
+/*                   DISCOVER_STARTED_TASK_ID                        */
+/*-------------------------------------------------------------------*/
+/*          Dynamically obtain the Health Checker Task ID            */
+/*-------------------------------------------------------------------*/
+DISCOVER_STARTED_TASK_ID:
+sysLvl = mvsvar(sysopsys)
+parse var syslvl os ver'.'rel'.' .
+ver = format(ver)
+rel = format(rel)
+if ver = 2 & (rel = 1 | rel = 2) then do
+  say;say ' This system is at level 'os' Rel 'ver'.'rel'. Processing continues.';say
+  call GET_TASK_ID
+end
+else do
+  say;say ' HC_rexx.txt (the IBM Health Checker for z/OS Workflow exec) will only run on'
+  say ' z/OS Rel 2.1 or 2.2 systems.'
+  say ' This system is at level 'os' Rel 'ver'.'rel'.';say
+  maxrc = 8                                                  /* 1506 */
+end
+return
+ 
+/*-------------------------------------------------------------------*/
+/*                           GET_TASK_ID                             */
+/*-------------------------------------------------------------------*/
+GET_TASK_ID:
+cvtaddr = C2x(storage(10,4))                   /* CVT address in hex */
+/*-------------------------------------------------------------------*/
+/*         Point to extended CVT address field (offset 8C)           */
+/*-------------------------------------------------------------------*/
+ecvtaddr_field = x2d(cvtaddr) + x2d('8c')           /* decimal value */
+/*-------------------------------------------------------------------*/
+/*  Get the ECVT Address from storage. This points to the ECVT map   */
+/*-------------------------------------------------------------------*/
+ecvtaddr_map_addr = c2x(storage(d2x(ecvtaddr_field),4))
+/*-------------------------------------------------------------------*/
+/* Point to the ECVTCTBL field which contains the CSRCTABL map addr  */
+/*                   Offset of ECVTCTBL is 0CC                       */
+/*-------------------------------------------------------------------*/
+ecvtctbl_field = x2d(ecvtaddr_map_addr) + x2d('0cc')  /*decimal value*/
+/*-------------------------------------------------------------------*/
+/*               Read the address at the 0cc offset.                 */
+/*               This address points us to the CSRCTABL Map.         */
+/*-------------------------------------------------------------------*/
+csrctabl_map_addr = c2x(storage(d2x(ecvtctbl_field),4))
+/*-------------------------------------------------------------------*/
+/*      Point to HZSTABLE field in the CSRCTABL map (offset 12C)     */
+/*-------------------------------------------------------------------*/
+HZSTABLE_field = x2d(csrctabl_map_addr) + x2d('12c')
+HZSTABLE_addr = c2x(storage(d2x(HZSTABLE_field),4))
+/*-------------------------------------------------------------------*/
+/*       See if the flag is set that says that HC is startd          */
+/*       The flags can be found at offset 4d8.                       */
+/*-------------------------------------------------------------------*/
+HC_flag_field = x2d(HZSTABLE_addr) + x2d('4D8')
+HC_flags = storage(d2x(HC_flag_field),1)
+HC_flags = c2x(hc_flags)
+HC_flags = x2b(hc_flags)
+if left(HC_flags,1) = 1 then do
+  say;say ' Looks like Health Checker is active';say
+  task_field = x2d(HZSTABLE_addr) + x2d('5A0')
+  proc_field = x2d(HZSTABLE_addr) + x2d('598')
+  taskid = space(storage(d2x(task_field),8))
+  procname = space(storage(d2x(proc_field),8))
+  if c2x(taskid) <> 0 then do
+    say ' Procname was found to be 'procname
+    say ' Task ID was found to be 'taskid;say
+  end
+  else do
+    say;say ' A Task ID was not located';say
+    maxrc = 8                                                /* 1506 */
+  end
+end
+else do
+  say;say ' Looks like Health Checker is NOT active';say
+  maxrc = 8                                                  /* 1506 */
+end
+return
+ 
+/*-------------------------------------------------------------------*/
+/*                         PROCESS_RESPONSE                     1506 */
+/*-------------------------------------------------------------------*/
+PROCESS_RESPONSE:
+parse arg check stateval staterec
+xrc = 0
+display_command = 'F 'started_task',DISPLAY,CHECK=('check'),DETAIL'
+run_command = 'F 'started_task',RUN,CHECK=('check')'
+activate_command = 'F 'started_task',ACTIVATE,CHECK=('check')'
+deactivate_command = 'F 'started_task',DEACTIVATE,CHECK=('check')'
+say;say ' Proccessing Check 'check' response.';say
+say ' The current state of the Check is 'stateval'.';say
+/*-------------------------------------------------------------------*/
+/*   We found the state of the check. First see if it is DISABLED.   */
+/*   If so we will exit.                                             */
+/*   If it is not disabled we will check to see if it is INACTIVE.   */
+/*   If so we will ACTIVATE the check.                               */
+/*-------------------------------------------------------------------*/
+needs_activation = 0
+if pos('DISABLED',stateval) = 0 then do
+  /*-----------------------------------------------------------------*/
+  /*      The check is NOT DISABLED, so now check for INACTIVE       */
+  /*-----------------------------------------------------------------*/
+  needs_activation = (pos('INACTIVE',stateval) > 0)
+end
+else do
+  /*-----------------------------------------------------------------*/
+  /*                   The check is DISABLED. Abort                  */
+  /*     Check for GLOBAL status and if found report SYS= info       */
+  /*-----------------------------------------------------------------*/
+  say;say ' Check is DISABLED.'
+  if pos('GLOBAL',staterec) > 0 then do
+    parse var staterec . 'STATUS:' statusval
+    say ' System 'space(statusval)' appears to have this check active exclusively.';say
+  end
+  else do
+    if checkname.0 > 1 then do
+      say ' Processing will continue for other checks.';say
+    end
+    else do
+      say ' This must be resolved before this program can continue.';say
+    end
+  end
+  xrc = 8
+end
+if xrc = 0 then do
+  /*-----------------------------------------------------------------*/
+  /*   All is well so far, we have the state of the Check and know   */
+  /*   if we need to ACTIVATE the Check or just RUN the Check.       */
+  /*   Since activating also runs the check we will issue either     */
+  /*   an ACTIVATE command or RUN command here.                      */
+  /*-----------------------------------------------------------------*/
+  if needs_activation = 1 then do
+    /*---------------------------------------------------------------*/
+    /*       The check was INACTIVE so we will ACTIVATE it now       */
+    /*---------------------------------------------------------------*/
+    command = activate_command
+    say;say ' The Check was INACTIVE.'
+    say;say ' Activate the Check so we can generate current status.';say
+    initial_state = 'INACTIVE'
+  end
+  else do
+    /*---------------------------------------------------------------*/
+    /*      The check is already ACTIVE, so we will RUN it now       */
+    /*---------------------------------------------------------------*/
+    command = run_command
+    initial_state = 'ACTIVE'
+    say;say ' Run the Check so we can generate current status.';say
+  end
+  say;say ' Issuing the following Operator command with cart value 'name;say
+  say ' 'command;say
+  xrc = XCON(name command)
+  if xrc = 0 then do
+    if needs_activation = 1 then do
+      /*-------------------------------------------------------------*/
+      /*          Assure the ACTIVATE completed successfully         */
+      /*-------------------------------------------------------------*/
+      activate_success = 0
+      do xc = 1 to cons.0 while activate_success = 0
+        if pos('ACTIVATE PROCESSING HAS BEEN COMPLETED',cons.xc) > 0 then do
+          activate_success = 1
+          say;say ' The Check Activate was successful.';say
+        end
+      end
+      if activate_success = 0 then do
+        say;say ' The Check Activate failed.';say
+        xrc = 8
+      end
+    end
+    if xrc = 0 then do
+      /*-------------------------------------------------------------*/
+      /*     All is well so far, we have successfully issued an      */
+      /*     ACTIVATE or RUN for the Check.                          */
+      /*     Now lets DISPLAY the status of the Check                */
+      /*-------------------------------------------------------------*/
+      say;say ' Display the Check so we can obtain status.';say
+      command = display_command
+      say;say ' Issuing the following Operator command with cart value 'name;say
+      say ' 'command;say
+      do a = 1 to 5
+        call WAITASEC 3      /* wait a sec for the Check to complete */
+        xrc = XCON(name command)
+        running_found = 0
+        do xc = 1 to cons.0
+          if pos('STATUS: RUNNING',cons.xc) > 0 then do
+            running_found = 1
+          end
+        end
+        if running_found = 0 then
+          leave
+        else do
+          say;say ' Check is still running. Retrying after 3 seconds.';say
+        end
+      end
+      if xrc = 0 then do
+        statusfound = 0
+        do xc = 1 to cons.0 while statusfound = 0
+          if pos('STATUS:',cons.xc) > 0 then do
+            parse var cons.xc 'STATUS:' statusval
+            statusval = space(statusval)
+            statusfound = 1
+          end
+        end
+        if statusfound = 1 then do
+          /*---------------------------------------------------------*/
+          /*       Ok we have the status, what do we do with it      */
+          /*---------------------------------------------------------*/
+          say;say ' The status of the Check is 'statusval'.';say
+          xrc = (pos('SUCCESS',statusval) = 0)
+        end
+        else do
+          /*---------------------------------------------------------*/
+          /*    The Check status was not located in DISPLAY output   */
+          /*---------------------------------------------------------*/
+          say;say ' Was unable to locate status of check in DISPLAY output.';say
+          xrc = 8
+        end
+        if initial_state = 'INACTIVE' then do
+          say;say ' Returning Check back to original state of INACTIVE.';say
+          command = deactivate_command
+          say;say ' Issuing the following Operator command with cart value 'name;say
+          say ' 'command;say
+          drc = XCON(name command)
+          if drc = 0 then do
+            /*-------------------------------------------------------*/
+            /*     Assure the DEACTIVATE completed successfully      */
+            /*-------------------------------------------------------*/
+            deactivate_success = 0
+            do xc = 1 to cons.0 while deactivate_success = 0
+              if pos('DEACTIVATE PROCESSING HAS BEEN COMPLETED',cons.xc) > 0 then do
+                deactivate_success = 1
+                say;say ' The Check Deactivate was successful.';say
+              end
+            end
+            if deactivate_success = 0 then do
+              say;say ' The Check Deactivate failed.';say
+              drc = 8
+            end
+          end
+        end
+      end
+    end
+  end
+  else do
+    /*---------------------------------------------------------------*/
+    /*    XCON failed when obtaining output of the RUN or ACTIVATE   */
+    /*---------------------------------------------------------------*/
+    say;say ' XCON failed when obtaining output of the RUN or ACTIVATE';say
+    xrc = 8
+  end
+end
+return
+$$
+//*
+//*********************************************************************
+//* STEP #2 : RUN STEP - IKJEFT01
+//*********************************************************************
+//RUNIT    EXEC PGM=IKJEFT01
+//SYSEXEC  DD DISP=(OLD,DELETE),DSN=&&TMP
+//SYSTSPRT DD SYSOUT=*
+//SYSTSIN  DD *
+  %TSOREXX
+//*********************************************************************
+//* STEP #3 : HZPSRINT CHECK MESSAGE BUFFER
+//*********************************************************************
+//HZSPRINT EXEC PGM=HZSPRNT,TIME=1440,REGION=0M,PARMDD=SYSIN
+//SYSIN DD *
+CHECK(${check})
+//SYSOUT   DD SYSOUT=*,DCB=(LRECL=256)
