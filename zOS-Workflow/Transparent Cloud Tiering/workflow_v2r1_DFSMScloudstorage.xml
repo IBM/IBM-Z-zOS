@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--  
+/*********************************************************************/
+/* Copyright 2017 IBM Corp.                                          */
+/*                                                                   */
+/* Licensed under the Apache License, Version 2.0 (the "License");   */
+/* you may not use this file except in compliance with the License.  */
+/* You may obtain a copy of the License at                           */
+/*                                                                   */
+/* http://www.apache.org/licenses/LICENSE-2.0                        */
+/*                                                                   */
+/* Unless required by applicable law or agreed to in writing, software*/
+/* distributed under the License is distributed on an "AS IS" BASIS, */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/* See the License for the specific language governing permissions and */
+/* limitations under the License.                                   */
+/*********************************************************************/     
+-->
+<workflowInfo>
+	<workflowID>Transparent Cloud Tiering
+	</workflowID><workflowDescription>Workflow for Setting up of Transparent Cloud Tiering on DFSMS</workflowDescription>
+	<workflowVersion>1.0</workflowVersion>
+	<vendor>IBM</vendor>
+	<Configuration>
+		<productID>ABC123</productID>
+		<productName>Product ABC</productName>
+		<productVersion>Version 1</productVersion>
+ 	</Configuration>
+</workflowInfo>
+
+<step name="ds8000"><title>Set up a cloud on your DS8000</title><description>Setting up a cloud on DS8000 storage hardware </description><instructions>Perform the cloud set up steps as documented in your DS8000 information. 
+For information about setting up your DS8000, see <a href="http://www.ibm.com/support/knowledgecenter/ST8NCA/product_welcome/ds8000_kcwelcome.html">www.ibm.com/support/knowledgecenter/ST8NCA/product_welcome/ds8000_kcwelcome.html.
+</a><p>Note: Initially, the DS8000 only supports a single account. With only a single account, there is no way to separate test data from production data. 
+Additionally, there is no way to separate HSM data from DSS data. It is recommended that using both DFSMShsm and DFSMSdss for the same account should only be done in a test environment. 
+DFSMSdss and DFSMShsm should not share a single account in a production environment.</p></instructions><weight>1</weight></step><step name="tcpip"><title>Ensure TCP/IP is enabled</title><description>Ensuring TCP/IP is enabled on z/OS </description><instructions>Ensure that TCP/IP is enabled on your z/OS host system.</instructions><weight>1</weight></step><step name="provider"><title>Obtain cloud provider information</title><description>Obtain the following information from your cloud provider or administrator.</description><instructions>Obtain the following information from your cloud provider or administrator:<ul>
+<li>Provider:<ul><li>SWIFT (if your cloud is an Openstack-based Swift object storage cloud using the built-in Tempauth authorization system).
+</li>
+<li>SWIFT-KEYSTONE (if your cloud is an Openstack-based Swift object storage cloud using the Keystone Identity service).</li>
+</ul>
+<li>Identity: <ul><li>a concatenation of the tenant name and a user name for that tenant in the form <i>tenant_name:user_name</i>.<p>In order to secure the cloud password, DFSMShsm data must have its own account and should not be intermixed with other data. </p></li></ul></li>
+<li>Endpoint: <ul><li>the Uniform Resource Identifier (URI) that DFSMS should use when authenticating with your object storage cloud.<p>Note: when SWIFT-KEYSTONE is the provider, the endpoint must contain the version number of the identity API to use. Currently, only the version 2 API is supported. For example,
+if the endpoint is <i>https://dallas.ibm.com</i>, the endpoint in the SMS construct should be <i>https://dallas.ibm.com/v2.0</i> . </p></li></ul></li>
+<li>Port Number: <ul><li>the port on which DFSMS is to communicate with the endpoint.</li></ul></li>
+<li>SSL Version: <ul><li>the lowest acceptable level of SSL/TLS that should be used when establishing a secure connection.</li></ul></li>
+</li></ul></instructions><weight>1</weight></step><step name="digitalcert">
+        <title>Digital certificate setup for SSL/TLS </title>
+        <description>If your cloud provider uses SSL/TLS communication, you must obtain the necessary digital certificates and understand the type of  SSL/TLS authentication the cloud performs.</description>
+		<step name="subStep1_1">	<title>Set up for server authentication</title>
+<description>Set up for server authentication.</description>
+			<step name="subStep1_1_1">
+				<title>Add the cloud root CA certificate.</title>
+<description>Add the cloud root CA certificate.</description>
+<instructions>Issue the RACDCERT CERTAUTH ADD command: <p>RACDCERT CERTAUTH ADD(&lt;<i>dataset containing cloud root CA</i> >) WITHLABEL(’Cloud Root CA') TRUST</p></instructions>		
+<weight>1</weight></step><step name="subStep_1_2_1"><title>Add the cloud intermediate CA certificate</title><description>Add the cloud intermediate CA certificate</description><instructions>(Optional) Use the RACDCERT CERTAUTH ADD command: <p>RACDCERT CERTAUTH ADD(&lt;<i>dataset containing cloud intermediate CA</i>>) WITHLABEL(’Cloud Intermediate CA') TRUST</p><p>Note: the intermediate CA certificate can be omitted if the cloud's key ring contains the intermediate CA certificate.</p><p>If the cloud identity certificate was signed by a root CA then the intermediate CA is also not necessary.</p></instructions><weight>1</weight></step><step name="SubStep1_3_1"><title>Virtual keyring</title><description>In this case we can use a virtual keyring in our SMS cloud construct.</description>
+<instructions>For the SSL key in the SMS cloud construct, specify a virtual key ring by the name of *AUTH*/*</instructions>
+<weight>1</weight></step>
+
+		</step><step name="subStep2_1">	<title>Set up for mutual authentication</title>
+<description>Set up for mutual authentication.</description>
+			<step name="subStep2_1_1">
+				<title>Add a key ring for DFSMS to use.</title>
+<description>Add a key ring for DFSMS to use.</description>
+<instructions>Issue the RACDCERT ID(DFHSM) command: <p>RACDCERT ID(DFHSM) ADDRING(<i>ring_name</i>)</p></instructions>
+<weight>1</weight>							
+</step><step name="subStep_2_3"><title>Add the z/OS host identity certificate with the private key and its CA certificate</title><description>Add the z/OS host identity certificate with the private key and its CA certificate</description>
+<instructions>Specify the following commands:<p>RACDCERT CERTAUTH ADD(&lt;<i>dataset containing X</i>>) WITHLABEL(’zOS host Root CA') TRUST</p><p>RACDCERT ID(DFHSM) ADD(&lt;<i>dataset containing C and private key</i>>) WITHLABEL(’zOS host cert') TRUST PASSWORD('…')</p> 
+</instructions><weight>1</weight>
+</step>
+<step name="subStep_2_3_1"><title>Add the cloud root CA certificate</title><description>Add the cloud root CA certificate.</description>
+<instructions>Specify the following command: <p>RACDCERT CERTAUTH ADD(&lt;<i>dataset containing A</i>>) WITHLABEL('Cloud Root CA') TRUST</p></instructions>
+<weight>1</weight></step></step>		
+<step name="subStep_2_4_1"><title>Connect all the certificates to the key ring</title><description>Connect all the certificates to the key ring</description><instructions>Specify the following commands:<p>RACDCERT ID(DFHSM) CONNECT(CERTAUTH LABEL(’zOS host Root CA') ring(CLOUD))</p><p>RACDCERT ID(DFHSM) CONNECT(CERTAUTH LABEL(’Cloud Root CA') ring(CLOUD))</p><p>RACDCERT ID(DFHSM) CONNECT(LABEL(’zOS host cert') ring(CLOUD) DEFAULT)</p> </instructions><weight>1</weight>
+</step>		
+<step name="subStep_2_5_1"><title>Real key ring</title><description>In this case we can use a real key ring in our SMS cloud construct.</description>
+<instructions>For the SSL key in the SMS cloud construct, specify a real key ring by the name of  DFHSM/ring_name</instructions>
+<weight>1</weight></step></step><step name="SMSSetup"><title>SMS Setup</title><description>Set up SMS to support  transparent cloud tiering.</description><instructions>Perform the following SMS configuration steps to enable transparent cloud tiering:
+<ul><li>(Optional) Allocate a backup SMS configuration data set (BACKUP.SCDS), a backup active configuration data set (BACKUP.ACDS), 
+and a new active configuration data set (NEW.ACDS) that you will use for a new SMS configuration. </li>
+<li>Make a backup of your existing SMS configuration, using the SETSMS SAVESCDS(scds.name) command.</li>
+<li>Make a backup of your existing active SMS configuration data set, using the SETSMS SAVEACDS(acds.name) command.</li>
+<li>Use new ISMF Cloud panels to define cloud construct(s) in the active SMS source configuration data set
+ (required information: cloud name, provider, identity (credentials), endpoint, port, SSL version, SSL key).</li>
+<li>Validate the new SMS configuration in the active source configuration data set, using ISMF.</li>
+<li>Copy the active SCDS into the new ACDS, using the SETSMS COPYSCDS(new.scds) command.</li>
+<li>Activate the new SMS active configuration data set, using the SETSMS ACDS(new.acds) command.</li>
+
+</ul>.
+</instructions><weight>1</weight></step>
+<step name="SDMsetup"><title>SDM  Setup</title><description>Enable SDM for transparent cloud tiering.</description><instructions>Define SAF resources to control access to the OBJSTORE ILK on the ANTRQST API.  
+It is recommended that the following FACILITY class profile is defined with a universal access of NONE:<ul><li>STGADMIN.ANT.ESS.OBJSTORE</li></ul></instructions><weight>1</weight></step>
+<step name="DSSsetup"><title>DFSMSdss Setup</title><description>Enable DFSMSdss commands for transparent cloud tiering.</description><instructions>Define SAF resources to control access to the CLOUD keyword on the DFSMSdss DUMP and RESTORE commands, by granting READ access to the following FACILITY 
+class profiles:<ul><li>STGADMIN.ADR.DUMP.CLOUD</li><li>STGADMIN.ADR.RESTORE.CLOUD</li></ul></instructions><weight>1</weight></step>
+<step name="HSMsetup"><title>DFSMShsm Setup</title><description>Enable DFSMShsm commands for transparent cloud tiering.</description><instructions>Enable the CP Assist for Cryptographic Functions.<p>Define DFSMShsm to z/OS UNIX System Services as a superuser, and the RACF user ID must have a default RACF group which has an OMVS segment with a group id (GID). 
+The user ID must also have an OMVS segment with the following parameters: UID(0) HOME('/').</p><p>Define SAF resources to control access to the CLOUD keyword on the HMIGRATE end user command, by granting READ access to the following FACILITY 
+class profile:<ul><li>STGADMIN.ARC.ENDUSER.HMIGRATE.CLOUD</li></ul></p><p>Set the password that DFSMShsm uses when communicating with the Object Storage account:<ul><li>Issue the following operator command: SETSYS CLOUD(NAME(cloud_name) CCREDS)
+</li><li>The system will prompt for the cloud password in a WTOR and the response will not be echoed back to the console. If the cloud password is case sensitive, 
+use the System Command Extension from the SDSF log when replying to the WTOR. (The System Command Extension can be started by typing a forward slash (/) 
+on the Command Input line in the SDSF system log.).</li>
+<li>The cloud password must be secured. IBM recommends that the Security Administrator who is administering the Cloud Storage accounts be the one who enters this password.</li></ul></p></instructions><weight>1</weight></step>
+
+<step name="enablemsg"><title>Enable status messages</title><description>Enable status messages </description><instructions>Specify ENABLE(AOM0496I) in DEVSUP<i>xx</i>, when exceptions need to be looked at. Note: the default is DISABLE(AOM0496I).</instructions><weight>1</weight></step>
+<step name="users"><title>Inform users</title><description>Inform users about cloud commands</description><instructions>Inform users about the various commands for using transparent cloud tiering, including the new DFSMSdss and DFSMShsm commands.</instructions><weight>1</weight></step>
+
+</workflow>
