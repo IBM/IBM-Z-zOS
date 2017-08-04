@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  
+/*********************************************************************/
+/* Copyright 2017 IBM Corp.                                          */
+/*                                                                   */
+/* Licensed under the Apache License, Version 2.0 (the "License");   */
+/* you may not use this file except in compliance with the License.  */
+/* You may obtain a copy of the License at                           */
+/*                                                                   */
+/* http://www.apache.org/licenses/LICENSE-2.0                        */
+/*                                                                   */
+/* Unless required by applicable law or agreed to in writing, software*/
+/* distributed under the License is distributed on an "AS IS" BASIS, */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/* See the License for the specific language governing permissions and */
+/* limitations under the License.                                   */
+/*********************************************************************/     
+-->
+<workflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="workflow_v1.xsd">                          
+		  
+	<workflowInfo>
+	<workflowID scope="system" isCallable="system">sparkmds</workflowID><workflowDescription>Installation and customization IBM zOS Platform for Apache Spark Data Service Server and Studio </workflowDescription>
+		<workflowVersion>1</workflowVersion>
+		<vendor>IBM</vendor>	</workflowInfo>
+<step name="Step1"><title>How to use this workflow</title><description>To use this workflow, note the following:<ul><li><b>Take ownership!</b>  Make sure that you have ownership of workflow steps that you want to perform, and assign other steps to the appropriate users, 
+using the <b>Assignment and Ownership</b> action in the Workflow Steps table. 
+Taking ownership is important, because without it you will not see the <b>Perform</b> tab, which contains the meat of the instructions for each step. <p>If you're the owner of the workflow, you can take ownership of all steps. 
+If you were assigned one or more steps by the owner, you can take ownership of those steps.</p><p>Do the following:
+<ul><li>From the table listing the steps for the workflow (the Workflow Steps table), select the step or steps to be owned by you. This action is disabled if the step is not assigned to you. </li>
+<li>Click <b>Actions</b>, then select <b>Assignment and Ownership</b> > <b>Take Ownership</b>. The Take Ownership window is displayed. This page includes the Selected Steps table. 
+You can expand this section to review the steps for which this action applies. </li>
+<li>Optionally, enter a comment in the Comments field to document this action. </li>
+<li>Click OK to complete the transfer of step ownership to yourself. </li></ul>
+</p></li><li><b>Expand all steps for ease of navigation:</b> You might find it easier to navigate through all the steps in the workflow if you expand the view so that all the sub-steps show as follows:
+<ol>
+<li>Click <b>Actions</b>, then select <b>Select All</b>.</li>
+<li>Click <b>Actions</b>, then select <b>Expand</b>.</li></ol></li>
+<li><b>Track your progress:</b> When you have performed the work of a step, click the <b>Finish</b> box below the instructions to track your progress through the workflow. 
+This also takes you back out to the list of steps for the workflow so that you are ready to go on to the next one.</li>
+<b>Substeps:</b> To navigate to the substeps contained within a step, click on the workflow title of the workflow at the top of the screen. 
+Although the sub-steps are listed below the step, you cannot navigate to the sub-steps from within a step.<p>Note that a step containing substeps does not include a <b>Perform</b> tab.</p></ul></description><instructions>Congratulations! If you can read this, you have successfully taken ownership of this workflow step!</instructions><weight>1</weight></step><step name="Step2"><title>Install the Data Service server and apply server maintenance</title><description>Install the Data Service server and apply server maintenance.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>z/OS Mainframe Data Service for Apache Spark is a part of IBM z/OS Platform for Apache Spark.  To install the Data Service server and apply server maintenance, acquire available PTFs.<p>For information, see <cite><a href="https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azka100/topics/azkic_t_install.htm">Installing IBM z/OS Platform for Apache Spark</a></cite> in 
+<cite><a href="https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azka100/toc.htm">IBM z/OS Platform for Apache Spark Installation and Customization Guide </a></cite>
+ (<a href="https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azka100/toc.htm">https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azka100/toc.htm</a>).</p></instructions><weight>1</weight></step>
+<step name="Step3"><title>Follow the Data Service server naming conventions</title><description>You must follow the Data Service server naming conventions for the server
+subsystem ID and the server initialization member.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>The server subsystem name must be <i>x</i>ZK<i>y</i>, where <i>x</i> is any alphabetic character A-Z and <i>y</i> is any alphanumeric character A-Z or 0-9. 
+<p>Depending on what you name the server subsystem, the server initialization member must follow the same naming convention, <i>x</i>ZK<i>y</i>IN00.</p><p><b>Note:</b> The default server naming conventions used throughout this guide are AZKS for the server subsystem name and AZKSIN00 for the server initialization member.</p></instructions><weight>1</weight></step><step name="Step4"><title>Create system data sets</title><description>Create system data sets.<p>The AZKDFDIV member creates data sets for the Trace Browse, the global variable
+checkpoint, and the data-mapping facility (DMF). The AZKGNMP1 member copies
+distributed data sets into user-modifiable data sets. The AZKEXSWI member copies
+distributed objects into user-modifiable objects.</p><p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Use the following procedure to create system data sets. Note that each member listed below contains comments describing how to customize the variables. 
+The high level qualifier you specify (<i>hlq</i>) will depend on where you installed the product using SMP/E. 
+<ol><li>Customize the AZKDFDIV member in <i>hlq</i>.SAZKCNTL to meet your requirements and then submit it.</li>
+<li>Customize the AZKGNMP1 member in <i>hlq</i>.SAZKCNTL to meet your requirements and then submit it. <p><b>Note:</b> The map data set created with this step should be the first concatenated data set to the server's AZKMAPP DD.  
+See AZK.SAZKCNTL(AZK1PROC).  Both the user creating maps and the server should have read and write permissions to this data set.  
+The system-provided data set (AZK.SAZKSMAP) should be the
+last data set in the AZKMAPP concatenation and the user and server should only have read access to the data set.  The administrator will need read and write permissions.
+</p> </li><li>Customize the AZKEXSWI  member in <i>hlq</i>.SAZKCNTL to meet your requirements and then submit it.</li>
+</ol></instructions><weight>1</weight></step><step name="Step5"><title>Define security authorizations</title><description>Define security authorizations.<p>To use an external security product, such as RACF, ACF2, or Top Secret, 
+work with your z/OS Security Administrator to define the started task name to the security product and authorize the data set.</p><p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions><p>To define the server and other required permissions for your security product, customize the appropriate security option located in the <i>hlq</i>.SAZKCNTL library, and
+submit the job - note that each member contains comments describing how to customize the variables:<ul>
+<li><b>AZKRAVDB</b> for IBM Resource Access Control Facility (RACF) security
+<p><b>Note:</b> In later steps, you can allow AZKS to administer the WLM policy or 			
+administer it manually. If you want AZKS to administer it, change WLMUSERID 	
+as directed in the job and add the WLMUSERID option to server initialization member AZKSIN00. Further 		
+information can be found in <cite><a href="https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azkc100/dvs_sg_tsk_wlm_server.htm">Providing WLM definitions via AZK</a></cite> in 
+<cite><a href="https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azkc100/toc.htm">IBM z/OS Platform for Apache Spark Administrator's Guide</a></cite> 
+(<a href="https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azkc100/toc.htm">https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azkc100/toc.htm</a>).</p>
+</li><li><b>AZKA2VDB</b> for CA ACF2 (Access Control Facility) security</li>
+<li><b>AZKTSVDB</b> for CA Top Secret Security (TSS).</li></ul></p></instructions><weight>1</weight></step><step name="Step6"><title>Configure Workload Manager (WLM) to optimize performance</title><description>Configure Workload Manager (WLM) to optimize performance from the server by defining the server to WLM.  <p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Configure WLM to optimize performance from the server by defining the server to WLM.  
+The Data Service service should be prioritized slightly below the data provider in your WLM environment. 
+It is not sufficient to simply add the STC to a WLM service class as the server will create independent enclaves for each connection.  The server should be configured to use a medium to high performing 
+WLM velocity goal as its default service class.<p>For further details, see <p><cite><a href="https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azkc100/dvs_sg_con_perf_intro.htm">Performance</a></cite> in 
+<cite><a href="https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azkc100/toc.htm">IBM z/OS Platform for Apache Spark Administrator's Guide</a></cite> 
+(<a href="https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azkc100/toc.htm">https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azkc100/toc.htm</a>).</p></p><p>Do the following:<ol>
+<li>Go to the WLM ISPF application and select option <b>6</b> (Classification Rules), and select option <b>1</b> to Create.</li>
+<li>Set the Subsystem Type to AZK, and provide an optional description.</li>
+<li>Under the Class/Service Column next to DEFAULTS, set the desired default service class name.  If a desired service class does not exist, then create one using option 4 
+(Service Classes) under the <b>Primary WLM</b> menu.  Press enter and PF3 to save.</li>
+<li>Define the Data Service started task AZK1PROC:<ol>
+<li>Go to the WLM ISPF application and select option <b>6</b> (Classification Rules).</li>
+<li>For the STC WLM-subsystem type, select Modify.</li>
+<li>Add an entry for AZK1PROC.</li>
+<li>Add an appropriate service class for the started task and define it relative to existing workload resource management objectives.</li>
+<li>Add a unique Report class for the started task.</li></ol></li>
+<li>Activate the new WLM policy definition.</li></ol></p></instructions><weight>1</weight></step><step name="Step7"><title>APF-authorize the LOAD library</title><description>APF-authorize the LOAD library.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Ensure that the LOAD library AZK.SAZKLOAD is APF authorized.
+<p><b>Note:</b>  The APF authorize should be done dynamically and then made permanent for the next IPL.
+</p></instructions><weight>1</weight></step>
+<step name="Step8"><title>Copy target libraries</title><description>Copy target libraries.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>Because SMP/E maintains the libraries that the installation program creates, you can make a copy of the target libraries to use in your runtime environments.</instructions><weight>1</weight></step><step name="Step9"><title>Configure support for code pages and DBCS </title><description>You can configure support for Japanese code pages and the double-byte character set (DBCS).<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Configure support for code pages and DBCS by modifying <i>hlq</i>.AZKS.SAZKEXEC(AZKSIN00) as follows:<ol>
+<li>In member AZKSIN00, find the comment <code>Set CCSID for non-DB2 data</code>:<p><code>/*-------------------------------------*/
+/* Set CCSID for non-DB2 data */
+/*-------------------------------------*/
+if DoThis then
+do
+"MODIFY PARM NAME(SQLENGDFLTCCSID) VALUE(1047)"
+"MODIFY PARM NAME(SQLENGDBCSLTFMT) VALUE(ASIS)"</code></p></li>
+<li>Enable the CCSID parameters by changing  if <code>DontDoThis</code> to if <code>DoThis</code>.</li>
+<li>Set <code>SQLENGDFLTCCSID</code> to a valid value, for example, <code>(1047)</code>.</li>
+<li>Set <code>SQLENGDBCSLTFMT</code> to a valid value,  <code>(ASIS)</code>, <code>(FULL)</code>, or <code>(HALF)</code>.</li></ol> For more details, see 
+<cite><a href="https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azka100/topics/dvs_ig_tsk_dbcs_support.htm">Configuring support for code pages and DBCS </a></cite> 
+in <cite><a href="https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azka100/toc.htm">IBM z/OS Platform for Apache Spark Installation and Customization Guide </a> 
+</cite> (<a href="https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azka100/toc.htm">https://www.ibm.com/support/knowledgecenter/SSCTFE_1.1.0/com.ibm.azk.v1r1.azka100/toc.htm</a>).</instructions><weight>1</weight></step>
+<step name="Step10"><title>Customize the server initialization member </title><description>The server initialization member AZKSIN00 is a REXX program that you use to set
+product parameters and define links and databases. You must customize the server
+initialization member for your installation environment. <p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>The server initialization member is shipped in data set member
+hlq.SAZKEXEC(AZKSIN00) and was copied to a new data set
+hlq.AZKS.SAZKEXEC(AZKSIN00) for customization.<p>As you go through the installation, you accept or set parameter values in the
+server initialization member.<ul><li>If you are installing the server for the first time, it is recommended that all the
+default values be accepted. You can change the values as needed later.</li><li>If you are installing a new version of the server over a previous version, the
+previous server member might contain parameter values that you modified to
+meet specific requirements in your environment. In this case, you might need to
+reset the values of the parameters during the installation.</li></ul><ol>
+<li>Find the line that contains <code>SHLQ1</code> and provide your own high-level qualifier
+to define the ISPF data sets. For example: <p><code>SHLQ1=AZK</code></p></li><li>Find the line that contains <code>SHLQ2</code> and provide your own high-level qualifier
+to define the Event Facility (SEF) data sets. Ensure that the HLQ results in
+proper data set references for these features. For example:<p><code>SHLQ2=AZK.AZKS</code></p></li><li>Review the following default values for the TCP/IP parameters and change the
+values as necessary:<p><code>MODIFY PARM NAME(OEPORTNUMBER) VALUE(1200)
+MODIFY PARM NAME(WSOEPORT) VALUE(1201)
+MODIFY PARM NAME(TRACEOERW) VALUE(YES)
+MODIFY PARM NAME(OEKEEPALIVETIME) VALUE(30)
+MODIFY PARM NAME(PARALLELIO) VALUE(YES)
+MODIFY PARM NAME(OEPIOPORTNUMBER) VALUE(1204)</code></p></li></ol></p></instructions>
+<weight>1</weight></step><step name="Step11"><title>Configure the started task JCL </title><description>To configure the started task JCL, modify the AZK1PROC (subsystem default ID) member that is in the <i>hlq</i>.SAZKCNTL library.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>The AZK1PROC member contains the JCL procedure that is required to run the main address space (started task).<p>Do the following to configure <i>hlq</i>.SAZKCNTL(AZK1PROC):</p><ol><li>Add the HLQ name of the libraries to the <i>hlq</i> parameter.<p><b>Note:</b> This parameter sets the server data set allocations to the correct data set names.</p></li><li>Confirm that the SYSEXEC DD statement allocates the correct data set name that contains the customized server initialization member AZKSIN00. <p><b>Note:</b> This data set was created in job AZKGNMP1 previously. The default name is <i>hlq</i>.AZKS.SAZKEXEC(AZKSIN00).
+</p></li><li>Ensure that the <code>DD AZKMAPP</code> concatenation points to the &amp;<i>hlq</i>.AZKS.SAZKMAP data set created in the previous installation job AZKGNMP1. <p>
+<b>Note:</b> This data set should be first in the concatenation and is used for storing virtual table maps created during development. 
+The &amp;<i>hlq</i>.SAZKMAP data set, which contains maps that are part of the product distribution, should be placed last.
+</p></li><li>Under normal circumstances, the server, running as a z/OS started task, starts at system startup and stops before the system shuts down.  
+<p>To start or stop the server use the following console command respectively:</p><p><code>S AZKS
+P AZKS
+</code></p><b>Note:</b> If you use a procedure name other than the SSID provided in the example, then you issue the start command using that procedure name.  
+If you issue a CANCEL command, all available connections terminate with an abend, and the server shuts down immediately.</li><li>If you use an automation package to start the system, associate the START 
+command with the VTAM initialization complete message (IST020I), the TCP/IP initialization complete message (EZB6473I), or both messages.</li>
+<li>Optionally verify the startup is successful, look for the following entries in the server Job Entry Subsystem (JES) log:<p><code>SD74391I OE stack binding port 1200 to IP address 0.0.0.0
+SD74391I OE stack binding port 1201 to IP address 0.0.0.0
+SD74391I OE stack binding port 1204 to IP address 0.0.0.0
+</code></p></li></ol></instructions>
+<weight>1</weight></step><step name="Step12"><title>Configure and start the ISPF application</title><description>Configure and start the ISPF application.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Note that before you start the ISPF application, the server must be started.<ol>
+<li>Edit the <i>hlq</i>.SAZKEXEC(AZK) member, and replace the data set name in the following statement with the data set name that you chose for the <i>hlq</i>.SAZKLOAD library:<p><code>llib=’<i>hlq</i>.SAZKLOAD’</code></p></li>
+<li>Copy the <i>hlq</i>.SAZKEXEC(AZK) member to a data set that is allocated to all TSO users SYSPROC allocation.<p>Before starting the ISPF application, you must start your server.  See Step 11, <cite>Configure the started task JCL</cite>. When the server starts, the ISPF data sets are dynamically allocated.
+</p></li><li>To start the ISPF application, go to the ISPF command shell and enter the following command:<p><code>EX ‘<i>hlq</i>.SAZKEXEC(AZK)’ ‘SUB(AZKS)’</code></p><p>Where:</p><p><i>hlq</i> is the high level qualifier</p><p>AZKS is the subsystem name of the copy of the server instance.</p></li></ol>All ISPF clients communicate with the specified subsystem.</instructions><weight>1</weight></step><step name="Step13"><title>Install the Data Service Studio</title><description>Install the Data Service Studio.</description><step name="Step13_1"><title>Ensure prerequisites are met</title><description>Before you install the Data Service Studio, ensure that prerequisites are met. The Data Service Studio is an 
+Eclipse-based user interface that allows you to create and manage the requisite metadata on the 
+Data Service server that is used to provide SQL access to your z/OS mainframe data sets.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Before you install the Data Service Studio, ensure that the following prerequisites are met:<ul>
+<li><b>Permissions</b>: Ensure you have appropriate user log-on credentials and user privileges on your Windows system to install the Data Service Studio.</li>
+<li><b>Supported operating systems</b>: Use Windows 8 (32-bit and 64-bit) or Windows 7 (32-bit and 64-bit) OS only.</li>
+<li><b>System memory</b>: A minimum of 4 GB is recommended.</li>
+<li><b>Hard disk space</b>: A minimum of 1 GB is recommended.<p> Installing the Data Service Studio as a plug-in to an existing Eclipse Kepler or Luna application.</p></li>
+
+<li><b>Software</b>: A full install includes the Data Service Studio product installer and is bundled with the required software. The bundled software includes the 64-bit Windows Eclipse. 
+If the Windows operating system is 32-bit, download the 32-bit Windows Eclipse and install Data Service Studio using the plugin install method as follows:<ol>
+<li>Under Eclipse Help, select <b>Install New Software wizard</b>.</li>
+<li>Select install using the Archive option and pick the mds.zip file from the <code>../studio/install</code> folder. 
+<p>To install the Data Service Studio as a plug-in to your existing Eclipse environment requires Eclipse Kepler 4.1.x (such as IBM Data Studio 4.1.x), and Java 1.7 or Java 1.8.</p></li></ol></li></ul></instructions><weight>1</weight>
+</step><step name="Step13_2"><title>Perform the installation </title><description>You can choose to install the Data Service Studio software in a new Eclipse
+environment, or you can choose to install the software as a plug-in within an
+existing Eclipse environment.
+<p><b>Note:</b> If you have already installed the Data Service Studio, and you want to
+upgrade to a newer version of the software, follow the instructions for installing
+new software. The upgrade applies to installations that use the Data Service Studio
+Eclipse bundle, or your own previously existing Eclipse environment.</p><p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Do the following to perform the installation of the Data Service Studio after the prerequisites are met:
+<ul>
+<li>From the z/OS mainframe, transfer the installation member (<i>hlq</i>.SAZKBIN(AZKBIN1)) to a folder on your workstation using File Transfer Protocol (FTP) in binary mode.</li>
+<li>Rename the file to spark-studio-1.1.0.x.zip.</li>
+<li>Create a new installation folder for the Data Service Studio.</li>
+<li>Double-click the spark-studio-1.1.0.x.zip, and then extract the contents to the installation folder.</li>
+<li>In the installation folder, navigate to the <b>studio>install</b> folder that was created, and then select one of the following installation methods:
+<ul><li>If you are installing Data Service Studio software in a new Eclispe environment, do the following:
+<ul>
+<li>In the <b>install</b> folder, run the setup.bat script.</li>
+<li>In the <b>install>studio</b> folder, right-click launch.bat script, and then select <b>Run as administrator</b>.</li>
+<li>Verify that the Data Service Studio starts and that the Welcome page displays.</li>
+<li>Create a shortcut to the launch.bat file on your desktop.</li></ul></li>
+<li>If you are installing Data Service Studio software as a plug-in to an existing Eclispe environment, do the following:<ul>
+<li>In the <b>install</b> folder, double-click the spark-studio-1.1.0.x.zip file, and extract the contents to the folder.</li>
+<li>Navigate to the <b>install>studio</b> folder, and then locate the mds.zip file.  The mds.zip file is the plug-in archive.</li>
+<li>From your Eclispe application, click <b>Help>Install New Software</b>, and then click <b>Add</b>.</li>
+<li>On the Add Repository dialog box, click <b>Archive</b>.</li>
+<li>Locate the mds.zip file, and then click <b>Open</b>.</li>
+<li>Enter the software file name, a name for the repository, and then click <b>OK</b>.</li>
+<li>Select the check box next to the file, and then click <b>Next</b>.</li>
+<li>Complete the remaining installation wizard steps, and then restart your workstation.</li>
+</ul></li>
+</ul></li>
+</ul> To begin using Data Service Studio, open the DV Data perspective.</instructions>
+<weight>1</weight></step></step><step name="Step14"><title>Configure the Data Service Studio</title><description>Configure the connection from the Data Service Studio to the server.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Configure the connection from the Data Service Studio to the server as follows:<p><ol>
+<li>On the <b>Server</b> tab, click <b>Set Server</b>.</li>
+<li>Provide information for the <b>Host</b>, <b>Port</b>, <b>Userid</b> and the <b>User Password</b> and click <b>OK</b>. 
+The <b>Server</b> tab displays the new server connection.  You can now configure the interfaces for the solutions that you want to use.</li></ol></p></instructions><weight>1</weight></step><step name="Step15"><title>Install the JDBC driver</title><description>Install the JDBC driver. The JDBC driver is a Type 4 driver that is written in Java and implements the network protocol for the IBM® z/OS® Mainframe Data Service for 
+Apache Spark Data Service. Clients connect directly to the Data Service without translation. The Java Virtual Machine manages the applications connection to the Data Service.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>
+The JDBC driver requires Java 1.7 or higher and is supplied as a ZIP jar archive file that contains the following components:<p><ul>
+<li>dv-jdbc-[version #].jar (the driver core implementation file)</li>
+<li>log4j-api-[version #].jar (logging framework API file)</li>
+<li>log4j-core-[version #].jar (logging framework implementation file)</li>
+<li>log4j2.xml (sample logging configuration file)</li>
+</ul></p><p>Do the following:<ol>
+<li>From the mainframe, transfer the driver installation member (<i>hlq</i>.AZK0110.SAZKBIN(AZKBIN2)) to your local workstation using the File Transfer Protocol (FTP) in binary mode.</li>
+<li>Rename the file to DSDriver.zip.</li>
+<li>On your local workstation, create a directory, and then unzip the files to that directory.</li>
+<li>To use the drivers with Data Service, create a directory on the mainframe and FTP the driver files in binary mode to that directory. 
+For example:<p><code><i>mount_point</i>/DSDriver</code></p>The <i>mount_point</i>/DSDriver path is used with the spark-submit command.
+</li></ol></p></instructions><weight>1</weight></step><step name="Step16"><title>Verifying the Data Service server installation</title><description>To verify the server installation, create a sample VSAM file and a virtual table, and
+then run a query that accesses the VSAM data.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Do the following:<p><ol>
+<li>Create the sample VSAM file on the mainframe that hosts the server. Run the
+<code>AZKGNSTF</code> member in the <i>hlq</i>.SAZKCNTL data set to allocate and load the
+sample VSAM file. The job should complete with a condition code of 0.</li>
+<li>Create the <code>staffvs</code> virtual table. Run the <code>AZKIVVS1</code> member in the
+<i>hlq</i>.SAZKCNTL data set to perform a batch extract of the sample VSAM file
+listing and create a virtual table that formats the result set that is returned from
+the VSAM file. This step runs a query against the sample VSAM file. The job
+should complete with a condition code of 0.</li>
+
+</ol></p></instructions><weight>1</weight></step></workflow>
