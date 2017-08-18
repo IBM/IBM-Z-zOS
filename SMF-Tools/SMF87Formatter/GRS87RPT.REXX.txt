@@ -1,0 +1,350 @@
+/*REXX-----------------------------------------------------------------
+ ENQ Report from SMF87 Records
+ 
+ Copyright 2017 IBM Corp.                                          
+                                                                  
+ Licensed under the Apache License, Version 2.0 (the "License");   
+ you may not use this file except in compliance with the License. 
+ You may obtain a copy of the License at                           
+                                                                   
+ http://www.apache.org/licenses/LICENSE-2.0                        
+                                                                   
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS, 
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ See the License for the specific language governing permissions and 
+ limitations under the License.                                   
+ ---------------------------------------------------------------------*/
+ parse upper arg parms
+ numeric digits 20
+ Signal on novalue
+ trace O
+ call initialize
+ call process_parms(parms)
+ call process_smf_data
+exit 0
+ 
+/*---------------------------------------------------------------------
+ ---------------------------------------------------------------------*/
+initialize: procedure expose __.
+  __. = ''
+  __.0border = copies('-',70)
+  __.0IncludeTimes = 0
+  __.0IncludeTest = 0
+  __.0IncludeScope = 4
+  __.0dlm = ' '
+  return
+/*---------------------------------------------------------------------
+ ---------------------------------------------------------------------*/
+process_parms:    procedure expose __.
+  parse UPPER arg locparms
+  If index(locparms,'TIMES') > 0 then
+  __.0IncludeTimes = 1
+  If index(locparms,'TEST') > 0 then
+  __.0IncludeTest = 1
+  If index(locparms,'SCOPE') > 0 then
+    do
+      parse locparms . 'SCOPE('zzz')' .
+      If zzz = 'STEP' then
+         __.0IncludeScope = 1
+      If zzz = 'SYSTEM' then
+         __.0IncludeScope = 2
+      If zzz = 'SYSTEMS' then
+         __.0IncludeScope = 3
+    end
+  If index(locparms,'DLM(') > 0 then
+    do
+      parse VAR locparms . 'DLM(' __.0dlm ')' .
+    end
+  return
+/*---------------------------------------------------------------------
+ ---------------------------------------------------------------------*/
+process_smf_data: procedure expose __.
+  "CALL 'SYS1.LINKLIB(IFASMFDP)'"
+  "REPRO IFILE(DUMPOUT) OFILE(WORKSMF)"
+  "EXECIO * DISKR  WORKSMF ( FINIS STEM SMF."
+  drop GRS_OUT.
+  count = 1
+  j = 1
+  AlphaNumNat='.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@#$0123456789'
+  say date() time() "GRS Report => read " smf.0 "input records"
+  /*-------------------------------------------------------------------
+   -------------------------------------------------------------------*/
+  do i = 1 to  smf.0
+     line      = smf.i
+  /* trace r*/
+     say c2x(substr(line,1,4)) c2x(substr(line,5,4)) c2x(substr(line,9,4)) c2x(substr(line,13,4)) ,
+         c2x(substr(line,17,4)) c2x(substr(line,21,4)) c2x(substr(line,25,4)) c2x(substr(line,29,4))
+    /*-----------------------------------------------------------------
+     The standard SMF record header with subtypes . . .
+     We're ignoring SMFxLEN (Offset 00) and SMFxSEG (Offset 02) since
+     the IDCAMS PRINT utility doesn't include the record length and
+     segment descriptor fields.
+     ----------------------------------------------------------------*/
+    SMFxFLG = binary_b(line,offset(4),1)
+    PARSE VAR SMFxFLG ,                             /* Parse out the bits     */
+      1 dummy1   +1,                                /* unused                 */
+      2 SMF87FST +1,                                /* Subtypes defined       */
+      3 dummy3   +1,                                /* unused                 */
+      4 dummy4   +1,                                /* unused                 */
+      5 dummy5   +1,                                /* unused                 */
+      6 dummy6   +1,                                /* unused                 */
+      7 dummy7   +1,                                /* unused                 */
+      8 dummy8   +1                                 /* unused                 */
+    rectype = binary_d(line,offset(5),1)  /* SMFxRTY: Record type    */
+    subtype = binary_d(line,offset(22),2) /* SMFxSTP: subrec type    */
+    If SMF87FST = 0 then
+    say 'Line:' right(i,6,'0') 'Record Type:' rectype
+    Else
+    say 'Line:' right(i,6,'0') 'Record Type:' rectype 'Subtype:' subtype
+    /*-----------------------------------------------------------------
+     -----------------------------------------------------------------*/
+    if (rectype = 87) & subtype = 2 then do;
+      SMFxTME = smftime(line,offset(6),4)
+      SMFxDTE = smfjdate(line,offset(10),4)
+      olddate = substr(smfxdte,3,2)||,         /* YYYY.DDD in YYDDD   */
+                substr(smfxdte,6,3)
+      Datum   = date('S',olddate,'J')          /* Date Conversion     */
+      SMF87SID = ebcdic(line,offset(14),4)    /* SMF87SID: System ID  */
+   /* trace r */
+      SMF87DEF_REQ_off = binary_d(line,offset(28),4) /* section length*/
+      SMF87DEF_REQ_len = binary_d(line,offset(32),2) /* section offset*/
+      SMF87DEF_REQ_NUM = binary_d(line,offset(34),2) /* section number*/
+      SMF87DEF_DATA_Off = binary_d(line,offset(36),4) /* section length*/
+      SMF87DEF_DATA_Len = binary_d(line,offset(40),2) /* section iffset*/
+      SMF87DEF_DATA_Num = binary_d(line,offset(42),2) /* section number*/
+ 
+      do K = 1 to SMF87DEF_REQ_NUM
+         SMF87REQ_ASID=binary_x(line,SMF87DEF_Req_Off+Offset(28),2)
+         SMF87REQ_JOB=ebcdic(line,SMF87DEF_Req_Off+Offset(36),8)
+         SMF87REQ_TCB=binary_x(line,SMF87DEF_Req_Off+Offset(32),4)
+         SMF87REQ_PSW=binary_x(line,SMF87DEF_Req_Off+Offset(84),8)
+         SMF87REQ_TimeStart=binary_d(line,SMF87DEF_Req_Off+Offset(45),8) /* 8 bytes of TOD, from 1 byte into ETOD */
+         SMF87REQ_TimeComp =binary_d(line,SMF87DEF_Req_Off+Offset(61),8) /* 8 bytes of TOD, from 1 byte into ETOD */
+ 
+         SMF87DATA_FL1=binary_x(line,SMF87DEF_DATA_Off+Offset(12),1)
+ 
+         SMF87DATA_FL2=binary_b(line,SMF87DEF_DATA_Off+Offset(13),1)
+         /* 08x - Obtain, 20x - SHR*/
+         SMF87DATA_Scope=binary_d(line,SMF87DEF_DATA_Off+Offset(14),1)
+         /* Scope:  1=step, 2=system,3=systems */
+         SMF87DATA_RnameLen=right(binary_d(line,SMF87DEF_DATA_Off+Offset(15),1),3,'0')
+         SMF87DATA_ReqType =RIGHT(binary_d(line,SMF87DEF_DATA_Off+Offset(16),1),2,'0')
+         /* ReqType: 0=NONE, 2=RET=HAVE, 7 TEST */
+         SMF87DATA_Qname   =ebcdic(line,SMF87DEF_DATA_Off+Offset(28),8)
+         SMF87DATA_Rname   =ebcdic(line, ,
+                              SMF87DEF_DATA_Off+Offset(36),SMF87DATA_RnameLen)
+         If Pos(left(SMF87DATA_Rname,1),alphanumnat) = 0 then
+           SMF87DATA_Rname   =binary_x(line, ,
+                              SMF87DEF_DATA_Off+Offset(36),SMF87DATA_RnameLen)
+ 
+         SMF87DATA_FL2_e = ''
+         If SMF87DATA_ReqType = 7 Then
+           SMF87DATA_FL2_e = SMF87DATA_FL2_e||'Tst'
+         Else
+           If substr(smf87data_FL2,5,1)='1' then
+             SMF87DATA_FL2_e = SMF87DATA_FL2_e||'Obt'
+           Else
+             SMF87DATA_FL2_e = SMF87DATA_FL2_e||'Rel'
+         If substr(smf87data_FL2,3,1)='1' then
+           SMF87DATA_FL2_e = SMF87DATA_FL2_e||'Shr'
+         Else
+           SMF87DATA_FL2_e = SMF87DATA_FL2_e||'Exc'
+ 
+         SMF87DEF_REQ_OFF = SMF87DEF_REQ_OFF+ SMF87DEF_REQ_LEN /*
+                                                 section offset       */
+         SMF87DEF_DATA_OFF = SMF87DEF_DATA_OFF+ SMF87DEF_DATA_LEN /*
+                                                 section offset       */
+         If SMF87DATA_ReqType = 7 Then
+           say 'Debug:Test Request!'
+         If SMF87DATA_ReqType/= 7 | ,
+               __.0IncludeTest = 1 Then
+           If __.0IncludeScope = 4 | ,
+             SMF87DATA_Scope = __.0IncludeScope Then
+            do
+             j=j+1
+             GRS_out.j = datum||__.0dlm||SMFxTME||__.0dlm||SMF87SID||__.0dlm||,
+                    SMF87REQ_JOB||__.0dlm||,
+                    SMF87REQ_ASID||__.0dlm||,
+                    SMF87REQ_TCB||__.0dlm||,
+                    SMF87REQ_PSW||__.0dlm||,
+                    SMF87DATA_FL1||__.0dlm||,
+                    SMF87DATA_FL2||__.0dlm||,
+                    SMF87DATA_FL2_e||__.0dlm||,
+                    SMF87DATA_Scope||__.0dlm||,
+                    SMF87DATA_RnameLen||__.0dlm||,
+                    SMF87DATA_ReqType||__.0dlm||,
+                    SMF87DATA_Qname||__.0dlm||,
+                    SMF87DATA_Rname
+             if __.0IncludeTimes then
+               GRS_out.j = GRS_OUT.j||__.0dlm||,
+                    TodDateTime(SMF87REQ_TimeStart)||__.0dlm||,
+                    TodDateTime(SMF87REQ_TimeComp)
+            end
+          end
+      trace o
+ 
+    /*-----------------------------------------------------------------
+     -----------------------------------------------------------------*/
+      count = count + 1
+    end
+  end
+  GRS_out.0 = count
+  say GRS_out.0' Records written'
+  GRS_out.1 = 'DATE'||__.0dlm||'TIME'||__.0dlm||'SMF'||__.0dlm||'SYS'||__.0dlm||'ASID'||__.0dlm||'TCB'||__.0dlm||,
+               'PSW'||__.0dlm||'F1'||__.0dlm||'F2'||__.0dlm||'F2-e'||__.0dlm||'Sc'||__.0dlm||'rln'||__.0dlm||'typ'||__.0dlm||'Qname'||__.0dlm||'Rname'
+  if __.0IncludeTimes then GRS_out.1 = GRS_out.1||__.0dlm||'obtain_time'||__.0dlm||'release_time'
+ 
+  "Execio * Diskw OUTDS (finis stem grs_out."
+ 
+  return
+/*---------------------------------------------------------------------
+ Functions:
+ 
+ These functions are from the following articles by George Ng:
+ http://ibmsystemsmag.com/mainframe/tipstechniques/applicationdevelopment/rexx_smf_part1/
+ http://ibmsystemsmag.com/mainframe/tipstechniques/applicationdevelopment/rexx_smf_part2/
+ http://ibmsystemsmag.com/mainframe/tipstechniques/applicationdevelopment/rexx_smf_part3/
+
+ The original code appears to also published here in one place: 
+ https://en.wikibooks.org/wiki/SMF_Records/How_to_Extract_Values_from_SMF_Record_Fields
+
+ ---------------------------------------------------------------------*/
+/*---------------------------------------------------------------------
+ Function: OFFSET
+ Input: Field offset (decimal) per SMF Reference (SA22-7630, Chapter 14)
+ Output: Input offset minus three
+   To get the correct offset into the SMF input line, subtract three
+   bytes. These three bytes consist of:
+   2 bytes, to account for RDW not being present
+   1 byte, because in Rexx, indices begin at position 1, not zero
+ ---------------------------------------------------------------------*/
+offset: procedure
+  arg this_offset
+  return (this_offset-3)
+/*---------------------------------------------------------------------
+ Function: Binary_d
+ Returns : Decimal
+ ---------------------------------------------------------------------*/
+binary_d: procedure expose __.
+  parse arg $dumpline,$offset,$field_length
+  this_field = substr($dumpline,$offset,$field_length)
+  translated_field = x2d(c2x(this_field))
+  return (translated_field)
+/*---------------------------------------------------------------------
+ Function: Binary4_d  --> for negative Values in 4 Byte binary fields
+ Returns : Decimal
+ ---------------------------------------------------------------------*/
+binary4_d: procedure expose __.
+  parse arg $dumpline,$offset,$field_length
+  this_field = substr($dumpline,$offset,$field_length)
+  translated_field = x2d(c2x(this_field),8)
+  return (translated_field)
+/*---------------------------------------------------------------------
+ Function: Binary_h
+ Returns : Decimal
+ ---------------------------------------------------------------------*/
+binary_h: procedure expose __.
+  parse arg $dumpline,$offset,$field_length
+  this_field = substr($dumpline,$offset,$field_length)
+  translated_field = x2d(c2x(this_field))
+  return (translated_field)
+/*---------------------------------------------------------------------
+ Function: Binary_x
+ Returns : Hexadecimal
+ ---------------------------------------------------------------------*/
+binary_x: procedure expose __.
+  parse arg $dumpline,$offset,$field_length
+  this_field = substr($dumpline,$offset,$field_length)
+  translated_field = c2x(this_field)
+  return (translated_field)
+/*---------------------------------------------------------------------
+ Function: Binary_b
+ Returns : Binary
+ ---------------------------------------------------------------------*/
+binary_b: procedure expose __.
+  parse arg $dumpline,$offset,$field_length
+  this_field = substr($dumpline,$offset,$field_length)
+  translated_field = x2b(c2x(this_field))
+  return (translated_field)
+/*---------------------------------------------------------------------
+ Function: Packed
+ ---------------------------------------------------------------------*/
+packed: procedure expose __.
+  parse arg $dumpline,$offset,$field_length
+  translated_field = binary_x($dumpline,$offset,$field_length)
+  return (translated_field)
+/*---------------------------------------------------------------------
+ Function: EBCDIC
+ Returns:  EBCDIC
+ ---------------------------------------------------------------------*/
+ebcdic: procedure expose __.
+  parse arg $dumpline,$offset,$field_length
+  this_field = substr($dumpline,$offset,$field_length)
+  return (this_field)
+/*---------------------------------------------------------------------
+ Function: Smftime
+ Returns: hh:mm:ss
+ ---------------------------------------------------------------------*/
+smftime: procedure
+  parse arg $dumpline,$offset,$field_length
+  _time     = binary_d($dumpline,$offset,$field_length)
+  hundreths = _time % 100
+  hh        = hundreths % 3600
+  hh        = RIGHT("0"||hh,2)
+  mm        = (hundreths % 60) - (hh * 60)
+  mm        = RIGHT("0"||mm,2)
+  ss        = hundreths - (hh * 3600) - (mm * 60)
+  ss        = RIGHT("0"||ss,2)
+  this_time = hh||":"||mm||":"||ss
+  return (this_time)
+/*---------------------------------------------------------------------
+ Function: Smfjdate
+ Returns: Julian date yyyy.ddd
+ Per SMF documentation, SMFxDTE is the date when the record was moved
+ into the SMF buffer, in the form 0cyydddF where
+   c   is 0 for 19xx and 1 for 20xx
+   yy  is the current year (0-99)
+   ddd is the current day (1-366)
+   F   is the sign)
+ ---------------------------------------------------------------------*/
+smfjdate: procedure
+  parse arg $dumpline,$offset,$field_length
+  this_field = c2x(substr($dumpline,$offset,$field_length))
+  parse value this_field with 1 . 2 c 3 yy 5 ddd 8 .
+  if (c = 0) then
+    yyyy = '19'||yy
+  else
+    yyyy = '20'||yy
+  julian_date = yyyy||'.'||ddd
+  return (julian_date)
+/*---------------------------------------------------------------------
+ Function: TodDateTime
+ Returns: 27 char Human readable date/time
+ ---------------------------------------------------------------------*/
+TodDateTime: procedure expose __.
+  parse arg tod_val    /* input TOD in decimal */
+ 
+  tod_val = tod_val /*  + CvtLDTO - CVTLSO */
+  useconds = tod_val % 4096
+  seconds = useconds % 1000000
+  days = seconds % 86400
+  seconds = seconds // 86400
+  useconds = right(useconds // 1000000,6,0)
+  day = date('N',days+693595,'B')
+  hours = right(seconds % 3600,2,0)
+  minutes = right((seconds - hours * 3600) % 60,2,0)
+  seconds = right(seconds // 60,2,0)
+  htime = day hours':'minutes':'seconds'.'useconds
+  return (htime)
+ 
+Novalue:
+   Say ' Error Text       = 'Errortext(rc)
+   Say ' Line in Error    = 'Sourceline(sigl)
+   say ' Context: '
+   If sigl-2 > 0 then say sourceline(sigl-2)
+   If sigl-1 > 0 then say sourceline(sigl-1)
+   say sourceline(sigl)
+   say sourceline(sigl+1)
+   say sourceline(sigl+2)
+Exit 12
