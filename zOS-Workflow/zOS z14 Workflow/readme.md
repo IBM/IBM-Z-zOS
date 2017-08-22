@@ -9,8 +9,11 @@ The workflow contains the same valuable information as the z/OS Migration book, 
 
 **Important information**
 
-* Transfer the file as binary using File Transfer Protocol (FTP).
+Transfer the appropriate two files as binary using File Transfer Protocol (FTP), and store them in the same z/OS UNIX directory:
 
-We welcome any contributions or feedback on anything you find. Keep in mind, there are no warranties for any of the files or contributions that you find here. This is a z/OS community that is sharing with others and it is expected that you review what you are using in your environment. 
-To report a problem, or provide suggestions or comments, contact zosmig@us.ibm.com. 
+    * z14_zOS_Migration-Level1.0.xml
+    * HC_rexx.txt
+ 
+We welcome any contributions or feedback on anything you find. Keep in mind, there are no warranties for any of the files or contributions that you find here. This is a z/OS community that is sharing with others and it is expected that you review what you are using in your environment. This tool is not supported by the IBM Service organization, but rather by the tool owner on a best-can-do basis.
 
+Please report any problems, suggestions, or comments to zosmig@us.ibm.com.
