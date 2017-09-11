@@ -16,7 +16,6 @@
 /* limitations under the License.                                   */
 /*********************************************************************/     
 -->
-
 <workflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../workflow/schemas/workflow_v1.xsd">
 	<workflowInfo>
 		<workflowID>00000001</workflowID>
@@ -72,6 +71,33 @@
 	<label>User's Email</label>
 	<abstract>User's Email address</abstract>
 	<description>Please enter you Email for further contact and FTP results to IBM</description>
+	<category>String Variables</category>
+	<string>
+	    <default>xxx@yourcompany.com</default>
+	</string>
+</variable>
+<variable name="ftpHostName" scope="instance">
+	<label>Host name of the FTP server for data uploading to IBM</label>
+	<abstract>FTP host name</abstract>
+	<description>Please enter the FTP host name for data uploading to IBM</description>
+	<category>String Variables</category>
+	<string>
+	    <default>TESTCASE.BOULDER.IBM.COM</default>
+	</string>
+</variable>
+<variable name="ftpUserName" scope="instance">
+	<label>User name on FTP server, or 'anonymous' if the FTP server accepts anonymous login.</label>
+	<abstract>User name</abstract>
+	<description>Please enter your user name, or 'anonymous' if the FTP server accepts anonymous login.</description>
+	<category>String Variables</category>
+	<string>
+	    <default>anonymous</default>
+	</string>
+</variable>
+<variable name="ftpPassword" scope="instance">
+	<label>Password on FTP server, or your email in the case of anonymous login.</label>
+	<abstract>Password.</abstract>
+	<description>Please enter your password, or your email in the case of anonymous login. </description>
 	<category>String Variables</category>
 	<string>
 	    <default>xxx@yourcompany.com</default>
@@ -408,7 +434,7 @@ END</inlineTemplate>
 						  </tr>
 						  <tr>
 							<td width=30px></td>
-							<td><code>ADD HIS OMVS(UID(123) HOME('/var/his'))</code></td>
+							<td><code>ADDUSER HIS OMVS(UID(123) HOME('/var/his'))</code></td>
 						  </tr>
 					</table>
 					</p>
@@ -676,6 +702,8 @@ END</inlineTemplate>
 				<p>At the appropriate time during the measurement (which should take place during specific time(s) such as Peak Hours),
 				issue the following z/OS Command to start CPU Measurement Facility Data Collection:
 				</p> 
+				<p>The directory '/var/his/SAMPLE_YYMMDD_HHmm' in the following examples need be created first.
+				</p> 
 				<p>For Diagnostic Sample Data collection (use this if sending data to IBM):
 					<table>
 					  <tr>
@@ -890,7 +918,9 @@ END</inlineTemplate>
 			]]></description> 
 			<variableValue name="sourceDir" scope="instance" required="true"/>
 			<variableValue name="hispaxzFile" scope="instance" required="true"/>
+			<!--
 			<variableValue name="useremail" scope="instance" required="true"/>
+			-->
 			<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>
 			<weight>10</weight>
 		</step>
@@ -992,24 +1022,25 @@ exit 8]]></inlineTemplate>
 				</p>
 			]]></description> 
 			<prereqStep name="Compress_HIS_Directory"/>
+			<variableValue name="ftpHostName" scope="instance" required="true"/>
+			<variableValue name="ftpUserName" scope="instance" required="true"/>
+			<variableValue name="ftpPassword" scope="instance" required="true"/>
 			<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>
 			<weight>10</weight>
 			<autoEnable>true</autoEnable>
 			<template>
 				<inlineTemplate substitution="true">//****************************************************************                                      
 //* FTP PARMS                                                                   
-//* TESTCASE.BOULDER.IBM.COM ANONYMOUS                                          
-//* /toibm/mvs/                               
 //****************************************************************              
 //FTPSTEP EXEC PGM=FTP,REGION=0M,                                               
-// PARM='9.123.251.181 (EXIT'                                        
+// PARM='${instance-ftpHostName} (EXIT'                                        
 //NETRC DD SYSOUT=*                                                             
 //SYSMDUMP DD SYSOUT=*                                                          
 //SYSPRINT DD SYSOUT=A                                                          
 //OUTPUT DD SYSOUT=*                                                            
 //INPUT DD *                                                                    
-WORKFLOW
-HISWKFLW                                                                       
+${instance-ftpUserName}
+${instance-ftpPassword}                                                                       
 cd TEST
 bin                                                                             
 put '${instance-hispaxzFile}'                                                   
@@ -1047,4 +1078,4 @@ quit</inlineTemplate>
 			<weight>10</weight>
 		</step>
 	</step>
-</workflow>	
+</workflow>
