@@ -15,7 +15,7 @@ Modules are provided for the following:
 
 * [z/OS V2.3](zOS-V2.3-Education)
 
-* [Hints and Tips for Java on zOS] (Hints and Tips for Java on zOS) 
+* [Hints and Tips for Java on zOS](Hints and Tips for Java on zOS) 
 
 Your feedback is welcome. 
 
