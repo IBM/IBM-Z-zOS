@@ -1,0 +1,140 @@
+Using ACIF Exits                                                                
+                                                                                
+  ACIF exits may be written in any language that supports standard              
+System 370 (MVS) calling sequence, that is, on entry to the exit                
+register 1 points to the address of a parameter list, which in turn             
+contains the address of the exit's parameter block. All registers must          
+be saved and restored by the exit program.  For AIX users this                  
+interface is somewhat different, but the passed argument is still the           
+exit's parameter block.                                                         
+                                                                                
+  ACIF uses the name of the exit, as given in it's associated control           
+statement, to LOAD the exit routine during initialization. ACIF will            
+then CALL the routine at the loaded entry address. There is no                  
+explicit initialization call, but each exit is called at termination            
+with no input data but with the EOF indicator set.                              
+                                                                                
+  If the exit is written in a high-level language that must initialize          
+a runtime library (such as COBOL), you should indicate to the runtime           
+routines that they should only be initialized once to avoid the                 
+penalty of repeated initialization at each call.                                
+                                                                                
+  If your routine requires saving data across invocations, you may              
+use the 16 byte work area passed in the parameter block to anchor any           
+storage you require.  This storage should then be released when ACIF            
+indicates EOF.  ACIF cannot release any storage acquired by an exit,            
+but it will release the storage for the work area after the EOF call            
+to the exit.  The work area is allocated by ACIF before the first               
+invocation of the exit, and remains until after EOF.  Each exit                 
+currently receives a different work area.                                       
+                                                                                
+Input Exit                                                                      
+                                                                                
+  The Input exit is called once after each input record is read by              
+ACIF.  If there are no input records in the input file, the exit is             
+not called.  This means that if you intend to insert all the input              
+records at the input exit rather than from a file, you must still               
+provide a file with at least one dummy record, which your exit can              
+replace.  It is currently not possible to avoid ACIF's attempt to open          
+the input file.                                                                 
+                                                                                
+  After the last record has been read and processed and the input file          
+is at end-of-file, the input exit will be called one last time with             
+the EOF indicator set.  The pointer to the input record and to the              
+print file attributes will be invalid at this point. The contents of            
+the request flag will be ignored when the exit returns control to               
+ACIF. Only the work area pointer will be valid. You may use this last           
+call for any cleanup (closing files, releasing storage, etc.)  that             
+your program requires.                                                          
+                                                                                
+Output Exit                                                                     
+                                                                                
+  The Output exit is called for each record before it is written to             
+the output file.  If there are no input records the output exit will            
+not be called.  ACIF outputs complete MO:DCA pages as groups of                 
+records.  This means that enough input must have been processed to              
+complete a full page before the output exit will be driven.  If a               
+terminating error occurs before the first page is complete, the output          
+exit may never be called.                                                       
+                                                                                
+  You may alter or delete records at the Output exit.  However, if you          
+change the length of a record or delete a record, the index object              
+will not properly reflect byte and record counts and offsets.                   
+                                                                                
+  All output to the output file may be suppressed by flagging each              
+record for deletion.  You may write output records to your own file or          
+process it in any way necessary.  If the length and number of records           
+has not been changed, the index file will be accurate.  However, ACIF           
+will still attempt to open and close the output file, so at least a             
+dummy file must be provided.                                                    
+                                                                                
+  After the last record has been written and the input file is at               
+end-of-file, the output exit will be called one last time with the EOF          
+indicator set.  The pointer to the output record and to the print file          
+attributes will be invalid at this point. The contents of the request           
+flag will be ignored when the exit returns control to ACIF. Only the            
+work area pointer will be valid. You may use this last call for any             
+cleanup (closing files, releasing storage, etc.)  that your program             
+requires.                                                                       
+                                                                                
+Index Exit                                                                      
+                                                                                
+  The Index exit is called each time an index object record is to be            
+written.  If no indexing is performed (no TRIGGER1 control statement            
+or no index records present in an input AFPDS file), the index exit             
+will not be driven.  If a terminating error occurs before the first             
+index is complete, the index exit may never be called, or a complete            
+index may not be constructed.                                                   
+                                                                                
+  You may alter or delete records at the Input exit.  Be careful of             
+altering the index structure in such a way as to make a syntactically           
+invalid index.  Index Elements (IELs) contain record and byte offsets           
+to the beginning of a Group or page, and a count of the number of               
+bytes and records in each object.  If these values are altered the              
+index may no longer be synchronized with the corresponding output               
+file.                                                                           
+                                                                                
+  All output to the index file may be suppressed by flagging each               
+record for deletion.  You may process the index records to create a             
+different index form, such as a index file or database entries.                 
+However, ACIF will still attempt to open and close the index file, so           
+at least a dummy file must be provided.                                         
+                                                                                
+  After the last record has been written and the input file is at               
+end-of-file, the index exit will be called one last time with the EOF           
+indicator set.  The pointer to the index record and to the print file           
+attributes will be invalid at this point. The contents of the request           
+flag will be ignored when the exit returns control to ACIF. Only the            
+work area pointer will be valid. You may use this last call for any             
+cleanup (closing files, releasing storage, etc.)  that your program             
+requires.                                                                       
+                                                                                
+Resource Exit                                                                   
+                                                                                
+  The Resource exit is called whenever a new resource is encountered.           
+It will be called only once for each type of resource with the same             
+name.  The exit will only be called for resource types named in the             
+RESTYPE control statement.  It will not be called for FORMDEF or                
+PAGEDEF.  Since only one FORMDEF can be used for an input file, and it          
+is required, the saving of the FORMDEF in the resource object is                
+controlled by the RESTYPE statement.  The PAGEDEF is used to format             
+line data files, and has no meaning for converted MO:DCA data, so it            
+is not saved.  Both the FORMDEF and PAGEDEF names are available to the          
+resource exit as part of the print file attributes.                             
+                                                                                
+  The Resource exit can only control the inclusion of resources in the          
+resource object.  It does not receive the actual resource records.              
+There is at present no facility in ACIF to intercept records written            
+to the resource object.                                                         
+                                                                                
+  The Resource exit can be useful for producing a list of resources             
+used in a print file, or to control inclusion of specific resources,            
+such as sensitive segments or overlays.                                         
+                                                                                
+  After the last record has been written and the input file is at               
+end-of-file, the resource exit will be called one last time with the            
+EOF indicator set.  The resource name and to the print file attributes          
+will be invalid at this point. The contents of the request flag will            
+be ignored when the exit returns control to ACIF.  Only the work area           
+pointer will be valid. You may use this last call for any cleanup               
+(closing files, releasing storage, etc.)  that your program requires.           
