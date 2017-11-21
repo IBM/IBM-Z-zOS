@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="workflow_v1.xsd">                          
+		  
+	<workflowInfo>
+	<workflowID isCallable="system" scope="system">izodatune</workflowID><workflowDescription>Tuning and allocating resources for IBM Open Data Analytics for zOS</workflowDescription>
+		<workflowVersion>1</workflowVersion>
+		<vendor>IBM</vendor>	</workflowInfo>
+<step name="Step1"><title>How to use this workflow</title><description>To use this workflow, note the following:<ul><li><b>Take ownership!</b>  Make sure that you have ownership of workflow steps that you want to perform, and assign other steps to the appropriate users, 
+using the <b>Assignment and Ownership</b> action in the Workflow Steps table. 
+Taking ownership is important, because without it you will not see the <b>Perform</b> tab, which contains the meat of the instructions for each step. <p>If you're the owner of the workflow, you can take ownership of all steps. 
+If you were assigned one or more steps by the owner, you can take ownership of those steps.</p><p>Do the following:
+<ul><li>From the table listing the steps for the workflow (the Workflow Steps table), select the step or steps to be owned by you. This action is disabled if the step is not assigned to you. </li>
+<li>Click <b>Actions</b>, then select <b>Assignment and Ownership</b> > <b>Take Ownership</b>. The Take Ownership window is displayed. This page includes the Selected Steps table. 
+You can expand this section to review the steps for which this action applies. </li>
+<li>Optionally, enter a comment in the Comments field to document this action. </li>
+<li>Click OK to complete the transfer of step ownership to yourself. </li></ul>
+</p></li><li><b>Expand all steps for ease of navigation:</b> You might find it easier to navigate through all the steps in the workflow if you expand the view so that all the sub-steps show as follows:
+<ol>
+<li>Click <b>Actions</b>, then select <b>Select All</b>.</li>
+<li>Click <b>Actions</b>, then select <b>Expand</b>.</li></ol></li>
+<li><b>Track your progress:</b> When you have performed the work of a step, click the <b>Finish</b> box below the instructions to track your progress through the workflow. 
+This also takes you back out to the list of steps for the workflow so that you are ready to go on to the next one.</li>
+<b>Substeps:</b> To navigate to the substeps contained within a step, click on the workflow title of the workflow at the top of the screen. 
+Although the sub-steps are listed below the step, you cannot navigate to the sub-steps from within a step.<p>Note that a step containing substeps does not include a <b>Perform</b> tab.</p></ul></description><instructions>Congratulations! If you can read this, you have successfully taken ownership of this workflow step!</instructions><weight>1</weight></step><step name="Step2"><title>Introduction to tuning and allocating resources for IBM Open Data Analytics for z/OS Spark</title><description>This workflow describes what to consider when tuning and allocating resources for IBM Open Data Analytics for z/OS Spark. 
+<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Spark workload performance depends on multiple factors: the application itself, the type and amount of data it consumes, and the environment in which it runs.  
+This workflow guides a z/OS system programmer through considerations when configuring a Spark cluster, and allows a system programmer to minimally configure a Spark cluster with enough 
+resources to run the Spark examples and perform basic tests. It also provides guidance and steps for application developers and system programmers to assess their specific resource needs over time.
+<p>For more information, see <a href="http://www-03.ibm.com/support/techdocs/atsmastr.nsf/WebIndex/WP102684">Resource Tuning Recommendations for IBM z/OS Platform for Apache Spark</a>.
+</p></instructions><weight>1</weight></step>
+<step name="Step3"><title>Perform steps in the Install and Configure IBM Open Data Analytics for z/OS Spark Software workflow</title><description>Perform the steps in the <cite>Install and Configure IBM Open Data Analytics for z/OS Spark Software</cite> workflow.</description><instructions>Perform the steps in the <cite>Install and Configure IBM Open Data Analytics for z/OS Spark Software</cite> workflow.</instructions><weight>1</weight></step><step name="Step4"><title>Determine how much memory and processors you need for Spark</title><description>A Spark cluster typically has multiple processes, each running in its own Java™ virtual machine (JVM). The following list describes the most significant processes: 
+<ul><li>The master daemon allocates resources across applications.</li>
+<li>The worker daemon monitors and reports resource availability and, when directed by the master, spawns executors. The worker also monitors the liveness and resource consumption of the executors.</li>
+<li>The executor performs the actual computation and data processing for the application.</li>
+<li>The driver program runs the main function of the application and creates a <code>SparkContext</code>.
+</li></ul><p>The master and worker are long-running processes started by a system programmer and are generally lightweight. By contrast, the executors, acting on behalf of an application, attempt to use all available system resources by default, 
+unless constrained by Spark settings and z/OS controls. This workflow helps you put those controls in place.</p><p>The executors work on behalf of a Spark application, but it is likely that planned Spark application resource requirements are not yet fully known. 
+This workflow will demonstrate how to monitor Spark usage over time, such that you can adjust and grow these settings later, if needed.</p><p>The driver process can either run on behalf of the user that is invoking the Spark application, inheriting their z/OS resource limits (if in client deploy mode), or use the back-end cluster resources 
+(if in cluster deploy mode.)  It is important to understand from your Spark application developers how they plan to deploy their Spark applications so that you 
+can ensure adequate resources on the back-end cluster. Generally speaking, client deploy mode tends to be used while application developers are creating and 
+building their applications (for example, using Jupyter notebooks or interactive spark-shell.)  When their application is ready to go into production, often, cluster deploy mode is then used.  
+Start with a configuration for client deploy mode and measure the resources needed, changing the cluster resources accordingly, 
+when moving an application deployment to cluster deploy mode.</p><p>IBM Open Data Analytics for z/OS Spark has both a Spark component and an MDS component. This workflow covers the Spark component.</p></description><step name="subStep4_1"><title>Figure out how much memory you need for Spark</title><description>Figure out how much memory you need for Spark.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>To figure out how much memory you need for Spark, consider the available white space on your system.  
+Use the z/OS console command <code>D M=STOR</code> to display the status of central storage. <p>To avoid paging, Spark's memory shouldn't exceed the following equation:</p><p><code>Total System memory - (memory that is needed for MDS) - (memory that is needed for subsystems that are used with Spark, like Db2) - (memory that is required for other work on the system)</code></p><p>Note that with SPE APAR OA50845 you can constrain Spark's memory use and paging to within a subset, or pool, of memory, such that your calculation becomes:
+</p><p><code>System Pool memory - (memory that is needed for MDS) - (memory that is needed for subsystems that are used with Spark, like Db2) - (memory that is required for other work on the system)
+</code></p><p>The minimum amount of memory that is needed to get started for one cluster with one executor and one concurrent user running Spark examples in client deploy mode is 
+6 GB for a Spark cluster itself (separate from the other components in a Spark environment, like MDS and Db2).  </p><p>Use the following table to estimate storage that is needed:
+<table frame="box"><tr><th>Component</th><th>Default</th><th>Getting started (samples, eduction)</th></tr>
+<tr><td>Spark Master</td><td>1 GB</td><td>1 GB</td></tr>
+<tr><td>Spark Worker</td><td>1 GB</td><td>1 GB</td></tr>
+<tr><td>Spark Driver</td><td>1 GB</td><td>2 GB</td></tr>
+<tr><td>Spark Executor</td><td>1 GB</td><td>2 GB</td></tr>
+<tr><td>Total</td><td>4 GB</td><td>6 GB</td></tr></table></p></instructions><weight>1</weight></step><step name="subStep4_2"><title>Decide how many processors to use for Spark</title><description>Decide how many processors to use for Spark.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions><p>Use the z/OS console command <code>D M=CORE</code> to display processor information.</p><p>Spark workloads are zIIP-eligible. Configuring Spark to use more cores than the zIIPs available (over committing) might cause spillover to general purpose processors.  
+With SPE APAR OA50845, there is no zIIP to GCP spill at a service class level. An entire Spark cluster can be in a Service Class, preventing spill to GCPs.</p><p>The minimum number of processors needed for one cluster with one executor and one concurrent user running Spark examples in client deploy mode are 2 zIIPs and 1 GCP. 
+Include 1 GCP for data sources that are not zIIP-eligible, and to cover the small percentage of work within Spark that isn't zIIP-eligible.</p></instructions><weight>1</weight></step></step><step name="Step5"><title>Determine how many Spark applications you would like a Spark cluster to concurrently support</title><description>Determine how many Spark applications you would like a Spark cluster to support concurrently. IBM Open Data Analytics for z/OS Spark runs in a stand-alone cluster with a single worker.  
+Multiple Spark applications can run concurrently on the worker if the available memory and processors meet the application specifications.<p>By default, a Spark application tries to use all cores on the z/OS system. This means that by default there can only be 1 application running at a time.</p><p>The number of concurrent applications is controlled by how the executors are configured. The following are the primary factors controlling the number of executors that are started for each Spark application:
+<ul>
+<li>The number of cores and amount of memory available on the worker node, set by the Spark administrator.</li>
+<li>The number of cores and amount of memory that is requested by the application, set by the Spark application developer, but restricted by a combination of Spark cluster settings and z/OS controls. </li></ul></p><p>A z/OS system programmer can set defaults, forcing a user's application to either fail or wait if they attempt to exceed the entire resources for the cluster.  
+However, note that by design Spark does not prevent a single user from using all the resources that are allocated to the entire cluster.</p><p>You can also run multiple Spark clusters instead of configuring a Spark cluster for multiple applications. This can be beneficial if:
+<ul>
+<li>You have applications with different workload priorities (production vs. development). While a single cluster supporting multiple applications of different priorities can be configured, 
+separate clusters can simplify the configuration and administration of your cluster as priority requirements change.</li>
+<li>You have applications with greatly varying resource (memory/cpu) requirements. By default, a cluster configuration has the same setting for all its applications. 
+Individual users can submit applications with different resource requirements, but balancing those calculations over time can become complex.</li>
+<li>You want to isolate workloads for security reasons or because of the nature of the data being analyzed.</li></ul></p><p>This workflow configures a single cluster, but can be repeated for each planned cluster. It is possible that you won't know how many concurrent applications to support.  
+In this case, understand that the default configuration for a cluster supports only one concurrent application at a time. Change your configuration, accordingly, as your requirements change.</p>  </description><step name="Step5_1"><title>Additional factor to consider in deciding how many executors to use</title><description>Consider additional factors when deciding how many executors to use in support of multiple concurrent applications, or a single application using multiple executors.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>Consider these additional factors when deciding how many executors to use in support of multiple concurrent applications, or a single application using multiple executors:
+<ul>
+<li>There is some startup cost that is associated with initializing a new Java Virtual Machine. 
+Each executor runs within its own JVM so the total overhead associated with JVM startup increases with each executor added.</li>
+<li>Garbage collection costs can be higher for large heaps. If an application requires a lot of heap space, the use of more executors with smaller heaps, in place of fewer executors with 
+larger heaps, can reduce the amount of garbage collection overhead.  
+<p>Note that IBM Java can typically run with large heaps (100 GB) with little garbage collection overhead, allowing the JVM heap size on z/OS to be larger than you might attempt 
+on other platforms.</p>
+Time that is spent in garbage collection time can be monitored in the Spark application's web UI.</li>
+<li>Efficient Spark applications are written to allow a high degree of parallelism. 
+The use of multiple executors can avoid the contention that can occur when too many threads run in parallel within the same JVM.  </li>
+<li>Some increased overhead exists when sharing data (shuffle) among executors.</li></ul></instructions>
+<weight>1</weight></step></step><step name="Step6"><title>Modify memory and processor defaults for Spark components, applications, users, and environment</title><description>Now that you identified how much memory and how many processors you want to use for Spark, you can go on to configure those settings, 
+both in Spark and using existing z/OS controls. <p><cite>Figure 5</cite> in <a href="https://www.ibm.com/support/knowledgecenter/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_t_configmemcpu.htm">Configuring memory and CPU options</a> in <cite><a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/toc.htm">IBM Open Data Analytics for z/OS Installation and Customization Guide</a></cite>, 
+shows Spark resource settings, their defaults (in parentheses), and their scopes (within the dashed lines). In this figure: <ul><li>The cluster is started by user <code>SPARKID</code>.</li>
+<li>Two users, Dottie and Larry, plan to submit applications to the cluster. </li></ul> 
+This workflow doesn't assume that exactly two users are being configured, 
+but demonstrates two users so you can observe the scope of settings when multiple users are involved. z/OS constraints, such as
+address space size (<code>ASSIZEMAX</code>) and amount of storage above the 2-gigabyte bar (<code>MEMLIMIT</code>) apply to these processes, as usual.</p></description><step name="Step6_1"><title>Modify the Spark configuration to control memory and core resource usage</title><description>Modify the Spark configuration to control memory and core resource usage.</description><step name="Step6_1_1"><title>Configure Spark to control memory settings for the Spark master and worker </title><description>Configure Spark to control memory settings for the Spark master and worker.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Spark has a configuration property, <code>SPARK_DAEMON_MEMORY</code>, 
+that controls the amount of memory to allocate for each of its daemon-like processes, specifically, the master, worker, and optional history server.  
+Determine the amount of memory you want to set aside for these processes. The default is 1 GB, which is satisfactory for most workloads.
+<p>You can alter this setting in <code>spark-env.sh</code> using the following command (for example, to change to 2 GB):</p><p><code>export SPARK_DAEMON_MEMORY=2g</code></p><p>Note that there is no corresponding processor (cores) setting for Spark daemon processes.</p><p>For more information about <code>SPARK_DAEMON_MEMORY</code> and other daemon settings, see 
+<a href="http://spark.apache.org/docs/2.1.1/spark-standalone.html">Spark Standalone Mode</a>.</p></instructions><weight>1</weight>
+</step><step name="Step6_1_2"><title>Restrict the total amount of memory and processors available</title><description>Restrict the total amount of memory and processors available in the Spark cluster for all Spark application usage. <p>See the <b>Perform</b> workflow tab for further instructions.</p> </description><instructions>Restrictions on the total amount of memory and processors available in the Spark cluster for all Spark application usage are enforced by limit totals on the Spark executors, 
+which are controlled by Spark worker settings. Two Spark environment variables, SPARK_WORKER_MEMORY and SPARK_WORKER_CORES, 
+can be used to restrict the amount of memory and the number of cores the worker can assign to its executors. <ul>
+<li>The default setting for SPARK_WORKER_CORES is all the cores on the z/OS system.</li>
+<li>The default setting for SPARK_WORKER_MEMORY is the total memory of the z/OS system minus 1 GB.</li></ul><p>Update the spark-env.sh file with the amount of memory and cores that are estimated from workflow steps 4.1 and 4.2 for these environment variables, respectively.
+</p><p>For more information about these Spark configuration settings, see 
+<a href="http://spark.apache.org/docs/2.1.2/spark-standalone.html">Spark Standalone Mode</a>.
+</p></instructions><weight>1</weight></step><step name="Step6_1_3"><title>Adjust Spark cluster and application settings</title><description>Adjust Spark cluster and application settings to configure how many Spark applications you would like the cluster to be able to run concurrently.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Setting the <code>spark.cores.max</code> property in <code>spark-defaults.conf</code> to a smaller number than <code>SPARK_WORKER_CORES</code> increases the number of applications that can run 
+concurrently. For example, assuming there is only 1 worker, and <code>SPARK_WORKER_CORES=15</code> 
+(set in <code>spark-env.sh</code>) and <code>spark.cores.max</code> is set to 5, then 3 applications can run concurrently in the Spark cluster.<p>The number of executors for a specific application is the smaller of:
+<ul>
+<li>The number of cores for the application (<code>spark.cores.max</code>) divided by the number of cores per executor (<code>spark.executor.cores</code>).</li>
+<li>The amount of memory the worker is allowed to use (<code>SPARK_WORKER_MEMORY</code>) divided by the amount of memory per executor (<code>spark.executor.memory</code>).
+</li></ul><ol>
+<li>For the cluster, set <code>spark.cores.max</code> and/or <code>spark.deploy.defaultCores</code> accordingly, based on the value already set for <code>SPARK_WORKER_CORES</code>
+and the number of concurrent applications that are identified in workflow Step 4, <cite>Determine how many Spark applications you would like a Spark cluster to concurrently support</cite> .</li>
+<li>For a Spark application, executor settings are controlled through the following Spark properties: 
+<ul><li><b>spark.executor.memory</b> (default is 1 GB)</li>
+<li><b>spark.executor.cores</b> (default is all cores)</li>
+<li><b>spark.cores.max</b> (default is spark.deploy.defaultCores if set, otherwise infinite)</li>
+<li><b>spark.deploy.defaultCores</b> (default is infinite).</li></ul>
+</li></ol></p><p>Instruct your Spark users NOT to set these higher than the values you intend or they see out of memory errors, or potentially prevent concurrent applications from running on the cluster.   
+As a reminder, these values can be set within an application, on the command line, or in <code>spark-defaults.conf</code>.</p></instructions><weight>1</weight></step><step name="Step6_1_4"><title>Configure memory and processor options for Apache Spark applications</title><description>Configure memory and processor options for Apache Spark applications.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>In addition to executor settings, there are Spark properties that control memory settings for the driver process (where the SparkContext is created).  
+<p><ul><li><b>spark.driver.memory</b> controls the amount of memory this driver process can use. The default is 1 GB.</li>
+<li><b>spark.driver.maxResultSize</b> limits of the total size of serialized results of all partitions for each Spark action. 
+Jobs fail if the size of the results is above this limit. Having a high limit can cause out-of-memory errors in the driver.</li>
+<li><b>spark.driver.cores</b> property controls the number of cores to use for the driver (only applicable to cluster deploy mode.)</li></ul></p><p>For information about setting Spark properties and environment variables, see <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_r_memcpuconfigopts.htm">Memory and CPU configuration options</a>
+ in <cite><a href=" https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/toc.htm">IBM Open Data Analytics for z/OS Installation and Customization Guide</a></cite>.</p></instructions><weight>1</weight></step>
+
+</step><step name="Step6_2"><title>Modify z/OS configuration to control memory and core resource use</title><description>Modify the z/OS configuration to control memory and core resource usage.</description><step name="Step6_2_1"><title>Restrict virtual memory available to Spark address spaces.  </title><description>You can enforce a hard cap on the amount of memory available to a single Spark address space by setting MEMLIMIT on the user ID 
+under which Spark runs (SPARK ID), as well as for user ID's running Spark applications.</description><step name="Step6_2_1_1"><title>Configure the Spark Cluster</title><description>Configure the Spark Cluster so that each cluster process will have separate memory limit settings.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>A Spark cluster consists of a number of jvm processes, each of which run under the SPARK ID:
+<ul>
+<li><b>master</b> - long running process that accepts connections from Spark applications.</li>
+<li><b>worker</b> - long running process that manages the compute resources for the cluster and creates executors.</li>
+<li><b>executor</b>  - one or more processes that run Spark application logic, and are only created and running when needed (during the application lifetime).  
+The total number of executors is configured by the Spark admin.</li></ul>
+Rather than setting a memory limit for the entire address space under which these processes run, a memory limit can be effectively 
+set for each process by configuring each to run in a separate address space.  
+Separate address spaces allow you to separately use the maximum amount of memory that is specified by the <code>memlimit</code> of the SPARK ID.  
+This configuration can help you calculate and control the estimated memory usage, and help prevent out-of-memory errors.<p>Use the following syntax from within z/OS UNIX System Services (for example, in <code>spark-env.sh</code>) to set the <code>_BPX_SHAREAS</code> parameter:</p><p><code>export _BPX_SHAREAS=NO</code></p><p>You must restart the master and worker for this change to take effect.</p> This procedure forces the system to create a new address space for every (JVM) process that is started from that ID, each with potential access to the amount of memory specified by <code>MEMLIMIT</code>.
+</instructions><weight>1</weight></step><step name="Step6_2_1_2"><title>Adjust the memory limit and Address Space size for the SPARK ID</title><description>Adjust the memory limit (<code>MEMLIMIT</code>) and Address Space size for the SPARK ID.<p>See the <b>Perform</b> workflow tab for further instructions.</p> </description><instructions>Set the <code>MEMLIMIT</code> in the OMVS segment of the security profile for the SPARK ID to the largest JVM heap size (typically <code>spark.executor.memory</code>) 
+plus the amount of native memory needed (2G might be a good starting point.)<p>Spark has the ability to use off-heap storage, which is configured through Spark property <code>spark.memory.offHeap.enabled</code>. This is disabled by default. 
+If you enable use of off-heap storage, the <code>MEMLIMIT</code> should also account for this memory, which would be set in Spark by <code>spark.memory.offHeap.size</code>, in <code>spark-defaults.conf</code>.</p><p>The <code>MEMLIMIT</code> for a user ID can be set by using the <code>ALTUSER</code> RACF command. For more information about the <code>ALTUSER</code> command, see 
+<a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.icha400/altuser.htm">ALTUSER (Alter user profile)</a> in <cite><a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.icha400/toc.htm">z/OS Security Server RACF Command Language Reference</a></cite>.</p><p>To check the <code>memlimit</code> setting for your SPARK ID, while logged in as the SPARK ID you can issue the <code>ulimit</code> command:</p><p><code>/bin/ulimit -a
+core file         8192b
+cpu time          unlimited
+data size         unlimited
+file size         unlimited
+stack size        unlimited
+file descriptors  1500
+address space     unlimited
+memory above bar  16384m
+</code></p><p>MEMLIMIT can also be set by other means which take precedence.  For more information, see 
+<a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieaa500/limo.htm">Limiting the use of private memory objects</a> in <cite><a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieaa500/toc.htm">z/OS MVS Programming: Extended Addressability Guide</a></cite>. </p><p><ul>
+<li>If an IEFUSI exit is used, make sure that exceptions are made for SPARK jobs. For more information about IEFUSI, see 
+<a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieae400/usi.htm">IEFUSI — Step Initiation Exit</a> in <cite><a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieae400/toc.htm">z/OS MVS Installation Exits</a></cite>.</li>
+<li>Check to see whether MEMLIMIT is being set on a JOB or EXEC statement for Spark work.</li></ul></p><p>Also, ensure that the address space size and other z/OS UNIX settings are large enough. 
+Specifically, make sure your BPXPRMxx settings (or the individual overwrites) meet the recommended minimums for Java. For more information, see <a href="https://www.ibm.com/support/knowledgecenter/SSYKE2_8.0.0/com.ibm.java.zos.80.doc/user/zos_bpxprm.html">Working with BPXPRM settings</a> in 
+<cite><a href="https://www.ibm.com/support/knowledgecenter/SSYKE2_8.0.0/com.ibm.java.zos.80.doc/homepage/plugin-homepage-java.html">IBM SDK, Java Technology Edition z/OS User Guide</a></cite>.</p><p>For more information, see 
+<a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.bpxb200/stepse.htm">Steps for setting process limits in z/OS UNIX</a> and 
+<a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.bpxb200/defsysli.htm">Defining system limits</a> in 
+<cite><a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.bpxb200/toc.htm">z/OS UNIX System Services Planning</a></cite>.</p></instructions><weight>1</weight></step><step name="Step6_2_1_3"><title>Adjust the MEMLIMIT for the user IDs submitting applications to the cluster</title><description>Adjust the <code>MEMLIMIT</code> for the user IDs submitting applications to the cluster. <p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Adjust the <code>MEMLIMIT</code> for the user IDs submitting applications to the cluster.  
+The <code>MEMLIMIT</code> should be larger than <code>spark.driver.memory</code> (1G by default, 2G minimum suggested), if running in client deploy mode.  
+If running in local mode (not using a remote cluster at all), the memory requirements are higher since all the logic that is normally run on a cluster is run locally.  
+For a base configuration (education and running examples), 6 GB should be a sufficient minimum for local mode. <p>Ensure that the z/OS UNIX limits for the application developer meet the minimum requirements for java. 
+See 
+<a href="https://www.ibm.com/support/knowledgecenter/SSYKE2_8.0.0/com.ibm.java.zos.80.doc/user/zos_bpxprm.html">Working with BPXPRM settings</a> in 
+<cite><a href="https://www.ibm.com/support/knowledgecenter/SSYKE2_8.0.0/com.ibm.java.zos.80.doc/homepage/plugin-homepage-java.html">IBM SDK, Java Technology Edition z/OS User Guide</a></cite>.
+</p></instructions><weight>1</weight></step></step><step name="Step6_2_2"><title>Configure WLM to manage priorities for your Spark workload </title><description>Configure WLM to manage priorities for your Spark workload and restrict the physical memory and processor usage.
+<p>With WLM SPE APAR OA50845, the physical memory limit for a Spark cluster can be restricted.  
+Spark address spaces can be defined to a WLM resource group, and the physical memory for that resource group can be set by WLM memory limit on that resource group.
+</p></description><step name="Step6_2_2_1"><title>Verify that you have set _BPX_SHAREAS=NO</title><description>Verify that you have set <code>_BPX_SHAREAS=NO</code>, before starting the Spark cluster, 
+to ensure each of the spawned Spark processes runs in its own address space.</description>
+<instructions>Verify that you have set <code>_BPX_SHAREAS=NO</code>, before starting the Spark cluster, 
+to ensure each of the spawned Spark processes runs in its own address space.</instructions><weight>1</weight></step><step name="Step6_2_2_2"><title>Assign different job names to the Spark processes</title><description>Assigning unique job names to Spark processes can help to identify the purpose of each process, correlate a process to an application, and facilitate the grouping of processes into a WLM service class. Use Spark properties and the <code>_BPX_JOBNAME</code> environment variable to assign job names to executors, drivers, and other Spark processes.</description><step name="Step6_2_2_2_1"><title>Using _BPX_JOBNAME to assign job names to Spark processes</title><description>User environment variable <code>_BPX_JOBNAME</code> to assign different job names to the Spark processes or address spaces.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Setting <code>_BPX_JOBNAME</code> requires appropriate privileges.  
+<p>For more information about <code>_BPX_SHAREAS</code> and <code>_BPX_JOBNAME</code>, see the following topics in 
+<cite><a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.bpxb200/toc.htm">z/OS UNIX System Services Planning</a></cite> 
+:</p>
+<ul>
+<li><a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.bpxb200/bpxenv.htm">_BPX environment variables</a></li>
+<li><a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.bpxb200/fclass.htm">Setting up the UNIX-related FACILITY and SURROGAT class profiles</a></li>
+</ul><p>The following example shows how <code>_BPX_JOBNAME</code> can be used to assign different job names for the master and worker process before starting them:
+<code>_BPX_JOBNAME='ODASM1A' /usr/lpp/IBM/izoda/spark/spark211/sbin/start-master.sh
+sleep 5
+export _BPX_SHAREAS=NO
+_BPX_JOBNAME='ODASW1A' /usr/lpp/IBM/izoda/spark/spark211/sbin/start-slave.sh spark://127.0.0.1:7077</code></p><p>As the executor processes usually consume a large amount of system resources, IBM recommends that
+you set <code>_BPX_SHAREAS=NO</code> for easier resource management and isolation. It also increases the available resources for the executor.</p><p>To set the job name for the executors in the submitting user's Spark configuration (for example, <code>$SPARK_HOME/conf/spark-defaults.conf</code>), add the following line:
+<code>spark.executorEnv._BPX_JOBNAME ODASX1A</code></p><p><b>Note:</b>
+<ul><li>The <code>$SPARK_HOME/conf/spark-defaults.conf</code> file is in ASCII. However, if you have the environment variable <code>_BPXK_AUTOCVT="ON"</code>,
+as specified in <a href="https://www.ibm.com/support/knowledgecenter/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_t_setuserid.htm">Setting up a user ID for use with z/OS Spark</a>
+in <cite><a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/toc.htm">IBM Open Data Analytics for z/OS Installation and Customization Guide</a></cite>, you can edit it without any explicit conversion needed.</li>
+<li>Only the <code>spark.executorEnv._BPX_JOBNAME</code> setting that is specified in the <code>spark-defaults.conf</code> file is honored.
+Any settings that are specified in an application or on the command line are ignored.</li></ul></p></instructions><weight>1</weight></step><step name="Step6_2_2_2_2"><title>Setting the job name of the executors</title><description>Setting the job name of the executors.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>A system programmer can specify the <code>spark.zos.executor.jobname.prefix</code> property in the <code>spark-defaults.conf</code> configuration file to define a job name prefix.
+<p>The job names of the executors consist of the defined prefix plus as many digits of the corresponding application instance number, starting from the last digit to form an 8 character job name.
+For example, if you specify the following, the job name of the executors for application 0001 is <code>SPARKX01</code>.
+<code>spark.zos.executor.jobname.prefix=SPARKX</code></p><p>The <code>spark-defaults.conf</code> files contains a default setting of <code>spark.zos.executor.jobname.prefix=ODASX</code>. If no executor is specified in the <code>spark-defaults.conf</code>
+file, the job names of the executors follow the z/OS UNIX default of a user ID with a numeric suffix. If <code>spark.executorEnv._BPX_JOBNAME</code> is specified in the <code>spark-defaults.conf</code> file,
+the <code>_BPX_JOBNAME</code> environment variable takes precedence.</p></instructions><weight>1</weight></step><step name="Step6_2_2_2_3"><title>Setting the job name of the driver in cluster deploy mode</title><description>Setting the job name of the driver in cluster deploy mode.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>A system programmer can specify the <code>spark.zos.driver.jobname.prefix</code> property in the <code>spark-defaults.conf</code> configuration file to define a job name prefix.
+<p>The <code>spark.zos.driver.jobname.prefix</code> property that is combined with some or all of the driver instance numbers, forms the job name of the driver in cluster deploy mode.
+For example, if you specify the following, the job name of the driver with a driver instance number of 0001 is <code>SPARKD01</code>.
+<code>spark.zos.driver.jobname.prefix=SPARKD</code></p><p>The <code>spark-defaults.conf</code> files contains a default setting of <code>spark.zos.driver.jobname.prefix=ODASD</code>. If no driver is specified in the <code>spark-defaults.conf</code>
+file, the job name of the driver in cluster deploy mode follows the z/OS UNIX default of a user ID with a numeric suffix.</p></instructions><weight>1</weight></step></step><step name="Step6_2_2_3"><title>Update your WLM policy to classify Spark processes </title><description>Update your WLM policy to classify Spark processes into at least one separate service class. <p>See the <b>Perform</b> workflow tab for further instructions.</p> </description><instructions>Update your WLM policy to classify Spark processes into at least one separate service class
+by specifying a classification rule for the OMVS subsystem with a qualifier of job name (TN option on the WLM panel), such as <code>SPARK1*</code>. 
+It is also recommended to use separate and combined report classes to help identifying GP and zIIP usage. <p>For more information, see the following sections in 
+<cite><a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieaw100/toc.htm">z/OS MVS Planning: Workload Management</a></cite>
+:</p>
+<ul><li>For more information about WLM classification, see 
+<a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieaw100/clsf.htm">Defining classification rules</a>.
+</li><li>For more information about WLM report classes, 
+see <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieaw100/repc.htm">Defining report classes</a>.</li>
+<li>For an example of a WLM classification scenario, see <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_c_wlmclassification.htm">Overview of WLM classification</a> in <cite><a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/toc.htm">IBM Open Data Analytics for z/OS Installation and Customization Guide</a></cite>.</li></ul></instructions><weight>1</weight></step><step name="Step6_2_2_4"><title>Configure WLM resource groups  </title><description>Configure WLM resource groups to restrict physical memory and general purpose processor usage.<p>See the <b>Perform</b> workflow tab for further instructions.</p> </description>
+<instructions>Configure WLM resource groups to restrict physical memory and general purpose processor usage. 
+A WLM resource group is a way of limiting or guaranteeing general purpose processor capacity available to one or more service classes. WLM SPE APAR OA50845 also provides the ability to 
+limit the physical memory, at a system level, consumed by all address spaces belonging to a resource group.
+For more information, see <cite>Overview of WLM classification</cite> in <cite>IBM Open Data Analytics for z/OS Spark Installation and Customization Guide</cite>.</instructions><weight>1</weight>
+</step></step><step name="Step6_2_3"><title>Ensure that your z/OS UNIX environment has sufficient memory configured </title><description>Ensure that your z/OS UNIX environment has sufficient memory that is configured for extended common service area (ECSA) and extended system queue area (ESQA).  <p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>For more information, see <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.bpxb200/scmvs.htm">Evaluating virtual memory needs</a> in 
+<cite><a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.bpxb200/toc.htm">z/OS UNIX System Services Planning</a></cite>.</instructions><weight>1</weight></step></step></step><step name="Step7"><title>Consider using SMT to improve throughput</title><description>Consider using simultaneous multithreading (SMT) to improve throughput.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>z Systems Integrated Information Processors (zIIPs) are available on z13, zEnterprise, z10 and z9 servers. By giving select workloads an alternative to running on general purpose 
+CPs, zIIPs provide both additional capacity and cost savings.
+<p>Beginning with z13, Simultaneous Multithreading (SMT) can be enabled on zIIPs. 
+Since IBM Open Data Analytics for z/OS Spark is zIIP-eligible, it can also benefit from SMT. 
+When running on a system that is configured with sufficient zIIP capacity, the benchmarks that are demonstrated in 
+<a href="http://www-03.ibm.com/support/techdocs/atsmastr.nsf/WebIndex/WP102684">Resource Tuning Recommendations for IBM z/OS Platform for Apache Spark</a> showed throughput improvements of 15-20% when SMT was turned on. 
+</p><p>Note that if you have 6 zIIPs on your system, when SMT2 is enabled, Spark recognizes that as 12 cores.</p><p>For more information about zIIPs and SMT, see <a href="http://www-03.ibm.com/systems/z/hardware/features/ziip/">IBM z Systems Integrated Information Processor (zIIP)</a>.</p></instructions><weight>1</weight></step>
+<step name="Step8"><title>Monitor your resource usage and adjust your configuration</title><description>Monitor the actual resource usage of the Spark cluster and adjust your configuration.</description><step name="Step8_1"><title>Monitor resources using Spark Web User Interfaces</title><description>Apache Spark comes with a suite of web user interfaces that allow you to monitor the status and resource consumption of your Spark cluster. 
+The application web UI is useful to identify potential performance issues with your Spark applications. <p>
+Note that some sections of the web UIs are displayed only if relevant information is available. 
+The master web UI, for example, omits the driver information section if there hasn’t been any driver running in the cluster.
+</p></description><step name="Step8_1_1"><title>Open the Master, Worker and Application Web UIs</title><description>Open the Master, Worker, and Application Web UIs. <p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>The Master Web UI provides an overview of the Spark cluster, including:
+<ul><li>Master URL and REST URL.</li>
+<li>CPUs and memory available to the Spark cluster.</li>
+<li>Worker status and its allotted resources.</li>
+<li>Information on the active and completed applications, such as their status, allotted resources, and duration.</li>
+<li>Information on the active and completed drivers, such as their status and allotted resources.</li>
+</ul><p>By default, the master’s web UI is <code>http://localhost:8080</code>. The configured location, if different than the default, is displayed when starting the master.  
+It can be found in the master log, which is:</p><p><code>$SPARK_LOG_DIR/spark-<i>userId</i>- org.apache.spark.deploy.master.Master-<i>instance</i>-<i>host</i>.out</code></p><p>where:</p><p><ul><li><i>userId</i> is the user ID that started the Master or Worker.</li>
+<li><i>instance</i> is the Master or Worker instance number.</li>
+<li><i>host</i> is the short name of the host where the Master or Worker is started.</li>
+</ul></p><p>The worker web UI and application (driver) web UI can be navigated to from the Master UI, or can be accessed directly through the following default locations:
+<ul>
+<li>Worker: <code>http://<i>host</i>:8081 </code></li>
+<li>Application (driver): <code>http://<i>host</i>:4040</code>
+</li>
+</ul></p><p>where:</p><p><i>host</i> is the short name of the host where the Master or Worker is started.</p></instructions><weight>1</weight></step><step name="Step8_1_2"><title>Use the Master Web UI to verify the amount of CPU and memory resources </title><description>Use the Master Web UI to verify the amount of CPU and memory resources that are assigned to the Spark cluster and each application.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>You can use the Master Web UI to identify the amount of CPU and memory resources that are allotted to the Spark cluster and to each application. 
+Note that each simultaneous multithreading (SMT) enabled zIIP processor is seen by Spark as having two cores.  <p>In the Master Web UI, under the <b>Workers</b> section, it shows the amount of memory and the number of cores that in use by the Spark cluster. 
+For the number of cores that are used, the web UI shows both the configured value, with the used value in parentheses, for example, 12 (12 Used). 
+Memory that is used in spark cluster is displayed under Memory column, for example, 270 GB (270 GB Used). This shows that all resources set aside for the cluster were in use.</p><p>As a reminder, the maximum resources available to the cluster are configured under these settings in spark-env.sh, and take effect when starting the worker:  <p><code>SPARK_WORKER_MEMORY=270 GB
+SPARK_WORKER_CORES=12</code> </p></p><p> This example shows that all the resources that were set aside for the cluster are in use.</p><p>For more information, see the topic on the <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_c_webUIs.htm">Spark web interfaces</a> in <cite><a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/toc.htm">IBM Open Data Analytics for z/OS Installation and Customization Guide</a></cite>.</p>
+<!--Figure TODO1 shows data from a sample Master Web UI.  Under the "Workers" section, it shows the Spark cluster is currently using 270 GB of memory and 12 cores.   
+The web UI shows both the configured value, with the used value in parentheses, for example,  "12 (12 Used)".--><p>The <b>Running Applications</b> section of the Master Web UI shows the resource being used by each application, including the cores and the memory per node (effectively, the executor).  
+As an example, if under CORES you see 12 and under Memory per Node you see 135.0 GB, the application is using 12 cores and each "node" (effectively, an executor) is using 135 GB of memory.</p><p>The following resource limits are set through the following Spark properties in <code>spark-defaults.conf</code>:<ul>
+<li><code>spark.executor.memory=135g</code></li>
+<li><code>spark.executor.cores=6</code></li>
+<li><code>spark.cores.max=12</code></li>
+</ul></p><p>A Spark administrator can supply defaults to be used by all applications, but each application (user) can attempt to override the defaults.  
+As a reminder, users are still restricted by z/OS constraints (for example, <code>MEMLIMIT</code>) and Spark cluster-side constraints (<code>SPARK_WORKER_*</code> environment variables).</p><p>Clicking the hyperlink of a worker in the <b>Workers</b> section will redirect you to a page that shows the executors running, including information about the cores and memory that is used by 
+each executor, as well as the name of the application for which the executor is performing work in the <b>Job Details</b> column.</p></instructions><weight>1</weight></step><step name="Step8_1_3"><title>Determine if an application has sufficient resources to run</title><description>Determine if an application has sufficient resources to run.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>Open the Master web UI and then start your sample application. 
+(See the topic on the <cite>Master web UI</cite>  in <cite>IBM Open Data Analytics for z/OS Spark Installation and Customization Guide</cite>.)
+From the Master Web UI main page, under <b>Running Applications</b>, check the state of your application under the <b>State</b> column.  
+If it is in RUNNING state, then it has sufficient resources to run. If your application is in a WAITING state, then it likely does not have sufficient resources to run.  
+For example, an application might request 15 cores, when only 12 cores were available to the overall cluster.  
+<p>You might also see the WAITING state when:<ul><li>Multiple applications are submitted to Spark.  
+If some are already running with all the resources currently being used, newly submitted applications wait until resource is freed up from other applications ending.  <p>Once the shortage for an application is relieved, the application runs and you see the RUNNING state in the Master web UI.</p></li><li>Constraints existing in Spark at the application layer, because of Spark settings defined.  
+Make sure that you supply adequate resources for the current number of concurrent applications, as described in Step 6 
+<cite>Modify memory and processor defaults for Spark components, applications, users, and environment</cite> of this workflow.</li>
+</ul></p><p>If you suspect that a lack of resources is occurring at the system level and starving the intended resources for Spark, 
+use RMF monitoring, as discussed in subsequent steps in this workflow.</p>
+</instructions><weight>1</weight></step></step><step name="Step8_2"><title>Tune java settings for Spark</title><description>Tune java settings for Spark.</description><step name="Step8_2_1"><title>Executor JVM heap performance considerations for a Spark application</title><description>The size of the executor heap can have a significant impact on the overall performance of a Spark application. Spark executor JVM heap is 
+divided into several different regions, including a large area used for caching results and a smaller area reserved for use during shuffle operations. 
+An extreme shortage of memory for either the data cache or shuffle work area can result in Java out-of-memory failures. 
+A larger heap allows processing to proceed but can not provide optimal performance.</description><step name="Step8_2_1_1"><title>Determine the size of the In-memory data cache needed for a Spark application</title><description>Determine the size of the In-memory data cache that is needed for a Spark application.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>Spark sets aside a certain percentage of the executor heap as a cache for RDDs and DataFrames. If the cache is too small, Spark can’t keep all the data in memory, 
+instead, acts according to the strategy dictated by the prescribed storage level. The storage level is set by the application using the 
+<a href="https://spark.apache.org/docs/1.5.1/api/java/org/apache/spark/storage/StorageLevel.html">Class StorageLevel</a> object.  
+When the storage level setting <code>MEMORY_ONLY</code> is in effect, Spark does not store a data partition if there’s insufficient memory in the cache but will, instead, drop it 
+and recalculate its contents as needed.  
+Note that <code>MEMORY_ONLY</code> is the default setting for RDDs and <code>MEMORY_AND_DISK</code> is the default setting for Datasets and DataFrames.
+<p>In the Application web UI, click the Storage tab to see whether the executor heap is large enough to cache all data. 
+See the <cite>Application web UI</cite> in <cite>IBM Open Data Analytics for z/OS Spark Installation and Customization Guide</cite>. 
+The Storage tab of the Application web UI displays the amount of data that is cached in the <b>Fraction Cached</b> column. 
+If the amount of data that is cached is under 100%, it means that the heap is not large enough to cache all the data. 
+For the best performance, it is recommended that you try to cache 100% of data.</p><p>Note that the data in the <b>Fraction Cached</b> column of the Application web UI only appears on the storage tab of the Application web UI if the spark application caches or persists the 
+DataFrame/RDD and then issues an action on the cached/persisted object.  
+The cache() and persist() APIs doesn't execute until an action command forces the issue.</p><p>You can also use the executor <code>stderr</code> log to determine whether the cache is sufficiently large to hold all the application data.  
+Messages such as below indicate that the heap is too small for 100% caching:</p><p><code>INFO CacheManager: Partition rdd_2_102 not found, computing it
+INFO MemoryStore: Will not store rdd_2_102 as it would require dropping another block from the same RDD
+WARN MemoryStore: Not enough space to cache rdd_2_102 in memory! (computed 391.0 MB so far)
+INFO CacheManager: Partition rdd_2_102 not found, computing it
+</code></p><p>For optimal performance, set storage level <code>MEMORY_ONLY</code> and allocate a large enough executor heap to keep all data in memory without being serialized.  
+This is set in the application by using the
+<a href="https://spark.apache.org/docs/1.5.1/api/java/org/apache/spark/storage/StorageLevel.html">Class StorageLevel</a> object. 
+The default for RDDs is MEMORY_ONLY, while the default for datasets and DataFrames is MEMORY_AND_DISK.  
+For more information on these settings, see 
+<a href="http://spark.apache.org/docs/2.1.1/programming-guide.html">Spark Programming Guide</a>.  
+If it's not viable to provide enough memory to cache all data in deserialized form, see 
+<a href="http://www-03.ibm.com/support/techdocs/atsmastr.nsf/WebIndex/WP102684">Resource Tuning Recommendations for IBM z/OS Platform for Apache Spark</a> for alternatives.</p></instructions><weight>1</weight></step><step name="Step8_2_1_2"><title>Determine the size needed for the In-memory shuffle work area</title><description>Spark always writes to disk during a shuffle, but does set aside a percentage of the executor heap for use as a work area during shuffle operations.  
+When the amount of shuffle memory for this work area isn’t adequate 
+for the required shuffle operations, Spark spills the excess data to disk. If the spillage is too great, performance might be impacted.</description><step name="Step8_2_1_2_1"><title>Determine whether you have sufficient memory for shuffle</title><description>Determine if you have sufficient memory for shuffle by using the executor <code>stderr</code> logs.  <p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>The executor <code>stderr</code> logs can be viewed from the Master web UI.  
+They are also located in the UNIX file system, which is configured by the setting of the <code>$SPARK_WORKER_DIR</code> environment variable, which is <code>${SPARK_HOME}/work</code> by default. 
+Note that these files are encoded in ASCII. 
+<p>Memory shortages can be detected through the following messages in the executor <code>stderr</code> log:</p><p><code>INFO ExternalSorter: Thread 106 spilling in-memory map of 824.3 MB to disk (1 time so far)
+INFO ExternalSorter: Thread 102 spilling in-memory map of 824.3 MB to disk (1 time so far)
+INFO ExternalSorter: Thread 116 spilling in-memory map of 824.3 MB to disk (1 time so far)
+</code></p></instructions>
+<weight>1</weight></step><step name="Step8_2_1_2_2"><title>Consider expanding the size of the executor heap</title><description>Consider expanding the size of the executor heap to avoid or reduce spills to disk during a shuffle.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>The default Java garbage collection policy, <code>gencon</code>, divides the Java heap into an area for older, long-lived objects (the tenured area) 
+and an area for younger, short-lived objects (the nursery). Since the objects in shuffle memory are generally short-lived, they tend to reside in the nursery section of the heap. 
+It can be possible to eliminate or reduce shuffle spill to disk by increasing the size of the nursery, by requesting a larger overall heap.  </instructions><weight>1</weight></step>
+<step name="Step8_2_1_2_3"><title>Consider modifying the percentage of the heap allocated for shuffle data</title><description>For Spark 1.5.2, if you are unable to modify the executor heap size, or modifying it is not sufficient, it is also possible to modify the percentage of the heap that is allocated for shuffle data.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>For Spark 1.5.2, if you are unable to modify the executor heap size, or modifying it is not sufficient, it is also possible to modify the percentage of the heap that is allocated for 
+shuffle data by increasing the <code>spark.shuffle.memoryFraction</code> and, 
+if necessary, simultaneously reducing the size of the data cache (<code>spark.storage.memoryFraction</code>). </instructions>
+<weight>1</weight></step></step><step name="Step8_2_1_3"><title>Size the executor heap based on the amount of data you plan to process</title><description>Size the executor heap based on the amount of data you plan to process. 
+By default, Spark reserves a percentage (54% for Spark 1.5.2) of the executor heap for caching RDDs and DataFrames. 
+Therefore, a reasonable heap size estimate should be based on the amount of memory that is required to store an application’s data in the in-memory cache.  
+When raw data is encapsulated in a Java object, the object is often larger than the size of the data it holds.  
+This expansion factor is a key element to consider when projecting how large the data cache should be.<p>
+Keep in mind that in addition to the data cache, Spark requires heap for shuffle processing and other objects created during application execution. 
+Using the data cache to size the overall heap provides a good starting point. Further adjustments might be needed, however, depending on application-specific requirements.
+</p></description><step name="Step8_2_1_3_1"><title>Measure the expansion factor.</title><description>Measure the expansion factor by persisting sample data to an RDD or DataFrame and using the Web UI Storage tab to find the in-memory size. <p>See the <b>Perform</b> workflow tab for further instructions.</p> </description>
+<instructions>Measure the expansion factor by persisting sample data to an RDD or DataFrame and using the Web UI Storage tab to find the in-memory size.  <p>If it is not possible to measure the expansion factor this way, choose a value between 2x and 5x for RDDs and 1x to 2x for DataFrames to provide a reasonable estimate.</p><p>If the expansion factor is determined, the overall heap size can be calculated using the equations below:</p><p><code>in-memory data size = (raw data size*estimated or measured expansion factor)
+executor heap = in-memory data size / fraction of heap that is reserved for cache
+executor heap = in-memory data size / 0.54 (default)
+</code></p>
+</instructions>
+<weight>1</weight></step></step><step name="Step8_2_1_4"><title>Set spark.executor.memory</title><description>Set <code>spark.executor.memory</code> accordinglybased on Steps 3 - 5 in this workflow.</description>
+<instructions>Set <code>spark.executor.memory</code> accordingly based on Steps 3 - 5 in this workflow.</instructions><weight>1</weight></step></step><step name="Step8_2_2"><title>Driver JVM heap performance considerations for a Spark application</title><description>The driver heap should be large enough to hold the application results returned from the executors. 
+Applications that use actions like “collect” or “take” and return a sizable amount of data can require large driver heaps. 
+If the data returned exceeds the size of the driver heap, the driver JVM fails with an out-of-memory error.</description><step name="Step8_2_2_1"><title>Perform a test run of the Spark application to ensure adequate memory is available</title><description>Perform a test run of the Spark application to ensure that adequate memory is available (no out-of-memory errors).  
+If you encounter errors, consider adjusting settings in the following step.</description><step name="Step8_2_2_1_1"><title>If necessary, tune the driver heap size and result set</title><description>Tune the driver heap size and the maximum size of result set returned to the driver.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>You can use Spark properties <code>spark.driver.memory </code>and <code>spark.driver.maxResultSize</code> to tune the driver heap size and the maximum size of the result set returned to the driver.   
+You can set these properties in the <code>spark-defaults.conf</code> file or in the application with the <code>SparkConf</code> object. For more information, see 
+<a href="http://spark.apache.org/docs/2.1.1/configuration.html#application-properties">Application Properties</a>.</instructions>
+<weight>1</weight></step></step>
+<step name="Step8_2_2_2"><title>If your driver process runs in its own address space, verify the driver heap size</title><description>If your driver process runs in its own address space, verify that the driver heap is smaller than or equal to <code>MEMLIMIT</code> minus 2G. <p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>The <code>MEMLIMIT</code> can be set specifically for the user ID under which the driver process runs, or it can be a system-wide default.</instructions>
+<weight>1</weight></step></step><step name="Step8_2_3"><title>Consider using the Garbage Collection and Memory Visualizer to tune the executor and driver heaps</title><description>Consider using the Garbage Collection and Memory Visualizer (GCMV) to assist in tuning the executor and driver heaps.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>GCMV is a IBM Monitoring and Diagnostic Tools. You can download it from 
+<a href="https://www.ibm.com/developerworks/java/jdk/tools/gcmv/">IBM Monitoring and Diagnostic Tools - Garbage Collection and Memory Visualizer</a>.<p>GCMV displays a wealth of information. Several of the GCMV metrics are particularly useful when evaluating the potential for improving performance through heap tuning:
+<ul>
+<li>Percent of time that is spent in garbage collection pauses and the mean and maximum pause times.</li>
+<li>Number of collections and the average duration of the interval between collections.</li>
+<li>Heap occupancy, including nursery and tenured areas and the movement of data between them.</li></ul></p><p>For additional monitoring and diagnostic tools, see <a href="https://www.ibm.com/developerworks/java/jdk/tools/">IBM developer kits</a>.</p>
+</instructions>
+<weight>1</weight></step></step><step name="Step8_3"><title>Monitor resources using Resource Measurement Facility (RMF)</title><description>z/OS Resource Measurement Facility (RMF) is IBM’s strategic product for z/OS performance measurement and management. 
+It collects performance data for z/OS and Sysplex environments and generates reports that allow you to monitor and optimally tune systems according to your business needs.
+<p>RMF gathers data using three monitors:
+<ul><li>Short-term data collection with Monitor III</li>
+<li>Snapshot monitoring with Monitor II</li>
+<li>Long-term data gathering with Monitor I and Monitor III</li></ul></p><p>The system operator starts all monitors as background sessions with a variety of options that determine what type of data is collected 
+and where it is stored. For more information about setting up the RMF monitors, see 
+<cite><a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.erbb200/toc.htm">z/OS RMF User’s Guide</a></cite>.</p><p>All three RMF monitors and the Postprocessor can create reports. 
+The following sub-steps provide an overview of the reports that are most relevant to monitoring a Spark workload. 
+For complete information about RMF reports, see 
+<cite><a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.erbb500/toc.htm">z/OS RMF Report Analysis.</a></cite>.
+</p><p>For more information about the RMF reports that are most useful for z/OS Spark, see <a href="https://www.ibm.com/support/knowledgecenter/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_c_rmf.htm">Using RMF to monitor Spark workload</a> in <cite><a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/toc.htm">IBM Open Data Analytics for z/OS Installation and Customization Guide</a></cite>.
+</p><p>Note that there are other monitoring tools equivalent to RMF exist that might show similar reports.</p>
+</description><step name="Step8_3_1"><title>Use RMF reports to determine how much total memory Spark consumes</title><description>You can use the RMF Workload Activity Report (WLMGL) to calculate and summarize the total memory that is consumed by Spark over time.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>Use the RMF Workload Activity Report (WLMGL) to calculate and summarize the total memory consumed by Spark over time. 
+If the Spark master, worker, executors, and driver are running in the same service class and are the only significant users of memory in that class, you can view the storage usage by 
+Spark for that storage class. 
+The STORAGE column in this report shows the total amount of real memory that was consumed by Spark: 
+<ul>
+<li>AVG shows the average storage for the service class.</li>
+<li>TOTAL shows the total storage (in 4K frames) for the service class.</li></ul></instructions><weight>1</weight></step><step name="Step8_3_2"><title>Use RMF reports to determine how much CPU Spark consumes</title><description>Use the RMF Workload Activity Report (WLMGL) to calculate and summarize the amount of CPU used by Spark over time. <p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>Use the RMF Workload Activity Report (WLMGL) to calculate and summarize the amount of CPU used by Spark over time. See <cite>Workload Activity report</cite> in 
+<cite>IBM Open Data Analytics for z/OS Spark Installation and Customization Guide</cite> for information. The <b>APPL%</b> column of 
+this report represents the percentage of processor time. Relevant rows under <b>APPL%</b> show:<ul>
+<li>CP shows general CP usage.</li>
+<li>IIPCP shows the percentage of the processor time that is used by zIIP-eligible transactions running on general-purpose processors.
+This is a subset of the APPL % CP value.</li>
+<li>IIP shows the percentage of the processor time used by transactions executed on zIIPs.</li></ul><p>For example, assume that the Spark master, worker, executors, and driver are running in the same service class and are the only significant consumers of CPU in this class.  
+Let's assume there are 12 cores (6 zIIPS, SMT2 enabled).  The RMF Workload Activity Report shows the following under AAPL%:</p><p><code>---AAPL %---
+CP      5.73
+AAPCP   0.00
+IIPCP   5.03
+AAP     N/A
+IIP   560.66</code></p><p>In this report, the <b>APPL %</b> column represents percentage of processor time. Under <b>APPL %</b>:<ul>
+<li>The first row shows general CP usage.  
+Specifically, this example shows 5.73%, which is not ideal.  
+zIIP capacity should be configured such that this field is close to 0, indicating no spillover to GCP.  The 12 cores (6 zIIPs, SMT2 enabled) of zIIPs in this example were not enough and 
+this report demonstrates spilling over to CPs.</li>
+<li>The third row, IIPCP, almost matches the amount of time that this job was running on general CPs. This demonstrates that 5.03% of work that ran on general CPs was eligible to run on zIIPs.  
+Note that 0.70% still required some general processors, but it's minor.</li>
+<li>Lastly, IIP, shows the percentage of processor time running on zIIPs. The LPAR in this example was configured with 6 zIIPs.</li></ul></p></instructions>
+<weight>1</weight></step><step name="Step8_3_3"><title>Use RMF reports to determine how much memory is in use by Spark at peak times</title><description>Use RMF reports to determine how much memory is in use by Spark at peak times.</description><step name="Step8_3_3_1"><title>Calculate memory requirements for all address spaces </title><description>To calculate memory requirements for all address spaces during peak periods, use the Monitor III STORF (Storage Frame) report.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>To calculate memory requirements for all address spaces during peak periods, use the Monitor III STORF (Storage Frame) report.   
+Ensure that you have enough memory set aside for the executors, based on the working set (WSET) value, so you don't impact the performance of other workloads.  
+The values in the auxiliary slots (AUX SLOTS) and the paging rate (PGIN RATE) columns should be as close to 0, if not 0, for optimal performance, 
+ensuring you have enough memory for the workload and do not page.  
+
+<!--<p>With WLM SPE APAR OA50845, you can assign separate jobnames for differentapplications (executors running on behalf of an application).</p><p>The right hand side of the storage frames report shows the auxiliary slots (AUX SLOTS) and the paging rate (PGIN RATE).  
+Make sure these values are 0 for optimal performance, to ensure you have enough memory for the workload and do not page.  </p><p>For more information, see 
+<cite>Storage Frames report</cite> in <cite>IBM Open Data Analytics for z/OS Spark Installation and Customization Guide</cite>.</p>--></instructions><weight>1</weight></step><step name="Step8_3_3_2"><title>Assess 64-bit shared and 64-bit common memory peak usage for MDS</title><description>To assess 64-bit shared and 64-bit common memory peak usage for MDS, use the Monitor III STORM (Storage Memory Objects) report.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>MDS has a shared cache that uses common memory. The Monitor III STORM (Storage Memory Objects) report shows the number of frames that are consumed by shared memory 
+and common memory in the <b>--Frames--</b> column under <b>System Summary</b>.  Include this information in your assessment of total memory that is used during peak, 
+to include MDS as part of the overall assessment. 
+For more information, see <cite>Storage Memory Objects report</cite> in <cite>IBM Open Data Analytics for z/OS Spark Installation and Customization Guide</cite>.</instructions>
+<weight>1</weight></step></step><step name="Step8_3_4"><title>Check for storage delays caused by insufficient memory</title><description>Check for storage delays that are caused by insufficient memory.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>Use the Monitor III Storage Delay report to ensure that storage constraints aren’t causing memory delays. 
+In the Storage Delays report, delays are shown under the <b>DLY</b> column - if it displays zeros, the job was not delayed due to insufficient memory. If the job is delayed, you can 
+see the percentage of time the job was delayed. This number should be close to 0 for optimal performance.<p>For more information, see <cite>Storage Delays report</cite> in <cite><a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/toc.htm">IBM Open Data Analytics for z/OS Installation and Customization Guide</a></cite>.</p></instructions>
+<weight>1</weight></step><step name="Step8_3_5"><title>Make sure there is enough memory to avoid paging</title><description>Make sure there is enough memory to avoid paging.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Assess the page fault rate using the Monitor I post-processor report.
+Make sure PAGE-IN EVENTS are as close to 0.0 as possible. The following shows a report with PAGE-IN EVENTS:<p><code>
+PAGE MOVEMENT WITHIN CENTRAL STORAGE            285.55
+PAGE MOVEMENT %                                    0.0
+AVERAGE NUMBER OF PAGES PER BLOCK                  0.0
+BLOCKS PER SECOND                                 0.00
+PAGE-IN EVENTS (PAGE FAULT RATE)                  0.05 </code></p></instructions>
+<weight>1</weight></step><step name="Step8_3_6"><title>Make sure there are enough large pages to accommodate all requests</title><description>Make sure there are enough large pages to accommodate all requests:<ul>
+<li>On zEC12 and z13, use the default setting for pageable large pages. Set aside enough fixed large pages to satisfy large page requests that exceed the allocated pageable large pages. 
+Set the large frame area LFAREA parameter in the IEASYS<i>xx</i> parmlib member, as follows, where <i>xx</i> is the percentage of total real memory:<p><code>
+LFAREA=(2G=0,1M=<i>xx</i>%) 
+</code></p>The java heap performs best with 1M pages. Set LFAREA to account for the sum of all your JVMs.</li><li>Consider using FLASH Express® to further enhance large page performance.</li></ul></description><step name="Step8_3_6_1"><title>Use the RMF Paging Activity Report to evaluate large page use</title><description>Use the RMF Paging Activity Report to evaluate large page use.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>The RMF Paging Activity Report displays both fixed and pageable pages (frames) in use.</instructions>
+<weight>1</weight></step><step name="Step8_3_6_2"><title>Determine whether the large frame area (LFAREA) is the right size</title><description>Determine whether the large frame area (LFAREA) is the right size.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>Use system command <code>DISPLAY VIRTSTOR,LFAREA</code> to determine whether the LFAREA is the right size, too large, or too small. 
+Output from the command might look as follows:<p><code>
+IAR019I 18.11.54 DISPLAY VIRTSTOR  FRAME LAST
+  SOURCE = ZS
+  TOTAL LFAREA = 250675M , 0G
+  LFAREA AVAILABLE = 01127m , 0G
+  LFAREA ALLOCATED (1M) = 0M
+  LFAREA ALLOCATED (4K) = 0M
+  MAX LFAREA ALLOCATED (1M) = 0M
+  MAX LFAREA ALLOCATED (4K) = 0M
+  LFAREA ALLOCATED (PAGEABLE1M) = 159548M
+  MAX LFAREA ALLOCATED (PAGEABLE1M) = 202764M</code></p><p>This output shows:<ul>
+<li>The total size of LFAREA</li>
+<li>How much of LFAREA is available</li>
+<li>How much of LFAREA is allocated for 1M</li>
+<li>How much of LFAREA is allocated for 4K<p>Note that this value should be 0. If it is not, this indicates that the 4K memory pool was not big enough and spilled over to LFAREA for 4K memory.</p></li><li>The maximum LFAREA allocated (1M)</li>
+<li>The maximum LFAREA allocated (4K)<p>Note that the maximum is the high water mark for the life of the IPL. The 4K value should be 0, which indicates no spillover to the LFAREA for 4K requests.</p></li>
+</ul></p></instructions><weight>1</weight></step></step></step></step></workflow>

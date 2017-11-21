@@ -1,0 +1,1466 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workflow>
+    <workflowInfo>
+        <workflowID scope="system" isCallable="system">izodaic</workflowID>
+        <workflowDescription>Install and Configure IBM Open Data Analytics for zOS Spark Software</workflowDescription>
+        <workflowVersion>1</workflowVersion>
+        <vendor>IBM</vendor>
+    </workflowInfo>
+    <step name="Step0">
+        <title>How to use this workflow</title>
+        <description>To use this workflow, note the following:<ul>
+                <li>
+                    <b>Take ownership!</b>  Make sure that you have ownership of workflow steps that you want to perform, and assign other steps to the appropriate users, 
+using the <b>Assignment and Ownership</b> action in the Workflow Steps table. 
+Taking ownership is important, because without it you will not see the <b>Perform</b> tab, which contains the meat of the instructions for each step, 
+instructions you'll need to complete the workflow task.. <p>If you're the owner of the workflow, you can take ownership of all steps. 
+If you were assigned some or all steps by the owner, you can take ownership of those steps.</p>
+                    <p>Do the following:
+<ul>
+                            <li>From the table listing the steps for the workflow (the Workflow Steps table), select the step or steps to be owned by you. This action is disabled if the step is not assigned to you. </li>
+<li>Click <b>Actions</b>, then select <b>Assignment and Ownership</b> --&gt; <b>Take Ownership</b>. The Take Ownership window is displayed. This page includes the Selected Steps table. 
+You can expand this section to review the steps for which this action applies. </li>
+<li>Optionally, enter a comment in the Comments field to document this action. </li>
+<li>Click OK to complete the transfer of step ownership to yourself. </li>
+<li>
+<b>Did these instructions work?</b> To verify that these instructions worked, check to see if the <b>Perform</b> tab is not grayed out, and that when you click on it, you see 
+information in the <b>Perform</b> tab. </li>
+                        </ul>
+</p>
+                </li>
+                <li>
+                    <b>Expand all steps for ease of navigation:</b> You might find it easier to navigate through all the steps in the workflow if you expand the view so that all the sub-steps show as follows:
+<ol>
+<li>Click <b>Actions</b>, then select <b>Select All</b>.</li>
+<li>Click <b>Actions</b>, then select <b>Expand</b>.</li>
+                    </ol>
+                </li>
+<li>
+                    <b>Track your progress:</b> When you have performed the work of a step, click the <b>Finish</b> box below the instructions to track your progress through the workflow. 
+This also takes you back out to the list of steps for the workflow so that you are ready to go on to the next one.
+</li>
+                <li>
+                    <b>Navigate substeps:</b> To navigate to the substeps contained within a step, click on the workflow title of the workflow at the top of the screen. 
+Although the sub-steps are listed below the step, you cannot navigate to the sub-steps from within a step.<p>Note that a step containing substeps does not include a <b>Perform</b> tab.</p>
+                </li>
+            </ul>
+        </description>
+        <instructions>Congratulations! If you can read this, you have successfully taken ownership of this workflow step!</instructions>
+        <weight>1</weight>
+    </step>
+    <step name="Step1">
+        <title>Ensure that IBM Open Data Analytics for z/OS Software requirements are met.</title>
+        <description>Ensure that you have the software requirements identified by all of the steps in this task.  
+For the latest list of software requirements, see 
+IBM Open Data Analytics for z/OS Product Details at: <a href="https://www.ibm.com/us-en/marketplace/open-data-analytics-for-zos/details#product-header-top">IBM Open Data Analytics for z/OS highlights</a>. </description>
+        <step name="subStep1_1">
+            <title>Verify that IBM z/OS V2.1, or later, is installed.</title>
+            <description>Verify that IBM z/OS V2.1, or later, is installed.</description>
+            <instructions>Verify that IBM z/OS V2.1, or later, is installed.</instructions>
+            <weight>1</weight>
+        </step>
+        <step name="subStep1_2">
+            <title>Verify that IBM 64-Bit SDK for z/OS, Java Technology Edition is installed at the correct level.</title>
+            <description>The minimum Java level that is required for IBM Open Data Analytics for z/OS is IBM 64-Bit SDK for z/OS, Java Technology Edition, Fix Version 8 Refresh 4 Fix Pack 6(Java 8 SR4 FP6). 
+However, if the RELEASE file in the Spark installation directory indicates that the product was built with a later Java level, 
+IBM recommends that you use that higher level of Java. <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>
+The default path to IBM 64-Bit SDK for z/OS Java Technology Edition V8 is 
+<code>/usr/lpp/java/J8.0_64</code>. If your path is different, make a note of it as it is used for customization later.</instructions>
+            <weight>1</weight>
+        </step>
+        <step name="Step1_3">
+            <title>Verify that bash (Bourne Again Shell) version 4.2.53 is installed.</title>
+            <description>Verify that bash (Bourne Again Shell) version 4.2.53 is installed. </description>
+            <step name="subStep1_3_1">
+                <title>Check to see if and what version of bash is installed.</title>
+                <description>Check to see if and what version of bash is installed.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>To check if and what version of bash is installed, issue the following command from z/OS UNIX (OpenSSH or OMVS):
+<p>
+                        <code>bash -version</code>
+                    </p>
+                </instructions>
+                <weight>1</weight>
+            </step>
+            <step name="subStep1_3_2">
+                <title>If bash is not found, search for it.</title>
+                <description>If you don't find bash after issuing the command in the previous step, bash might be installed but not in your PATH. <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>
+                    <ul>
+                        <li>Search your system for bash. The default path to bash 4.2.x is <code>/usr/bin/bash-4.2</code>, though your system might contain more than one instance of bash.<p>
+<b>Tip:</b> Use the <code>find</code> command to search for bash.  For example, the following command searches for all files named "bash" from the root ("/") directory:</p>
+                            <p>
+<code>find / -name "bash"</code>
+                            </p>
+                            <p>
+<b>Note: </b>This command traverses your whole system, and might take some time. You can see access errors if you issue this command from a user ID without sufficient authority to traverse and access all the directories or files in your system.
+In this case, consider narrowing the search to directories that are likely candidates for product installs (for example, <code>/usr/bin</code> or <code>/usr/lpp</code>).</p>
+                        </li>
+                        <li>Go to all the directories where you found instances of bash and run <code>./bash -version</code> to call the instance and check the version.</li>
+                    </ul>
+                </instructions>
+                <weight>1</weight>
+            </step>
+            <step name="subStep1_3_3">
+                <title>If the required version of bash is not installed, download and install the latest level of bash</title>
+                <description>If bash is not installed or a version other than 4.2.53 is installed, download the 4.2.53 level of bash. You can download bash 4.2.53 from z/OS IzODA Anaconda (FMID HANA110), or download it from Rocket z/OS Open Source Community Downloads
+(<a href="http://www.rocketsoftware.com/zos-open-source/tools">http://www.rocketsoftware.com/zos-open-source/tools</a>).<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>Download bash and follow the instructions to register with Rocket. You can then download the archive file and the "Getting Started" document.<p>Tips: The bash installation process involves the following actions:<ol>
+                            <li>Create a mount point and file system on z/OS to hold the bash files</li>
+                            <li>Upload in binary the archive file into your new file system
+<li>Extract the archive file with command <code>gzip –d filename.tar.gz</code>
+    <li>Extract the file with command <code>tar –xvfo filename.tar</code>
+    </li>
+</li>
+</li>
+                        </ol>
+                    </p>
+                </instructions>
+                <weight>1</weight>
+            </step>
+            <step name="subStep1_3_4">
+                <title>Make a note of the path to the bash /bin directory</title>
+                <description>Directories <code>/bin</code> and <code>/man</code> represent the bash shell code.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions> Make note of the path to the bash <code>/bin</code> directory for configuration later.</instructions>
+                <weight>1</weight>
+            </step>
+        </step>
+        <step name="subStep1_4">
+            <title>Verify the installation location for the env command</title>
+            <description>Apache Spark is dependent on the <code>env</code> command being located in <code>/usr/bin</code>.</description>
+            <step name="subStep1_4_1">
+                <title>Test the path for env</title>
+                <description>Test the path for <code>env</code>, in an SSH or Telnet environment. <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>To test the path for <code>env</code>, in an SSH or Telnet environment, run the following command to verify the location and contents of <code>env</code>: 
+<p>
+                        <code>/usr/bin/env</code>
+                    </p>
+The command returns a list of name and value pairs for the environment in your shell. <p>If <code>/usr/bin/env</code> does not exist, complete the following steps to set it up:<ol>
+<li>Locate the <code>env</code> program on your system. A potential location is in <code>/bin/env</code>.</li>
+<li>Create a symbolic link (symlink) so that <code>/usr/bin/env</code> resolves to the true location of <code>env</code>. For example:
+<p>
+    <code>ln -s /bin/env /usr/bin/env</code>
+</p>
+                            </li>
+<li>Optionally, in an SSH or Telnet shell environment, run the following command to verify that the symlink works:
+<p>
+    <code>/usr/bin/env</code>
+</p>
+                            </li>
+                        </ol>
+The command returns a list of name and value pairs for the environment in your shell.
+</p>
+                </instructions>
+                <weight>1</weight>
+            </step>
+            <step name="subStep1_4_2">
+                <title>Ensure that the symbolic link for the env command persists across IPLs</title>
+                <description>Ensure that the symbolic link for the <code>env</code> command persists across IPLs.
+<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>Depending on how <code>/usr/bin/</code> is configured on your system, the symbolic link that is created for <code>/usr/bin/env</code> might not persist across an IPL without additional setup. 
+Ensure that your IPL setup includes the creation of this symbolic link if needed.
+For instance, you can update your <code>/etc/rc</code> file to include the command that is used to create the symbolic link. The <code>/etc/rc</code> file is typically used to customize commands for z/OS UNIX application services.
+</instructions>
+                <weight>1</weight>
+            </step>
+        </step>
+    </step>
+    <step name="Step2">
+        <title>Ensure that IBM z/OS UNIX configuration requirements are met</title>
+        <description>Ensure that IBM z/OS UNIX configuration requirements are met</description>
+        <step name="subStep2_1">
+            <title>Verify your z/OS UNIX environment is correctly configured</title>
+            <description>Spark runs in z/OS UNIX. If it is the first time you are running applications in z/OS UNIX, see 
+<a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.bpxb200/toc.htm">z/OS UNIX System Services Planning</a> to ensure that your z/OS UNIX environment is properly configured and customized.
+<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>An example of configuring z/OS UNIX correctly for Spark is that Spark is not run as UID 0. However, if you choose to run Spark as UID 0 in an environment where multiple users are mapped to UID 0, you might encounter problems with the wrong shell profile being read and the required environment variables not being set.   
+<p>For example, <code>$HOME/.profile</code> might be read for user BOB mapped to UID 0, when you wanted the shell profile for SPARKID (also mapped to UID 0) to be read. </p>
+                <p>
+See <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.bpxb200/seca.htm">Superusers in z/OS UNIX</a> in <cite>z/OS UNIX System Services Planning</cite> for alternatives to setting multiple user IDs as UID 0.
+</p>
+            </instructions>
+            <weight>1</weight>
+        </step>
+        <step name="subStep2_2">
+            <title>Ensure that your z/OS UNIX environment has sufficient memory configured </title>
+            <description>Ensure that your z/OS UNIX environment has sufficient memory configured for extended common service area (ECSA) and extended system queue area (ESQA).  <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>See <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxb200/scmvs.htm">Evaluating virtual memory needs</a> in 
+<cite>z/OS UNIX System Services Planning</cite>.</instructions>
+            <weight>1</weight>
+        </step>
+        <step name="Step2_3">
+            <title>Optionally enable IBM Health Checker for z/OS checks for z/OS Unix and other z/OS system services</title>
+            <description>Optionally consider enabling IBM Health Checker for z/OS checks for z/OS UNIX and other z/OS system services.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>For more information, see 
+<a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.e0zl100/toc.htm">IBM Health Checker for z/OS User's Guide</a>. The following IBM Health Checker for z/OS checks might be useful for Spark:
+<ul>
+<li>RACF_UNIX_ID</li>
+<li>RSM_MEMLIMIT</li>
+<li>RSM_AFQ</li>
+<li>IEA_ASIDS</li>
+<li>USS_AUTOMOUNT_DELAY</li>
+<li>USS_FILESYS_CONFIG</li>
+<li>USS_MAXSOCKETS_MAXFILEPROC</li>
+<li>USS_CLIENT_MOUNTS</li>
+<li>USS_KERNEL_PVTSTG_THRESHOLD</li>
+<li>USS_KERNEL_STACKS_THRESHOLD</li>
+<li>VSM_CSA_THRESHOLD</li>
+<li>VSM_SQA_THRESHOLD</li>
+                </ul>
+            </instructions>
+            <weight>1</weight>
+        </step>
+    </step>
+    <step name="Step3">
+        <title>Install and customize IBM Open Data Analytics for z/OS</title>
+        <description>This task enumerates the installation and customization steps from <cite>IBM Open Data Analytics for z/OS Installation and Customization Guide</cite>.</description>
+        <step name="Step3_1">
+            <title>Install IBM Open Data Analytics for z/OS on your system</title>
+            <description>Install IBM Open Data Analytics for z/OS on your system as detailed in <a href=" https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_t_install.htm">Installing IBM Open Data Analytics for z/OS</a> in
+<cite>IBM Open Data Analytics for z/OS Installation and Customization Guide</cite>.</description>
+            <step name="Step3_1_1">
+                <title>Choose the most appropriate method for installing IBM Open Data Analytics for z/OS</title>
+                <description>Choose the most appropriate method for installing IBM Open Data Analytics for z/OS.</description>
+                <instructions>Choose the most appropriate method for installing IBM Open Data Analytics for z/OS.</instructions>
+                <weight>1</weight>
+            </step>
+            <step name="Step3_1_2">
+                <title>Installing IBM Open Data Analytics for z/OS on your system</title>
+                <description>Use the information in the Program Directory for IBM Open Data Analytics for z/OS, the PSP bucket and, if applicable, the PTF cover letter to install IBM Open Data Analytics for z/OS on your system.</description>
+                <instructions>Use the information in the Program Directory for IBM Open Data Analytics for z/OS, the PSP bucket and, if applicable, the PTF cover letter to install IBM Open Data Analytics for z/OS 
+on your system.</instructions>
+                <weight>1</weight>
+            </step>
+        </step>
+        <step name="Step3_2">
+            <title>Set up the user ID for use with z/OS Spark</title>
+            <description>Set up the user ID for use with z/OS Spark. Specifically, this is the user ID under which the Spark cluster is started, and is referred to as the SPARK ID.
+Work with your security administrator to configure the SPARK ID. The SPARK ID should be UID non-0 (not a superuser), and should not have additional access to any data 
+beyond what is required for running a Spark cluster. </description>
+            <step name="Step3_2_1">
+                <title>Ensure that the SPARK ID's OMVS segment's default shell program is set to the bash shell. </title>
+                <description>Ensure that the SPARK ID's OMVS segment's default shell program is set to the bash shell. <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>Do one of the following:<ul>
+                        <li>
+                            <b>Using an existing user ID for the SPARK ID</b>
+                            <p>If you are using an existing user ID for the SPARK ID, determine if the PROGRAM attribute of the OMVS segment is valid for the SPARK ID:
+<ol>
+    <li>Use SSH to log on using the SPARK ID.</li>
+<li>Run <code>echo $SHELL</code> and review the output.</li>
+</ol>
+<p>If bash is still not listed as the default shell for the SPARK ID, a potential reason is because <code>/etc/profile</code> is providing an explicit invocation of the shell 
+other than bash. If so, work with your system administrator to update <code>/etc/profile</code> to define the operative shell in the OMVS segment.  
+The following code provides an example of how one might override the shell set by the OMVS segment:</p>
+<p>
+    <code>if [ -z "$STEPLIB" ] &amp;&amp; tty -s;
+then
+export STEPLIB=none
+exec -a $0 $SHELL -
+fi
+</code>
+</p>
+                            </p>
+                        </li>
+                        <li>
+                            <b>Creating a new user ID for the SPARK ID</b>
+                            <p>If you are creating a new user ID for z/OS SPARK, establish the OMVS segment during creation. The following JCL example shows how to create a new user ID and group for the 
+SPARK ID "SPARKID", which is used to run z/OS Spark:
+<p>
+    <code>//SPARK JOB (0),’SPARK RACF’,CLASS=A,REGION=0M,
+//         	MSGCLASS=H,NOTIFY=&amp;SYSUID
+//*------------------------------------------------------------*/
+//RACF       	EXEC PGM=IKJEFT01,REGION=0M
+//SYSTSPRT 	DD SYSOUT=*
+//SYSTSIN  	DD *
+ADDGROUP SPKGRP OMVS(AUTOGID) OWNER(SYS1)
+ADDUSER SPARKID DFLTGRP(SPKGRP) OMVS(AUTOUID HOME(/u/sparkid) -
+PROGRAM(/shared/rocket/bash-4.2/bin/bash)) -
+NAME(’Spark ID’) NOPASSWORD NOOIDCARD
+ALTUSER SPARKID PASSWORD(SPARKID) NOEXPIRED
+/*
+</code>
+</p>
+<p>
+    <b>Notes:</b>
+</p>
+<p>
+    <ul>
+<li>AUTOGID and AUTOUID in the example are based on a local preference. Your coding might differ.</li>
+<li>Set the PROGRAM attribute to define the path to your own installation of bash 4.2.53 as noted in step 1.3.4.</li>
+</ul>
+</p>
+                            </p>
+                        </li>
+                    </ul>
+                </instructions>
+                <weight>1</weight>
+            </step>
+        </step>
+        <step name="Step3_3">
+            <title>Configure the z/OS UNIX shell environment for SPARK ID and users</title>
+            <description>Configure the z/OS UNIX shell environment for both your SPARK ID and all users of z/OS Spark. z/OS Spark requires certain environment variables to be set. </description>
+            <step name="Step3_3_1">
+                <title>Consider the scope under which you want this environment to take effect</title>
+                <description>Consider the scope under which you want this environment to take effect. <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>Consider the following: 
+<ul>
+                        <li>Do you want to configure Spark for all users or a subset of users?</li>
+<li>Do you have other java applications that require a different level of java or require different (conflicting) java settings?</li>
+                    </ul>
+At a high level, this environment can be set for all users of both shells, an individual user's shell environment, or, for some settings, only for users only when they issue Spark commands.
+<p>Minimally, the environment is required to be set up for the SPARK ID, and each user of Spark.</p>
+<p>Use the following table to decide where to set each environment variable. Note that this table applies for users with either a login shell of bash or <code>/bin/sh</code>.</p>
+<p>
+                        <table frame="box">
+                            <tr>
+<th>Set the environment variable here:</th>
+<th>If you want it to have the following scope:</th>
+                            </tr>
+                            <tr>
+<td>
+    <code>/etc/profile</code>
+</td>
+<td>All users, all the time</td>
+                            </tr>
+<tr>
+<td>
+    <code>$HOME/.profile</code> for a specific user</td>
+<td>Specific users all the time</td>
+                            </tr>
+<tr>
+<td>
+    <code>spark-env.sh</code>
+</td>
+<td>Specific users only for Spark commands</td>
+                            </tr>
+                        </table>
+                    </p>
+<p>
+                        <ul>
+                            <li>Values that are set in the <code>$HOME/.profile</code> file override the values that are set in the <code>/etc/profile</code> system file.</li>
+<li>Values that are set in <code>spark-env.sh</code> override any values that are set previously in either <code>/etc/profile</code> or <code>$HOME/.profile</code>.</li> </ul>
+                    </p>
+Take note of which files you want to update for the next step in the workflow.  
+Creation and customization of <code>spark-env.sh</code> are discussed in a later step.<p>
+                        <b>Note:</b> If the SPARK ID does not already have a <code>$HOME/.profile</code> file, create one.
+</p>
+                </instructions>
+                <weight>1</weight>
+            </step>
+            <step name="Step3_3_2">
+                <title>Edit the files that are identified in step 4.3.1 and set the environment variables</title>
+                <description>For the files that are identified in step 4.3.1, edit each to set the environment variables.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>For the files that are identified in step 4.3.1, edit each to set the environment variables as follows:
+<p>
+                        <ol>
+                            <li>Set JAVA_HOME to point to the location of IBM 64-bit SDK for z/OS Java Technology Edition V8 (as noted in step 1.2).</li>
+<li>Set PATH to include the <code>/bin</code> directory of IBM 64-bit SDK for z/OS Java Technology Edition V8. <p>
+    <b>Tip:</b> You can set this value by using $JAVA_HOME.</p>
+                            </li>
+                            <li>Set PATH to prioritize the path to the <code>/bin</code> directory of bash 4.2.53 higher than any earlier version of bash that exists on your system.  <p>
+<b>NOTE:</b> You must set PATH in either <code>/etc/profile</code> or a user's <code>$HOME/.profile</code>, not in <code>spark-env.sh</code>.</p>
+                            </li>
+                            <li>Set IBM_JAVA_OPTIONS to assign file encoding to UTF-8.</li>
+<li>Set _BPXK_AUTOCVT to ON to enable the automatic conversion of tagged files.</li>
+<li>Include an export statement to make all of the variables available to the z/OS UNIX shell environment. </li>
+                        </ol>
+                    </p>
+<p>The following example illustrates how to code a <code>.profile</code> file for the environment variable settings:</p>
+<p>
+                        <code># SPARK ID .profile
+JAVA_HOME=/shared/java/java_1.8_64
+PATH=$JAVA_HOME/bin:/shared/rocket/bash-4.2/bin:$PATH
+IBM_JAVA_OPTIONS="-Dfile.encoding=UTF8"
+_BPXK_AUTOCVT=ON
+
+#This line sets the prompt
+PS1=’$LOGNAME’:’$PWD’:’&gt;’
+
+#This line exports the variable settings
+export JAVA_HOME PATH IBM_JAVA_OPTIONS _BPXK_AUTOCVT PS1
+</code>
+                    </p>
+<b>Note:</b> The same syntax applies for <code>/etc/profile</code>, <code>$HOME/.profile</code> and <code>spark-env.sh</code>. 
+</instructions>
+                <weight>1</weight>
+            </step>
+            <step name="Step3_3_3">
+                <title>Optionally verify that the information is set properly for the SPARK environment</title>
+                <description>Optionally verify that the bash version, bash default, JAVA_HOME, file encoding and automatic conversion of tagged files are set 
+properly for the Spark environment under SPARK ID.</description>
+                <step name="Step3_3_3_1">
+                    <title>Open a new login shell for the SPARK ID</title>
+                    <description>Open a new login shell for the SPARK ID, by using OMVS or SSH.</description>
+                    <instructions>Open a new login shell for the SPARK ID, by using OMVS or SSH.</instructions>
+                    <weight>1</weight>
+                </step>
+                <step name="Step3_3_3_2">
+                    <title>Verify the bash version</title>
+                    <description>Verify that the bash version is set to 4.2.53. <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                    </description>
+                    <instructions>To verify that the bash version is set to 4.2.53 issue the command:
+<p>
+                            <code>bash -version</code>
+                        </p>
+<p>If the version returned is incorrect, check the PATH value in the <code>$HOME/.profile</code> or <code>/etc/profile</code> file that lists the latest version of the bash <code>/bin</code> directory before any other bash installations.
+</p>
+                    </instructions>
+                    <weight>1</weight>
+                </step>
+                <step name="Step3_3_3_3">
+                    <title>Verify that the bash is the default shell </title>
+                    <description>Verify that the bash is the default shell for the currently logged in SPARK ID.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                    </description>
+                    <instructions>To verify that the bash is the default shell for the currently logged in SPARK ID, issue the command:
+<p>
+                            <code>ps -p $$</code>
+                        </p>
+<p>The command returns the value of the process ID and indicates the shell program that is used, for example:</p>
+<p>
+                            <code># ps -p $$                                           
+       PID TTY       TIME CMD                        
+  33619981 ttyp0000  0:00 /usr/bin/bash-4.2/bin/bash
+</code>
+                        </p>
+<p>If the latest copy of bash is not listed, something in <code>/etc/profile</code> might be overriding the shell. Ensure that <code>/etc/profile</code> is correct.</p>
+                    </instructions>
+                    <weight>1</weight>
+                </step>
+                <step name="Step3_3_3_4">
+                    <title>Verify that JAVA_HOME is set to IBM 64-bit SDK for z/OS Java Technology Edition V8</title>
+                    <description>Verify that JAVA_HOME is set to IBM 64-bit SDK for z/OS Java Technology Edition V8.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                    </description>
+                    <instructions>To verify that JAVA_HOME is set to IBM 64-bit SDK for z/OS Java Technology Edition V8 issue the command:
+<p>
+                            <code>java -version</code>
+                        </p>
+<p>You should see output similar to:</p>
+                        <p>
+                            <code>java version "1.8.0"
+Java(TM) SE Runtime Environment (build pmz6480sr4fp2-20170322_01(SR4 FP2))
+IBM J9 VM (build 2.8, JRE 1.8.0 z/OS s390x-64 Compressed References 20170314_340265 (JIT enabled, AOT enabled)
+J9VM - R28_20170314_2309_B340265
+JIT - tr.r14.java.green_20170314_134138
+GC - R28_20170314_2309_B340265_CMPRSS
+J9CL - 20170314_340265)
+
+JCL - 20170318_01 based on Oracle jdk8u121-b13</code>
+                        </p>
+<p>If that output is not correct, or java is not found, issue:</p>
+<p>
+                            <code>echo $JAVA_HOME</code>
+                        </p>
+<p>The command returns the path to IBM 64-bit SDK for z/OS Java Technology Edition V8. </p>
+<p>If not, ensure that the JAVA_HOME value is set correctly in the <code>/etc/profile</code> or <code>$HOME/.profile</code> file.</p>
+                    </instructions>
+                    <weight>1</weight>
+                </step>
+                <step name="Step3_3_3_5">
+                    <title>Verify the correct file encoding </title>
+                    <description>Verify the correct file encoding. <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                    </description>
+                    <instructions>To verify the correct file encoding issue the command:
+<p>
+                            <code>echo $IBM_JAVA_OPTIONS</code>
+                        </p>
+
+The command output includes "<code>-Dfile.encoding=UTF8</code>". If it does not, ensure that the IBM_JAVA_OPTIONS value is set correctly in the <code>$HOME/profile</code> file.
+</instructions>
+                    <weight>1</weight>
+                </step>
+                <step name="Step3_3_3_6">
+                    <title>Verify automatic conversion of tagged files </title>
+                    <description>Verify automatic conversion of tagged files. <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                    </description>
+                    <instructions>To verify the automatic conversion of tagged files issue the command:
+<p>
+                            <code>echo $_BPXK_AUTOCVT</code>
+                        </p>
+
+<p>The command returns ON. If not, ensure that the _BPXK_AUTOCVT value is set correctly in the <code>$HOME/.profile</code> file.</p>
+                    </instructions>
+                    <weight>1</weight>
+                </step>
+            </step>
+        </step>
+        <step name="subStep3_4">
+            <title>Customize the directories and files needed by Apache Spark</title>
+            <description>This step creates the directories and files necessary for Apache Spark to write to.<p>IBM Open Data Analytics for z/OS installs Apache Spark into a z/OS file system (zFS) or hierarchical file system (HFS) directory. 
+This documentation refers to the installation directory as SPARK_HOME. The default installation directory is <code>/usr/lpp/IBM/izoda/spark/spark<i>nnn</i>
+                    </code> where <i>nnn</i> is the current Apache Spark version (for instance, /usr/lpp/IBM/izoda/spark/spark211 for Spark 2.1.1).  
+By default, Apache Spark runs from the installation directory, and most of its configuration files, log files, and working information are stored in the installation directory structure. 
+On z/OS systems, however, the use of the installation directory for all of these purposes is not ideal operating behavior. 
+Therefore, by default, IBM Open Data Analytics for z/OS installs Apache Spark in a read-only file system.</p>
+                <p>In the following steps, we describe how to set up customized directories for the Apache Spark configuration files, log files, and temporary work files.  
+While you can customize the directory structure used by Apache Spark, the examples here follow the Filesystem Hierarchy Standard (FHS).
+</p>
+                <p>Work with your system programmer who has authority to update system directories.  
+</p>
+                <p>
+                    <b>Note:</b> SPARK_HOME is an environment variable that is used by many Apache Spark scripts. 
+This variable must contain the path to the IBM Open Data Analytics for z/OS installation directory.</p>
+            </description>
+            <step name="Step3_4_1">
+                <title>Create the configuration directory</title>
+                <description>The first of these new directories to be created is the configuration directory.  
+In accordance with the Filesystem Hierarchy Standard (FHS), IBM recommends creating the new configuration directory under <code>/etc</code>. <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>
+                    <ol>
+<li>Open an OMVS or SSH shell environment and use the following command to create a new directory under <code>/etc</code> for the Apache Spark configuration files.  
+For example, you might do the following:
+<p>
+<code>mkdir -p /etc/spark/conf</code>
+                            </p>
+</li>
+<li>Provide read/write access to the new directory to the user ID that runs Apache Spark.</li>
+<li>Ensure that the SPARK_CONF_DIR environment variable points to the new directory, for example:  
+<code>export SPARK_CONF_DIR=/etc/spark/conf</code>
+</li>
+                    </ol>
+                </instructions>
+                <weight>1</weight>
+            </step>
+            <step name="Step3_4_2">
+                <title>Copy and update the Apache Spark configuration files to the new configuration directory</title>
+                <description>Copy the Apache Spark configuration files to the new configuration directory and update them. There are three main Apache Spark configuration files:
+<ul>
+                        <li>
+                            <b>spark-env.sh</b> - A shell script that is sourced by most of the other scripts in the Apache Spark installation. 
+You can use it to configure environment variables that set or alter the default values for various Apache Spark configuration settings.
+</li>
+<li>
+                            <b>spark-defaults.conf</b> - A configuration file that sets default values for the Apache Spark runtime components. 
+You can override these default values on the command line when you interact with Spark by using shell scripts. 
+</li>
+<li>
+                            <b>log4j.properties</b> - Contains the default configuration for log4j, the logging package that Apache Spark uses.  
+</li>
+                    </ul>Templates for these configuration files exist in the $SPARK_HOME/conf directory.</description>
+                <step name="Step3_4_2_1">
+                    <title>Copy the templates configuration files to your new configuration directory.</title>
+                    <description>Copy the templates configuration files to your new configuration directory.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                    </description>
+                    <instructions>Copy the templates configuration files to your new configuration directory using the following commands:
+
+<p>
+                            <code>cp $SPARK_HOME/conf/spark-env.sh.template $SPARK_CONF_DIR/spark-env.sh
+cp $SPARK_HOME/conf/spark-defaults.conf.template $SPARK_CONF_DIR/spark-	defaults.conf
+cp $SPARK_HOME/conf/log4j.properties.template $SPARK_CONF_DIR/log4j.properties
+</code>
+                        </p>
+                    </instructions>
+                    <weight>1</weight>
+                </step>
+                <step name="Step3_4_2_2">
+                    <title>Update the configuration files as necessary  </title>
+                    <description>Update the configuration files as necessary. <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                    </description>
+                    <instructions>Update the configuration files as necessary.  For configuration samples, see  
+<a href=" https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_r_sampconfigfiles.htm">Sample Apache Spark configuration files</a>
+ in <cite>IBM Open Data Analytics for z/OS Installation and Customization Guide</cite>.
+<p>
+<b>Note:</b> The <code>spark-env.sh</code> script must include environment variables that point to the working directories created next.
+This script must also be modified to export JAVA_HOME as noted in step 2.2.</p>
+                    </instructions>
+                    <weight>1</weight>
+                </step>
+            </step>
+            <step name="Step3_4_3">
+                <title>Create the remaining working directories for Apache Spark </title>
+                <description>Create the remaining working directories for Apache Spark following your file system conventions.  </description>
+                <step name="Step3_4_3_1">
+                    <title>Decide where to create the Apache Spark working directories</title>
+                    <description>Decide where to create the Apache Spark working directories. <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                    </description>
+                    <instructions>The first table in the section on 
+<a href=" https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_t_createworkdirs.htm">Creating the Apache Spark working directories</a> 
+in <cite>IBM Open Data Analytics for z/OS Installation and Customization Guide</cite> 
+contains the working directory defaults.  
+You can either take the defaults or create your own directories and configure Apache Spark to use the directories. <p>
+For more information about creating and mounting directories, see <cite>z/OS UNIX System Services User's Guide</cite>.</p>
+                        <p>
+                            <b>Note:</b> Consider mounting the $SPARK_WORKER_DIR and $SPARK_LOCAL_DIRS on separate zFS file systems to avoid uncontrolled growth on the primary zFS where Spark is located. </p>
+                    </instructions>
+                    <weight>1</weight>
+                </step>
+                <step name="Step3_4_3_2">
+                    <title>Provide read/write access to the user ID that runs Spark </title>
+                    <description>Provide read/write access to the user ID that runs Spark.  </description>
+                    <instructions>For all new directories created, provide read/write access to the user ID that runs Apache Spark. 
+</instructions>
+                    <weight>1</weight>
+                </step>
+                <step name="Step3_4_3_3">
+                    <title>Update the $SPARK_CONF_DIR/spark-env.sh script with the new environment variables </title>
+                    <description>Update the <code>$SPARK_CONF_DIR/spark-env.sh</code> script with the new environment variables that point to the new working directories. <p>See the <b>Perform</b> workflow tab for further instructions.</p> </description>
+                    <instructions>Update the <code>$SPARK_CONF_DIR/spark-env.sh</code> script with the new environment variables that point to the new working directories.  
+For example:
+<p>
+                            <code>export SPARK_WORKER_DIR=/var/spark/work
+</code>
+                        </p>
+                    </instructions>
+                    <weight>1</weight>
+                </step>
+                <step name="Step3_4_3_4">
+                    <title>Configure the working directories to be cleaned regularly </title>
+                    <description>Configure the working directories to be cleaned regularly.</description>
+                    <step name="Step3_4_3_4_1">
+                        <title>Configure Spark to perform cleanup</title>
+                        <description>By default, Spark does not regularly clean up worker directories, but can be configured to do so.  
+Change the following Spark properties in <code>spark-defaults.conf</code> to values that support your planned activity, and monitor these settings over time.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                        </description>
+                        <instructions>Monitor these settings over time:
+<p>
+<ol>
+    <li>
+        <b>spark.worker.cleanup.enabled</b> - Enables periodic cleanup of worker and application directories. This setting is disabled by default. Set to "true" to enable it.
+</li>
+<li>
+        <b>spark.worker.cleanup.interval</b> - The frequency in seconds that the worker cleans up old application work directories. The default is 30 minutes - decide whether this is adequate.
+</li>
+<li>
+        <b>spark.worker.cleanup.appDataTtl</b> - Controls how long (in seconds) to retain application work directories. The default is 7 days, which is generally inadequate if Spark jobs 
+run frequently. Decide whether this setting is adequate.
+</li>
+</ol>
+                            </p>
+<p>For more information about these properties, see 
+the following:</p>
+                            <p>
+<a href="http://spark.apache.org/docs/2.1.1/spark-standalone.html">Spark Standalone Mode</a>
+                            </p>
+                        </instructions>
+                        <weight>1</weight>
+                    </step>
+                    <step name="Step3_4_3_4_2">
+                        <title>Configure Spark to enable rolling log files</title>
+                        <description>By default, Spark retains all of the executor log files. You can change the following Spark properties in <code>$SPARK_CONF_DIR/spark-defaults.conf</code> to enable the rolling of executor log files.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                        </description>
+                        <instructions>
+                            <p>
+<ul>
+    <li>
+        <b>spark.executor.logs.rolling.maxRetainedFiles</b> - Sets the number of latest rolling log files that are going to be retained by the system. Older log files are deleted. The default is to retain all of the log files.
+</li>
+<li>
+        <b>spark.executor.logs.rolling.time.interval</b> - Sets the time interval by which the executor logs are to be rolled over. Valid values are: <ul>
+            <li>Daily</li>
+            <li>Hourly</li>
+            <li>Minutely</li>
+            <li>Any number of seconds</li>
+        </ul>
+</li>
+<li>
+        <b>spark.executor.logs.rolling.maxSize</b> - Sets the maximum file size, in bytes, by which the executor logs are to be rolled over. For more information about these properties, see <a href="http://spark.apache.org/docs/2.1.1/configuration.html">Spark Configuration</a>.</li>
+<li>
+        <b>spark.executor.logs.rolling.strategy</b> - Sets the strategy for the rolling of executor logs. By default, this setting is disabled. The following values are valid:<ul>
+            <li>
+                <b>time</b> - Time-based rolling. Use spark.executor.logs.rolling.time.interval to set the rolling time interval.</li>
+            <li>
+                <b>size</b> - Size-based rolling. Use spark.executor.logs.rolling.maxSize to set the maximum file size for rolling.</li>
+        </ul>
+</li>
+</ul>
+                            </p>
+                        </instructions>
+                        <weight>1</weight>
+                    </step>
+                    <step name="Step3_4_3_4_3">
+                        <title>Create jobs that clean up or archive directories</title>
+                        <description>Create jobs that clean up or archive the working directories.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                        </description>
+                        <instructions>Create jobs that clean up or archive the directories that are listed in <a href=" https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_t_createworkdirs.htm"> Creating the Apache Spark working directories</a> in <cite>IBM Open Data Analytics for z/OS Installation and Customization Guide</cite>:
+<ol>
+<li>$SPARK_LOG_DIR</li>
+<li>$SPARK_WORKER_DIR (if not configured to be cleaned by Spark properties)</li>
+<li>$SPARK_LOCAL_DIRS</li>
+                            </ol>
+                            <p>z/OS UNIX ships a sample script skulker that can be used as written, or modified to suit your specific needs, and 
+regularly scheduled to run from cron or other in-house automation tooling. See 
+<a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxa500/skulker.htm">skulker — Remove old files from a directory</a> 
+and <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxa500/crondmon.htm">cron daemon — Run commands at specified dates and times</a>
+in <cite>UNIX System Services Command Reference</cite>.</p>
+                        </instructions>
+                        <weight>1</weight>
+                    </step>
+                </step>
+                <step name="Step3_4_3_5">
+                    <title>Optionally, check all Spark file systems periodically</title>
+                    <description>Optionally, check all Spark file systems periodically. For example, check $SPARK_HOME and any file systems mounted inside or elsewhere. <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                    </description>
+                    <instructions>
+                        <ol>
+                            <li>You can associate the FSFULL BPXPRM<i>xx</i> parameter with a file system to generate operator messages as a file system reaches a user-specified threshold. See 
+<a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxb200/tfsfull.htm">Monitoring space in the TFS</a> in <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.bpxb200/toc.htm">z/OS UNIX System Services Planning</a>.</li>
+<li>Look for the number of extents, which can impact performance of the packs involved. If this needs to be addressed, create and mount a new zFS and use CopyTree, tar, or similar utilities to copy the key directories from the old to the new.  
+Then, unmount the old and mount the new in its place.</li> 
+<li>For more information, see <cite>
+    <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.idas300/dasmov.htm">Managing File System Size</a>
+</cite> in <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.idas300/toc.htm">z/OS DFSMSdfp Advanced Services</a>.</li>
+                        </ol>
+</instructions>
+                    <weight>1</weight>
+                </step>
+            </step>
+            <step name="Step3_4_4">
+                <title>Update the BPXPRMxx member with the information about the new Apache Spark file systems</title>
+                <description>Update the BPXPRM<i>xx</i> member with the information about the new Apache Spark file systems.</description>
+                <instructions>Update the BPXPRM<i>xx</i> member with the information about the new Apache Spark file systems.</instructions>
+                <weight>1</weight>
+            </step>
+        </step>
+        <step name="Step3_5">
+            <title>Install and customize MDS</title>
+            <description>Go to 
+<cite>
+                    <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/dvs_ig_tsk_srvr_cnfg.htm">Customizing the Data Service server</a>
+                </cite> and 
+<cite>
+                    <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azk_ig_tsk_inst_studio.htm">Installing the Data Service Studio</a>
+                </cite>
+ in <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/toc.htm">IBM Open Data Analytics for z/OS Installation and Customization Guide</a> to install and customize 
+MDS Data Service and Data Service Studio.</description>
+            <instructions>Go to the <cite>IBM Open Data Analytics for z/OS Data Service Server and Studio installation and customization</cite> workflow or <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/toc.htm">IBM Open Data Analytics for z/OS Installation and Customization Guide</a> to install and customize 
+MDS Data Service and Data Service Studio.</instructions>
+            <weight>1</weight>
+        </step>
+    </step>
+    <step name="Step4">
+        <title>Configure networking</title>
+        <description>Configure networking</description>
+        <step name="Step4_1">
+            <title>Configure your port settings</title>
+            <description>For your planned deployment and ecosystem, consider any port access and firewall implications 
+and consider configuring specific port settings if needed.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>For your planned deployment and ecosystem, consider any port access and firewall implications 
+based on the following ports, and consider configuring specific port settings if needed.<p>Network ports used by the Spark cluster:
+<table width="100%">
+                        <tr>
+                            <th width="3*">Port name</th>
+                            <th width="1*">Default port number</th>
+                            <th width="3*">Configuration property</th>
+                            <th width="3*">Notes</th>
+                        </tr>
+<tr>
+                            <td>Master web UI</td>
+                            <td>8080</td>
+                            <td>spark.master.ui.port or SPARK_MASTER_WEBUI_PORT</td>
+                            <td>The value set by the spark.master.ui.port property takes precedence.</td>
+                        </tr>
+<tr>
+                            <td>Worker web UI</td>
+                            <td>8081</td>
+                            <td>spark.worker.ui.port or SPARK_WORKER_WEBUI_PORT</td>
+                            <td>The value set by the spark.worker.ui.port takes precedence.</td>
+                        </tr>
+<tr>
+                            <td>History server web UI</td>
+                            <td>18080</td>
+                            <td>spark.history.ui.port</td>
+                            <td>Optional; only applies if you use the history server.</td>
+                        </tr>
+<tr>
+                            <td>Master port</td>
+                            <td>7077</td>
+                            <td>SPARK_MASTER_PORT</td>
+                            <td> </td>
+                        </tr>
+<tr>
+                            <td>Master REST port</td>
+                            <td>6066</td>
+                            <td>spark.master.rest.port</td>
+                            <td>Not needed if you disable the REST service.</td>
+                        </tr>
+<tr>
+                            <td>Worker port</td>
+                            <td>(random)</td>
+                            <td>SPARK_WORKER_PORT</td>
+                            <td> </td>
+                        </tr>
+<tr>
+                            <td>Block manager port</td>
+                            <td>(random)</td>
+                            <td>spark.blockManager.port</td>
+                            <td> </td>
+                        </tr>
+<tr>
+                            <td>Shuffle server</td>
+                            <td>7337</td>
+                            <td>spark.shuffle.service.port</td>
+                            <td>Optional; only applies if you use the external shuffle service. </td>
+                        </tr>
+</table>
+</p>
+                <p>Network ports used by the Spark driver:
+<table width="100%">
+                        <tr>
+                            <th width="3*">Port name</th>
+                            <th width="1*">Default port number</th>
+                            <th width="3*">Configuration property</th>
+                            <th width="3*">Notes</th>
+                        </tr>
+<tr>
+                            <td>Application web UI</td>
+                            <td>4040</td>
+                            <td>spark.ui.port</td>
+                            <td> </td>
+                        </tr>
+<tr>
+                            <td>Driver port</td>
+                            <td>(random)</td>
+                            <td>spark.driver.port </td>
+                            <td> </td>
+                        </tr>
+<tr>
+                            <td>Block manager port</td>
+                            <td>(random)</td>
+                            <td>spark.blockManager.port</td>
+                            <td> </td>
+                        </tr>
+</table>
+</p>
+                <p>Every time a Spark process is started, a number of listening ports are created that are specific to that process’ intended function.  
+Depending on your site policies, limit access to all ports, and permit access for specific users or applications. </p>
+                <p>
+In z/OS, you can enforce controls by using Communications Server and RACF settings.</p>
+                <p>
+Specifying PORT UNRSV DENY in your TCPIP.PROFILE denies all applications access to unreserved ports for TCP or UDP.  
+Additionally, PORT UNRSV SAF can be used to grant specific access to specific users, like the user ID starting the Spark cluster, and the users of Spark.  
+For more information about the PORT statement, see <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.2.0/com.ibm.zos.v2r2.halz001/toc.htm">z/OS Communications Server: IP Configuration Reference</a>.
+</p>
+            </instructions>
+            <weight>1</weight>
+        </step>
+        <step name="Step4_2">
+            <title> Consider planned usage of the REST server</title>
+            <description>Consider planned usage of the REST server.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>The REST server interface, which listens on port 6066 by default, is currently not in the 
+Apache Spark documentation. The REST server does not support TLS nor client authentication; however, Spark applications can be submitted through this interface. The REST server is used when applications are submitted by using cluster deploy mode (--deploy-mode cluster).
+The REST server is used when applications are submitted by using cluster deploy mode (--deploy-mode cluster). Client deploy mode is the default behavior for Spark, and is 
+how notebooks, like Jupyter Notebook, connect to a Spark cluster. Depending on your planned deployment and environment, access to this REST server might be restricted by other controls or secured using methods such as AT-TLS.  
+However, if you want to enable it, you can do so by setting <code>spark.master.rest.enabled</code> to <code>true</code>  in spark-defaults.conf.</instructions>
+            <weight>1</weight>
+        </step>
+        <step name="Step4_3">
+            <title>Configure Spark environment variables for common Enterprise networking configurations.</title>
+            <description>Configure Spark environment variables for common Enterprise networking configurations.  Each of these can be set in spark-env.sh.</description>
+            <step name="Step4_3_1">
+                <title>Set SPARK_PUBLIC_DNS to the external hostname to be used for the Spark Web UIs</title>
+                <description>Set SPARK_PUBLIC_DNS to the external hostname to be used for the Spark Web UIs.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>For environments that use Network Address Translation (NAT), set SPARK_PUBLIC_DNS to the external hostname to be used for the 
+Spark Web UIs.  SPARK_PUBLIC_DNS sets the public DNS name of the Spark master and workers.  
+This allows the Spark Master to present in the logs a URL with the hostname that is visible to the outside world.  </instructions>
+                <weight>1</weight>
+            </step>
+            <step name="Step4_3_2">
+                <title>Set the SPARK_LOCAL_IP environment for listening ports</title>
+                <description>Set the SPARK_LOCAL_IP environment variable.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>Set the SPARK_LOCAL_IP environment variable to configure Spark processes to bind to a specific and consistent IP address when creating listening ports. </instructions>
+                <weight>1</weight>
+            </step>
+            <step name="Step4_3_3">
+                <title>Set the SPARK_MASTER_HOST environment variable properly</title>
+                <description>Set the SPARK_MASTER_HOST environment variable properly.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>On systems with multiple network adapters, Spark might attempt the default setting and give up if it doesn't work.  Set the SPARK_MASTER_HOST (prior to Spark 2.0 known as SPARK_MASTER_IP) 
+environment variable to avoid this.</instructions>
+                <weight>1</weight>
+            </step>
+        </step>
+    </step>
+    <step name="Step5">
+        <title>Configuring client authentication for z/OS Spark</title>
+        <description>This task enumerates the steps to configure client authentication for z/OS Spark from IBM Open Data Analytics for z/OS Installation and Customization Guide.<p>z/OS Spark uses Application Transparent Transport Layer Security (AT-TLS) with level 2 client authentication to secure communications between the Spark master and its clients, including the Spark worker and driver. The TLS protocol relies on the digital certificates that are signed by a trusted certificate authority (CA) to authenticate the end points. For more information about AT-TLS, see <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/attls.htm">Application Transparent Transport Layer Security</a> and <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/attls_get_started.htm">Getting started with AT-TLS</a> in <cite>
+                    <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/toc.htm">z/OS Communications Server: IP Configuration Guide</a>
+                </cite>.</p>
+            <p>This workflow uses an internal CA. The configuration also uses a one-to-one certificate-to-user ID associated - one certificate maps to one user.
+
+<b>Note:</b> Client authentication is enabled by default. If you want to defer the use of client authentication, you can disable the function by setting the following property in the <code>spark-defaults.conf</code> file:</p>
+            <p>
+                <code>spark.zos.master.authenticate       false</code>
+            </p>
+        </description>
+        <step name="Step5_1">
+            <title>Creating and configuring digital certificates and key rings</title>
+            <description>This task enumerates the steps of creating and configuring digital certificates and key rings for the internal CA, Spark master, and Spark users.<p>Digital certificates can be managed through RACF, PKI Services, or other security products. If you plan to have many Spark users (50 or more), consider using PKI Services, which provides additional management functionality for larger environments.</p>
+                <p>
+                    <ul>
+                        <li>For more information about digital certificates in RACF, see <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.icha700/icha700_Planning_your_certificate_environment.htm">Planning your certificate environment</a> and <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.icha700/digsenv.htm">Setting up your certificate environment</a> in <cite>
+<a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.icha700/toc.htm">z/OS Security Server RACF Security Administrator's Guide</a>
+                            </cite>.</li>
+<li>For more information about PKI Services, see <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.ikya100/int.htm">Introducing PKI Services</a> in <cite>
+<a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.ikya100/toc.htm">z/OS Cryptographic Services PKI Services Guide and Reference</a>
+                            </cite>.</li>
+                    </ul>
+                </p>
+                <p>The following sub steps in this task provide examples of using RACF commands. The subsequent configuration steps assume the CA definitions that appear in these examples.</p>
+            </description>
+            <step name="Step5_1_1">
+                <title>Create a CA certificate</title>
+                <description>If you already configured an internal CA for use with other products, you can reuse any existing end user certificates for Spark.<p>Use RACF, PKI Services, or other security products as the CA to create a CA certificate.</p>
+                    <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>Use the following RACF command to create a CA certificate:<p>
+                        <code>RACDCERT GENCERT CERTAUTH SUBJECTSDN(OU('SPARK Local CA') O('IBM') C('US'))
+WITHLABEL('SPARK IBM Local CA') NOTAFTER(DATE(2030/01/01)) SIZE(1024)</code>
+                    </p>
+                    <p>For more information about the RACDCERT command, see <cite>
+                            <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.icha400/toc.htm">z/OS Security Server RACF Command Language Reference</a>
+                        </cite>.</p>
+                </instructions>
+                <weight>1</weight>
+            </step>
+            <step name="Step5_1_2">
+                <title>Create and connect a certificate and key ring for the Spark cluster</title>
+                <description>Create and connect a certificate and key ring for the Spark cluster. <p>The Spark cluster consists of a master process, acting as a server, which accepts connections from Spark users. It also consists of a worker process that connects to the master.</p>
+                    <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>The Spark master and the worker both run under the same user ID (SPARKID in this example), and therefore, share the same key. Perform the following:
+<ol>
+                        <li>Create a certificate for the Spark cluster that is signed by the CA.<p>
+<code>RACDCERT GENCERT ID(SPARKID) SIGNWITH(CERTAUTH LABEL('SPARK IBM Local CA'))
+KEYUSAGE(HANDSHAKE) WITHLABEL('Spark Server Cert')
+
+SUBJECTSDN(CN('SPARK TEST SERVER') O('IBM') L('Poughkeepsie')
+
+SP('New York') C('US')) NOTAFTER(DATE(2030/01/01))</code>
+                            </p>
+                        </li>
+                        <li>Create an SSL key ring for the Spark cluster.<p>
+<code>RACDCERT ADDRING(SparkClusterRing) ID(SPARKID)</code>
+                            </p>
+                        </li>
+                        <li>Connect the Spark cluster certificate to the cluster key ring.<p>
+<code>RACDCERT ID(SPARKID) CONNECT(ID(SPARKID) LABEL('Spark Server Cert')
+RING(SparkClusterRing) USAGE(PERSONAL) DEFAULT)</code>
+                            </p>
+                        </li>
+                        <li>Connect the CA certificate to the Spark cluster key ring.<p>
+<code>RACDCERT ID(SPARKID) CONNECT(CERTAUTH LABEL('SPARK IBM Local CA')
+RING(SparkCluserRing))</code>
+                            </p>
+                        </li>
+                        <li>Allow the Spark user ID (SPARKID) to access its key ring.<p>
+<code>PERMIT IRR.DIGTCERT.LISTRING CLASS(FACILITY) ID(SPARKID) ACCESS(READ)
+PERMIT IRR.DIGTCERT.LIST CLASS(FACILITY) ID(SPARKID) ACCESS(READ)</code>
+                            </p>
+                        </li>
+                    </ol>
+                    <p>Issue the following command to verify your setup:</p>
+                    <p>
+                        <code>RACDCERT LISTRING(SparkClusterRing) ID(SPARKID)</code>
+                    </p>
+                </instructions>
+                <weight>1</weight>
+            </step>
+            <step name="Step5_1_3">
+                <title>Create and connect a certificate and key ring for each Spark end user that connects to the cluster</title>
+                <description>Create and connect a certificate and key ring for each Spark end user that connects to the cluster.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>Perform the following:
+<ol>
+                        <li>Create a certificate for each end user that is signed by the CA.<p>For the end user whose user ID is SPARKUSR:</p>
+                            <p>
+<code>RACDCERT GENCERT ID(SPARKUSR) SIGNWITH(CERTAUTH LABEL('SPARK IBM Local CA'))
+KEYUSAGE(HANDSHAKE) WITHLABEL('Spark Client Cert')
+SUBJECTSDN(CN('SPARK TESTS CLIENT') O('IBM') L('Poughkeepsie')
+SP('New York') C('US')) NOTAFTER(DATE(2030/01/01))</code>
+                            </p>
+                            <p>
+<b>Note:</b> For end users that are using off-platform Jupyter Notebook environments to connect to Spark on this z/OS system, must export their certificates and send them to the system administrator of the system from which those clients are connecting. For instance, a distributed system administrator for JupyterHub or a z/OS system administrator that is using a different security database. The remote system administrator needs to set up the client certificates to be used when connecting to this z/OS system. Specifically, to export the client certificate (public and private key) and the CA certificate (public key) into a PKCS#12 certificate package, issue the following command:</p>
+                            <p>
+<code>RACDCERT EXPORT(LABEL('Spark Client Cert')) ID(SPARKUSR)
+DSN('SPARKADM.SPARKUSR.P12') FORMAT(PKCS12DER) PASSWORD('password')</code>
+                            </p>
+                            <p>In the previous RACF command, the following variables mean:</p>
+                            <p>
+<ul>
+    <li>
+        <b>SPARKADM</b> - The system programmer who is configuring certificates.</li>
+<li>
+        <b>SPARKUSR</b> - The end user.</li>
+<li>
+        <b>password</b> - The password that is used to access the contents of the package.</li>
+</ul> 
+This command creates a <code>p12</code> package in the <code>SPARKADM.SPARKUSR.P12</code> data set.</p>
+                        </li>
+                        <li>Create a key ring for each user who is connecting to a Spark cluster. To simplify the AT-TLS policy, use the same RACF key ring name for every client. When accessed, System SSL qualifies the key ring name with the current user ID. The following examples use <code>SparkUserRing</code> as the key ring name.<p>
+<code>RACDCERT ADDRING(SparkUserRing) ID(SPARKUSR)</code>
+                            </p>
+                        </li>
+<li>Connect the end user's certificates to the end user's key ring by issuing the following command:<p>
+<code>RACDCERT ID(SPARKUSR) CONNECT(ID(SPARKUSR) LABEL('Spark Client Cert')
+RING(SparkUserRing) USAGE(PERSONAL) DEFAULT)</code>
+                            </p>
+                        </li>
+<li>Connect the CA certificate to the end user's key ring by issuing the following command:<p>
+<code>RACDCERT ID(SPARKUSR) CONNECT(CERTAUTH LABEL('SPARK IBM Local CA') RING(SparkUserRing))</code>
+                            </p>
+                        </li>
+<li>Allow the end user's user ID to access its key ring by issuing the following command: <p>
+<code>PERMIT IRR.DIGTCERT.LISTRING CLASS(FACILITY) ID(SPARKUSR) ACCESS(READ)</code>
+                            </p>
+                        </li>
+                    </ol>
+                </instructions>
+                <weight>1</weight>
+            </step>
+        </step>
+        <step name="Step5_2">
+            <title>Configuring Policy Agent</title>
+            <description>Policy Agent runs as a z/OS UNIX process, therefore it can be started from either the z/OS UNIX shell or as a z/OS started task. The following task uses a z/OS started task procedure to start Policy Agent. Complete the following to configure Policy Agent to run as a z/OS started task.<p>
+                    <b>Note:</b> Skip this task if a Policy Agent started task if a Policy Agent started task is already configured on system.</p>
+                <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>Create the following sample procedure to start Policy Agent as a z/OS started task.<p>
+                    <code>//PAGENT PROC
+//PAGENT EXEC PGM=PAGENT,REGION=OK,TIME=NOLIMIT,
+//PARM=('ENVAR("_CEE_ENVFILE=DD:STDENV")/-I SYSLOGD')
+//*
+//* For information on the previous environment variables, refer to the
+//* IP CONFIGURATION GUIDE. Other environment variables can also be
+//* specified via STDENV.
+//*
+//* UNIX file containing environment variables:
+//STDENV DD PATH='/etc/pagent.env',PATHOPTS=(ORDONLY)
+//*
+//* Output that is written to stdout and stderr goes to the data set or
+//* file that is specified with SYSPRINT or SYSOUT, respectively. But
+//* normally, PAGENT doesn't write output to stdout or stderr.
+//* Instead, output is written to the log file, which is specified
+//* by the PAGENT_LOG_FILE environment variable, and defaults to
+//* /tmp/patent.log. When the -d parameter is specified, however,
+//* output is also written to stdout.
+//*
+//SYSPRINT DD SYSOUT=*
+//SYSOUT DD SYSOUT=*
+//CEEDUMP DD SYSOUT=*,DCB(RECFM=FB,LRECL=132,BLKSIZE=132)
+</code>
+                </p>
+                <p>In the previous sample, <code>/etc/pagent.env</code> points to the Policy Agent environment file.
+<ul>
+                        <li>For more information about starting Policy Agent as a z/OS started task, see <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz001/startingpolicyagentasastartedtask.htm">Starting Policy Agent as a started task</a> in <cite>
+<a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz001/toc.htm">z/OS Communications Server: IP Configuration Reference</a>.</cite>
+                        </li>
+<li>For more information about starting Policy Agent from the z/OS UNIX shell, see <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz001/startingpolicyagentfromzosshell.htm">Starting Policy Agent from the z/OS shell</a> in <cite>
+<a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz001/toc.htm">z/OS Communications Server: IP Configuration Reference</a>.</cite>
+                        </li>
+<li>For more information about the overall configuration of Policy Agent, see <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/pbn_cfg.htm">Steps for configuring the Policy Agent</a> in <cite>
+<a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/toc.htm">z/OS Communications Server: IP Configuration Guide</a>.</cite>
+                        </li>
+                    </ul>
+                </p>
+            </instructions>
+            <weight>1</weight>
+        </step>
+        <step name="Step5_3">
+            <title>Defining security authorization for Policy Agent</title>
+            <description>The policies that are managed by Policy Agent can significantly affect system operation. Therefore, IBM suggests that you restrict the list of z/OS user ID's under which Policy Agent is allowed to run. To do this, you must define certain resources and controls in your system's security management product, such as RACF.</description>
+            <step name="Step5_3_1">
+                <title>Define the PAGENT user ID</title>
+                <description>Define the z/OS user ID <code>PAGENT</code> under which Policy Agent runs.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>Define the <code>PAGENT</code> user ID. The following sample uses <code>OMVSGRP</code> as the default group (DFLTGRP) and an OMVS segment with a UID of 0.<p>
+                        <code>ADDUSER PAGENT DFLTGRP(OMVSGRP) OMVS(UID(0) HOME('/'))</code>
+                    </p>
+                </instructions>
+                <weight>1</weight>
+            </step>
+            <step name="Step5_3_2">
+                <title>Define the PAGENT started task to RACF</title>
+                <description>Define the <code>PAGENT</code> started task to RACF.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>Issue the following commands to have Policy Agent run as a z/OS started task name <code>PAGENT</code>. The commands configure the <code>STARTED</code> class and create the <code>PAGENT.*</code> profile in the <code>STARTED</code> class.<p>
+                        <code>SETROPTS CLASSACT(STARTED)
+SETROPTS RACLIST(STARTED)
+SETROPTS GENERIC(STARTED)
+RDEFINE STARTED PAGENT.* STDATA(USER(PAGENT))
+SETROPTS RACLIST(STARTED) REFRESH
+SETROPTS GENERIC(STARTED) REFRESH</code>
+                    </p>
+                </instructions>
+                <weight>1</weight>
+            </step>
+            <step name="Step5_3_3">
+                <title>Grant Policy Agent the ability to make socket requests during TCP/IP stack initialization</title>
+                <description>Grant Policy Agent the ability to make socket requests during TCP/IP stack initialization. A TCP/IP stack initializes before Policy Agent installs policies into the stack. During the initialization window, only user IDs that are permitted to the <code>EZB.INITSTACK.sysname.tcpname</code> profile in the SERVAUTH class can make socket requests.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>Issue the following RACF commands to define a generic <code>EZB.INITSTACK.**</code> resource profile and grant READ access to the <code>PAGENT</code> user ID.<p>
+                        <code>SETROPTS GENERIC(SERVAUTH)
+SETROPTS CLASSACT(SERVAUTH) RACLIST(SERVAUTH)
+RDEFINE SERVAUTH EZB.INITSTACK.** UACC(NONE)
+PERMIT EZB.INITSTACK.** CLASS(SERVAUTH) ACCESS(READ) ID(PAGENT)
+SETROPTS RACLIST(SERVAUTH) REFRESH</code>
+                    </p>
+                </instructions>
+                <weight>1</weight>
+            </step>
+            <step name="Step5_3_4">
+                <title>Grant access to authorized users to manage the PAGENT started task</title>
+                <description>Grant access to authorized users to manage the <code>PAGENT</code> started task.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                </description>
+                <instructions>Issue the following commands to restrict management access to the <code>PAGENT</code> started task. These commands define an <code>MVS.SERVMGR.PAGENT</code> profile in the <code>OPERCMDS</code> resource class and permit authorized users access to this profile.<p>
+                        <code>SETROPTS CLASSACT(OPERCMDS)
+SETROPTS RACLIST(OPERCMDS)
+RDEFINE OPERCMDS (MVS.SERVMGR.PAGENT) UACC(NONE)
+PERMIT MVS.SERVMGR.PAGENT CLASS(OPERCMDS) ACCESS(CONTROL) ID(PAGENT)
+SETROPTS RACLIST(OPERCMDS) REFRESH</code>
+                    </p>
+                </instructions>
+                <weight>1</weight>
+            </step>
+            <step name="Step5_3_5">
+                <title>Consider restricting access to the pasearch command</title>
+                <description>Consider restricting access to the <code>pasearch</code> command.</description>
+                <instructions>You can use the z/OS UNIX <code>pasearch</code> command to display policy definitions. The output from this command indicates whether policy rules are active and displays the policy definition attributes. To restrict access to the <code>paesearch</code> command, define an appropriate resource profile in the <code>SERVAUTH</code> resource class as described in <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/pbn_cfg_general_info.htm">Step 1: Configure general information</a> of <cite>
+                        <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/toc.htm">z/OS Communications Server: IP Configuration Guide</a>.</cite>
+                </instructions>
+                <weight>1</weight>
+            </step>
+        </step>
+        <step name="Step5_4">
+            <title>Create the Policy Agent configuration files</title>
+            <description>Create the Policy Agent configuration files.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>
+                <ol>
+                    <li>Create a file to contain the environment variable that points to the <code>PAGENT</code> configuration file. The default configuration file is <code>/etc/pagent.env</code>, but you can specify a different location in the Policy Agent started that JCL that you created in Step 6.2. In this example, the <code>pagent.env</code> file defines the following <code>PAGENT</code> environment variables:
+<ul>
+                            <li>
+<b>PAGENT_CONFIG_FILE</b> -This points to the <code>PAGENT</code> configuration file, <code>pagent.conf</code>.</li>
+<li>
+<b>PAGENT_LOG_FILE</b> -This points to the PAGENT log file. In this example, Policy Agent logs messages to the syslog daemon and is the recommended practice. For more information about setting up the syslog daemon, see <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/syslogd_configuration.htm">Configuring the syslog daemon</a> in <cite>
+    <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/toc.htm">z/OS Communications Server: IP Configuration Guide</a>.</cite>
+                            </li>
+<li>
+<b>LIBPATH</b> - Policy Agent needs access to one or more DLLs at run time. Set the LIBPATH environment variable to include the <code>/usr/lib</code> directory, which normally includes all of the required DLLs.</li>
+<li>
+<b>TZ</b> - Defines the local time zone.</li>
+                        </ul>
+                        <p>The <code>pagent.env</code> file should look like the following</p>
+                        <p>
+                            <code>PAGENT_CONFIG_FILE=/etc/pagent.conf
+PAGENT_LOG_FILE=SYSLOGD
+LIBPATH=/usr/lib
+TZ=EST5EDT</code>
+                        </p>
+                    </li>
+<li>Create the <code>PAGENT</code> configuration file, <code>pagent.conf</code>. The following example displays the contents of the <code>pagent.conf</code> file:<p>
+                            <code># LOGLEVEL 511 turns on all trace levels for Policy Agent
+LOGLEVEL 511
+TcpImage TCPIP FLUSH PURGE
+TTLSConfig /etc/pagent/TCPIP_TTLS.policy</code>
+                        </p>
+                        <p>The <code>/etc/pagent/TCPIP_TTLS.policy</code> file is the AT-TLS policy to be defined in Step 6.6.</p>
+                    </li>
+                </ol>
+            </instructions>
+            <weight>1</weight>
+        </step>
+        <step name="Step5_5">
+            <title>Configuring PROFILE.TCPIP for AT-TLS</title>
+            <description>Configuring <code>PROFILE.TCPIP</code> for AT-TLS.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>Add the following statement to the <code>PROFILE.TCPIP</code> data set to enable AT-TLS support.<p>
+                    <code>TCPCONFIG TTLS</code>
+                </p>
+                <p>For more information about the TCPCONFIG TTLS statement, see <cite>
+                        <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz001/toc.htm">z/OS Communications Server: IP Configuration Reference</a>.</cite>
+                </p>
+            </instructions>
+            <weight>1</weight>
+        </step>
+        <step name="Step5_6" optional="false">
+            <title>Defining the AT-TLS policy rules</title>
+            <description>Defining the AT-TLS policy rules. An AT-TLS policy configuration file contains the AT-TLS rules that identify specific types of TCP traffic, along with the type of TLS/SSL to be applied to those connections. If a rule match is found, AT-TLS transparently provides TLS protocol control for the connection based on the security attributes that are specified in the actions that are associated with the rule.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions substitution="false">&lt;ol&gt;&lt;li&gt;Configure your AT-TLS policy rules as described in &lt;a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/attls_policy_cfg.htm" target="_blank"&gt;AT-TLS policy configuration&lt;/a&gt; in &lt;cite&gt;&lt;a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/toc.htm" target="_blank"&gt;z/OS Communications Server: IP Configuration Guide&lt;/a&gt;&lt;/cite&gt;. For a sample policy file, see &lt;a href="https://www.ibm.com/support/knowledgecenter/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_r_samptlspolicy.htm" target="_blank"&gt;Sample AT-TLS policy&lt;/a&gt; in &lt;cite&gt;&lt;a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/toc.htm" target="_blank"&gt;IBM Open Data Analytics for z/OS Installation and Customization Guide&lt;/a&gt;&lt;/cite&gt;. 
+
+<p>The figure in &lt;a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_t_definetlspolicy.htm" target="_blank"&gt;Defining the AT-TLS policy rules&lt;/a&gt; illustrates the communication connections between the processes in a typical Spark cluster.</p>&lt;p&gt;In the referenced figure, connection &lt;b&gt;1&lt;/b&gt; represents any connection to a Spark cluster from the end user. Connection &lt;b&gt;2&lt;/b&gt; represents the worker processes connecting to the cluster as part of normal cluster operations.&lt;/p&gt;&lt;p&gt;For connection &lt;b&gt;1&lt;/b&gt;, there is a rule that governs all inbound connections to the master port range, that is represented by &lt;b&gt;a&lt;/b&gt;. There is also a rule that governs all outbound connections to the master port range, that is represented by &lt;b&gt;b&lt;/b&gt;.&lt;/p&gt;&lt;p&gt;The policy rule for endpoint &lt;b&gt;a&lt;/b&gt; of both connections specifies that the handshake role is of a server enforcing client authentication for inbound connections. It also points to the SAF key ring of the Spark user ID (SPARKID) for the cluster.&lt;/p&gt;&lt;p&gt;The sample policy file has the following rule for inbound connections to the Spark master:&lt;/p&gt;&lt;p&gt;
+&lt;code&gt;TTLSRule                                 SparkMaster_Server
+{
+   LocalPortRangeRef                     SparkMasterPort
+   Direction                             Inbound
+   TTLSGroupActionRef                    gAct1
+   TTLSEnvironmentActionRef              eAct2~SparkMaster_Server
+   TTLSConnection ActionRef              cAct2~SparkMaster_Server
+}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;In the following example, &lt;code&gt;SparkMasterPort&lt;/code&gt; has the following defined port range, where 7077 is the default master port. By default, Spark retries with the next port up to 16 times if it is unable to bind to the first port (7077 + 16 = 7093).&lt;/p&gt;&lt;p&gt;
+&lt;code&gt;PortRange                        SparkMasterPort
+{
+   Port                          7077-7093
+}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;The environmental action &lt;code&gt;eAct2~SparkMaster_Server&lt;/code&gt; enforces client authentication, by specifying &lt;code&gt;ServerWithClientAuth&lt;/code&gt;, and points to the Spark ID cluster key ring (&lt;code&gt;SparkClusterRing&lt;/code&gt;).&lt;/p&gt;&lt;p&gt;
+&lt;code&gt;TTLSEnvironmentAction                             eAct2~SparkMaster_Server
+{
+   HandshakeRole                                  ServerWithClientAuth
+   EnvironmentUserInstance                        0
+   TTLSKeyringParmsRef                            SparkClusterRing
+   TTLSEnvironmentAdvancedParmsRef                SparkServerEndAdv
+}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;The group action &lt;code&gt;gAct1&lt;/code&gt; ensures that TLS is enabled.&lt;/p&gt;&lt;p&gt;
+&lt;code&gt;TLLSGroupAction                     SparkMasterPort
+{
+  TLLSEnabled                       On 
+}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;The advanced environmental action &lt;code&gt;SparkServerEnvAdv&lt;/code&gt; ensures that TLS 1.2 is being used and enforces level-2 client authentication by specifying &lt;code&gt;ClientAuthTypeSAFCheck&lt;/code&gt;.&lt;/p&gt;&lt;p&gt;
+&lt;code&gt;TTLSEnvironmentAdvancedParms                          SparkServerEnvAdv
+{
+   ClientAuthType                                     SAFCheck
+   TLSv1                                              Off
+   TLSv1.1                                            Off
+   TLSv1.2                                            On
+}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;The policy rule for endpoint &lt;b&gt;b&lt;/b&gt; specifies that the handshake role is a client for outbound connections to master ports and points to the SAF key ring of the end user.&lt;/p&gt;&lt;p&gt;
+&lt;code&gt;TTLSRule                                    SparkDriver_Client
+{
+   Direction                                Outbound
+   RemotePortRangeRef                       SparkMasterPort
+   TTLSGroupActionRef                       gAct1
+   TTLSEnvironmentActionRef                 eAct1~SparkDriver_Client
+   TTLSConnectionActionRef                  cAct1~SparkDriver_Client
+   Priority                                 50
+}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;The &lt;code&gt;eAct1~SparkDriver_Client&lt;/code&gt;environmental rule specifies its handshake role and points to the SAF key ring of the end user.&lt;/p&gt;&lt;p&gt;
+&lt;code&gt;TTLSEnvironmentAction                             eAct1~SparkDriver_Client
+{
+   HandshakeRole                                  Client
+   EnvironmentUserInstance                        0
+   TTLSKeyringParmsRef                            SparkUserRing
+   TTLSEnvironmentAdvancedParmRef                 SparkClientEnvAdv
+}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;&lt;code&gt;SparkUserRing&lt;/code&gt; is a key ring that is used by the user in the TLS handshake.&lt;/p&gt;&lt;p&gt;
+&lt;code&gt;TTLSKeyringParms                             SparkUserRing
+{
+   Keyring                                   SparkUserRing
+}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;A SAF key ring name can be specified in the policy as &lt;code&gt;userid/keyring&lt;/code&gt;. If &lt;code&gt;userid&lt;/code&gt; is omitted, the user ID of the application that owns the AT-TLS protected socket is used. In this case, the Spark end user. This is useful to avoid updating the policy for every end user. Give each end user the same key ring name. The key ring for the user ID associated with the socket is used.&lt;/p&gt;&lt;p&gt;The policy rule for endpoint &lt;b&gt;c&lt;/b&gt; is similar to the one for &lt;b&gt;b&lt;/b&gt; in that it is a client. However, because it is the worker process that is running under the Spark ID, it uses that user's key ring for authentication.&lt;/p&gt;&lt;p&gt;
+&lt;code&gt;TTLSEnvironmentAction                             eAct3~SparkCluster_Client
+{
+   HandshakeRole                                  Client
+   EnvironmentUserInstance                        0
+   TTLSKeyringParmsRef                            SparkClusterRing
+   TTLSEnvironmentAdvancedParmRef                 SparkClientEnvAdv
+}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;This rule takes effect when the user ID is SPARKID. Due to the higher priority, this rule matches for SPARKID before &lt;code&gt;SparkDriver_Client&lt;/code&gt; does.&lt;/p&gt;&lt;p&gt;
+&lt;code&gt;TTLSRule                                        SparkCluster_Client
+{
+   Userid                                       SPARKID
+   Direction                                    Outbound
+   RemotePortRangeRef                           SparkMasterPort
+   TTLSGroupActionRef                           gAct1
+   TTLSEnvironmentActionRef                     eAct3~SparkCluster_Client
+   TTLSConnectionActionRef                      cAct3~SparkCluster_Client
+   Priority                                     1000
+}&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;Recycle TCP/IP to pick up the profile changes that you made earlier or issue the following MVS system command to refresh its profile.&lt;p&gt;&lt;code&gt;VARY TCPIP,,OBEYFILE,DSN=new_tcpip_profile&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ol&gt;</instructions>
+            <weight>1</weight>
+            <autoEnable>false</autoEnable>
+            <canMarkAsFailed>false</canMarkAsFailed>
+        </step>
+        <step name="Step5_7">
+            <title>Starting and stopping Policy Agent</title>
+            <description>Staring and stopping Policy Agent.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>
+                <ul>
+                    <li>Issue the MVS START command to start Policy Agent as a started task:<p>
+                            <code>S PAGENT</code>
+                        </p>
+                    </li>
+                    <li>To perform a normal shutdown of Policy Agent, issue the MVS STOP command.<p>
+                            <code>P PAGENT</code>
+                        </p>
+                    </li>
+                </ul>
+            </instructions>
+            <weight>1</weight>
+        </step>
+        <step name="Step5_8">
+            <title>Configuring additional authorities and permissions for the Spark cluster</title>
+            <description>Complete this step to configure additional authorites and permissions that are needed within the Spark cluster.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>
+                <ol>
+                    <li>Ensure that Spark client authentication is enabled. Verify the following property in the <code>spark-defaults.conf</code> file:<p>
+                            <code>spark.zos.master.authenticate      true</code>
+                        </p>
+                    </li>
+                    <li>Configure the Spark cluster user ID (SPARKID in previous examples) to have the authority to change the user IDs of the Spark executors to those of the authenticated end user IDs. To do this, configure the <code>SURROGAT</code> class profile for the surrogate user ID. For example:
+<ol>
+                            <li>Issue the following RACF commands to define a generic profile that allows SPARKID (a non-UID 0 user ID) to switch to any other z/OS user ID that has a defined z/OS UNIX segment:<p>
+    <code>SETROPTS CLASSACT(SURROGAT)      RACLIST(SURROGAT) ENERIC(SURROGAT)
+RDEFINE SURROGAT BPX.SRV.** UACC(NONE)
+PERMIT BPX.SRV.** CLASS(SURROGAT) ACCESS(READ) ID(SPARKID)
+SETROPTS GENERIC(SURROGAT) RACLIST(SURROGAT) REFRESH</code>
+</p>
+                            </li>
+                            <li>Issue the following command to verify that the profile setup is successful:<p>
+    <code>RLIST SURROGAT BPX.SRV.** AUTHUSER</code>
+</p>
+                            </li>
+                            <li>Configure the z/OS system that hosts the Spark cluster to honor ACLs that are set by the Spark ID that is running the cluster. For example, issue the following RACF command:<p>
+    <code>SETROPTS CLASSACT(FFSEC)</code>
+</p>
+                            </li>
+                            <li>Change the permissions on the Spark working directory and Spark local directory so that both SPARKID and the end users can write to them. Add the sticky bit so that users can only delete their own files. For example, issue the following commands from the z/OS UNIX shell:<p>
+    <code>chmod 775 $SPARK_WORKER_DIR
+chmod +t $SPARK_WORKER_DIR
+chmod 775 $SPARK_LOCAL_DIR
+chmod +t $SPARK_LOCAL_DIR</code>
+</p>
+                            </li>
+                        </ol>
+                        <p>
+                            <b>Note:</b> If you enabled event logging, perform this step for the event log directory as well.
+
+You can issue the following command to verify the proper setting:
+
+</p><p><code>ls -ld $SPARK_WORKER_DIR $SPARK_LOCAL_DIRS</code>
+                        </p>
+                        <p>The output should be similar to the following example:
+
+
+</p><p><code>drwxrwxr-t 2 SPARKID SYS1 8192 Aug 8 08:51 /Spark-2.1.1/work
+drwxrwxr-t 2 SPARKID SYS1 8192 Aug 8 08:51 /Spark-2.1.1/tmp</code>
+                        </p>
+                    </li>
+                </ol>
+            </instructions>
+            <weight>1</weight>
+        </step>
+        <step name="Step5_9">
+            <title>Starting the Spark cluster</title>
+            <description>Starting the Spark cluster.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>After completing all of the tasks to enable client authentication and configure z/OS Spark, start the Spark cluster and run your Spark application as usual. If a worker or driver does not have a valid certificate that maps to a z/OS user ID, it fails to connect to the master port. Executors that are started for a client-deploy-model application run under the user ID of that application. Executors and drivers that are started in cluster deploy mode are considered part of the Spark cluster and continue to run under the user ID of the worker.</instructions>
+            <weight>1</weight>
+        </step>
+    </step>
+    <step name="Step6">
+        <title>Configure IBM Java</title>
+        <description>Spark runs as several JVM processes. The following steps help you to ensure that IBM Java is configured properly.  </description>
+        <step name="Step6_1">
+            <title>Ensure that the Java configuration is correct</title>
+            <description>Ensure that the Java configuration is correct for z/OS.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>See <a href="http://www.ibm.com/systems/z/os/zos/tools/java/faq/javafaq.html">Hints and Tips for Java on z/OS</a> to ensure that your java configuration has appropriate settings for z/OS.  See also 
+<a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_r_memcpuconfigopts.htm#azkic_r_memcpuconfigopts__tzosopts">Table 6. IBM z/OS configuration parameters</a> and
+<cite>
+                    <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_t_configmemcpu.htm">Configuring memory and CPU options</a>
+                </cite> in the 
+<cite>IBM Open Data Analytics for z/OS Installation and Customization Guide</cite> for more settings.</instructions>
+            <weight>1</weight>
+        </step>
+        <step name="Step6_2">
+            <title>Set the environment setting  _CEE_DMPTARG</title>
+            <description>Set the environment setting  _CEE_DMPTARG to store java dumps on a separate mount point, outside of $SPARK_HOME. <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>Set environment setting  _CEE_DMPTARG to store java dumps on a separate mount point, outside of $SPARK_HOME. For more information, see JVM environment settings in 
+<cite>IBM® SDK, Java™ Technology Edition z/OS User Guide</cite> 
+(<a href="https://www.ibm.com/support/knowledgecenter/en/SSYKE2_8.0.0/com.ibm.java.zos.80.doc/diag/appendixes/env_var/env_jvm.html#env_jvm__dumps">Javadump and Heapdump options</a>).
+For more information about the order that java takes dump settings, see <a href="https://www.ibm.com/support/knowledgecenter/SSYKE2_7.0.0/com.ibm.java.lnx.70.doc/diag/tools/dumpagents_env.html">Dump agent environment variables</a> in 
+<cite>IBM® SDK, Java™ Technology Edition Linux User Guide</cite>.
+</instructions>
+            <weight>1</weight>
+        </step>
+        <step name="Step6_3">
+            <title>Configure large page memory allocation for Java</title>
+            <description>Configure large page memory allocation for Java.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>Configure large page memory allocation for Java. Configuration and best practices in setting max Java heap sizes are detailed in <a href="https://www.ibm.com/support/knowledgecenter/SSYKE2_8.0.0/com.ibm.java.zos.80.doc/user/alloc_large_page.html">Configuring large page memory allocation</a> of <cite>IBM® SDK, Java™ Technology Edition z/OS User Guide</cite>.
+</instructions>
+            <weight>1</weight>
+        </step>
+        <step name="Step6_4">
+            <title>Ensure that zEDC is configured properly</title>
+            <description>If you have Java applications that use compression, ensure that zEDC is configured properly.  <p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>If you have Java applications that use compression, ensure that zEDC is configured properly.  For more information, see <a href="https://www.ibm.com/support/knowledgecenter/en/SSYKE2_8.0.0/com.ibm.java.zos.80.doc/user/zedc_compression.html">zEnterprise Data Compression</a> in <cite>IBM® SDK, Java™ Technology Edition z/OS User Guide</cite>.</instructions>
+            <weight>1</weight>
+        </step>
+    </step>
+    <step name="Step7">
+        <title>Create jobs for starting and stopping Spark processes</title>
+        <description>Create jobs for starting and stopping Spark processes.</description>
+        <step name="Step7_1">
+            <title>Start and stop Spark processes</title>
+            <description>Spark processes, such as the master and worker, can be started through BPXBATCH.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            </description>
+            <instructions>You can start Spark processes, such as the master and worker, by using BPXPATCH. For example, the following is a sample of BPXBATCH logic to start the master and worker:
+<p>
+                    <code>//SPARKMST JOB 'SPARK START',CLASS=K,MSGCLASS=A,
+// NOTIFY=&amp;SYSUID,SYSTEM=HOST,USER=SPARKID
+//PRTDS EXEC PGM=BPXBATCH,REGION=0M
+//STDPARM DD *
+SH /bin/bash -l -c ’cd /usr/lpp/IBM/izoda/spark/spark211/sbin;start-master.sh;
+sleep 5;start-slave.sh spark://hostname.yourcompany.com:7077’
+//SYSOUT DD SYSOUT=*
+//STDIN DD DUMMY
+//STDOUT DD SYSOUT=*
+//STDERR DD SYSOUT=*
+//
+</code>
+                </p>
+<p>The samples assume the user ID starting the Spark cluster is SPARKID, the default program (shell) of that user is bash, and that the Spark product is installed in <code>/usr/lpp/IBM/Spark</code>.  
+The <code>-l</code> and <code>-c</code> options of bash instruct bash to run a login shell with the entire shell command sequence that is given between the single quotes.  
+The semi-colons in the command sequence separate different shell commands. Specifically, the sample start job instructs bash to change directories to the Spark product install 
+directory where admin commands are located:
+<p>
+                        <code>cd /usr/lpp/IBM/izoda/spark/spark211/sbin</code>
+                    </p>
+</p>
+                <p>Then, it starts the master by issuing the following:
+<p>
+                        <code>start-master.sh</code>
+                    </p>
+<p>Next, it sleeps for 5 seconds to allow the master time to start:</p>
+<p>
+                        <code>sleep 5</code>
+                    </p>
+<p>Finally, it starts the worker:</p>
+<p>
+                        <code>start-slave.sh spark://HOST.POK.IBM.COM:7077</code>
+                    </p> <p>where HOST.POK.IBM.COM is the name of the host where your master is listening, using port 7077 by default.  </p>
+These start commands can also be run directly from z/OS UNIX instead of BPXBATCH as a quick test of your Spark configuration.</p>
+                <p>The sample job to stop Spark is similar, except it issues the specific Spark commands stop the worker and then the master.</p>
+                <p>The following is a sample of BPXBATCH logic to stop the master and worker:</p>
+<p>
+                    <code>//SPARKSTP JOB 'SPARK STOP',CLASS=K,MSGCLASS=A,
+// NOTIFY=&amp;SYSUID,SYSTEM=HOST,USER=SPARKID
+//PRTDS EXEC PGM=BPXBATCH,REGION=0M
+//STDPARM DD *
+//STDPARM DD * SH /bin/bash -l -c ’cd /usr/lpp/IBM/izoda/spark/spark211/sbin;
+stop-slave.sh;sleep 5;stop-master.sh’
+//SYSOUT DD SYSOUT=*
+//STDIN DD DUMMY
+//STDOUT DD SYSOUT=*
+//STDERR DD SYSOUT=*
+//
+</code>
+                </p>
+                <p>Consider testing the starting and stopping of the Spark cluster to ensure that your setup is correct. However, review the guidance in the <a href="https://www-03.ibm.com/support/techdocs/atsmastr.nsf/WebIndex/WP102684">Resource Tuning Recommendations for IBM z/OS Platform for Apache Spark</a> white paper before going into production..</p>
+</instructions>
+            <weight>1</weight>
+        </step>
+    </step>
+    <step name="Step8">
+        <title>Tune Spark workloads</title>
+        <description>Tune Spark workloads.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+        </description>
+        <instructions>Go to the <cite>
+                <a href="https://www-03.ibm.com/support/techdocs/atsmastr.nsf/WebIndex/WP102684">Resource Tuning Recommendations for IBM z/OS Platform for Apache Spark</a>
+            </cite> 
+white paper to assign resources (memory, processors) for Spark workloads.</instructions>
+        <weight>1</weight>
+    </step>
+</workflow>
