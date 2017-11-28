@@ -1,5 +1,5 @@
-//BPXREALT JOB 'XXXXXX,D75,B7078','JPERIL',CLASS=A,
-//     MSGCLASS=A,MSGLEVEL=(1,1),NOTIFY=JPERIL
+//BPXREALT JOB 'XXXXXX,D75,B7078','JOEUSER',CLASS=A,
+//     MSGCLASS=A,MSGLEVEL=(1,1),NOTIFY=JOEUSER
 //********************************************************************/
 //* Copyright 2017 IBM Corp.                                         */
 //*                                                                  */
@@ -31,7 +31,7 @@
 //*    Note3: The PARM= data is a max of 100 characters!             */
 //********************************************************************/
 //RUNTEST  EXEC PGM=BPXBATCH,TIME=NOLIMIT,REGION=0M,
-// PARM='SH cd /u/jperil/zAnalytics/smfreal; ./smfreal'
+// PARM='SH cd /u/joeuser/zAnalytics/smfreal; ./smfreal'
 //*            Xcontinuation-starts-here'
 //*
 //STDOUT   DD   PATH='/tmp/ifaSmfreal.out',

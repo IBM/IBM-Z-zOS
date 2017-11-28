@@ -40,7 +40,7 @@ Record(0) was retrieved:
         System ID: SY1
         Work Type: TSO
         SMF 30 Subtype: 02
-        Job Name: JPERIL
+        Job Name: JOEUSER
         Program Name: IKJEFT01
         Step Name: TMP
         User-defined ID field:
@@ -700,7 +700,7 @@ Record(44) was retrieved:
         System ID: SY1
         Work Type: OMVS
         SMF 30 Subtype: 02
-        Job Name: JPERIL5
+        Job Name: JOEUSER5
         Program Name: BPXPRECP
         Step Name: *OMVSEX
         User-defined ID field:
@@ -715,7 +715,7 @@ Record(45) was retrieved:
         System ID: SY1
         Work Type: OMVS
         SMF 30 Subtype: 02
-        Job Name: JPERIL
+        Job Name: JOEUSER
         Program Name: BPXPRECP
         Step Name: STEP1
         User-defined ID field:
@@ -745,7 +745,7 @@ Record(47) was retrieved:
         System ID: SY1
         Work Type: TSO
         SMF 30 Subtype: 02
-        Job Name: JPERIL
+        Job Name: JOEUSER
         Program Name: IKJEFT01
         Step Name: TMP
         User-defined ID field:
