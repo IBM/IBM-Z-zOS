@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+/*********************************************************************/
+/* Copyright 2017 IBM Corp.                                                                */
+/*                                                                                                               */
+/* Licensed under the Apache License, Version 2.0 (the "License");   */
+/* you may not use this file except in compliance with the License.  */
+/* You may obtain a copy of the License at                                           */
+/*                                                                                                               */
+/* http://www.apache.org/licenses/LICENSE-2.0                               */
+/*                                                                                                                */
+/* Unless required by applicable law or agreed to in writing, software*/
+/* distributed under the License is distributed on an "AS IS" BASIS, */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/* See the License for the specific language governing permissions and */
+/* limitations under the License.                                   */
+/*********************************************************************/    
+ -->
+<workflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="workflow_v1.xsd">                          
+		  
+	<workflowInfo>
+		<workflowID>disrupt</workflowID><workflowDefaultName>Disruptive CF Upgrade</workflowDefaultName><workflowDescription>Use when reactivating a CF image with CPC staying operational; no physical or logical CF changes </workflowDescription>
+		<workflowVersion>1</workflowVersion>
+		<vendor>IBM</vendor>	</workflowInfo>
+
+<step name="Step1"><title>How to use this workflow</title><description>To use this workflow, note the following: <ul><li><b>Take ownership!</b>  Make sure that you have ownership of workflow steps that you want to perform, and assign other steps to the appropriate users, 
+using the <b>Assignment and Ownership</b> action in the Workflow Steps table. 
+Taking ownership is important, because without it you will not see the <b>Perform</b> tab, which contains the meat of the instructions for each step, 
+instructions you'll need to complete the workflow task.. <p>If you're the owner of the workflow, you can take ownership of all steps. 
+If you were assigned some or all steps by the owner, you can take ownership of those steps.</p><p>Do the following:
+<ul><li>From the table listing the steps for the workflow (the Workflow Steps table), select the step or steps to be owned by you. This action is disabled if the step is not assigned to you. </li>
+<li>Click <b>Actions</b>, then select <b>Assignment and Ownership</b> --> <b>Take Ownership</b>. The Take Ownership window is displayed. This page includes the Selected Steps table. 
+You can expand this section to review the steps for which this action applies. </li>
+<li>Optionally, enter a comment in the Comments field to document this action. </li>
+<li>Click OK to complete the transfer of step ownership to yourself. </li>
+<li><b>Did these instructions work?</b> To verify that these instructions worked, check to see if the <b>Perform</b> tab is not grayed out, and that when you click on it, you see 
+information in the <b>Perform</b> tab. </li></ul>
+</p></li><li><b>Expand all steps for ease of navigation:</b> You might find it easier to navigate through all the steps in the workflow if you expand the view so that all the sub-steps show as follows:
+<ol>
+<li>Click <b>Actions</b>, then select <b>Select All</b>.</li>
+<li>Click <b>Actions</b>, then select <b>Expand</b>.</li></ol></li>
+<li><b>Track your progress:</b> When you have performed the work of a step, click the <b>Finish</b> box below the instructions to track your progress through the workflow. 
+This also takes you back out to the list of steps for the workflow so that you are ready to go on to the next one.
+</li><li><b>Navigate substeps:</b> To navigate to the substeps contained within a step, click on the workflow title of the workflow at the top of the screen. 
+Although the sub-steps are listed below the step, you cannot navigate to the sub-steps from within a step.<p>Note that a step containing substeps does not include a <b>Perform</b> tab.</p></li></ul></description><instructions>Congratulations! If you can read this, you have successfully taken ownership of this workflow step!</instructions><weight>1</weight></step><step name="Step2"><title>When to use this workflow</title><description>Use the procedure in this workflow when the coupling facility image must be reactivated, but the CPC on which the coupling facility resides will remain operational across the reactivation process. This procedure also assumes the CF links, CF control unit, and CF definition in the CFRM policy are not changing.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions><p>See <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieaf100/disrupt.htm">Disruptive CF Upgrade</a> 
+(<a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieaf100/disrupt.htm">
+https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieaf100/disrupt.htm</a>).</p></instructions><weight>1</weight></step><step name="Step3">			<title>Create new CFRM policy</title><description>Create a new CFRM policy distinct from the currently active policy with the new CF definition and updated structure definitions based on the CFSIZER or SIZER web-based utility.   <p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Create a new CFRM policy distinct from the currently active policy distinct from the 
+currently active policy. You can create a new CFRM policy ahead of time to minimize net down time. Appropriate structure sizes for the new CFCC level can be obtained from either:
+<ul><li>CFSizer, see <a href="http://www-947.ibm.com/systems/support/z/cfsizer/">http://www-947.ibm.com/systems/support/z/cfsizer/</a></li>
+<li>Sizer, see <a href="http://www-947.ibm.com/systems/support/z/cfsizer/altsize.html">http://www-947.ibm.com/systems/support/z/cfsizer/altsize.html</a>.</li></ul>
+<p>Updated structure sizes are necessary to ensure that a performance problem does not occur due to a structure space constraint. Also, the updated structure sizes will ensure that there is no 
+issue restarting an application in
+the future due to invalid structure sizes.</p><p>This step is required for CFCC Level changes. This step is
+desirable if the sizes were not adjusted across the last
+CFCC Level upgrade or if the usage of the structures has
+changed significantly.</p><p>Alternatively, update the current policy "in place" to avoid
+changing the name of the policy. For information on defining a CFRM policy, see <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.ieaf100/subcfrm.htm">CFRM parameters for administrative data utility</a> (<a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.ieaf100/subcfrm.htm">https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.ieaf100/subcfrm.htm</a>).</p><p>Caution: This procedure assumes that the CF links, control unit, and CFRM definition are not changing. 
+If the links, control unit, or CFRM definition change, the CF may become accessible earlier than planned.</p><p>Note that if all systems reside on the same CPC then the new CFRM policy must be started before the
+last system is shutdown.  </p></instructions><weight>1</weight></step>	
+
+<step name="Step4">			<title>Place the CF to be shutdown in maintenance mode</title><description>Place the CF to be shutdown in maintenance mode so that no new structures will be allocated on the CF.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Issue the following command to place the CF in maintenance mode:<p><code>SETXCF START,MAINTMODE,CFNAME=<i>cfname</i></code></p><p>This command is sysplex scope and only needs to be entered on one system.</p></instructions><weight>1</weight></step><step name="Step5"><title>Move structures off the CF</title><description>Move structures off the CF.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Use the following procedure to prepare for and then move structures off the CF using the REALLOCATE command:<ol><li>Preview the results of REALLOCATE  using the following command: <p><code>D XCF,REALLOCATE,TEST</code></p><p>Evaluate any exceptions in the results of the preview of REALLOCATE. 
+If a severe problem is detected, remove <i>cfname</i> from MAINTMODE and address the problem.
+Then, go back to Step 2, "Place the CF to be upgraded in maintenance mode".</p></li><li>Issue the following command to have XCF assess and possibly relocate structures: <p><code>SETXCF START,REALLOCATE</code></p><p>XCF will seek to move the structures off the CF in MAINTMODE.</p></li><li>Determine whether any structures remain in the CF 
+being removed from service  by issuing the following command: <p><code>D XCF,CF,CFNAME=<i>cfname</i></code></p><p>In the command output, look for structures remaining in the CF being removed. If structures remain in the CF being removed, skip to 
+Step 5, "Manually rebuild any structures that remain in the CF".<!--manual rebuild-->
+<!--<li><p><ul>
+<li>If there are structures still in the CF, continue on with this procedure.
+</li>
+<li>If no structures remain in the CF being removed, skip to 
+Step 5, "Manually rebuild any structures that remain in the CF".</li></ul></p></li><li>Issue the following command to have XCF assess and possibly relocate structures: <p><code>SETXCF START,REALLOCATE</code></p><p>XCF will seek to move the structures off the CF in MAINTMODE.</p></li>--></p></li></ol></instructions><weight>1</weight></step>
+<!--<step name="Step3"><title>Preview the results of REALLOCATE TEST command</title><description>Preview the results of REALLOCATE TEST command output.</description>	<instructions>To preview the results of REALLOCATE, issue the following command: <p><code>D XCF,REALLOCATE,TEST</code> (This command is available on z/OS Version 1 Release 12 or later systems.)</p><p>Evaluate any exceptions in the results of the preview of REALLOCATE. 
+If a severe problem is detected, remove <i>cfname</i> from MAINTMODE and address the problem.
+Then, go back to Step 3, "Place the CF to be upgraded in maintenance mode".</p></instructions><weight>1</weight></step>-->
+<!--<step name="Step4">	<title>Issue REALLOCATE to move structures off the CF</title><description>Issue REALLOCATE to move structures off the CF.</description>	<instructions>Issue the following command to have XCF assess and possibly relocate structures: <p><code>SETXCF START,REALLOCATE</code></p><p>XCF will seek to move the structures off the CF in MAINTMODE.</p></instructions><weight>1</weight></step>-->
+<!--<step name="Step5">	<title>Determine whether any structures remain in the CF</title><description>Determine whether any structures remain in the CF 
+being removed from service.</description>	<instructions>Issue the following command: <p><code>D XCF,CF,CFNAME=<i>cfname</i></code></p><p>Look in the command output to see whether structures remain in the CF being removed. </p><ul>
+<li>If there are structures still in the CF, go
+to Steps 7 and 8.</li>
+<li>If no structures remain in the CF being removed, skip to 
+Step 9. </li></ul></instructions><weight>1</weight></step>--><!--<step name="Step6">	<title>Review the REALLOCATE REPORT</title><description>If Step 5 shows any structures that did not move, review the
+REALLOCATE REPORT output and address any errors.</description>	<instructions>Issue the following command:<p><code>D XCF,REALLOCATE,REPORT</code>  (This command is available on z/OS Version 1 Release 12 or later systems.)</p> Address any errors found in the output.</instructions><weight>1</weight></step>--><step name="Step6">	<title>Manually rebuild any structures that remain in the CF</title><description>Manually rebuild any structures that remain in CF <i>cfname</i>.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Application-specific protocols may be needed to move
+structures. <p>For details about moving structures out of the CF, see 
+<a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.ieaf100/remstr.htm"><cite>Removing structures from a coupling facility for shutdown</cite></a>
+(<a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.ieaf100/remstr.htm">https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.ieaf100/remstr.htm</a>) and 
+<a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.ieaf100/actrem.htm"><cite>Actions to remove a structure from a coupling facility</cite></a>
+(<a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.ieaf100/actrem.htm">https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.ieaf100/actrem.htm</a>)
+in <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.ieaf100/toc.htm"><cite>z/OS MVS Setting Up a Sysplex</cite></a>
+ (<a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.ieaf100/toc.htm">https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.ieaf100/toc.htm</a>).</p><ol>
+<li>Issue the following commands to manually rebuild any structures that remain in the CF:<p><code>
+SETXCF START,REBUILD,STRNAME=<i>strname</i>,LOC=OTHER
+SETXCF STOP,REBUILD,DUPLEX,STRNAME=<i>strname</i>,KEEP=NEW|OLD</code>
+</p></li><li>Verify that no structures remain on the
+coupling facility about to be upgraded:
+<p><code>
+D XCF,CF,CFNAME=<i>cfname</i></code></p></li></ol></instructions><weight>1</weight></step>
+<step name="Step7">	<title>VARY the paths to the CF offline</title><description>VARY the paths to the CF offline. <p>See the <b>Perform</b> workflow tab for further instructions.</p></description>	<instructions><ol><li>VARY the paths to the CF offline using the following command: <p><code>VARY PATH(CFNAME,<i>xx</i>,CFNAME,<i>yy</i>,etc),OFFLINE,UNCOND</code></p><p>You must issue the VARY command
+from all systems in the sysplex; path
+numbers may be different for each system. Taking the
+paths offline and then recycling is cleaner for z/OS to
+handle than not taking the paths offline. The hot
+unplug or TOGGLE is received as an “error” by z/OS.</p><p>To obtain the list of CHPIDs, issue <code>D CF</code> from each
+system. The list of CHPIDs is helpful when bringing the
+paths back online.</p><p>The VARY command is used rather than the CONFIG
+command because it is possible that use of the links by
+STP would cause the CONFIG command to be rejected.
+Using the VARY command affects only the logical path
+state for coupling facility communication and does not
+affect (nor is it affected by) the STP network; STP can
+still utilize the links to maintain the timing network.</p><p>When the paths are VARYd OFFLINE, the <code>D CF,CFNAME=<i>cfname</i></code> command shows the paths as being
+logically offline, but physically online.</p></li><li>At this point, the paths to the CF will indicate logically OFFLINE.
+Re-verify that no structures in the CF and no systems
+have connectivity to CF using the following commands: <p><code>RO *ALL,D CF,CFNAME=<i>cfname</i></code> </p><p>Verify that no structures remain on the coupling facility about to be upgraded:</p><p><code>D XCF,CF,CFNAME=<i>cfname</i></code></p></li></ol></instructions><weight>1</weight></step><!--<step name="Step8">	<title>VARY the paths to the CF offline</title><description><p>VARY the paths to the CF offline. </p></description>	<instructions>VARY the paths to the CF offline using the following command: <p><code>VARY PATH(CFNAME,<i>xx</i>,CFNAME,<i>yy</i>,etc),OFFLINE,UNCOND</code></p><p>You must issue the VARY command
+from all systems in the sysplex; path
+numbers may be different for each system. Taking the
+paths offline and then recycling is cleaner for z/OS to
+handle than not taking the paths offline. The hot
+unplug or TOGGLE is received as an “error” by z/OS.</p><p>To obtain the list of CHPIDs, issue <code>D CF</code> from each
+system. The list of CHPIDs is helpful when bringing the
+paths back online.</p><p>The VARY command is used rather than the CONFIG
+command because it is possible that use of the links by
+STP would cause the CONFIG command to be rejected.
+Using the VARY command affects only the logical path
+state for coupling facility communication and does not
+affect (nor is it affected by) the STP network; STP can
+still utilize the links to maintain the timing network.</p><p>When the paths are VARYd OFFLINE, the <code>D CF,CFNAME=<i>cfname</i></code> command shows the paths as being
+logically offline, but physically online.</p></instructions><weight>1</weight></step>-->
+<!--<step name="Step9">	<title>Verify that no system has an active path to CF</title><description>Verify that no system has an active path to CF.</description>	<instructions>At this point, the paths to the CF will indicate logically OFFLINE.
+Re-verify that no structures in the CF and no systems
+have connectivity to CF using the following commands: <p><code>RO *ALL,D CF,CFNAME=<i>cfname</i></code></p><p><code>D XCF,CF,CFNAME=<i>cfname</i></code></p></instructions><weight>1</weight></step>-->
+<step name="Step8">	<title>Shut down the CF</title><description>Shut down the CF.  <p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>From the Operating System Messages panel for the Coupling Facility on the Hardware Management Console (HMC), issue the SHUTDOWN command. <!--From the CF OPERMSG console, issue the <code>SHUTDOWN</code> command.--> The <code>SHUTDOWN</code> command is recommended to avoid the potential error of 
+DEACTIVATING the coupling
+facility that has all of the structures allocated in it. The
+<code>SHUTDOWN</code> command will not complete if structures
+are present in the coupling facility.
+<p>The following scenario shows the message sequence for
+the SHUTDOWN command when structures are still
+allocated in the CF:</p>
+<code>=> shutdown
+CF0090A Do you really want to shut down
+the Coupling Facility? (YES/NO)
+=> yes
+CF0093A There are structures present in
+the CF. SHUTDOWN canceled.</code>
+<p>After the <code>SHUTDOWN</code> command completes successfully, the CF LPAR will become “not operating.”</p><p>If structures are still allocated in the CF, verify that the correct CF was selected for <code>SHUTDOWN</code>. If the correct
+CF was selected, consider reviewing the structures still allocated in the CF and seek to move them out of the CF.
+At this point, the paths must be VARYd back ONLINE to allow structures to rebuild out of the CF. VARY the paths
+ONLINE and go back to Step 5, "Manually rebuild any structures that remain in the CF".  If VARYing the paths ONLINE and moving the structures is not desired (that
+is, deleting the structures has been deemed acceptable), the CF image may be DEACTIVATEd.
+</p><p><b>Note:</b> Do not perform a power on reset (POR) of the CPC. If there is to be a POR, perform workflow <cite>Push then pull of a CF</cite>.</p></instructions>	<weight>1</weight></step><step name="Step9">		<title>Activate the new CFRM policy with the definitions for the new CF</title><description>Activate the new CFRM policy with the definitions for the updated structure sizes per CFSizer or SIZER output. Structure size changes will be pending after the new or modified policy is activated.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Activate the new CFRM policy with the definitions for the updated structure sizes per CFSizer or SIZER output. Structure size changes will be pending after the new or modified policy is activated.<p>Issue one of the following commands:</p><p><code>SETXCF START,POLICY,TYPE=CFRM,POLNAME=<i>new_policy</i></code></p>Or<p><code>
+SETXCF START,POLICY,TYPE=CFRM,POLNAME=<i>mod_active_policy</i></code></p></instructions><weight>1</weight></step><step name="Step10">	<title>Vary the paths online from all systems in the sysplex</title><description>Vary the paths online from all systems in the sysplex.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>You must issue the command to vary the paths online from all systems in the sysplex. Note that the path numbers might be different for each system.
+To obtain the list of CHPIDs, issue command <code>D CF</code> from each system or use the list from Step 6. Then issue the following command for each system in the sysplex:
+<p><code>V PATH(<i>cfname</i>,<i>xx</i>,<i>cfname</i>,<i>yy</i>,etc),ONLINE</code></p>
+</instructions><weight>1</weight></step><step name="Step11">	<title>Verify that XCF is connected to the correct CF</title><description>Verify that XCF is connected to the correct CF, 
+including the serial number for the new CF.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>	<instructions>Issue the following commands: <ul>
+<li>Issue command <code>D XCF,CF,CFNAME=<i>cfname</i></code> to display the CF definition that XCF logically knows about and the physical information for the CF the image is connected to.</li>
+<li>Issue command <code>RO *ALL,D CF,CFNAME=<i>cfname</i></code>. </li></ul><p>Note that the serial numbers in the <code>D XCF</code> and <code>D CF</code> commands for each CF must match. 
+Verify that all systems have connectivity to the new CF and all the paths are ONLINE. 
+Verify also verify that the CF to CF links are available.</p></instructions><weight>1</weight></step><step name="Step12">		<title>Take the upgraded CF out of MAINTMODE</title><description>Take the upgraded CF out of MAINTMODE.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Take the upgraded CF out of MAINTMODE to allow structure allocations in the new CF.<p>Use the following command:</p><p><code>SETXCF STOP,MAINTMODE,CFNAME=<i>cfname</i></code></p></instructions><weight>1</weight></step>
+<step name="Step13">	<title>Relocate structures to the desired CFs</title><description> Relocate structures to the desired CFs.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>	<instructions><ol><li>Issue the following command to relocate structures to the desired CFs:<p><code>SETXCF START,REALLOCATE</code></p><p>XCF will seek to
+resolve the pending policy changes.</p></li><li>To verify that all structures reside in the desired CFs, issue the following command and correct any errors noted by the report:
+<p><code>D XCF,REALLOCATE,REPORT</code></p></li><li>Double check that structures reside in the preferred CFs - Even if REALLOCATE processing completes without 
+exceptions you still need to double check that structures are in the preferred CFs - XCF / XES places the structure in the 
+most desirable CFs, which may not coincide with the
+order of the CFs in the PREFLIST or the desired CF site
+preference for duplexed structures. To verify that structures reside in the preferred CFs, review output
+from z/OS Health Check XCF_CF_STR_PREFLIST. Investigate structures that were not placed in the
+desired CF PREFLIST order, taking into account any CF
+site preferences for duplexed structures. Assess the reason for the structure placement and
+relocate structures to desired CFs, as needed.<p> Use the following SETXCF REBUILD commands, as necessary, to
+move structures:</p><p>
+<code>
+SETXCF START,REBUILD,STRNAME=<i>strname</i>,LOC=OTHER
+SETXCF STOP,REBUILD,DUPLEX,STRNAME=<i>strname</i>,KEEP=NEW|OLD</code>
+</p></li></ol></instructions><weight>1</weight></step><!--<step name="Step15">		<title>Relocate structures to the desired CFs</title><description> Relocate structures to the desired CFs. XCF will seek to
+resolve the pending policy changes.</description><instructions>Issue the following command to relocate structures to the desired CFs:<p><code>SETXCF START,REALLOCATE</code></p><p>XCF will seek to
+resolve the pending policy changes.</p></instructions><weight>1</weight></step>--><!--<step name="Step16">	<title>Verify that structures reside in the desired CFs</title><description>Verify that all structures reside in the desired CFs.
+</description>	
+<instructions>Issue the following command (available on z/OS V1R12 and later systems) and correct any errors noted by the report:
+<p><code>D XCF,REALLOCATE,REPORT</code></p><p>Correct any errors displayed in the report.</p></instructions><weight>1</weight></step>--><!--<step name="Step17">	<title>Double check that structures reside in the preferred CFs</title><description>Even if REALLOCATE processing completes without exceptions you still need to double check that structures are in the preferred CFs - XCF / XES places each structure in the 
+most desirable CFs, which may not coincide with the
+order of the CFs in the PREFLIST or the desired CF site
+preference for duplexed structures.</description>	<instructions>Review output
+from IBM Health Checker for z/OS check XCF_CF_STR_PREFLIST and verify that structures reside in the preferred CFs. Investigate structures that were not placed in the
+desired CF PREFLIST order, taking into account any CF
+site preferences for duplexed structures.<p>Assess the reason for the structure placement and
+relocated structures to desired CFs, as needed.</p><p>Use the following SETXCF REBUILD commands, as necessary, to
+move structures:</p><p><code>
+SETXCF START,REBUILD,STRNAME=<i>strname</i>,LOC=OTHER
+SETXCF STOP,REBUILD,DUPLEX,STRNAME=<i>strname</i>,KEEP=NEW|OLD</code></p><p>In cases where additional CFRM policy updates are warranted,
+(such as changing a duplex CF site preference or a CF site
+specification), the <code>SETXCF START,REALLOCATE</code>   command may be
+used again once the new policy is started.</p></instructions><weight>1</weight></step>--></workflow>
