@@ -1,19 +1,10 @@
+z/OSMF workflows for the z/OS platform
+======================================
 
-IBM recommends following the best practices documented in these workflows when upgrading a coupling facility. These steps are 
-intended to help you avoid unexpected delays or outages to applications that are using structures in coupling facilities. Follow all of 
-the steps in the procedures. 
+This repository contains workflow definitions (XML files) that can be used with the Workflows task of the z/OS Management Facility (z/OSMF).
 
-workflow_pushpull.xml
-    Use for a “push/pull” of a CPC on which a coupling facility image resides OR when there is to be a power-on reset, POR, of the CPC on which the coupling facility image resides 
-    and there is a physical or logical change to the coupling facility.
-workflow_PORNoChg.xml
-    Use for a POR of a CPC on which a coupling facility image resides. This procedure applies where there is to be a POR of a CPC on which a coupling facility 
-    resides and, across the POR, there are no physical or logical changes to the coupling facility.
-workflow_disrupt.xml
-    Use for a disruptive coupling facility upgrade. The disruptive coupling facility upgrade procedure should be conformed to anytime the coupling facility image must be reactivated 
-    but the CPC on which the coupling facility resides is not going to be PORd. Most CFCC maintenance applications can be achieved concurrently. 
-    That is, the CF image does not need to be reactivated to pick up the new service level of CFCC. The reasons a CF image may need to be reactivated include: 
-    the rare disruptive coupling facility code change, change to CFCC image storage requirements, and activating a new Coupling Facility Release level that is typically 
-    delivered with a System z driver upgrade.
+In z/OSMF, a **workflow** is a guided set of steps that help you perform an activity on z/OS®, such as configuring a software product, managing a z/OS resource, or simplifying some relatively complex operation. To support these activities, a workflow can be designed to perform a wide variety of operations, such as starting z/OS subsystems, submitting jobs and scripts, and invoking TSO/E functions.
 
-For more information about upgrading a coupling facilty, see https://www.ibm.com/support/knowledgecenter/SSLTBW_2.2.0/com.ibm.zos.v2r2.ieaf100/toc.htm.
+There are no warranties of any kind, and there is no service or technical support available for these materials from IBM. As a recommended practice, review carefully any materials that you download from this site before using them on a live system.
+
+Though the materials provided herein are not supported by the IBM Service organization, your comments are welcomed by the developers, who reserve the right to revise or remove the materials at any time. To report a problem, or provide feedback, contact zosmig@us.ibm.com.
