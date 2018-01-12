@@ -78,8 +78,12 @@
 #include <stdint.h>                                                             
 #include <stdlib.h>                                                             
 #include <ctype.h>                                                              
-#include <//'EBPRYOR.SMFREAL.CSAMP(SMFREALH)'>                                  
-                                                                                
+#include <smfreal.h>
+/* If using this sample from within MVS data sets instead
+ * of USS files, you can use this form of include to
+   pull in the header from a member of a data set.
+   #include <//'EBPRYOR.SMFREAL.CSAMP(SMFREALH)'>
+   */
                                                                                 
 /*                                                                              
  * SMF Record Area mapping (we reserve a full 32K area)                         
