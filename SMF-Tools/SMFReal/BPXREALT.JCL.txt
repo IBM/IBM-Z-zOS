@@ -21,9 +21,9 @@
 //********************************************************************/
 //*  STEP 1 - Run test case                                          */
 //*                                                                  */
-//*    Note1: Change the /u/jman... in the PARM= parameters to be    */
+//*    Note1: Change the /u/joeuser... in the PARM= parameters to be */
 //*           the directory where you downloaded the smfreal.c       */
-//*           source.
+//*           source.                                                */
 //*    Note2: for PARM= parameters to the shell, you must use an     */
 //*           asterick on column 72 to properly continue the line.   */
 //*           The continuation on the next line should start in      */
