@@ -1,0 +1,772 @@
+$OUTPUT.txt
+
+** Beginning of Copyright and License **
+
+Copyright 2017 IBM Corp.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+** End of Copyright and License **
+
+The following is sample output from smfreal.c, a simple example
+application to use the SMF Real-Time services using a C program.
+
+--------- SMFREAL start ---------
+
+Initialize RC=0
+
+CONNECT attempt to IFASMF.INMEM begins now...
+CONNECT attempt made.
+Connect RC=0000 RSN=0000
+
+Validating connect token, RC=0
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(0) was retrieved:
+  Record Length: 2206, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: TSO
+        SMF 30 Subtype: 02
+        Job Name: JOEUSER
+        Program Name: IKJEFT01
+        Step Name: TMP
+        User-defined ID field:
+        JES JobID: T0000038
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(1) was retrieved:
+  Record Length: 1584, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: MSTJCLS0
+        Program Name: IEEMB860
+        Step Name:
+        User-defined ID field:
+        JES JobID: MSTR
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(2) was retrieved:
+  Record Length: 1464, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: CATALOG
+        Program Name: IGG0CLX0
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: CATALOG
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(3) was retrieved:
+  Record Length: 1224, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: JESXCF
+        Program Name: IXZIX00
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: JESXCF
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(4) was retrieved:
+  Record Length: 1320, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: CEA
+        Program Name: CEAINIT
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: CEA
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(5) was retrieved:
+  Record Length: 1284, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: ANTMAIN
+        Program Name: ANTMAIN
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: ANTMAIN
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(6) was retrieved:
+  Record Length: 1224, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: DEVMAN
+        Program Name: DMOVS001
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: DEVMAN
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(7) was retrieved:
+  Record Length: 1284, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: SMF
+        Program Name: IFASMF
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: SMF
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(8) was retrieved:
+  Record Length: 1224, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: HWIBCPII
+        Program Name: HWIAMIN2
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: HWIBCPII
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(9) was retrieved:
+  Record Length: 1224, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: IXGLOGR
+        Program Name: IXGBLF01
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: IXGLOGR
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(10) was retrieved:
+  Record Length: 1224, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: IOSAS
+        Program Name: IOSVROUT
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: IOSAS
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(11) was retrieved:
+  Record Length: 1944, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: XCFAS
+        Program Name: IXCINJST
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: XCFAS
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(12) was retrieved:
+  Record Length: 1374, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: OMVS
+        Program Name: BPXINIT
+        Step Name: OMVS
+        User-defined ID field:
+        JES JobID: OMVS
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(13) was retrieved:
+  Record Length: 1374, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: DUMPSRV
+        Program Name: IEAVTDSV
+        Step Name: DUMPSRV
+        User-defined ID field:
+        JES JobID: DUMPSRV
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(14) was retrieved:
+  Record Length: 1224, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: WLM
+        Program Name: IWMINJST
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: WLM
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(15) was retrieved:
+  Record Length: 1192, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 06
+        Job Name: PCAUTH
+        Program Name:
+        Step Name:
+        User-defined ID field:
+        JES JobID:
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(16) was retrieved:
+  Record Length: 1192, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 06
+        Job Name: RASP
+        Program Name:
+        Step Name:
+        User-defined ID field:
+        JES JobID:
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(17) was retrieved:
+  Record Length: 1192, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 06
+        Job Name: TRACE
+        Program Name:
+        Step Name:
+        User-defined ID field:
+        JES JobID:
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(18) was retrieved:
+  Record Length: 1192, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 06
+        Job Name: GRS
+        Program Name:
+        Step Name:
+        User-defined ID field:
+        JES JobID:
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(19) was retrieved:
+  Record Length: 1192, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 06
+        Job Name: SMSPDSE
+        Program Name:
+        Step Name:
+        User-defined ID field:
+        JES JobID:
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(20) was retrieved:
+  Record Length: 1192, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 06
+        Job Name: CONSOLE
+        Program Name:
+        Step Name:
+        User-defined ID field:
+        JES JobID:
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(21) was retrieved:
+  Record Length: 1192, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 06
+        Job Name: IEFSCHAS
+        Program Name:
+        Step Name:
+        User-defined ID field:
+        JES JobID:
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(22) was retrieved:
+  Record Length: 1192, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 06
+        Job Name: ALLOCAS
+        Program Name:
+        Step Name:
+        User-defined ID field:
+        JES JobID:
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(23) was retrieved:
+  Record Length: 1224, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: JES2MON
+        Program Name: HASJES2$
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: JES2MON
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(24) was retrieved:
+  Record Length: 1320, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: RESOLVER
+        Program Name: EZBREINI
+        Step Name: EZBREINI
+        User-defined ID field:
+        JES JobID: RESOLVER
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(25) was retrieved:
+  Record Length: 1464, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: ZFS
+        Program Name: BPXVCLNY
+        Step Name: ZFZGO
+        User-defined ID field:
+        JES JobID: ZFS
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(26) was retrieved:
+  Record Length: 1254, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: AXR
+        Program Name: AXRINIT
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: AXR
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(27) was retrieved:
+  Record Length: 1224, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: VLF
+        Program Name: COFMINIT
+        Step Name: VLF
+        User-defined ID field:
+        JES JobID: VLF
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(28) was retrieved:
+  Record Length: 1284, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: ANTAS000
+        Program Name: ANTXAINI
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: ANTAS000
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(29) was retrieved:
+  Record Length: 1344, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: RACF
+        Program Name: IRRSSM00
+        Step Name: RACF
+        User-defined ID field:
+        JES JobID: RACF
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(30) was retrieved:
+  Record Length: 1374, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: JES2
+        Program Name: HASJES20
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: JES2
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(31) was retrieved:
+  Record Length: 2814, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: LLA
+        Program Name: CSVLLCRE
+        Step Name: LLA
+        User-defined ID field:
+        JES JobID: LLA
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(32) was retrieved:
+  Record Length: 1224, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: ZTTX
+        Program Name: ZTTXINIT
+        Step Name: ZTTX
+        User-defined ID field:
+        JES JobID: ZTTX
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(33) was retrieved:
+  Record Length: 1284, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: SMS
+        Program Name: IGDSSI01
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: SMS
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(34) was retrieved:
+  Record Length: 1224, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: GTZ
+        Program Name: GTZINIT
+        Step Name: GTZ
+        User-defined ID field:
+        JES JobID: GTZ
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(35) was retrieved:
+  Record Length: 1192, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 06
+        Job Name: TNF
+        Program Name:
+        Step Name:
+        User-defined ID field:
+        JES JobID:
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(36) was retrieved:
+  Record Length: 1192, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 06
+        Job Name: VMCF
+        Program Name:
+        Step Name:
+        User-defined ID field:
+        JES JobID:
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(37) was retrieved:
+  Record Length: 1192, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 06
+        Job Name: JES2AUX
+        Program Name:
+        Step Name:
+        User-defined ID field:
+        JES JobID:
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(38) was retrieved:
+  Record Length: 1304, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: SDSF
+        Program Name: ISFHCTL
+        Step Name: SDSF
+        User-defined ID field:
+        JES JobID: S0000003
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(39) was retrieved:
+  Record Length: 1344, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: RMF
+        Program Name: ERBMFMFC
+        Step Name: IEFPROC
+        User-defined ID field:
+        JES JobID: S0000010
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(40) was retrieved:
+  Record Length: 1640, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: TCPIPALP
+        Program Name: EZBTCPIP
+        Step Name: TCPIP
+        User-defined ID field:
+        JES JobID: S0000008
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(41) was retrieved:
+  Record Length: 2804, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: VTAM44
+        Program Name: ISTINM01
+        Step Name: VTAM
+        User-defined ID field:
+        JES JobID: S0000005
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(42) was retrieved:
+  Record Length: 1350, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: HZSPROC
+        Program Name: HZSINIT
+        Step Name: HZSSTEP
+        User-defined ID field:
+        JES JobID: S0000016
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(43) was retrieved:
+  Record Length: 1284, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: SDSFAUX
+        Program Name: HSFSRV00
+        Step Name: SDSFAUX
+        User-defined ID field:
+        JES JobID: S0000026
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(44) was retrieved:
+  Record Length: 1320, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: OMVS
+        SMF 30 Subtype: 02
+        Job Name: JOEUSER5
+        Program Name: BPXPRECP
+        Step Name: *OMVSEX
+        User-defined ID field:
+        JES JobID: S0000037
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(45) was retrieved:
+  Record Length: 1320, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: OMVS
+        SMF 30 Subtype: 02
+        Job Name: JOEUSER
+        Program Name: BPXPRECP
+        Step Name: STEP1
+        User-defined ID field:
+        JES JobID: S0000034
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(46) was retrieved:
+  Record Length: 1320, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: STC
+        SMF 30 Subtype: 02
+        Job Name: BPXOINIT
+        Program Name: BPXPINPR
+        Step Name: BPXOINIT
+        User-defined ID field:
+        JES JobID: BPXOINIT
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(47) was retrieved:
+  Record Length: 2080, Record Type: 30
+        SMF Type 30 Details follow...
+        System ID: SY1
+        Work Type: TSO
+        SMF 30 Subtype: 02
+        Job Name: JOEUSER
+        Program Name: IKJEFT01
+        Step Name: TMP
+        User-defined ID field:
+        JES JobID: T0000038
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(48) was retrieved:
+  Record Length: 372, Record Type: 80
+
+GET attempt begins now...
+GET attempt made.
+Get RC=0000     RSN=0000
+Record(49) was retrieved:
+  Record Length: 372, Record Type: 80
+
+DISCONNECT attempt begins now...
+DISCONNECT attempt made.
+Disconnect RC=0000      RSN=0000
+
+
+--------- SMFREAL end -----------
+#
