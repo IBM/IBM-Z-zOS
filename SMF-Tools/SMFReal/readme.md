@@ -1,5 +1,5 @@
-README 
-
+## README 
+```
 ** Beginning of Copyright and License **
 
 Copyright 2017 IBM Corp.                                           
@@ -17,31 +17,31 @@ See the License for the specific language governing permissions and
 limitations under the License.                    
 
 ** End of Copyright and License **        
-
+```
 This is a simple example application to use the SMF Real-Time          
 services using a C program.                                            
-                                                                       
+```                                                                       
 Files:                                                                 
        smfrealc      (application)                                     
        smfrealh      (header, mappings)                                
        buildtst      (sample compile and link-edit USS script)         
        BPXREALT      (JCL sample to run smfreal in batch)              
        $OUTPUT       (output from a run collecting 50 records)         
-                                                                       
-This is an "as-is" type sample to demonstrate usage of                 
+```                                                                       
+This is an `as-is` type sample to demonstrate usage of                 
 SMF data through this interface. This example will obtain SMF 30 
 type records from an in-memory real-time resource and then do       
 something with those records.              
                                                                        
 Before getting started, modify the program if necessary.               
 For example, the program is hard-coded to collect SMF records from     
-the "IFASMF.INMEM" resource. You can change this in the program to     
+the `IFASMF.INMEM` resource. You can change this in the program to     
 match your existing SMF 30 in-memory resource name, or set up     
-one on your system.    Additionally, the main() function could be      
+one on your system. Additionally, the `main()` function could be      
 altered to accept parms, such as a resource name, which will prevent   
 the need to change it in the program code.                             
                                                     
-The remainder of this README contains two sets of instructions for
+The remainder of this `README` contains two sets of instructions for
 compiling and running this sample:  One set of instructions that
 uses a UNIX System Services (USS) file system, and one set that 
 works exclusively with MVS data sets. Use the set that is more
@@ -55,23 +55,23 @@ To build and run this sample in USS:
        o SMFREALH to smfreal.h                                           
        o BUILDTST to buildTst                                            
        o Note the USS and C environments are case sensitive              
-                                                                       
-  2) Issue a "chmod 755 buildTst".   This will make the compile          
+                                                                      
+  2) Issue a `chmod 755 buildTst`. This will make the compile          
      script executable.                                                  
                                                                        
-  3) Run buildTst (by typing "buildTst") to compile and link             
+  3) Run `buildTst` (by typing `buildTst`) to compile and link             
      the smfreal program.                                                
                                                                        
-  4) Check the listings for errors.  I suggest you check smfreal_2.lst   
+  4) Check the listings for errors.  I suggest you check `smfreal_2.lst`   
      first, as this will just show errors.  The compile and link should  
      complete without errors.                                            
-                                                                       
+                                                                      
       o Note:  The IFAIMxxx services in SYS1.CSSLIB should be in         
                the linklist or equivalent.                               
                                                                        
   5) Ensure that you have the smfreal program now in your directory.     
                                                                        
-  6) Execute the program either via command line (just type smfreal)     
+  6) Execute the program either via command line (just type `smfreal`)     
      or via batch job (example provided).                                
                      
 					 
@@ -86,11 +86,12 @@ SMF Realtime C Sample Program
 
 
 1: Store the code in an MVS PDS or PDSE data set, such as the following:
+```
 		JOEUSER.SMFREAL.CSAMP(SMFREALC) 
 		JOEUSER.SMFREAL.CSAMP(SMFREALH) 
-
+```
 2: Compile / Bind JCL
-
+```
 //BINDC64  JOB NOTIFY=????????,                                          
 // REGION=0M,MSGLEVEL=1,MSGCLASS=H                                      
 //*                                                                     
@@ -157,8 +158,8 @@ SMF Realtime C Sample Program
 //         DD  DSN=&LNGPRFX..SCLBSID(IOSTREAM),DISP=SHR                 
 //SYSLMOD  DD  DSN=&LOADLIB(&TARGET),DISP=SHR                           
 //SYSPRINT DD  SYSOUT=*                                                 
-
-It is worth mentioning that SMFREALTIME requires code to be compiled
+```
+It is worth mentioning that `SMFREALTIME` requires code to be compiled
 in 64 bit mode. When working with 64 bit code, you must invoke the 
 Binder (IEWL) instead of link editing. The output loadlib must be a 
 PDSE.
@@ -169,7 +170,7 @@ PDSE.
 	as collected by your SMFPRMXX member, as the SMFREALC program 
 	will make blocking get requests. This will appear to hang the 
 	program until 49 records are retrieved from the INMEM resource.
-
+```
 --------- SMFREAL start ---------
 Initialize RC=0                               
 CONNECT attempt to IFASMF.INMEM begins now...
@@ -191,4 +192,4 @@ DISCONNECT attempt begins now...
 DISCONNECT attempt made.              
 Disconnect RC=0000 RSN=0000           
 --------- SMFREAL end -----------   
-													   
+```													   
