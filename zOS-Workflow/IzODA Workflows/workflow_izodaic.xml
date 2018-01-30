@@ -1,24 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!--  
-/*********************************************************************/
-/* Copyright 2017 IBM Corp.                                          */
-/*                                                                   */
-/* Licensed under the Apache License, Version 2.0 (the "License");   */
-/* you may not use this file except in compliance with the License.  */
-/* You may obtain a copy of the License at                           */
-/*                                                                   */
-/* http://www.apache.org/licenses/LICENSE-2.0                        */
-/*                                                                   */
-/* Unless required by applicable law or agreed to in writing, software*/
-/* distributed under the License is distributed on an "AS IS" BASIS, */
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
-/* See the License for the specific language governing permissions and */
-/* limitations under the License.                                   */
-/*********************************************************************/     
--->
-<workflow>
-    <workflowInfo>
-        <workflowID scope="system" isCallable="system">izodaic</workflowID>
+<workflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../workflow_v1.xsd"><workflowInfo>
+        <workflowID isCallable="system" scope="system">izodaic</workflowID>
         <workflowDescription>Install and Configure IBM Open Data Analytics for zOS Spark Software</workflowDescription>
         <workflowVersion>1</workflowVersion>
         <vendor>IBM</vendor>
@@ -149,7 +131,7 @@ In this case, consider narrowing the search to directories that are likely candi
         </step>
         <step name="subStep1_4">
             <title>Verify the installation location for the env command</title>
-            <description>Apache Spark is dependent on the <code>env</code> command being located in <code>/usr/bin</code>.</description>
+            <description><!--Includes updated task descrption, Jan. '18-->Apache Spark depends on the <code>env</code> command being located in <code>/usr/bin</code>.<p>Before APAR PI87452, the shell scripts for IBM Open Data Analytics for z/OS Spark require <code>/usr/bin/env</code>. If your system doesn't have <code>/usr/bin/env</code>, complete this task to create a symbolic link for <code>/usr/bin/env</code>.<p>APAR PI87452 changes the shell scripts to use <code>/bin/env</code>, which is a more common setup. If your system doesn't have <code>/bin/env</code>, use the steps that are outlined in this task as a guideline to create a symbolic link for <code>/bin/env</code>.</p></p><!--end of update--></description>
             <step name="subStep1_4_1">
                 <title>Test the path for env</title>
                 <description>Test the path for <code>env</code>, in an SSH or Telnet environment. <p>See the <b>Perform</b> workflow tab for further instructions.</p>
@@ -517,7 +499,7 @@ The command output includes "<code>-Dfile.encoding=UTF8</code>". If it does not,
             <title>Customize the directories and files needed by Apache Spark</title>
             <description>This step creates the directories and files necessary for Apache Spark to write to.<p>IBM Open Data Analytics for z/OS installs Apache Spark into a z/OS file system (zFS) or hierarchical file system (HFS) directory. 
 This documentation refers to the installation directory as SPARK_HOME. The default installation directory is <code>/usr/lpp/IBM/izoda/spark/spark<i>nnn</i>
-                    </code> where <i>nnn</i> is the current Apache Spark version (for instance, /usr/lpp/IBM/izoda/spark/spark211 for Spark 2.1.1).  
+                    </code> where <i>nnn</i> is the current Apache Spark version (for instance, /usr/lpp/IBM/izoda/spark/spark220 for Spark 2.2.0).  
 By default, Apache Spark runs from the installation directory, and most of its configuration files, log files, and working information are stored in the installation directory structure. 
 On z/OS systems, however, the use of the installation directory for all of these purposes is not ideal operating behavior. 
 Therefore, by default, IBM Open Data Analytics for z/OS installs Apache Spark in a read-only file system.</p>
@@ -659,7 +641,7 @@ run frequently. Decide whether this setting is adequate.
 <p>For more information about these properties, see 
 the following:</p>
                             <p>
-<a href="http://spark.apache.org/docs/2.1.1/spark-standalone.html">Spark Standalone Mode</a>
+<a href="http://spark.apache.org/docs/2.2.0/spark-standalone.html">Spark Standalone Mode</a>
                             </p>
                         </instructions>
                         <weight>1</weight>
@@ -683,7 +665,7 @@ the following:</p>
         </ul>
 </li>
 <li>
-        <b>spark.executor.logs.rolling.maxSize</b> - Sets the maximum file size, in bytes, by which the executor logs are to be rolled over. For more information about these properties, see <a href="http://spark.apache.org/docs/2.1.1/configuration.html">Spark Configuration</a>.</li>
+        <b>spark.executor.logs.rolling.maxSize</b> - Sets the maximum file size, in bytes, by which the executor logs are to be rolled over. For more information about these properties, see <a href="http://spark.apache.org/docs/2.2.0/configuration.html">Spark Configuration</a>.</li>
 <li>
         <b>spark.executor.logs.rolling.strategy</b> - Sets the strategy for the rolling of executor logs. By default, this setting is disabled. The following values are valid:<ul>
             <li>
@@ -906,10 +888,21 @@ environment variable to avoid this.</instructions>
     </step>
     <step name="Step5">
         <title>Configuring client authentication for z/OS Spark</title>
-        <description>This task enumerates the steps to configure client authentication for z/OS Spark from IBM Open Data Analytics for z/OS Installation and Customization Guide.<p>z/OS Spark uses Application Transparent Transport Layer Security (AT-TLS) with level 2 client authentication to secure communications between the Spark master and its clients, including the Spark worker and driver. The TLS protocol relies on the digital certificates that are signed by a trusted certificate authority (CA) to authenticate the end points. For more information about AT-TLS, see <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/attls.htm">Application Transparent Transport Layer Security</a> and <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/attls_get_started.htm">Getting started with AT-TLS</a> in <cite>
+        <description><!--Updated w/ new client authentication method, Trusted Partner. Jan. '18-->This task enumerates the steps to configure client authentication for z/OS Spark from IBM Open Data Analytics for z/OS Installation and Customization Guide.<p>If client authentication is enabled, you can specify one of the following client authentication methods:
+<dl><dt><b>Application Transparent Transport Layer Security (AT-TLS)</b>
+
+<dd><p>This is the default Spark client authentication method that uses digital certificates along with AT-TLS. You need to set up digital certificates for the Spark cluster and its users, as well as an AT-TLS policy.</p></dd></dt>
+<dt><b>Trusted Partner</b>
+
+       <dd><p>If all connections to the master port are internal, then you can consider using the Trusted Partner client authentication method, which doesn't require client certificates. However, this method continues to use AT-TLS for server authentication. A connection is internal if both endpoints belong in the same sysplex, the data flowing through the connection is never exposed outside of the sysplex, and the link or interface that is used is one of the following types:
+<ul><li>CTC</li><li>HiperSockets interface (iQDIO)</li><li>MPCPTP (including XCF and IUTSAMEH)</li><li>OSA-Express QDIO with CHPID type OSX or OSM</li><li>Loopback</li><li>Both connection partners are owned by the same multihomed stack</li></ul></p>
+<p>For more information about internal connections, see <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.halx001/ovwcri.htm">Sysplex-specific connection routing information</a> in <cite>
                     <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/toc.htm">z/OS Communications Server: IP Configuration Guide</a>
-                </cite>.</p>
-            <p>This workflow uses an internal CA. The configuration also uses a one-to-one certificate-to-user ID associated - one certificate maps to one user.
+                </cite>.</p></dd></dt>
+</dl></p><p>For more information about client authentication methods, see <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_c_configclientauth.htm">Configuring client authentication for z/OS Spark</a>.</p>
+            <p>This workflow uses an internal CA. The configuration also uses a one-to-one certificate-to-user ID associated - one certificate maps to one user.</p><p>You can specify the wanted authentication method (<code>ATTLS</code> or <code>TrustedPartner</code>) in <code>spark-defaults.conf</code> file. For example:<p>
+                <code>spark.zos.master.authenticate.method       ATTLS</code>
+            </p><p>The APAR PI89136 is required to use Trusted Partner client authentication method.</p><!--end of update-->
 
 <b>Note:</b> Client authentication is enabled by default. If you want to defer the use of client authentication, you can disable the function by setting the following property in the <code>spark-defaults.conf</code> file:</p>
             <p>
@@ -918,7 +911,8 @@ environment variable to avoid this.</instructions>
         </description>
         <step name="Step5_1">
             <title>Creating and configuring digital certificates and key rings</title>
-            <description>This task enumerates the steps of creating and configuring digital certificates and key rings for the internal CA, Spark master, and Spark users.<p>Digital certificates can be managed through RACF, PKI Services, or other security products. If you plan to have many Spark users (50 or more), consider using PKI Services, which provides additional management functionality for larger environments.</p>
+            <description>This task enumerates the steps of creating and configuring digital certificates and key rings that are needed for z/OS Spark client authentication.
+<!--Updated w/ new client authentication method, Trusted Partner. Jan. '18--><p>The TLS protocol relies on digital certificates that are signed by a trusted certificate authority (CA) to authenticate the end points. The following configuration uses an internal CA. You might consider using an internal CA when only users within your company or organization need access to Spark. If you already configured an internal CA for user with other products, you can reuse any existing end-user certificates for Spark.</p><p>Digital certificates can be managed through RACF, PKI Services, or other security products. If you are using AT-TLS as the client authentication method and plan to have many Spark users (50 or more), consider using PKI Services, which provides additional management functionality for larger environments.</p><!--end of update-->
                 <p>
                     <ul>
                         <li>For more information about digital certificates in RACF, see <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.icha700/icha700_Planning_your_certificate_environment.htm">Planning your certificate environment</a> and <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.icha700/digsenv.htm">Setting up your certificate environment</a> in <cite>
@@ -991,7 +985,7 @@ PERMIT IRR.DIGTCERT.LIST CLASS(FACILITY) ID(SPARKID) ACCESS(READ)</code>
             </step>
             <step name="Step5_1_3">
                 <title>Create and connect a certificate and key ring for each Spark end user that connects to the cluster</title>
-                <description>Create and connect a certificate and key ring for each Spark end user that connects to the cluster.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+                <description><!--Updated w/ new client authentication method, Trusted Partner. Jan. '18-->If you are using AT-TLS as the Spark client authentication method, create, and connect a certificate and a key ring for each Spark end user. If you are using Trusted Partner as the client authentication method, you can skip this step. <!--end of update--><p>See the <b>Perform</b> workflow tab for further instructions.</p>
                 </description>
                 <instructions>Perform the following:
 <ol>
@@ -1208,35 +1202,52 @@ TTLSConfig /etc/pagent/TCPIP_TTLS.policy</code>
         </step>
         <step name="Step5_6" optional="false">
             <title>Defining the AT-TLS policy rules</title>
-            <description>Defining the AT-TLS policy rules. An AT-TLS policy configuration file contains the AT-TLS rules that identify specific types of TCP traffic, along with the type of TLS/SSL to be applied to those connections. If a rule match is found, AT-TLS transparently provides TLS protocol control for the connection based on the security attributes that are specified in the actions that are associated with the rule.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+<!--Updated w/ new client authentication method, Trusted Partner. Jan. '18-->           <description>Defining the AT-TLS policy rules. An AT-TLS policy configuration file contains the AT-TLS rules that identify specific types of TCP traffic, along with the type of TLS/SSL to be applied to those connections. If a rule match is found, AT-TLS transparently provides TLS protocol control for the connection based on the security attributes that are specified in the actions that are associated with the rule.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
             </description>
-            <instructions substitution="false">&lt;ol&gt;&lt;li&gt;Configure your AT-TLS policy rules as described in &lt;a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/attls_policy_cfg.htm" target="_blank"&gt;AT-TLS policy configuration&lt;/a&gt; in &lt;cite&gt;&lt;a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/toc.htm" target="_blank"&gt;z/OS Communications Server: IP Configuration Guide&lt;/a&gt;&lt;/cite&gt;. For a sample policy file, see &lt;a href="https://www.ibm.com/support/knowledgecenter/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_r_samptlspolicy.htm" target="_blank"&gt;Sample AT-TLS policy&lt;/a&gt; in &lt;cite&gt;&lt;a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/toc.htm" target="_blank"&gt;IBM Open Data Analytics for z/OS Installation and Customization Guide&lt;/a&gt;&lt;/cite&gt;. 
+            <instructions substitution="false"><ol><li>Configure your AT-TLS policy rules as described in <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/attls_policy_cfg.htm">AT-TLS policy configuration</a> in <cite><a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.halz002/toc.htm">z/OS Communications Server: IP Configuration Guide</a></cite>.
+The content of your AT-TLS policy depends on the Spark client authentication method that you choose.
+<ul><li>If you are using AT-TLS as your Spark client authentication method, you need to enable level 2 client authentication in your AT-TLS policy:
+<ul><li>The handshake role of the server needs to be <code>ServerWithClientAuth</code>.</li>
+<li>The <code>ClientAuthType</code> needs to be <code>SAFCheck</code> to enable level 2 client authentication.</li>
+<li>Each client that is connecting to the Spark master port needs to have its own key ring and its own certificate.</li>
+<li>The worker daemon, which is also a client connecting to the master port, needs its own separate set of AT-TLS rules because the worker uses a different key ring than the other clients.</li></ul></li>
+<li>If you are using Trusted Partner as your Spark client authentication method, you do not need to enable client authentication in your AT-TLS policy:
+<ul><li>The handshake role of the server only needs to be <code>Server</code>.</li>
+<li>The <code>ClientAuthType</code> does not need to be defined.</li>
+<li>The clients that are connecting to the Spark master port do not need to own key rings or certificates. The clients can instead use the CA's virtual key ring to access the CA's certificate, which is needed to validate the server's certificate.</li>
+<li>No separate rules are needed for the worker daemon.</li></ul></li></ul></li></ol> 
+For sample policy files, see &lt;a href="https://www.ibm.com/support/knowledgecenter/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_r_samptlspolicy.htm" target="_blank"&gt;Sample AT-TLS policies&lt;/a&gt; in &lt;cite&gt;&lt;a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/toc.htm" target="_blank"&gt;IBM Open Data Analytics for z/OS Installation and Customization Guide&lt;/a&gt;&lt;/cite&gt;. 
 
-<p>The figure in &lt;a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_t_definetlspolicy.htm" target="_blank"&gt;Defining the AT-TLS policy rules&lt;/a&gt; illustrates the communication connections between the processes in a typical Spark cluster.</p>&lt;p&gt;In the referenced figure, connection &lt;b&gt;1&lt;/b&gt; represents any connection to a Spark cluster from the end user. Connection &lt;b&gt;2&lt;/b&gt; represents the worker processes connecting to the cluster as part of normal cluster operations.&lt;/p&gt;&lt;p&gt;For connection &lt;b&gt;1&lt;/b&gt;, there is a rule that governs all inbound connections to the master port range, that is represented by &lt;b&gt;a&lt;/b&gt;. There is also a rule that governs all outbound connections to the master port range, that is represented by &lt;b&gt;b&lt;/b&gt;.&lt;/p&gt;&lt;p&gt;The policy rule for endpoint &lt;b&gt;a&lt;/b&gt; of both connections specifies that the handshake role is of a server enforcing client authentication for inbound connections. It also points to the SAF key ring of the Spark user ID (SPARKID) for the cluster.&lt;/p&gt;&lt;p&gt;The sample policy file has the following rule for inbound connections to the Spark master:&lt;/p&gt;&lt;p&gt;
+<p>The figure in &lt;a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_t_definetlspolicy.htm" target="_blank"&gt;Defining the AT-TLS policy rules&lt;/a&gt; illustrates the communication connections between the processes in a typical Spark cluster.</p><p>If you are using AT-TLS as the Spark client authentication method, you need to enforce client authentication when connecting to the master port, as shown by connection <b>1</b> and <b>2</b> in the referenced figure. Connection <b>1</b> represents any connection to a Spark cluster from an end user. Connection <b>2</b> represents the worker daemon that is connecting to the cluster as part of normal cluster operations. Both the master and worker daemons are run under the same user ID.</p>&lt;p&gt;For connection &lt;b&gt;1&lt;/b&gt;, there is a rule that governs all inbound connections to the master port range, that is represented by &lt;b&gt;a&lt;/b&gt;. There is also a rule that governs all outbound connections to the master port range, that is represented by &lt;b&gt;b&lt;/b&gt;.&lt;/p&gt;
+<p>The policy rule for endpoint <b>a</b> of both connections specifies the handshake role of the server and points to the SAF key ring of the Spark cluster user ID (SPARKID). For example, the policy file might have the following rule for inbound connections to the Spark master:</p>&lt;p&gt;
 &lt;code&gt;TTLSRule                                 SparkMaster_Server
 {
    LocalPortRangeRef                     SparkMasterPort
    Direction                             Inbound
-   TTLSGroupActionRef                    gAct1
-   TTLSEnvironmentActionRef              eAct2~SparkMaster_Server
-   TTLSConnection ActionRef              cAct2~SparkMaster_Server
-}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;In the following example, &lt;code&gt;SparkMasterPort&lt;/code&gt; has the following defined port range, where 7077 is the default master port. By default, Spark retries with the next port up to 16 times if it is unable to bind to the first port (7077 + 16 = 7093).&lt;/p&gt;&lt;p&gt;
+   TTLSGroupActionRef                    gAction_TTLS_On
+   TTLSEnvironmentActionRef              eAct_SparkMaster_Server
+}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;In the example, &lt;code&gt;SparkMasterPort&lt;/code&gt; has the following defined port range, where 7077 is the default master port. By default, Spark retries with the next port up to 16 times if it is unable to bind to the first port (7077 + 16 = 7093).&lt;/p&gt;&lt;p&gt;
 &lt;code&gt;PortRange                        SparkMasterPort
 {
    Port                          7077-7093
-}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;The environmental action &lt;code&gt;eAct2~SparkMaster_Server&lt;/code&gt; enforces client authentication, by specifying &lt;code&gt;ServerWithClientAuth&lt;/code&gt;, and points to the Spark ID cluster key ring (&lt;code&gt;SparkClusterRing&lt;/code&gt;).&lt;/p&gt;&lt;p&gt;
-&lt;code&gt;TTLSEnvironmentAction                             eAct2~SparkMaster_Server
+}&lt;/code&gt;&lt;/p&gt;
+<p>The <code>HandShakeRole</code> parameter in the environmental action <code>eAct_SparkMaster_Server</code> indicates the handshake role of the server. It can be specified as <code>ServerWithClientAuth</code>, which enforces client authentication and is required if you're using AT-TLS as the Spark client authentication method. It can also be specified as <code>Server</code>, which indicates that only server authentication is needed and can be used with the Trusted Partner authentication method. The <code>TTLSKeyringParms</code> parameter in this example, points to the Spark ID cluster key ring (<code>SparkClusterRing</code>):</p>&lt;p&gt;
+&lt;code&gt;TTLSEnvironmentAction                             eAct2_SparkMaster_Server
 {
    HandshakeRole                                  ServerWithClientAuth
    EnvironmentUserInstance                        0
-   TTLSKeyringParmsRef                            SparkClusterRing
-   TTLSEnvironmentAdvancedParmsRef                SparkServerEndAdv
-}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;The group action &lt;code&gt;gAct1&lt;/code&gt; ensures that TLS is enabled.&lt;/p&gt;&lt;p&gt;
-&lt;code&gt;TLLSGroupAction                     SparkMasterPort
+   TTLSKeyringParms
+   { 
+       Keyring                                    SparkClusterRing
+    }
+   TTLSEnvironmentAdvancedParmsRef                eAdv_SparkMaster_Server
+}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;The group action &lt;code&gt;gAction_TTLS_On&lt;/code&gt; ensures that TLS is enabled.&lt;/p&gt;&lt;p&gt;
+&lt;code&gt;TLLSGroupAction                     gAction_TTLS_On
 {
   TLLSEnabled                       On 
-}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;The advanced environmental action &lt;code&gt;SparkServerEnvAdv&lt;/code&gt; ensures that TLS 1.2 is being used and enforces level-2 client authentication by specifying &lt;code&gt;ClientAuthTypeSAFCheck&lt;/code&gt;.&lt;/p&gt;&lt;p&gt;
-&lt;code&gt;TTLSEnvironmentAdvancedParms                          SparkServerEnvAdv
+}&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The advanced environmental action &lt;code&gt;eAdv_SparkMaster_Server&lt;/code&gt; ensures that TLS 1.2 is used. If you are using AT-TLS as the Spark client authentication method, you also need to specify <code>ClientAuthType</code> of <code>SAFCheck</code> to enforce level 2 client authentication. <code>ClientAuthType</code> is not needed if you are using Trusted Partner as the authentication method.&lt;p&gt;
+&lt;code&gt;TTLSEnvironmentAdvancedParms                          eAdv_SparkMaster_Server
 {
    ClientAuthType                                     SAFCheck
    TLSv1                                              Off
@@ -1247,39 +1258,50 @@ TTLSConfig /etc/pagent/TCPIP_TTLS.policy</code>
 {
    Direction                                Outbound
    RemotePortRangeRef                       SparkMasterPort
-   TTLSGroupActionRef                       gAct1
-   TTLSEnvironmentActionRef                 eAct1~SparkDriver_Client
-   TTLSConnectionActionRef                  cAct1~SparkDriver_Client
+   TTLSGroupActionRef                       gAction_TTLS_On
+   TTLSEnvironmentActionRef                 eAct_SparkDriver_Client
    Priority                                 50
-}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;The &lt;code&gt;eAct1~SparkDriver_Client&lt;/code&gt;environmental rule specifies its handshake role and points to the SAF key ring of the end user.&lt;/p&gt;&lt;p&gt;
-&lt;code&gt;TTLSEnvironmentAction                             eAct1~SparkDriver_Client
+}&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;eAct_SparkDriver_Client&lt;/code&gt; environmental rule specifies its handshake role and points to the SAF key ring of the end user.&lt;/p&gt;&lt;p&gt;
+&lt;code&gt;TTLSEnvironmentAction                             eAct_SparkDriver_Client
 {
    HandshakeRole                                  Client
    EnvironmentUserInstance                        0
-   TTLSKeyringParmsRef                            SparkUserRing
-   TTLSEnvironmentAdvancedParmRef                 SparkClientEnvAdv
-}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;&lt;code&gt;SparkUserRing&lt;/code&gt; is a key ring that is used by the user in the TLS handshake.&lt;/p&gt;&lt;p&gt;
-&lt;code&gt;TTLSKeyringParms                             SparkUserRing
+   TTLSKeyringParmsRef                            ring_SparkClient
+   TTLSEnvironmentAdvancedParmRef                 eAdv_SparkClient
+}&lt;/code&gt;&lt;/p&gt;
+<p>If you are using AT-TLS as the Spark client authentication method, you need to specify the key ring that you defined for the client previously (<code>SparkUserRing</code> in the following example). A SAF key ring name can be specified in the policy as <i>userid/keyring</i>. If <i>userid</i> is omitted, the user ID of the application that owns the AT-TLS protected socket is used (in this case, the Spark end user). This is useful to avoid updating the policy for every end user. Give each end user the same key ring name, and the key ring for the user ID associated with the socket is used:</p>&lt;p&gt;
+&lt;code&gt;TTLSKeyringParms                             ring_SparkClient
 {
    Keyring                                   SparkUserRing
-}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;A SAF key ring name can be specified in the policy as &lt;code&gt;userid/keyring&lt;/code&gt;. If &lt;code&gt;userid&lt;/code&gt; is omitted, the user ID of the application that owns the AT-TLS protected socket is used. In this case, the Spark end user. This is useful to avoid updating the policy for every end user. Give each end user the same key ring name. The key ring for the user ID associated with the socket is used.&lt;/p&gt;&lt;p&gt;The policy rule for endpoint &lt;b&gt;c&lt;/b&gt; is similar to the one for &lt;b&gt;b&lt;/b&gt; in that it is a client. However, because it is the worker process that is running under the Spark ID, it uses that user's key ring for authentication.&lt;/p&gt;&lt;p&gt;
-&lt;code&gt;TTLSEnvironmentAction                             eAct3~SparkCluster_Client
+}&lt;/code&gt;&lt;/p&gt;
+<p>If you are using Trusted Partner as the Spark client authentication method, you can use the CA's virtual key ring to access the CA's certificate. This is needed to validate the server's certificate.
+</p><p>
+<code>TTLSKeyringParms                             ring_SparkClient
 {
-   HandshakeRole                                  Client
-   EnvironmentUserInstance                        0
-   TTLSKeyringParmsRef                            SparkClusterRing
-   TTLSEnvironmentAdvancedParmRef                 SparkClientEnvAdv
-}&lt;/code&gt;&lt;/p&gt;&lt;p&gt;This rule takes effect when the user ID is SPARKID. Due to the higher priority, this rule matches for SPARKID before &lt;code&gt;SparkDriver_Client&lt;/code&gt; does.&lt;/p&gt;&lt;p&gt;
-&lt;code&gt;TTLSRule                                        SparkCluster_Client
+   Keyring                                   *AUTH*/*
+}</code></p><p>The policy rule for endpoint <b>c</b> is similar to the one for <b>b</b> in that it is a client, but it is the worker daemon that is running under the Spark ID.</p><p>If you are using AT-TLS as the Spark client authentication method, you need extra rules for the worker daemon as a client, since the worker uses a different key ring than the other clients (Spark end users). The following sample rule takes effect when the user ID is SPARKID. Due to the higher priority, this rule matches for SPARKID before <code>SparkDriver_Client</code> does:
+</p><p>
+<code>TTLSRule                                        SparkWorker_Client
 {
    Userid                                       SPARKID
    Direction                                    Outbound
    RemotePortRangeRef                           SparkMasterPort
-   TTLSGroupActionRef                           gAct1
-   TTLSEnvironmentActionRef                     eAct3~SparkCluster_Client
-   TTLSConnectionActionRef                      cAct3~SparkCluster_Client
+   TTLSGroupActionRef                           gAction_TTLS_On
+   TTLSEnvironmentActionRef                     eAct_SparkWorker_Client
    Priority                                     1000
-}&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;Recycle TCP/IP to pick up the profile changes that you made earlier or issue the following MVS system command to refresh its profile.&lt;p&gt;&lt;code&gt;VARY TCPIP,,OBEYFILE,DSN=new_tcpip_profile&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ol&gt;</instructions>
+}</code></p><p>The environment avtion that is previously referenced, <code>eAct_SparkWorker_Client</code>, specifies that the Spark cluster key ring is used:
+</p><p>
+<code>TTLSEnvironmentAction                             eAct_SparkWorker_Client
+{
+   HandshakeRole                                  Client
+   EnvironmentUserInstance                        0
+   TTLSKeyringParmsRef 
+    {
+       Keyring                                    SparkClusterRing
+    }
+   TTLSEnvironmentAdvancedParmRef                 eAdv_SparkClient
+}</code></p>&lt;/li&gt;&lt;li&gt;Recycle TCP/IP to pick up the profile changes that you made earlier or issue the following MVS system command to refresh its profile.&lt;p&gt;&lt;code&gt;VARY TCPIP,,OBEYFILE,DSN=new_tcpip_profile&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ol&gt;</instructions><!--end of update-->
             <weight>1</weight>
             <autoEnable>false</autoEnable>
             <canMarkAsFailed>false</canMarkAsFailed>
@@ -1304,16 +1326,16 @@ TTLSConfig /etc/pagent/TCPIP_TTLS.policy</code>
         </step>
         <step name="Step5_8">
             <title>Configuring additional authorities and permissions for the Spark cluster</title>
-            <description>Complete this step to configure additional authorites and permissions that are needed within the Spark cluster.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
+            <description>Complete this step to configure additional authorities and permissions that are needed within the Spark cluster.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
             </description>
             <instructions>
                 <ol>
-                    <li>Ensure that Spark client authentication is enabled. Verify the following property in the <code>spark-defaults.conf</code> file:<p>
+                    <li><!--#1-->Ensure that Spark client authentication is enabled. Verify the following property in the <code>spark-defaults.conf</code> file:<p>
                             <code>spark.zos.master.authenticate      true</code>
                         </p>
                     </li>
-                    <li>Configure the Spark cluster user ID (SPARKID in previous examples) to have the authority to change the user IDs of the Spark executors to those of the authenticated end user IDs. To do this, configure the <code>SURROGAT</code> class profile for the surrogate user ID. For example:
-<ol>
+<li><!--#2  added for Trusted Partner update Jan '18-->Specify the Spark client authentication method to use. There are 2 Spark client authentication methods - AT-TLS (<code>ATTLS</code>), which is default, and Trusted Partner (<code>TrustedPartner</code>). Specify <code>spark.zos.master.authenticate.method</code> to be either <code>ATTLS</code> or <code>TrustedPartner</code> in the <code>spark-defaults.conf</code> file.<p><code>spark.zos.master.authenticate.method      ATTLS</code></p><!--end of update--></li>                    <li><!--#3-->Configure the Spark cluster user ID (SPARKID in previous examples) to have the authority to change the user IDs of the Spark executors to those of the authenticated end user IDs. To do this, configure the <code>SURROGAT</code> class profile for the surrogate user ID. For example:
+<ul>
                             <li>Issue the following RACF commands to define a generic profile that allows SPARKID (a non-UID 0 user ID) to switch to any other z/OS user ID that has a defined z/OS UNIX segment:<p>
     <code>SETROPTS CLASSACT(SURROGAT)      RACLIST(SURROGAT) ENERIC(SURROGAT)
 RDEFINE SURROGAT BPX.SRV.** UACC(NONE)
@@ -1325,19 +1347,19 @@ SETROPTS GENERIC(SURROGAT) RACLIST(SURROGAT) REFRESH</code>
     <code>RLIST SURROGAT BPX.SRV.** AUTHUSER</code>
 </p>
                             </li>
-                            <li>Configure the z/OS system that hosts the Spark cluster to honor ACLs that are set by the Spark ID that is running the cluster. For example, issue the following RACF command:<p>
+                            
+                        </ul></li>
+<li><!--#4-->Configure the z/OS system that hosts the Spark cluster to honor ACLs that are set by the Spark ID that is running the cluster. For example, issue the following RACF command:<p>
     <code>SETROPTS CLASSACT(FFSEC)</code>
 </p>
                             </li>
-                            <li>Change the permissions on the Spark working directory and Spark local directory so that both SPARKID and the end users can write to them. Add the sticky bit so that users can only delete their own files. For example, issue the following commands from the z/OS UNIX shell:<p>
+                            <li><!--#5-->Change the permissions on the Spark working directory and Spark local directory so that both SPARKID and the end users can write to them. Add the sticky bit so that users can only delete their own files. For example, issue the following commands from the z/OS UNIX shell:<p>
     <code>chmod 775 $SPARK_WORKER_DIR
 chmod +t $SPARK_WORKER_DIR
 chmod 775 $SPARK_LOCAL_DIR
 chmod +t $SPARK_LOCAL_DIR</code>
 </p>
-                            </li>
-                        </ol>
-                        <p>
+<p>
                             <b>Note:</b> If you enabled event logging, perform this step for the event log directory as well.
 
 You can issue the following command to verify the proper setting:
@@ -1347,11 +1369,40 @@ You can issue the following command to verify the proper setting:
                         <p>The output should be similar to the following example:
 
 
-</p><p><code>drwxrwxr-t 2 SPARKID SYS1 8192 Aug 8 08:51 /Spark-2.1.1/work
-drwxrwxr-t 2 SPARKID SYS1 8192 Aug 8 08:51 /Spark-2.1.1/tmp</code>
+</p><p><code>drwxrwxr-t 2 SPARKID SYS1 8192 Aug 8 08:51 /Spark-2.2.0/work
+drwxrwxr-t 2 SPARKID SYS1 8192 Aug 8 08:51 /Spark-2.2.0/tmp</code>
                         </p>
-                    </li>
-                </ol>
+                            </li><li><!--#6 (#6 through #10 are added for Trusted Partner update). Jan '18--><b>Note:</b> Steps 6 - 10 are only needed if you are using Trusted Partner as the Spark client authentication method.
+<p>Configure the Spark cluster user ID (SPARKID in the earlier examples) to have authority to obtain its connection partner's routing information and security credentials. To do this, grant the user ID READ access to the following SERVAUTH class profile:
+
+<code>EZB.IOCTL.<i>sysname</i>.<i>tcpprocname</i>.PARTNERINFO</code>
+</p><p>
+where:</p><p><ul><li><b><i>sysname</i></b> - Specifies the system name that is defined in the sysplex.</li>
+<li><b><i>tcpprocname</i></b> - Specifies the TCP/IP procedure name.</li></ul></p>
+<p><p><b>Tip:</b> You can specify a wildcard on segments of the profile name. For example, issue the following RACF commands:
+</p><p>
+<code>RDEFINE SERVAUTH EZB.IOCTL.*.*.PARTNERINFO UACC(NONE)
+PERMIT EZB.IOCTL.*.*.PARTNERINFO CLASS(SERVAUTH) ID(SPARKID) ACCESS(READ)
+SETROPTS RACLIST(SERVAUTH) REFRESH</code></p></p> </li><li><!--#7-->Create a common security daemon name within your sysplex. This is only needed if the client (Spark driver and worker) is using a different TCP/IP stack than the master daemon. To do this, define an EZBDOMAIN profile in the SERVAUTH class within the sysplex on which the Spark cluster and clients reside. Specify the security domain name in the <b>APPLDATA</b> field. For example, issue the following RACF commands:
+<p><code>RDEFINE SERVAUTH AZBDOMAIN APPLDATA('<i>security_domain_name</i>')
+SETROPTS RACLIST(SERVAUTH) REFRESH</code></p><p>where:</p><p><ul><li><b><i>security_domain_name</i></b> - Specifies the name of the security domain. The name is not case-sensitive and is limited to 255 characters.
+</li></ul></p><p>Issue the following RACF command to display the defined EZBDOMAIN:
+</p><p>
+<code>RLIST SERVAUTH EZBDOMAIN</code></p></li>
+ <li><!--#8-->Grant the Spark cluster user ID READ access to the BPX.SERVER FACILITY class profile, so the Spark master daemon can verify whether the client is authorized to connect to the master port. For example, issue the following RACF commands:
+<p><code>RDEFINE FACILITY BPX.SERVER UACC(NONE)
+PERMIT BPX.SERVER CLASS(FACILITY) ID(SPARKID) ACCESS(READ)
+SETROPTS RACLIST(FACILITY) REFRESH</code></p></li><li><!--#9-->Mark the file <code>$SPARK_HOME/lib/zos-native/libspark_zos_ioctl.so</code> as controlled (trusted), if it is not already.<p>To verify whether the file has the controlled attribute on, issue the following commands:
+</p><p><code>ls -E $SPARK_HOME/lib/zos-native</code>
+</p><p>The output should be similar to the following example:
+</p><p><code>-rwxr-xr-x -ps- 1 SPARKID  SPKGRP  81920 Oct 13 13:43 libspark_zos_ioctl.so</code></p><p>If the file does not have the <code>p</code> extended attribute, then it is not marked as controlled. To mark the file as controlled, issue the following command from a user ID that has READ access to the BPX.FILEATTR.PROGCTL resource in the FACILITY profile:
+</p><p><code>extattr +p $SPARK_HOME/lib/zos-native/libspark_zos_ioctl.so</code></p></li>                       
+                    
+<li><!--#10--> For each user ID that connects to the Spark master port, including the IDs of the Spark worker and drivers, grant the ID READ access to the AZK.SPARK.MASTER.CONNECT XFACILIT class profile. For example, issue the following RACF commands:<p><code>RDEFINE XFACILIT AZK.SPARK.MASTER.CONNECT UACC(NONE)
+PERMIT AZK.SPARK.MASTER.CONNECT CLASS(XFACILIT) ID (SPARKID) ACCESS(READ)
+PERMIT AZK.SPARK.MASTER.CONNECT CLASS(XFACILIT) ID(SPARKUSR) ACCESS(READ)
+SETROPTS RACLIST(XFACILIT) REFRESH</code></p></li>
+                </ol><!--end of update-->
             </instructions>
             <weight>1</weight>
         </step>
@@ -1359,7 +1410,7 @@ drwxrwxr-t 2 SPARKID SYS1 8192 Aug 8 08:51 /Spark-2.1.1/tmp</code>
             <title>Starting the Spark cluster</title>
             <description>Starting the Spark cluster.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
             </description>
-            <instructions>After completing all of the tasks to enable client authentication and configure z/OS Spark, start the Spark cluster and run your Spark application as usual. If a worker or driver does not have a valid certificate that maps to a z/OS user ID, it fails to connect to the master port. Executors that are started for a client-deploy-model application run under the user ID of that application. Executors and drivers that are started in cluster deploy mode are considered part of the Spark cluster and continue to run under the user ID of the worker.</instructions>
+            <instructions><!--updated for client authentication. Jan '18-->After completing all of the tasks to enable client authentication and configure z/OS Spark, start the Spark cluster and run your Spark application as usual. If a worker or driver is unable to be authenticated, it fails to connect to the master port. With z/OS Spark client authentication enabled, an application that is submitted to the master port has its executors started under the user ID of that application. An application that is submitted to the REST port, which is the port for cluster deploy mode, is considered part of the Spark cluster. Therefore, both the driver and executors are run under the user ID of the Spark cluster.</instructions><!--end of update-->
             <weight>1</weight>
         </step>
     </step>
@@ -1413,13 +1464,15 @@ For more information about the order that java takes dump settings, see <a href=
             <title>Start and stop Spark processes</title>
             <description>Spark processes, such as the master and worker, can be started through BPXBATCH.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
             </description>
-            <instructions>You can start Spark processes, such as the master and worker, by using BPXPATCH. For example, the following is a sample of BPXBATCH logic to start the master and worker:
+            <instructions><p><!--update w/ important note. Jan '18--><b>Important:</b> Be sure that all of the required environment variables, such as JAVA_HOME, are set in the environment that is started by BPXBATCH. You can accomplish this in one of the following ways:
+<ul><li>Export the environment variables in one of the bash startup files.<p>Invoke the <code>bash</code> command with the <code>-l</code> option in BPXBATCH. The <code>-l</code> option on the bash command instructs bash to run a login shell, in which bash first reads, and runs commands from the file <code>/etc/profile</code>, if the file exists. After reading that file, bash looks for <code>~/.bash_profile,~/.bash_login</code>, and <code>~/.profile</code> in that order, reads and runs commands from the first one that exists and is readable. You can export your environment variables in <code>~/.bash_profile</code>, for example, so they are added to the environment.</p></li><li>Use the <code>STDENV DD</code> statement to pass environment variables to BPXBATCH. You can specify a file that defines the environment variables or specify them directly in the JCL. For more information about using the <code>STDENV</code> statement, see <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.bpxa400/evbat.htm">Passing environment variables to BPXBATCH</a> in <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.bpxa400/toc.htm">z/OS UNIX System Services User's Guide</a>.</li></ul></p><!--end of update-->
+You can start Spark processes, such as the master and worker, by using BPXPATCH. For example, the following is a sample of BPXBATCH logic to start the master and worker:
 <p>
                     <code>//SPARKMST JOB 'SPARK START',CLASS=K,MSGCLASS=A,
 // NOTIFY=&amp;SYSUID,SYSTEM=HOST,USER=SPARKID
 //PRTDS EXEC PGM=BPXBATCH,REGION=0M
 //STDPARM DD *
-SH /bin/bash -l -c ’cd /usr/lpp/IBM/izoda/spark/spark211/sbin;start-master.sh;
+SH /bin/bash -l -c ’cd /usr/lpp/IBM/izoda/spark/spark220/sbin;start-master.sh;
 sleep 5;start-slave.sh spark://hostname.yourcompany.com:7077’
 //SYSOUT DD SYSOUT=*
 //STDIN DD DUMMY
@@ -1433,7 +1486,7 @@ The <code>-l</code> and <code>-c</code> options of bash instruct bash to run a l
 The semi-colons in the command sequence separate different shell commands. Specifically, the sample start job instructs bash to change directories to the Spark product install 
 directory where admin commands are located:
 <p>
-                        <code>cd /usr/lpp/IBM/izoda/spark/spark211/sbin</code>
+                        <code>cd /usr/lpp/IBM/izoda/spark/spark220/sbin</code>
                     </p>
 </p>
                 <p>Then, it starts the master by issuing the following:
@@ -1456,7 +1509,7 @@ These start commands can also be run directly from z/OS UNIX instead of BPXBATCH
 // NOTIFY=&amp;SYSUID,SYSTEM=HOST,USER=SPARKID
 //PRTDS EXEC PGM=BPXBATCH,REGION=0M
 //STDPARM DD *
-//STDPARM DD * SH /bin/bash -l -c ’cd /usr/lpp/IBM/izoda/spark/spark211/sbin;
+//STDPARM DD * SH /bin/bash -l -c ’cd /usr/lpp/IBM/izoda/spark/spark220/sbin;
 stop-slave.sh;sleep 5;stop-master.sh’
 //SYSOUT DD SYSOUT=*
 //STDIN DD DUMMY
@@ -1465,7 +1518,7 @@ stop-slave.sh;sleep 5;stop-master.sh’
 //
 </code>
                 </p>
-                <p>Consider testing the starting and stopping of the Spark cluster to ensure that your setup is correct. However, review the guidance in the <a href="https://www-03.ibm.com/support/techdocs/atsmastr.nsf/WebIndex/WP102684">Resource Tuning Recommendations for IBM z/OS Platform for Apache Spark</a> white paper before going into production..</p>
+                <p>Consider testing the starting and stopping of the Spark cluster to ensure that your setup is correct. However, review the guidance in the <a href="https://www-03.ibm.com/support/techdocs/atsmastr.nsf/WebIndex/WP102684">Resource Tuning Recommendations for IBM z/OS Platform for Apache Spark</a> white paper before going into production.</p>
 </instructions>
             <weight>1</weight>
         </step>
