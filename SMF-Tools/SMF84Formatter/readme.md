@@ -25,11 +25,11 @@ This tool can be used to format SMF 84 subtype 21 records into a CSV or JSON fil
         STEPLIB = <YOUR.STEPLIB.HERE>                                       
         ...
         ```
-3. From the command line, issue the `make` command. Verify that the compilation completed successfully.
+    2. From the command line, issue the `make` command. Verify that the compilation completed successfully.
 
-4. Collect the SMF data to be formatted - [example using `IFASMFDP`](https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.ieag200/rundump.htm) using `IFASMFDP`
+3. Collect the SMF data to be formatted - [example using `IFASMFDP`](https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.ieag200/rundump.htm) using `IFASMFDP`
 
-5. Customize the provided SMF84FMT job.
+4. Customize the provided SMF84FMT job.
     1. Ensure the JOB card meets standards for your installation.
     2. Set the `STEPLIB` JCL symbol to the library containing the `SMF84FMT` executable.
     3. Set the `SMF84IN` variable to the catalogued dataset containing the SMF 84.21 records to be formatted. Non-SMF 84.21 records will be ignored.
@@ -52,7 +52,7 @@ This tool can be used to format SMF 84 subtype 21 records into a CSV or JSON fil
     //*------------------------------------------------------------------*/
     ...
     ```
-6. Submit the SMF84FMT job. 
+5. Submit the SMF84FMT job. Examine the contents of FORMAT.SYSPRINT if the job finishes with a return code other than 0.
 
 ### Supported Parameters
 Parameters are specified as words on the `PARM=` on the `SMF84FMT` step. If no parameters are specified, the following defaults are used: `HEADER MEMORY RESOURCE CSV`
@@ -84,7 +84,7 @@ The following parameters are supported:
     
 * JSON
 
-  A list object where each member corresponds to an SMF 84.21 record. Each member contains a key/value pair mapping the section name to an object that represents that section. Keys are included for sections that were not requested to be formatted but point to an empty object.
+  A list object where each member corresponds to an SMF 84.21 record. Each member contains a key/value pair mapping the section name to an object that represents that section. Keys are included for sections that were not requested to be formatted but point to an empty object. For example, if the HEADER option was not specified, each member will contain `{..., "SMF84HDR": {}, ...}`.
 
   `PARM=PRODUCT GENERAL RESOURCE JSON`
     
