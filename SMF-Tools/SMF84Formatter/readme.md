@@ -33,7 +33,8 @@ This tool can be used to format SMF 84 subtype 21 records into a CSV or JSON fil
     1. Ensure the JOB card meets standards for your installation.
     2. Set the `STEPLIB` JCL symbol to the library containing the `SMF84FMT` executable.
     3. Set the `SMF84IN` variable to the catalogued dataset containing the SMF 84.21 records to be formatted. Non-SMF 84.21 records will be ignored.
-    4. If desired, set the desired options on `PARM=` to control which parts of the SMF 84.21 record are to be formatted and to set the desired output format (CSV or JSON).
+    4. By default, the CSV/JSON formatted records will be output to a SYSOUT dataset. If this is not desired, modify the SMF84OUT DD accordingly. The SMF84OUT datset must be a sequential dataset (DSORG=PS) with variable-sized, blocked records (RECFM=VB).
+    5. If desired, set the desired options on `PARM=` to control which parts of the SMF 84.21 record are to be formatted and to set the desired output format (CSV or JSON).
     ```
     //SMF84FMT JOB MSGLEVEL=(1,1),NOTIFY=&SYSUID
     ...
@@ -52,7 +53,7 @@ This tool can be used to format SMF 84 subtype 21 records into a CSV or JSON fil
     //*------------------------------------------------------------------*/
     ...
     ```
-5. Submit the SMF84FMT job. Examine the contents of FORMAT.SYSPRINT if the job finishes with a return code other than 0.
+5. Submit the SMF84FMT job. Examine the contents of FORMAT.SYSPRINT if the job finishes with a return code other than 0. The formatted SMF records will be written to the SMF84OUT DD, which by default is a SYSOUT dataset on SPOOL.
 
 ### Supported Parameters
 Parameters are specified as words on the `PARM=` on the `SMF84FMT` step. If no parameters are specified, the following defaults are used: `HEADER MEMORY RESOURCE CSV`
