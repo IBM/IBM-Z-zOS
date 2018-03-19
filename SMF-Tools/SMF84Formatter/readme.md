@@ -27,7 +27,7 @@ This tool can be used to format SMF 84 subtype 21 records into a CSV or JSON fil
         ```
     2. From the command line, issue the `make` command. Verify that the compilation completed successfully.
 
-3. Collect the SMF data to be formatted - [example using `IFASMFDP`](https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.ieag200/rundump.htm) using `IFASMFDP`
+3. Collect the SMF data to be formatted - [example using `IFASMFDP`](https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.ieag200/rundump.htm)
 
 4. Customize the provided SMF84FMT job.
     1. Ensure the JOB card meets standards for your installation.
@@ -86,7 +86,7 @@ The following parameters are supported:
 
   A list object where each member corresponds to an SMF 84.21 record. Each member contains a key/value pair mapping the section name to an object that represents that section. Keys are included for sections that were not requested to be formatted but point to an empty object. For example, if the HEADER option was not specified, each member will contain `{..., "SMF84HDR": {}, ...}`.
 
-  `PARM=PRODUCT GENERAL RESOURCE JSON`
+  `PARM=HEADER PRODUCT GENERAL JES2 MEMORY RESOURCE JSON`
     
     ```
     [{"SMF84HDR": {"SMF84LEN": 1344, "SMF84SEG": 0, "SMF84FLG": "5E", "SMF84RTY": 84, "SMF84TME": "22:05:55.51", "SMF84DTE": "2018/03/14", "SMF84SID": "SY1", "SMF84SBS": 2, "SMF84SGN": 1, "SMF84FL1": "80", "SMF84VER": 3, "SMF84STY": 21, "SMF84TRN": 3, "SMF84PRS": 52, "SMF84PRL": 192, "SMF84PRN": 1, "SMF84GNS": 244, "SMF84GNL": 52, "SMF84GNN": 1, "SMF84J1O": 296, "SMF84J1L": 1048, "SMF84J1N": 1},
