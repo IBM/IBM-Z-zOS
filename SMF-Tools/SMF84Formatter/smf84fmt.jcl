@@ -4,7 +4,7 @@
 //*   Author: Nick Becker                                            */
 //*   Created: 12 March, 2018                                        */
 //*   License: apache-2.0 (Apache License 2.0)                       */
-//*     URL::https://www.apache.org/licenses/LICENSE-2.0             */
+//*     URL: https://www.apache.org/licenses/LICENSE-2.0             */
 //********************************************************************/
 //*        The library that contains the SMF84FMT program            */
 //         SET STEPLIB=<YOUR.LIBRARY.HERE>
