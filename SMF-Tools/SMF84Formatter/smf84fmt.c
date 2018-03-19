@@ -1294,8 +1294,6 @@ static int32_t close(DCB *dcb) {
         : "r0", "r1", "r14", "r15"
         );
 
-  dcb = 0;
-
   return close_rc;
 }
 
