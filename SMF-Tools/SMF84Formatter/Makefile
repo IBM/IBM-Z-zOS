@@ -16,7 +16,7 @@ ASFLAGS = -mrent -mgoff -aegms
 
 # linker/binder
 LD = ld
-LDFLAGS  = -bac=1 -brent
+LDFLAGS  = -brent
 LDFLAGSR = -S "//'SYS1.CSSLIB'"
 
 STEPLIB = <YOUR.LINKLIB.HERE>
