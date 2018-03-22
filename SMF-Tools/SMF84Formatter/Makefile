@@ -1,5 +1,5 @@
 #######################################################################
-## smf84fmt.c                                                        ##
+## Makefile                                                          ##
 ##   Author: Nick Becker                                             ##
 ##   Created: 15 February, 2018                                      ##
 ##   License: apache-2.0 (Apache License 2.0)                        ##

@@ -1,5 +1,5 @@
 /*********************************************************************/
-/* smf84fmt.c                                                        */
+/* smf84fmt.h                                                        */
 /*   Author: Nick Becker                                             */
 /*   Created: 2 March, 2018                                          */
 /*   License: apache-2.0 (Apache License 2.0)                        */
