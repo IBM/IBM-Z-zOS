@@ -17,7 +17,7 @@ When in doubt, you can always check the level of the workflow to determine the c
 
 **What's new**
 
-The z/OS V2.3 Migration Workflow is updated to include the new migration actions that were added in the April 2018 edition of the *z/OS Migration* book, including changes for the new IBM z14 ZR1 mainframe. To indicate this change, in the workflow definition file, the workflow version tag is updated to Version 2.1. 
+The z/OS V2.3 Migration Workflow is updated to include the new migration actions that were added in the April 2018 edition of the *z/OS Migration* book, including changes for the new IBM z14&trade; ZR1 mainframe. To indicate this change, in the workflow definition file, the workflow version tag is updated to Version 2.1. 
 
 **Already started with an earlier version?**
 
