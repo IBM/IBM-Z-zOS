@@ -1,0 +1,801 @@
+/*  rexx  */
+/*********************************************************************/
+/*********************************************************************/
+/* Copyright 2017 IBM Corp.                                          */
+/*                                                                   */
+/* Licensed under the Apache License, Version 2.0 (the "License");   */
+/* you may not use this file except in compliance with the License.  */
+/* You may obtain a copy of the License at                           */
+/*                                                                   */
+/* http://www.apache.org/licenses/LICENSE-2.0                        */
+/*                                                                   */
+/* Unless required by applicable law or agreed to in writing, software*/
+/* distributed under the License is distributed on an "AS IS" BASIS, */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/* See the License for the specific language governing permissions and */
+/* limitations under the License.                                   */
+/*********************************************************************/ 
+/*                                                                   */
+/* MODULE NAME: DISCOVERY                                            */
+/*                                                                   */
+/* DESCRIPTION: The goal of this exec is to parse data returned by   */
+/*              the either the D PROD,STATE command or the           */
+/*              D PROD,REG command to determine the status, Enabled, */
+/*              or Disabled of a priced feature. The default is      */
+/*              disabled unless the data returned shows the feature  */
+/*              as enabled.                                          */
+/*                                                                   */
+/*              Specifically, this exec is triggered by the user     */
+/*              through z/OSMF. The data parsed in this exec is      */
+/*              used to change the status of variables found in      */
+/*              the z/OSMF workflow. This is accomplished through    */
+/*              the use of the $output feature provided by the       */
+/*              input workflow definition file.                      */
+/*                                                                   */
+/*              The act of using SYSCALL ADDRESS WRITEFILE along     */
+/*              with $output creates a persistant file that triggers */
+/*              the z/OSMF workflow to scan the file created for     */
+/*              variables that match the ones found in the workflow. */
+/*              In this case, if the status of one of the priced     */
+/*              features is found to be disabled the variable in the */
+/*              workflow will be set to disabled as well.            */
+/*                                                                   */
+/*              When all is said and done the workflow itself will   */
+/*              run through its conditions with the new variables    */
+/*              and will change the state of its steps accordingly.  */
+/*              (See z/OSMF documentation for more details on this)  */
+/*                                                                   */
+/*              IMPORTANT: 1. The variable names defined in this exec*/
+/*                         must match the same name of the variables */
+/*                         defined in the workflow definition file   */
+/*                         or it won't work properly.                */
+/*                                                                   */
+/*                         2. The file directory for $output is      */
+/*                         defined within the workflow definition    */
+/*                         file, NOT this exec.                      */
+/*                                                                   */
+/*                                                                   */
+/* CREATE DATE: 06/03/15                                             */
+/*                                                                   */
+/* AUTHORS: Keith Miller, Jeff Bland                                 */
+/*                                                                   */
+/* CHANGE ACTIVITY:                                                  */
+/*                                                                   */
+/* FLAG  PERSON  DATE       REASON                                   */
+/* ----  ------  ---------  ---------------------------------------- */
+/*  N/A  KMILLER 06/03/15   Initial Version                          */
+/*  1703 BLAND   03/20/17   Validate Program number first            */
+/*  1804 BLAND   04/04/18   Test for upper case Z/OS NAME            */ 
+/*********************************************************************/
+/*                                                                   */
+/*********************************************************************/
+/*                         MAIN PROGRAM                              */
+/*********************************************************************/
+address "TSO"
+xrc = 0
+name = 'CONDIST'
+/*-------------------------------------------------------------------*/
+/*    Check the current state of priced feature on user's system.    */
+/*    using either the D PROD,REG or D PROD,STATE command.           */
+/*-------------------------------------------------------------------*/
+/* runcmd = '${inputcmd}' */
+/*
+if runcmd = 'Use D PROD,STATE' then do
+  command = 'D PROD,STATE'
+end
+else if runcmd = 'Use D PROD,REG' then do
+  command = 'D PROD,REG'
+end
+*/
+command = 'D PROD,STATE'
+prognum_zos = '5650-ZOS'                                     /* 1703 */
+/*-------------------------------------------------------------------*/
+/*                        Run the Program                            */
+/*-------------------------------------------------------------------*/
+say
+say ' This program will determine the state of Priced Features on',
+    'the system.';say
+call CHECK_PRICED_FEATURES
+say;say ' Exiting with return code 'xrc;say
+exit xrc
+
+/*-------------------------------------------------------------------*/
+/*                     CHECK_PRICED_FEATURES                         */
+/*-------------------------------------------------------------------*/
+CHECK_PRICED_FEATURES:
+name = 'CONDIST'
+say ' Executing Command: 'command;say
+say ' Display the data related to the state of priced features.';say
+xrc = XCON(name command)
+if xrc = 0 then do
+  sysLvl = mvsvar(sysopsys)
+  parse var syslvl os ver'.'rel'.' .
+  ver = format(ver)
+  rel = format(rel)
+  say;say ' Extract the Priced Features states from the response.';say
+  statefound = 0
+  deleted_check = 0
+  /*-----------------------------------------------------------------*/
+  /*    Add the list of known priced features to a stem called       */
+  /*    feature. Set default of feature to disabled.                 */
+  /*-----------------------------------------------------------------*/
+  init_state = 'Disabled'
+  i = 1
+  feature_stat.   = init_state
+  feature_name.i  = 'BDTFTF'
+  feature_text.i  = 'bdtftf_status      ='
+  bdtftf_index    = i
+  i = i + 1
+  feature_name.i  = 'BDTNJE'
+  feature_text.i  = 'bdtnje_status      ='
+  bdtnje_index    = i
+  i = i + 1
+  feature_name.i  = 'BOOKMGR BUILD'
+  feature_text.i  = 'bookmgr_status     ='
+  bookmgr_index   = i
+  i = i + 1
+  feature_name.i  = 'XL C/C++'
+  feature_text.i  = 'xlccpp_status      ='
+  xlccpp_index    = i
+  i = i + 1
+  feature_name.i  = 'DFSMSDSS'
+  feature_text.i  = 'dfsmsdss_status    ='
+  dfsmsdss_index  = i
+  i = i + 1
+  feature_name.i  = 'DFSMSHSM'
+  feature_text.i  = 'dfsmshsm_status    ='
+  dfsmshsm_index  = i
+  i = i + 1
+  feature_name.i  = 'DFSMSRMM'
+  feature_text.i  = 'dfsmsrmm_status    ='
+  dfsmsrmm_index  = i
+  i = i + 1
+  feature_name.i  = 'DFSMSTVS'
+  feature_text.i  = 'dfsmstvs_status    ='
+  dfsmstvs_index  = i
+  i = i + 1
+  feature_name.i  = 'DFSORT'
+  feature_text.i  = 'dfsort_status      ='
+  dfsort_index    = i
+  i = i + 1
+  feature_name.i  = 'GDDM-PGF'
+  feature_text.i  = 'gddmpgf_status     ='
+  gddmpgf_index   = i
+  i = i + 1
+  feature_name.i  = 'GDDM-REXX'
+  feature_text.i  = 'gddmrexx_status    ='
+  gddmrexx_index  = i
+  i = i + 1
+  feature_name.i  = 'HCM'
+  feature_text.i  = 'hcm_status         ='
+  hcm_index       = i
+  i = i + 1
+  feature_name.i  = 'HLASM TOOLKIT'
+  feature_text.i  = 'hlasmtk_status     ='
+  hlasmtk_index   = i
+  i = i + 1
+  feature_name.i  = 'INFOPRINT SERVER'
+  feature_text.i  = 'infprntserv_status ='
+  infprntserv_index=i
+  i = i + 1
+  feature_name.i  = 'JES3'
+  feature_text.i  = 'jes3_status        ='
+  jes3_index      = i
+  i = i + 1
+  feature_name.i  = 'RMF'
+  feature_text.i  = 'rmf_status         ='
+  rmf_index       = i
+  i = i + 1
+  feature_name.i  = 'SDSF'
+  feature_text.i  = 'sdsf_status        ='
+  sdsf_index      = i
+  i = i + 1
+  feature_name.i  = 'SECURITY SERVER'
+  feature_text.i  = 'securserv_status   ='
+  securserv_index = i
+  i = i + 1
+  feature_name.i  = 'TCP/IP BASE'
+  feature_text.i  = 'tcpipbase_status   ='
+  tcpipbase_index = i
+  i = i + 1
+  feature_name.i  = 'ZEDC'
+  feature_text.i  = 'zedc_status        ='
+  zedc_index      = i
+  i = i + 1
+  feature_name.i  = 'ZFS'
+  feature_text.i  = 'zfs_status         ='
+  zfs_index       = i
+  /*-----------------------------------------------------------------*/
+  /* Set the following variable to Enabled by default because they   */
+  /* are not priced features.                                        */
+  /*-----------------------------------------------------------------*/
+  i = i + 1
+  feature_name.i  = 'JES2'
+  feature_text.i  = 'jes2_status        ='
+  jes2_index      = i
+  feature_stat.i  = 'Enabled'
+  feature.0 = i           /* Stem to hold data about priced features */
+  feature_list = ''
+  do f = 1 to feature.0
+    /*---------------------------------------------------------------*/
+    /*           Special case HLASM TOOLKIT and others               */
+    /*---------------------------------------------------------------*/
+    if feature_name.f = 'HLASM TOOLKIT' then
+      featurename = 'TOOLKIT DEBUGGER'
+    else if feature_name.f = 'TCP/IP' then
+      featurename = 'TCP/IP BASE'
+    else if feature_name.f = 'XL C/C++' then
+      featurename = 'C/C++'
+    else
+      featurename = feature_name.f
+    addfeature = "'"featurename"'"
+    feature_list = feature_list' 'addfeature
+  end
+  /*-----------------------------------------------------------------*/
+  /* The data obtained from the chosen command is in a stem called   */
+  /* cons. This data will be parsed to find the current status       */
+  /* (Enabled or Disabled) of a priced feature on the users system   */
+  /*-----------------------------------------------------------------*/
+  /*  Get the starting position of the header names of the columns   */
+  /*  and add them to an index variables.                            */
+  /*-----------------------------------------------------------------*/
+  statindex = wordindex(cons.2,1)                         /* S       */
+  ownindex = wordindex(cons.2,2)                          /* OWNER   */
+  nameindex = wordindex(cons.2,3)                         /* NAME    */
+  featindex = wordindex(cons.2,4)                         /* FEATURE */
+  verindex = wordindex(cons.2,5)                          /* VERSION */
+  idindex = wordindex(cons.2,6)                           /* ID      */
+  /*-----------------------------------------------------------------*/
+  /*       Calculate the proper selection range of the columns       */
+  /*-----------------------------------------------------------------*/
+  statchars = ownindex - statindex
+  namechars = featindex - nameindex
+  featchars = verindex - featindex
+  verchars = idindex - verindex
+  idchars = 8
+  sr = 0
+  do xc = 3 to cons.0 while statefound = 0
+    /*---------------------------------------------------------------*/
+    /*     Add the status, name, feature row data to a variable.     */
+    /*---------------------------------------------------------------*/
+    STATUS  = space(substr(cons.xc,statindex,statchars))
+    NAME    = space(substr(cons.xc,nameindex,namechars))
+    FEATURE = substr(cons.xc,featindex,featchars)
+    VERSION = space(substr(cons.xc,verindex,verchars),0)
+    ID      = space(substr(cons.xc,idindex,idchars))
+    /*---------------------------------------------------------------*/
+    /*          See if this is feature we're interested in           */
+    /*          The feature in the list has quotes around it         */
+    /*---------------------------------------------------------------*/
+    test_feature = "'"space(feature)"'"
+    if translate(NAME) = 'Z/OS' & pos(test_feature,feature_list) > 0 then do /* 1804 */
+      ver_rel_match = 0
+      if feature = 'TOOLKIT DEBUGGER' then
+        feature = left('HLASM TOOLKIT',featchars)  /* for formatting */
+      if feature = 'C/C++' then
+        feature = left('XL C/C++',featchars)       /* for formatting */
+      /*-------------------------------------------------------------*/
+      /*              Validate program number for ZOS                */
+      /*-------------------------------------------------------------*/
+      if id <> prognum_zos & id <> '*' then do               /* 1703 */
+        stat = 'Feature 'space(feature)' Product ID is ignored. Expecting 'prognum_zos' or * but saw 'id /* 1703 */
+        sr = sr + 1
+        status_results.sr = stat
+        status_results.0 = sr
+      end                                                    /* 1703 */
+      /* continue to validate ver, rel
+      else do                                                /* 1703 */
+      */
+        /*-----------------------------------------------------------*/
+        /*        Validate version matches our system version        */
+        /*-----------------------------------------------------------*/
+        parse var version vver'.'vrel'.'vmod .
+        if vver <> '*' then do
+          if vver <> ver then do
+            if STATUS = 'D' then do
+              /*-----------------------------------------------------*/
+              /*    Only report mismatch of ver rel when status D    */
+              /*-----------------------------------------------------*/
+              stat = space(feature)' is for 'vver'.'vrel' but this system is 'ver'.'rel
+              sr = sr + 1
+              status_results.sr = stat
+              status_results.0 = sr
+            end
+          end
+          else do
+            /*-------------------------------------------------------*/
+            /*      Validate release matches our system release      */
+            /*-------------------------------------------------------*/
+            if vrel <> '*' then do
+              if vrel <> rel then do
+                if STATUS = 'D' then do
+                  /*-------------------------------------------------*/
+                  /*  Only report mismatch of ver rel when status D  */
+                  /*-------------------------------------------------*/
+                  stat = space(feature)' is for 'vver'.'vrel' but this system is 'ver'.'rel
+                  sr = sr + 1
+                  status_results.sr = stat
+                  status_results.0 = sr
+                end
+              end
+              else
+                ver_rel_match = 1
+            end
+            else
+              ver_rel_match = 1
+          end
+        end
+        else do
+          /*---------------------------------------------------------*/
+          /*       Validate release matches our system release       */
+          /*---------------------------------------------------------*/
+          if vrel <> '*' then do
+            if vrel <> rel then do
+              if STATUS = 'D' then do
+                /*---------------------------------------------------*/
+                /*   Only report mismatch of ver rel when status D   */
+                /*---------------------------------------------------*/
+                stat = space(feature)' is for 'vver'.'vrel' but this system is 'ver'.'rel
+                sr = sr + 1
+                status_results.sr = stat
+                status_results.0 = sr
+              end
+            end
+            else
+              ver_rel_match = 1
+          end
+          else
+            ver_rel_match = 1
+        end
+      /*
+      end                                                    /* 1703 */
+   */
+   sdsf_enabled = 1
+      if STATUS = 'E' then do
+        if feature <> 'JES3' then do
+          stat = 'The feature 'left(feature,featchars)'   is ENABLED in the workflow'
+        end
+      end
+      else do
+        if STATUS = 'D' & ver_rel_match = 1 then do
+          stat = 'The feature 'left(feature,featchars)'   is SKIPPED in the workflow'
+    if feature = 'SDSF' then
+       sdsf_enabled = 0
+  end
+  else do
+    /*---------------------------------------------------------*/
+          /*     Ver Rel didn't match, so set status to Enable       */
+          /*---------------------------------------------------------*/
+          stat = 'The feature 'left(feature,featchars)'   is ENABLED in the workflow'
+          STATUS = 'E'
+        end
+      end
+      sr = sr + 1
+      status_results.sr = stat
+      status_results.0 = sr
+    end
+    else iterate
+    /*---------------------------------------------------------------*/
+    /*    Check if a priced feature is enabled, if so change the     */
+    /*    previously defined disabled to enabled to be used with     */
+    /*    ADDRESS SYSCALL WRITEFILE later. We want the data in       */
+    /*    the NAME row to be Z/OS, and the status row to be E        */
+    /*    (Enabled). If so check the FEATURE data, and assign        */
+    /*    the status of each variable accordingly.                   */
+    /*---------------------------------------------------------------*/
+    if pos('Z/OS',translate(NAME)) > 0 & space(STATUS) = 'E' then do /* 1804 */
+      select
+        when pos("BDTFTF",FEATURE) > 0 then do
+          feature_stat.bdtftf_index = 'Enabled'
+        end
+        when pos("BDTNJE",FEATURE) > 0 then do
+          feature_stat.bdtnje_index = 'Enabled'
+        end
+        when pos("BOOKMGR BUILD",FEATURE) > 0 then do
+          feature_stat.bookmgr_index = 'Enabled'
+        end
+        when pos("XL C/C++",FEATURE) > 0 then do
+          feature_stat.xlccpp_index = 'Enabled'
+        end
+        when pos("DFSMSDSS",FEATURE) > 0 then do
+          feature_stat.dfsmsdss_index = 'Enabled'
+        end
+        when pos("DFSMSHSM",FEATURE) > 0 then do
+          feature_stat.dfsmshsm_index = 'Enabled'
+        end
+        when pos("DFSMSRMM",FEATURE) > 0 then do
+          feature_stat.dfsmsrmm_index = 'Enabled'
+        end
+        when pos("DFSMSTVS",FEATURE) > 0 then do
+          feature_stat.dfsmstvs_index = 'Enabled'
+        end
+        when pos("DFSORT",FEATURE) > 0 then do
+          feature_stat.dfsort_index = 'Enabled'
+        end
+        when pos("GDDM-PGF",FEATURE) > 0 then do
+          feature_stat.gddmpgf_index = 'Enabled'
+        end
+        when pos("GDDM-REXX",FEATURE) > 0 then do
+          feature_stat.gddmrexx_index = 'Enabled'
+        end
+        when pos("HCM",FEATURE) > 0 then do
+          feature_stat.hcm_index = 'Enabled'
+        end
+        when pos("HLASM TOOLKIT",FEATURE) > 0 then do
+          feature_stat.hlasmtk_index = 'Enabled'
+        end
+        when pos("INFOPRINT SERVER",FEATURE) > 0 then do
+          feature_stat.infprntserv_index  = 'Enabled'
+        end
+        when pos("JES3",FEATURE) > 0 then do
+          feature_stat.jes3_index = 'Enabled'         /* jes3_status */
+          Numeric digits 10                  /* dflt of 9 not enough */
+          say;say ' Check the Control Blocks for the Primary JES.';say
+          call COMMON          /* control blocks needed by  routines */
+          call VERSION                        /* Version information */
+          call SUB                          /* Subsystem information */
+          if jes2_primary = 1 then do
+            stat = 'The feature 'left(feature,featchars)'   is SKIPPED in the workflow'
+            sr = sr + 1
+            status_results.sr = stat
+            status_results.0 = sr
+            feature_stat.jes3_index = 'Disabled'      /* jes3_status */
+          end
+          else
+            feature_stat.jes3_index = 'Enabled'       /* jes3_status */
+          /*---------------------------------------------------------*/
+          /* If the exec says that JES3 is primary and that JES2 is  */
+          /* secondary, KEEP both JES3 and JES2 steps in the workflow*/
+          /*---------------------------------------------------------*/
+          if jes3_primary = 1 & jes2_subsystem_running = 1 then do
+            say;say ' A JES2 subsystem is running secondary.';say
+            jes2_stat = 'The feature 'left('JES2',featchars)'   is ENABLED in the workflow'
+          end
+          /*---------------------------------------------------------*/
+          /* If the exec says that JES3 is primary and that JES2 is  */
+          /* not secondary (or JES2 isn't there), KEEP JES3, and skip*/
+          /* JES2 steps in the workflow.                             */
+          /*---------------------------------------------------------*/
+          else if jes3_primary = 1 & jes2_subsystem_running = 0 then do
+            say;say ' A JES2 subsystem is NOT running secondary.';say
+            feature_stat.jes2_index = 'Disabled'      /* jes2_status */
+            jes2_stat = 'The feature 'left('JES2',featchars)'   is SKIPPED in the workflow'
+          end
+          else
+            jes2_stat = 'The feature 'left('JES2',featchars)'   is ENABLED in the workflow'
+          sr = sr + 1
+          status_results.sr = jes2_stat
+          status_results.0 = sr
+          say
+        end
+        when pos("RMF",FEATURE) > 0 then do
+          feature_stat.rmf_index = 'Enabled'
+        end
+        when pos("SDSF",FEATURE) > 0 & sdsf_enabled = 1 then do
+          src = 0
+          say ' Check to see if SDSF is running on the system.';
+          say;say ' Add the SDSF host command environment';say
+          src=isfcalls('ON')
+          if src = 0 then do
+            say ' Issue SDSF command ISFEXEC ST';say
+            address sdsf "ISFEXEC ST"
+            src = rc
+            if src = 0 then do
+              say ' SDSF was found to be be running on the system.';
+              feature_stat.sdsf_index = 'Enabled'
+     say ' Delete the SDSF host command environment';say
+     rc=isfcalls('OFF')
+   end
+            else do
+              feature_stat.sdsf_index = 'Disabled'
+              say ' SDSF was found to NOT be running the system.';say
+            end
+            say ' Return code returned from SDSF was 'src;say
+          end
+          else do
+            say;say ' Add of the SDSF host command environment failed. Rc='src;say
+          end
+        end
+        when pos("Security Server",FEATURE) > 0 | ,
+                 pos("SECURITY SERVER",FEATURE) > 0 then do
+          feature_stat.securserv_index = 'Enabled'
+        end
+        when pos("TCP/IP BASE",FEATURE) > 0 then do
+          feature_stat.tcpipbase_index = 'Enabled'
+        end
+        when pos("ZEDC",FEATURE) > 0 then do
+          feature_stat.zedc_index = 'Enabled'
+        end
+        otherwise NOP
+      end
+    end
+  end
+  /*-----------------------------------------------------------------*/
+  /*                     Check for zFS status                        */
+  /*-----------------------------------------------------------------*/
+  say ' Check to see if ZFS is running on the system.';
+  call ZFSCHECK
+  say
+  do sr = 1 to status_results.0
+    say ' 'status_results.sr
+  end
+  /* Combine the first and second half of feature. */
+  say;say ' Creating records to write to $_output';say
+  do i = 1 to feature.0
+    writedata.i = feature_text.i' 'feature_stat.i
+ /* writedata.i = feature_text.i ' Disabled' */
+  end
+  do x = 1 to feature.0
+    say ' 'writedata.x
+  end
+  writedata.0 = feature.0 /* Stem to hold data to be written to file */
+  /*-----------------------------------------------------------------*/
+  /* Write the data added to writedata. to external file to update   */
+  /* the variables found in the workflow. $output is a function      */
+  /* provided by z/OSMF that writes to the directory specified in the*/
+  /* workflow. The act of using $output makes the workflow read the  */
+  /* the file generated updating the variables in the workflow.      */
+  /*-----------------------------------------------------------------*/
+  say;say ' Write the data listed above to $_output'
+  say ' This will update variables in the workflow.';say
+  ADDRESS SYSCALL "WRITEFILE $_output 777 writedata."
+  if rc = 0 then do
+    say ' Write Successful'
+    say;say ' Variables in workflow have been updated.';say
+    /*
+    say;say ' If ENABLED change state from NOT READY to READY.';
+    */
+    say ' If the priced feature is DISABLED, the state is changed to SKIPPED.'
+  end
+  else do
+    say ' Write FAILED. Rc='rc
+    say;say ' Variables in workflow have NOT been updated.'
+  end
+  if xrc = 0 then do
+  end
+end
+else do
+  /*-----------------------------------------------------------------*/
+  /*       XCON failed when obtaining current state of Check         */
+  /*-----------------------------------------------------------------*/
+  say;say ' XCON failed when obtaining the current state of Check';say
+  xrc = 8
+end
+return
+
+/*-------------------------------------------------------------------*/
+/*                            ZFSCHECK                               */
+/*-------------------------------------------------------------------*/
+ZFSCHECK:
+zfs_running = 0
+command = 'D OMVS,PFS'
+name = 'CONDIST'
+say ' Executing Command: 'command;say
+xrc = XCON(name command)
+if xrc = 0 then do
+  do xc = 2 to cons.0 while statefound = 0
+    zfsdone = 0
+    if pos('PFS TYPE   ENTRY',cons.xc) > 0 then do
+      stindex = wordindex(cons.xc,6)                           /* ST */
+      xc = xc + 1
+      do xc = xc to cons.0 while zfsdone = 0
+        if pos('PFS TYPE  DOMAIN',cons.xc) > 0 then
+          zfsdone = 1
+        else do
+          if word(cons.xc,1) = 'ZFS' & ,
+                     substr(cons.xc,stindex,1) = 'A' then do
+            zfs_running = 1
+            say;say ' ZFS is running on the system';say
+          end
+        end
+      end
+    end
+  end
+end
+if zfs_running = 1 then do
+  feature_stat.zfs_index = 'Enabled'
+  stat = 'The feature 'left('ZFS',featchars)'   is ENABLED in the workflow'
+end
+else do
+  feature_stat.zfs_index = 'Disabled'
+  stat = 'The feature 'left('ZFS',featchars)'   is SKIPPED in the workflow'
+end
+sr = sr + 1
+status_results.sr = stat
+status_results.0 = sr
+return
+
+/*-------------------------------------------------------------------*/
+/*                               XCON                                */
+/*-------------------------------------------------------------------*/
+XCON:
+parse upper arg name cmd                  /* parse cmd arg uppercase */
+drop cons.
+/*-------------------------------------------------------------------*/
+/*   Use outtrap to capture any failing messages from consprof cmd   */
+/*   Put the results in an array called msgs.                        */
+/*-------------------------------------------------------------------*/
+x = outtrap('cons.')                       /* capture messages       */
+"CONSPROF SOLDISP(NO) SOLNUM(100) UNSOLDISPLAY(NO)"
+!rc = rc
+x = outtrap('off')                         /* close out outtrap      */
+if !rc = 0 then do                         /* console command good   */
+  drop cons.
+  cons.0 = 0                               /* message stem init      */
+  "console activate name("name")"          /* activate emcs console  */
+  !rc = rc
+  "console syscmd("cmd") cart("name")"
+  !rc = rc
+  address "TSO"                            /* switch to tso mode     */
+  /*-----------------------------------------------------------------*/
+  /*   Get text resulting from the console command we just entered   */
+  /*   Put the text in an array called cons.                         */
+  /*-----------------------------------------------------------------*/
+  !rc = GETMSG('cons.','sol',name,,10)
+  if !rc <> 0 then do
+    cons.1 = 'GETMSG failed to obtain console response.';say
+    cons.0 = 1
+    say;say ' 'cons.1;say
+    !rc = 8
+  end
+  "console deactivate"                     /* deactivate console     */
+end
+/*-------------------------------------------------------------------*/
+/* For a DISPLAY command start at record 2 since if you don't the    */
+/* rexx output terminates in zosmf STATUS->SYSTSPRT output.          */
+/*-------------------------------------------------------------------*/
+start = 1
+if pos(',DISPLAY,',cmd) > 0 then
+  start = 2
+say " ------------------ Command Response ------------------"
+do xc = start to cons.0
+  say ' 'cons.xc
+end
+say " ---------------- End Command Response ----------------"
+return !rc
+
+/*-------------------------------------------------------------------*/
+/*                          JES3 SUBROUTINE                          */
+/*-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
+/*                             COMMON                                */
+/*-------------------------------------------------------------------*/
+COMMON:              /* Control blocks needed by multiple routines   */
+CVT      = c2d(storage(10,4))                /* point to CVT         */
+CVT      = c2d(storage(D2x(0 + 16),4))       /* ptr to current cvt   */
+PRODNAME = storage(D2x(CVT - 40),7)          /* point to mvs version */
+if substr(PRODNAME,3,1) > 3 then do
+  ECVT     = c2d(storage(D2x(CVT + 140),4))      /* point to CVTECVT */
+  ECVTSPLX = storage(D2x(ECVT+8),8)
+end
+FMIDNUM  = storage(D2x(CVT - 32),7)           /* point to fmid       */
+JESCT    = c2d(storage(D2x(CVT + 296),4))     /* point to JESCT      */
+JESPJESN = storage(D2x(JESCT + 28),4)         /* name of primary JES */
+say;say ' The primary job entry subsystem is 'JESPJESN'.'
+/*-------------------------------------------------------------------*/
+/*                       GET JES3 INDICATOR                          */
+/*   There looks to be 3 ways to determine if JES3 is active or not  */
+/*-------------------------------------------------------------------*/
+/*                            Way number 1                           */
+/*-------------------------------------------------------------------*/
+j = sysvar("sysjes")
+jes3act = sysvar("sysjes")
+jes3act = (word(jes3act,1) = 'JES3')
+/*-------------------------------------------------------------------*/
+/*                            Way number 2                           */
+/*-------------------------------------------------------------------*/
+/*     PSA+540 is PSATOLD. It points to the addr of the TCB map      */
+TCBMAP   = c2d(storage(D2x(0 + 540),4))      /* ptr to current tcb   */
+/*   TCBMAP+180 is TCPJSCB. It points to the addr of the JSCB map    */
+JSCBMAP  = c2d(storage(D2x(TCBMAP+180),4))   /* ptr to current jscb  */
+/*  JSCBMAP+316 is JSCBSSIB. It points to the addr of the SSIB map   */
+SSIBMAP  = c2d(storage(D2x(JSCBMAP+316),4))   /* ptr to current tcb  */
+SSIBSUSE = c2d(storage(D2x(SSIBMAP+32),4))    /* ptr to JES3 indicat */
+JES3ACT  = storage(D2x(SSIBSUSE),4)       /* point to JES3 indicator */
+JES3ACT = (JES3ACT = 'MEME')   /*if equal to 'MEME' then JES 3 active*/
+/*-------------------------------------------------------------------*/
+/*                            Way number 3                           */
+/*-------------------------------------------------------------------*/
+JESJESFG = storage(D2x(JESCT + 71),1)         /* JES3 Active ? '20'x */
+if bitand(JESJESFG,'00100000') = '00100000' then do
+  JES3ACT = 1
+  if substr(FMIDNUM,4,4) >= 5510 & ECVTSPLX <> 'LOCAL' then do
+    JESCTEXT = c2d(storage(D2x(JESCT +100),4))   /* point to JESPEXT */
+    JESDSNID = X2d(storage(D2x(JESCTEXT+120),2))   /*ID for temp dsns*/
+    say ' The sysplex name is' Strip(ECVTSPLX)'. This was system' ,
+            'number' Format(JESDSNID) 'added to the sysplex.'
+  end
+  else
+    say ' The sysplex name is' Strip(ECVTSPLX)
+end
+return
+
+/*-------------------------------------------------------------------*/
+/*                             VERSION                               */
+/*-------------------------------------------------------------------*/
+VERSION:                          /* Version information sub-routine */
+jes2_primary = 0
+jes3_primary = 0
+jes2_subsystem_running = 0
+jes3_subsystem_running = 0
+call SUB 'FINDJES'           /* call SUB routine with FINDJES option */
+if JESPJESN = 'JES3' then do
+  JESLEV   = SYSVAR(SYSJES)
+  JESNODE  = SYSVAR(SYSNODE)
+  jes3_primary = 1
+end
+else do                                                      /* JES2 */
+  JESLEV   = Strip(storage(D2x(JESSUSE),8))
+  JESNODE  = SYSVAR(SYSNODE)
+  jes2_primary = 1
+end
+say ' The 'JESPJESN 'level is 'JESLEV'.' ,
+     'The 'JESPJESN 'node name is 'JESNODE'.'
+return
+
+/*-------------------------------------------------------------------*/
+/*                               SUB                                 */
+/*-------------------------------------------------------------------*/
+SUB:                            /* Subsystem information sub-routine */
+Arg SUBOPT
+SSCVT    = c2d(storage(D2x(JESCT+24),4))           /* point to SSCVT */
+SSCVT2   = SSCVT                     /* save address for second loop */
+if SUBOPT <> 'FINDJES' then do
+  say;say ' Subsystem Communications Vector Table:';say
+  say ' Name   Hex       SSCTADDR   SSCTSSVT' ,
+        ' SSCTSUSE   SSCTSUS2  Status'
+end
+Do until SSCVT = 0
+  SSCTSNAM = storage(D2x(SSCVT+8),4)          /* subsystem name      */
+  SSCTSSVT = c2d(storage(D2x(SSCVT+16),4))    /* subsys vect tbl ptr */
+  SSCTSUSE = c2d(storage(D2x(SSCVT+20),4))    /* SSCTSUSE pointer    */
+  SSCTSUS2 = c2d(storage(D2x(SSCVT+28),4))    /* SSCTSUS2 pointer    */
+  if SUBOPT = 'FINDJES' & SSCTSNAM = JESPJESN then do
+     JESSSVT  = SSCTSSVT   /* save SSVTSSVT for "version" section    */
+                           /* this points to JES3 Subsystem Vector   */
+                           /* Table, mapped by IATYSVT               */
+     JESSUSE  = SSCTSUSE   /* save SSCTSUSE for "version" section    */
+                           /* this points to version for JES2        */
+     JESSUS2  = SSCTSUS2   /* save SSCTSUS2 for "version" section    */
+                           /* this points to $HCCT for JES2          */
+     Leave          /* found JES info for version section, exit loop */
+  end
+  SSCTSNAX = C2x(SSCTSNAM)    /* chg to EBCDIC for non-display chars */
+  call XLATE_NONDISP SSCTSNAM /* translate non display chars         */
+  SSCTSNAM = RESULT           /* result from XLATE_NONDISP           */
+  if SSCTSSVT = 0 then
+    SSCT_STAT = 'Inactive'
+  else
+    SSCT_STAT = 'Active'
+  if SUBOPT <> 'FINDJES' then do
+    say ' 'SSCTSNAM ' ' SSCTSNAX  ,
+        ' 'Right(D2x(SSCVT),8,0)    ' ' Right(D2x(SSCTSSVT),8,0) ,
+        ' 'Right(D2x(SSCTSUSE),8,0) ' ' Right(D2x(SSCTSUS2),8,0) ,
+        ' 'SSCT_STAT ' '
+  end
+  SSCTSSID = c2d(storage(D2x(SSCVT+13),1))      /* subsys identifier */
+  if bitand(SSCTSSID,'03'x) = '03'x then do
+    say;say ' This subsystem is a JES3';say
+    jes3_subsystem_running = 1
+  end
+  else if bitand(SSCTSSID,'02'x) = '02'x then do
+    say;say ' This subsystem is a JES2';say
+    jes2_subsystem_running = 1
+  end
+  SSCVT    = c2d(storage(D2x(SSCVT+4),4))      /* next sscvt or zero */
+end                                            /* do until sscvt = 0 */
+return
+
+/*-------------------------------------------------------------------*/
+/*                           XLATE_NONDISP                           */
+/*-------------------------------------------------------------------*/
+XLATE_NONDISP:          /* translate non-display characters to a "." */
+arg xlateprm
+xlatelen = length(xlateprm)      /* length of parm passed to routine */
+do i = 1 to xlatelen                       /* check each byte for    */
+  if (substr(xlateprm,i,1) > '00'x & ,     /* non-display characters */
+    substr(xlateprm,i,1) < '40'x ) | ,     /* and replace each       */
+    substr(xlateprm,i,1) = 'FF'x  then ,  /* character that          */
+    xlateprm = overlay('.',xlateprm,i)    /* is non-displayable      */
+end                                       /* with a period (.)       */
+return xlateprm
