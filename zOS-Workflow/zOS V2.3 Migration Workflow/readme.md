@@ -3,15 +3,31 @@ IBM z/OS V2.3 Migration Workflow
 
 Introducing another advancement in z/OS migration assistance!
 
-The z/OS V2R3 Migration book is available as two z/OS Management Facility (z/OSMF) z/OS Migration Workflows. Using the approrpiate workflow, you can perform a z/OS V2R3 migration as an interactive, step-by-step process. 
-Depending on your z/OS V2R3 migration path, you select the files that you need and download them to your system to create the workflow. 
-The workflow XML content is identical to the z/OS Migration book (GA32-0889); the book and the workflows contain the same information. 
-In z/OS V2R3, however, the z/OS V2R3 Migration Workflow further adds the ability to skip steps for certain features of z/OS you are not using (with discovery), invoke IBM Health Checker for z/OS health checks
-directly from the applicable steps, and also provides the option for you to send feedback on your migration experience to IBM. 
-When the z/OS Migration book is updated in the future, so too will the corresponding Migration Workflow files be updated to match. 
+The *z/OS V2R3 Migration* book is available as two z/OS Management Facility (z/OSMF) Migration Workflows. Depending on whether you are migrating from z/OS V2.2 or z/OS V2.1, you select the files that apply to your migration path and download them to your system to create the workflow. 
+
+Using a z/OSMF workflow, you can perform a z/OS V2R3 migration as an interactive, step-by-step process. The workflow XML content is identical to the *z/OS Migration* book (GA32-0889) --- the book and the workflows contain the same information. The z/OS V2R3 Migration Workflow goes even further by using the latest functions in z/OSMF to provide a smoother migration experience, as follows: 
+<ul>
+   <li>Adds the ability to skip steps for features of z/OS that you aren't using (with discovery)</li>
+   <li>Invokes IBM Health Checker for z/OS health checks directly from the applicable steps</li>
+   <li>Provides the option for you to send feedback on your migration experience to IBM.</li>
+   </ul>
+   
+Whenever the *z/OS Migration* book is updated, the corresponding migration workflow is updated to match. 
 When in doubt, you can always check the level of the workflow to determine the corresponding level of the book. 
 
+**What's new**
+
+The z/OS V2.3 Migration Workflow is updated to include the new migration actions that were added in the April 2018 edition of the *z/OS Migration* book, including changes for the new IBM z14&trade; ZR1 mainframe. To indicate this change, in the workflow definition file, the workflow version tag is updated to Version 2.1. 
+
+**Already started with an earlier version?**
+
+To upgrade an existing workflow to a new level of the workflow definition, use the action **Create New Based on Existing**, which is provided in the z/OSMF Workflows UI. When you upgrade a workflow, you create a new instance of the workflow, while you retain your data from the existing workflow. This action can help you avoid rework. As one of the upgrade actions, be sure to select **Assign all steps to owner user ID** if you want all of the steps to be assigned to you on completion of the upgrade action. For details, see the online help for the Workflows task in z/OSMF.  
+
+**Want to see a demo?**
+
 If you would like to see a short demo on using the z/OS V2R1 migration workflow, visit the site IBM z/OSMF V2.1 Migration Workflow Demo on YouTube.
+
+**Feedback is welcome**
 
 The z/OS V2R3 Migration Workflow takes advantage of the newer z/OSMF Workflow enhancement for Feedback. Before using this workflow,  minimally install these PTFs:
 
