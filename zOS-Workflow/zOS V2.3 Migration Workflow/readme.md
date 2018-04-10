@@ -20,6 +20,8 @@ The z/OS V2R3 Migration Workflow takes advantage of the newer z/OSMF Workflow en
 
 Otherwise, validation errors will occur (message IZUWF0133E) during the workflow creation process. To see your z/OSMF Workflow level, click About in the upper-right corner of the z/OSMF Welcome page. 
 
+**WHAT's new**
+
 Migration Workflow Tips
 -----------------------
 
