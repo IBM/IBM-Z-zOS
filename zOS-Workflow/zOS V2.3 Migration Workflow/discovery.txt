@@ -65,6 +65,7 @@
 /* ----  ------  ---------  ---------------------------------------- */
 /*  N/A  KMILLER 06/03/15   Initial Version                          */
 /*  1703 BLAND   03/20/17   Validate Program number first            */
+/*  1804 BLAND   04/04/18   Test for upper case Z/OS NAME            */ 
 /*********************************************************************/
 /*                                                                   */
 /*********************************************************************/
@@ -267,7 +268,7 @@ if xrc = 0 then do
     /*          The feature in the list has quotes around it         */
     /*---------------------------------------------------------------*/
     test_feature = "'"space(feature)"'"
-    if NAME = 'z/OS' & pos(test_feature,feature_list) > 0 then do
+    if translate(NAME) = 'Z/OS' & pos(test_feature,feature_list) > 0 then do /* 1804 */
       ver_rel_match = 0
       if feature = 'TOOLKIT DEBUGGER' then
         feature = left('HLASM TOOLKIT',featchars)  /* for formatting */
@@ -378,11 +379,11 @@ if xrc = 0 then do
     /*    Check if a priced feature is enabled, if so change the     */
     /*    previously defined disabled to enabled to be used with     */
     /*    ADDRESS SYSCALL WRITEFILE later. We want the data in       */
-    /*    the NAME row to be z/OS, and the status row to be E        */
+    /*    the NAME row to be Z/OS, and the status row to be E        */
     /*    (Enabled). If so check the FEATURE data, and assign        */
     /*    the status of each variable accordingly.                   */
     /*---------------------------------------------------------------*/
-    if pos('z/OS',NAME) > 0 & space(STATUS) = 'E' then do
+    if pos('Z/OS',translate(NAME)) > 0 & space(STATUS) = 'E' then do /* 1804 */
       select
         when pos("BDTFTF",FEATURE) > 0 then do
           feature_stat.bdtftf_index = 'Enabled'
