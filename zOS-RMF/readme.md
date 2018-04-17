@@ -5,6 +5,10 @@ RMF® is IBM's strategic product for z/OS® performance measurement and manageme
 
 This repository contains RMF resources that might be useful to the z/OS community. Here you will find items of interest about new functions in z/OS RMF.
 
+[Learn more about RMF](https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.erb/erb.htm)
+
+RMF tools can be found here :  ftp://public.dhe.ibm.com/eserver/zseries/zos/rmf/
+
 There are no warranties of any kind, and there is no service or technical support available for these materials from IBM. As a recommended practice, review carefully any materials that you download from this site before using them on a live system.
 
 Though the materials provided herein are not supported by the IBM Service organization, your comments are welcomed by the developers, who reserve the right to revise or remove the materials at any time. To report a problem, or provide suggestions or comments, contact rmf@de.ibm.com.
