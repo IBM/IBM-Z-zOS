@@ -3,21 +3,25 @@ IBM z/OS V2.3 Migration Workflow
 
 Introducing another advancement in z/OS migration assistance!
 
-The *z/OS V2R3 Migration* book is available as two z/OS Management Facility (z/OSMF) Migration Workflows. Depending on whether you are migrating from z/OS V2.2 or z/OS V2.1, you select the files that apply to your migration path and download them to your system to create the workflow. 
+The z/OS V2R3 Migration book is available as two z/OS Management Facility (z/OSMF) migration workflows. Depending on whether you are migrating from z/OS V2.2 or z/OS V2.1, you select the files that apply to your migration path and download them to your system to create the workflow. 
 
-Using a z/OSMF workflow, you can perform a z/OS V2R3 migration as an interactive, step-by-step process. The workflow XML content is identical to the *z/OS Migration* book (GA32-0889) --- the book and the workflows contain the same information. The z/OS V2R3 Migration Workflow goes even further by using the latest functions in z/OSMF to provide a smoother migration experience, as follows: 
+Using a z/OSMF workflow, you can perform a z/OS V2R3 migration as an interactive, step-by-step process. The workflow XML content is identical to the z/OS Migration book (GA32-0889) --- the book and the workflows contain the same information. The z/OS V2R3 Migration Workflow goes even further by using the latest functions in z/OSMF to provide a smoother migration experience, as follows: 
 <ul>
    <li>Adds the ability to skip steps for features of z/OS that you aren't using (with discovery)</li>
    <li>Invokes IBM Health Checker for z/OS health checks directly from the applicable steps</li>
    <li>Provides the option for you to send feedback on your migration experience to IBM.</li>
    </ul>
    
-Whenever the *z/OS Migration* book is updated, the corresponding migration workflow is updated to match. 
+Whenever the z/OS Migration book is updated, the corresponding migration workflow is updated to match. 
 When in doubt, you can always check the level of the workflow to determine the corresponding level of the book. 
 
 **What's new**
 
-The z/OS V2.3 Migration Workflow is updated to include the new migration actions that were added in the April 2018 edition of the *z/OS Migration* book, including changes for the new IBM z14&trade; ZR1 mainframe. To indicate this change, in the workflow definition file, the workflow version tag is updated to Version 2.1. 
+The z/OS V2.3 Migration Workflow is updated to include the new migration actions that were added in the April 2018 edition of the z/OS Migration book, including changes for the new IBM z14&trade; ZR1 mainframe. To indicate this change:
+<ul>
+   <li>In the workflow XML file, the workflow version tag is updated to Version 2.1.</li>
+   <li>In the z/OS Migration book, the edition notice states <i>Last updated: April 10, 2018</i>.</li>
+</ul>
 
 **Already started with an earlier version?**
 
@@ -39,7 +43,7 @@ Otherwise, validation errors will occur (message IZUWF0133E) during the workflow
 Migration Workflow Tips
 -----------------------
 
-To be consistent with the book, the workflows include some migration actions shown as "None" for components that do not have any migration action. "None" still counts as a workflow sub-task to “complete,” even though there is no migration action to perform. To complete the sub-task, mark the migration action sub-tasks with an "Override-complete" to have them marked as complete. The URL links to the documentation in the workflow cannot go to an anchor in the web page. The URLs take you to the web page, not specifically to the content, which might be further down in the page. You might have to scroll down the web page to find the information that you need. 
+To be consistent with the z/OS Migration book, the workflows include some migration actions shown as "None" for components that do not have any migration action. "None" still counts as a workflow sub-task to “complete,” even though there is no migration action to perform. To complete the sub-task, mark the migration action sub-tasks with an "Override-complete" to have them marked as complete. The URL links to the documentation in the workflow cannot go to an anchor in the web page. The URLs take you to the web page, not specifically to the content, which might be further down in the page. You might have to scroll down the web page to find the information that you need. 
 
 Some migration actions have associated health checks. For those steps, the health check is invoked to determine whether the migration action is applicable for your system. Read the instructions carefully on the Perform tab before running the health check for important information about each check. 
 
