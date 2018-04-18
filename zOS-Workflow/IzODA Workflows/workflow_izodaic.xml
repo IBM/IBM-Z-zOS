@@ -778,7 +778,7 @@ based on the following ports, and consider configuring specific port settings if
                             <td>Master port</td>
                             <td>7077</td>
                             <td>SPARK_MASTER_PORT</td>
-                            <td> </td>
+                            <td>SPARK_MASTER_PORT (or the default, 7077) is the starting point for connection attempts and not the actual port that might be connected. In addition, the value can be 0, which means it uses a random port number. Therefore, SPARK_MASTER_PORT (or the default, 7077) might not be the port that is used for the master. This statement is true for all methods of starting the master, including BPXBATCH, the start*.sh scripts, and the started task procedure.</td>
                         </tr>
 <tr>
                             <td>Master REST port</td>
@@ -1372,7 +1372,7 @@ You can issue the following command to verify the proper setting:
 </p><p><code>drwxrwxr-t 2 SPARKID SYS1 8192 Aug 8 08:51 /Spark-2.2.0/work
 drwxrwxr-t 2 SPARKID SYS1 8192 Aug 8 08:51 /Spark-2.2.0/tmp</code>
                         </p>
-                            </li><li><!--#6 (#6 through #10 are added for Trusted Partner update). Jan '18--><b>Note:</b> Steps 6 - 10 are only needed if you are using Trusted Partner as the Spark client authentication method.
+                            </li><li><!--#6 (#6 through #10 are added for Trusted Partner update). Jan '18--><b>Note:</b> Steps 6 - 11 are only needed if you are using Trusted Partner as the Spark client authentication method.
 <p>Configure the Spark cluster user ID (SPARKID in the earlier examples) to have authority to obtain its connection partner's routing information and security credentials. To do this, grant the user ID READ access to the following SERVAUTH class profile:
 
 <code>EZB.IOCTL.<i>sysname</i>.<i>tcpprocname</i>.PARTNERINFO</code>
@@ -1402,6 +1402,10 @@ SETROPTS RACLIST(FACILITY) REFRESH</code></p></li><li><!--#9-->Mark the file <co
 PERMIT AZK.SPARK.MASTER.CONNECT CLASS(XFACILIT) ID (SPARKID) ACCESS(READ)
 PERMIT AZK.SPARK.MASTER.CONNECT CLASS(XFACILIT) ID(SPARKUSR) ACCESS(READ)
 SETROPTS RACLIST(XFACILIT) REFRESH</code></p></li>
+<li><!--#11  added for Started Tasks FP2117 March '18--> If you are using started tasks to start the master and worker, after you installed JZOS, you must define a PROGRAM profile for the JZOS load module (JVMLDM86) and permit SPARKID read access to the profile. For example, issue the following RACF commands:<p><code>RDEFINE PROGRAM JVMLDM86 ADDMEM('datasetname'/volser/NOPADCHK)
+SETROPTS WHEN(PROGRAM) REFRESH
+PERMIT JVMLDM86 CLASS(PROGRAM) ID(SPARKID) ACCESS(READ)
+SETROPTS WHEN(PROGRAM) REFRESH</code></p><p>For more information about started tasks, see <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_t_ST_startstop.htm">Setting up started tasks to start and stop Spark processes</a></p></li>
                 </ol><!--end of update-->
             </instructions>
             <weight>1</weight>
@@ -1459,7 +1463,7 @@ For more information about the order that java takes dump settings, see <a href=
     </step>
     <step name="Step7">
         <title>Create jobs for starting and stopping Spark processes</title>
-        <description>Create jobs for starting and stopping Spark processes.</description>
+        <description>Create jobs for starting and stopping Spark processes. If you want to create jobs to start and stop Spark processes, continue with this step. Otherwise, you can skip it and continue on to the next step.</description>
         <step name="Step7_1">
             <title>Start and stop Spark processes</title>
             <description>Spark processes, such as the master and worker, can be started through BPXBATCH.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
@@ -1523,7 +1527,86 @@ stop-slave.sh;sleep 5;stop-master.sh’
             <weight>1</weight>
         </step>
     </step>
-    <step name="Step8">
+<step name="Step8"><!--NEW - Started Tasks line item FP2117. March '18--><title>Setting up started tasks to start and stop Spark processes</title><description>Setting up started tasks to start and stop Spark processes. If you want to use started tasks to start and stop Spark processes, continue with this step. Otherwise, you can skip it and continue on to the next step.<p>The following list provides the benefits of using this feature.
+<ul><li>Allows the Spark master and worker to run on z/OS consistent with running other MVS batch jobs, job steps, or started tasks.
+<ul><li>Handles START, STOP, and CANCEL command options and writes messages to the MVS console. For more information about the messages that are issued, see <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_c_izodamsg.htm">IBM Open Data Analytics for z/OS system messages</a>.</li>
+<li>Can be extended to take advantage of all of the capabilities that JZOS provides. These capabilities include the use of SYSOUT for output directories, MVS data sets, and DD statements.</li></ul></li>
+
+<li>Maintains flexible configuration of the Java execution environment and the z/OS UNIX System Services environment that the Spark master and worker require.</li>
+<li>Automation
+<ul><li>Allows the Spark master and worker to be managed through customer automation products and policies.</li>
+<li>Allows automation products to start and stop the master and worker with no parameters, with assurance that the worker is started using the master port for which the master is actually started.</li>
+<li>Allows the worker to retry starting for a period of time if the master is not yet started.</li>
+<li>Allows enterprise automation management strategies to be applied to the Spark master and worker. These strategies include the following:
+<ul><li>Started tasks dependencies such as staging the starting and stopping of Spark started tasks based on the availability of other started tasks. These tasks can include but are not limited to OMVS, MDS, TCPIP, and database servers (Db2, IMS, and more)</li>
+<li>Failure recovery by restarting Spark master and worker on any system under automation management control.</li></ul></li></ul></li></ul></p>
+<p>The examples of started tasks are based on the following assumptions:
+<ul><li>JZOS Batch Launcher and Toolkit function in IBM 64-Bit SDK for z/OS Java Technology Edition V8 is installed and operational. For installation and configuration instructions and information about messages and return codes from JZOS, see <cite><a href="https://www.ibm.com/support/knowledgecenter/en/SSYKE2_8.0.0/com.ibm.java.zsecurity.80.doc/zsecurity-component/jzos.html">JZOS Batch Launcher and Toolkit: Installation and User's Guide</a></cite>.</li>
+<li>If you are using Trusted Partner authentication, ensure that a PROGRAM profile is defined for the load module, JVMLDM86. For instructions, see task 11 in Step 6.8 Configuring additional authorities and permissions for the Spark cluster.</li>
+<li>For each Spark cluster, the <code>spark-env.sh</code> contains a unique <code>SPARK_IDENT_STRING</code>. Do not specify $USER or allow it to default to $USER.</li>
+<li>The user ID that starts and stops the Spark cluster is SPARKID. In addition, SPARKID and SPKGRP are created as described in <cite>IBM Open Data Analytics for z/OS Installation and Customization Guide</cite>.</li>
+<li>The default shell program for SPARKID is bash.</li>
+<li>Spark is installed in <code>/usr/lpp/IBM/izoda/spark/spark<i>nnn</i></code>, where <i>nnn</i> is the Spark version. For instance, <code>/usr/lpp/IBM/izoda/spark/spark220</code> for Spark 2.2.0.</li>
+<li>Spark is configured as described in this step and the required environment variables are set in the following procedures. For more information, see <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_t_ST_envvar.htm">Set and export common environment variables</a> in <cite>IBM Open Data Analytics for z/OS Installation and Customization Guide</cite>.</li>
+<li>OMVS must be initialized before the master can start.</li>
+<li>The directories that are specified by the following environment variables, or the defaults taken when not specified, must exist and have the appropriate authorities. For more information, see <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_t_createworkdirs.htm">Creating the Apache Spark working directories</a>.
+<ul><li><code>SPARK_HOME</code></li>
+<li><code>SPARK_CONF_DIR</code></li>
+<li><code>SPARK_LOG_DIR</code></li>
+<li><code>SPARK_PID_DIR</code></li>
+<li><code>SPARK_LOCAL_DIRS</code></li>
+<li><code>SPARK_WORKER_DIR</code></li></ul></li></ul></p>
+<p>For more information, see <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_t_ST_startstop.htm">Setting up started tasks to start and stop Spark processes</a> in <cite>IBM Open Data Analytics for z/OS Installation and Customization Guide</cite>.</p></description><step name="subStep8_1"><title>Master procedure for each Spark cluster</title><description>To create a procedure for the master of each Spark cluster, copy and edit the sample procedure, SYS1.AAZKSAMP(AZKMSTR), that is included in IBM Open Data Analytics for z/OS. The high-level qualifier (HLQ) depends on your installation. The procedure needs to be put in a data set in your PROCLIB concatenation, such as SYS1.PROCLIB.
+<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>Follow the instructions in the sample procedure. For example, <code>SPARK_CONF_DIR</code> must be set and exported in the procedure. It will not default to <code>$SPARK_HOME/conf</code>.</instructions>
+<weight>1</weight></step>
+<step name="subStep8_2"><title>Worker procedure for each master in a Spark cluster</title><description>To create a worker procedure for each master in a Spark cluster, copy and edit the sample procedure, SYS1.AAZKSAMP(AZKWRKR), that is included in IBM Open Data Analytics for z/OS. The high-level qualifier (HLQ) depends on your installation. The procedure needs to be put in a data set in your PROCLIB concatenation, such as SYS1.PROCLIB.
+<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+<instructions>Follow the instructions in the sample procedure. For example, <code>SPARK_CONF_DIR</code> must be set and exported in the procedure. It will not default to <code>$SPARK_HOME/conf</code>.</instructions>
+<weight>1</weight></step>
+<step name="subStep8_3"><title>Set and export common environment variables</title><description><p>Complete this task to set and export common environment variables.</p>Environment variables are needed by both the AZKMSTR and AZKWRKR procedures. In addition, the environment variables that are needed by JZOS launcher must be exported. However, the <code>/etc/profile</code> and <code>.profile</code> scripts are not run when the JZOS launcher is run.<p>Therefore, it is easiest to create a common script to set and export the environment variables. IBM Open Data Analytics for z/OS or IzODA provides a script template.</p><p>The template is installed in <code>$SPARK_HOME/conf</code> and is called <code>spark-zos-started-tasks.sh.template</code>. It needs to be copied and modified, and then put into the <code>$SPARK_CONF_DIR</code> with your scripts.</p><p>The template is modeled after the sample procedure (PROC) in <cite><a href="https://www.ibm.com/support/knowledgecenter/en/SSYKE2_8.0.0/com.ibm.java.zsecurity.80.doc/zsecurity-component/jzos.html">JZOS Batch Launcher and Toolkit: Installation and User's Guide</a></cite>. The environment variables are loaded from this script, rather than set directly in the PROC as shown in the sample. In addition, this script loads the <code>spark-env.sh</code> script and sets up other environment variables as needed for the started tasks.</p><p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions><p><ol><li>Copy the template into your configuration directory. For example:<p><code>cp $SPARK_HOME/conf/spark-zos-started-tasks.sh.template $SPARK_CONF_DIR/spark-zos-started-tasks.sh</code></p></li>
+<li>Update <code>$SPARK_CONF_DIR/spark-zos-started-tasks.sh</code> as necessary.</li></ol></p></instructions><weight>1</weight></step><step name="subStep8_4"><title>Define the RACF started profile for started tasks</title><description>Complete this task to define the RACF started profile for started tasks.<p>From TSO, or from JCL that runs IKJEFT01, you must define the RACF profiles to the started tasks. Use the names of the procedures for the started tasks for each cluster that you defined for your installation, in place of AZKMSTR and AZKWRKR in the example procedure provided.</p><p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions><p>
+<ol><!--#1--><li>Enter the following command to define the RACF started profile to the master started task:<p><code>RDEFINE STARTED AZKMSTR.* STDATA(USER(SPARKID) GROUP(SPKGRP))</code></p></li>
+<!--#2--><li>Enter the following command to define the RACF started profile to the worker task:<p><code>RDEFINE STARTED AZKWRKR.* STDATA(USER(SPARKID) GROUP(SPKGRP))</code></p></li>
+<!--3--><li>Enter the following command to set the RACF options previously specified:<p><code>SETROPTS RACLIST(STARTED) REFRESH</code></p></li></ol></p><p>After successfully completing the previous tasks, you should have a defined RACF started profile to the master and worker started tasks.</p><p><b>Note:</b> If you attempt to start AZKMSTR before you complete the steps in this task, you might be prompted with the following messages:<p><code>SY1     s azkmstr
+SY1     IRR813I NO PROFILE WAS FOUND IN THE STARTED CLASS FOR
+                 AZKMSTR WITH JOBNAME AZKMSTR. RACF WILL USE ICHRIN03
+SY1     $HASP100 AZKMSTR  ON STCINRDR
+SY1     $HASP373 AZKMSTR  STARTED
+SY1     ICH408I JOB(AZKMSTR) STEP(STARTING) CL(PROCESS)
+    OMVS SEGMENT NOT DEFINED
+SY1     $HASP395 AZKMSTR ENDED</code></p></p></instructions><weight>1</weight></step><step name="subStep8_5"><title>Configuring Workload Manager</title><description><p>Configuring Workload Manager (WLM). See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>Configure the AZKMSTR and AZKWRKR started tasks to use the same service class that you previously specified in the Spark master and worker daemons. For more information, see <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/dvs_ig_tsk_cfg_wlm.htm">Configuring Workload Manager (WLM)</a>.</instructions><weight>1</weight></step><step name="subStep8_6"><title>Stopping the started tasks</title><description>Stopping the started tasks. <p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>The started tasks are stopped by using the following <code>stop</code> commands with no parameters.<p><code>stop azkwrkr
+stop azkmstr</code></p><p>If a worker is started for a master task, the worker task is stopped when the master task is stopped. The system looks at the file that is created when the worker is started, which contains the process ID for the worker process. It does so by using the same naming convention that the shell scripts use (identified by <code>SPARK_IDENT_STRING</code>) and ensures that the worker is either a java process or JVMLDM86 (JZOS).</p><p>When the worker is stopped due to the master being stopped, the worker process is ended immediately. This action results in a return code of 0143 in the HASP395 message on the console when the worker stops. This return code is normal and appears as seen in the following example.
+<p><code>stop azkmstr
+$HASP395 AZKWRKR   ENDED - RC=0143
+$HASP395 AZKMSTR   ENDED - RC=0000</code></p></p></instructions><weight>1</weight></step><step name="subStep8_7"><title>Canceling the started tasks</title><description>Canceling the started tasks.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description><instructions>The started tasks can be canceled by using the following <code>cancel</code> commands.<p><code>cancel azkwrkr
+cancel azkmstr</code></p><p>If a worker is started for a master task and the master task is canceled, the worker task is not ended and is left in a state with no master associated to it. The worker task is reattached upon the restart of the master or can be manually ended by stopping or canceling it.</p></instructions><weight>1</weight></step><step name="subStep8_8"><title>Automating the starting of tasks</title><description>Complete this task if you want to automate the starting of tasks. <p>The following one-time steps are optional, but allow the following benefits:
+<ul><li>Automation products to start and stop the master with no parameters, with assurance that the worker is started using the master port for which the master is actually started.</li>
+<li>The worker to retry starting for a period of time if the master is not yet started.</li></ul></p><p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
+
+<instructions>
+<ol><li><!--#1-->If you modified the <code>$SPARK_CONF_DIR/log4j.properties</code> file, complete the following tasks. If you do not have a <code>$SPARK_CONF_DIR/log4j.properties</code> file, no action is required.
+<ul><li><!--1a.-->Ensure that <code>log4j.rootcategory</code> is set to INFO, DEBUG, or ALL, and that the appender is console, such as <code>log4j.rootCategory=INFO, console</code>.</li>
+<li><!--1b-->The <code>log4j.appender.console.target</code> parameter can be specified as either <code>System.err</code> or <code>System.out</code> if the procedure previously created for starting the master uses the correct corresponding card (STDERR or STDOUT) as described in the next step. For more information, see Step 9.1.
+<p><b>Note:</b> <code>log4j.appender.console.target=System.err</code> is the default and the following examples, such as SYS1.AAZKSMP(AZKMSTR), use STDERR.</p></li></ul></li><li><!--#2-->Change the DD statement, in the master procedures for each cluster to specify a unique z/OS UNIX System Services file in an existing directory. If you specified <code>log4j.appender.console.target=System.err</code> in the previous step, change the DD statement to STDERR. If you specified <code>log4j.appender.console.target=System.out</code> in the previous step, change the DD statement to STDOUT. An example is provided in the sample procedure, AZKMSTR, which shows the STDERR that can be used for a cluster that is denoted as <code>Cluster1</code>.
+<p><b>Note:</b> It is recommended, but not required, that you use the directory that you specified for the <code>$SPARK_LOG_DIR</code> environment variable in the <code>spark-env.sh</code> file. If you don't use the <code>$SPARK_LOG_DIR</code> directory path, the path must exist and SPARKID must have authority to read and write to it.<p><code>//STDERR     DD PATH='/var/spark/logs/azkmstrCluster1.err',
+//           PATHOPTS=(OWRONLY,OCREAT,OTRUNC),PATHMODE=SIRWXU</code></p></p></li>
+<li><!--#3-->Set and export the <code>SPARK_ZOS_MASTER_LOG</code> environment variable in the worker procedure for each cluster, to the same z/OS UNIX System Services file that is specified in the corresponding master procedure. An example is provided in the sample procedure, AZKWRKR. The following example shows the setting for the master for a cluster that is denoted as <code>Cluster1</code>.<p><code>export SPARK_ZOS_MASTER_LOG=/var/spark/logs/azkmstrCluster1.err</code></p></li></ol>
+<p>When the master is started with no parameters, values are either taken from the environment variables, if set, or the defaults are used. SPARK_MASTER_HOST does not have a default, and therefore must be set in the <code>spark-env.sh</code> file.<p>When the master is started by using the automation technique for started tasks, the INFO messages are written to the file that is specified in Step 2 of this task. These messages include the port number to which the master is bound, the master host, and the process ID for the master.</p></p><p>When the worker is started with no parameters, it reads the file that is specified in <code>SPARK_ZOS_MASTER_LOG</code> and fins the port number and any other values that are needed to ensure that the master is started. This is the same file that is written by the master when the cluster is started. If the master is not started, it retires for a period of time to allow the master time to start.</p></instructions><weight>1</weight></step></step>
+<step name="Step9"><!--Added for March '18. Configuration checker tool-->
+        <title>Using the IBM Open Data Analytics for zOS Spark Configuration Checker</title>
+        <description>The Configuration Checker tool, which is included in the IBM Open Data Analytics for z/OS Spark starting from IzODA Spark 2.2.0, verifies and displays some of your IzODA Spark settings.
+<p><b>Note:</b> If you are using Spark 2.2.0, APAR PI93605 is required to use the checker.</p><p>See the <b>Perform</b> workflow tab for further instructions.</p>
+        </description>
+        <instructions>The IzODA Spark Configuration Checker must be invoked from the user ID under which the Spark cluster is started. In this workflow, it is referred to as the Spark ID. To run the IzODA Spark Configuration Checker, invoke the following command.
+<p><code>$SPARK_HOME/sbin/spark-configuration-checker.sh</code></p><p>Where:</p><p><b>$SPARK_HOME</b> - Specifies the IzODA Spark installation directory.</p><p>The tool also supports the following parameters:
+<ul>
+<li><b>-v, --verbose</b> - Provides lists of checks, configuration files, settings, and solutions for errors or warnings as output.</li>
+<li><b>-c, --color</b> - Adds color to the output.</li>
+<li><b>-h, --help</b> - Displays the usage of the checker.</li></ul></p><p>For example, to run the IzODA Spark Configuration Checker in colorized verbose mode, you can issue the following command:<p><code>$SPARK_HOME/sbin/spark-configuration-checker.sh -v -c</code></p></p><p>After the tool is executed and completes successfully, the IzODA Spark Configuration Checker will produce a report of possible errors and warnings. IBM suggests that you review the report carefully, fix the reported errors, and take any warnings under advisement. For an example of sample output from the Configuration Checker, see <a href="https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0/com.ibm.izoda.v1r1.azka100/topics/azkic_t_configchecker.htm">Using the IBM Open Data Analytics for z/OS Spark Configuration Checker</a>.</p></instructions>
+        <weight>1</weight>
+    </step>
+    <step name="Step10">
         <title>Tune Spark workloads</title>
         <description>Tune Spark workloads.<p>See the <b>Perform</b> workflow tab for further instructions.</p>
         </description>
