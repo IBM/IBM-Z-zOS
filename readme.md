@@ -23,8 +23,8 @@ Though the materials provided herein are not supported by the IBM Service organi
 
 *Downloading a repository*
 
-To download an entire repository, go to the repository's page, then click on the green "Clone or download" button on the right side, then click "Download ZIP". This action creates a zip file with the contents of the repository in your "Downloads" folder. You can use a ZIP utility to access some or all of its contents.
+To download an entire repository, go to the repository's page, then click on the green `Clone or download` button on the right side, then click `Download ZIP`. This action creates a zip file with the contents of the repository in your `Downloads` folder. You can use a ZIP utility to access some or all of its contents.
 
 *Downloading individual files*
 
-To download an individual file, click the link for that file. You should see a button named "Raw" or "Download". Click the "Raw" or "Download" button. If the file is not saved to your "Downloads" folder automatically, right-click and select "Save Page as..." and choose a location for saving the file. If you are using Google Chrome, modify the file extension to the one that corresponds to the file and set the "Save as type" to "All files".
+To download an individual file, click the link for that file. You should see a button named `Raw` or `Download`. Click the `Raw` or `Download` button. If the file is not saved to your `Downloads` folder automatically, right-click and select `Save Page as...` and choose a location for saving the file. If you are using Google Chrome, modify the file extension to the one that corresponds to the file and set the `Save as type` to `All files`.
