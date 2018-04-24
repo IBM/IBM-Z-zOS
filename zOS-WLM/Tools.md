@@ -6,6 +6,6 @@ WLMOPT, the WLM OPT parameter viewer assists you in displaying the current OPT s
  
 To install the tools download
 
-[wlmqueue.zip](ftp://public.dhe.ibm.com/eserver/zseries/zos/wlm/wlmque.zip)
+[wlmqueue.zip](https://ibm.biz/BdZgnS)
 
 to your workstation. Note that both tools are contained in this file as well as the CEXEC library that will be created on z/OS. Unzip the file and follow the installation instructions in Readme.txt.
