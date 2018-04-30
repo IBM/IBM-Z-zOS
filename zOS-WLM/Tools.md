@@ -1,3 +1,7 @@
+There are no warranties of any kind, and there is no service or technical support available for these materials from IBM. As a recommended practice, review carefully any materials that you download from this site before using them on a live system.
+
+Though the materials provided herein are not supported by the IBM Service organization, your comments are welcomed by the developers, who reserve the right to revise or remove the materials at any time. To report a problem, or provide suggestions or comments, contact WLM@de.ibm.com.
+
 WLM Work Queue Viewing Tools (WLMQUE)
 =====================================
 WLMQUE, the WLM Work Queue Viewer is a small ISPF based tool that may assist you in displaying the application environments that are currently being used on your z/OS system. This can be helpful for using WebSphere Application Servers when you specify minimum and maximum limits for the number of server address spaces that should be started. You can view the number of started and active server address spaces, and the service classes being used as work queues for the application environments with the help of the REXX command list. The tool can be used for any kind of application environment from WebSphere, DB2 or user specified types and applications.
@@ -35,3 +39,7 @@ Requirements:
 * Excel Version 2013. The spreadsheet should also work on Excel 2007, 2010, and 2016
 
 Download: [SetupGenReport.exe](https://ibm.biz/BdZgeh)
+
+
+
+
