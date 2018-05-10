@@ -23,7 +23,7 @@
 //* language governing permissions and limitations under the License.*/
 //*                                                                  */
 //* End of Copyright and License                                     */
-/*********************************************************************/
+//********************************************************************/
 //*        The library that contains the SMF84FMT program            */
 //         SET STEPLIB=<YOUR.LIBRARY.HERE>
 //*------------------------------------------------------------------*/
@@ -41,4 +41,3 @@
 //SMF84OUT DD SYSOUT=*
 //SYSPRINT DD SYSOUT=*
 //********************************************************************/
-/*
