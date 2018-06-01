@@ -21,21 +21,36 @@ This health check is to be used for migration assistance from z/OS V2.1 to V2.2 
 
 3.  Edit the parmlib member HZSPRMxx and add the statements that follow.  Member HZSPRMxx contains the statements that manage Health Checker processing on your system.
 
-##### ADDREP CHECK(IBMZMIG,ZOSMIG_HTTP_SERVER_DOMINO_CHECK)
-##### EXEC(DOMCHK)
-##### REXXHLQ(IBMZMIG)
-##### REXXTSO(YES)
-##### REXXIN(NO)
-##### MSGTBL(* NONE)  /* ensure no space between the asterisk and NONE */
-##### USS(NO)
-##### VERBOSE(NO)
-##### SEVERITY(MEDIUM)
-##### INTERVAL(168:00)
-##### ACTIVE
-##### EINTERVAL(SYSTEM)
-##### DATE(20140915)
-##### PARM('')
-##### REASON('Verify that the IBM HTTP Server Domino is not in use.')
+
+<code>ADDREP CHECK(IBMZMIG,ZOSMIG_HTTP_SERVER_DOMINO_CHECK) </code>
+
+<code>EXEC(DOMCHK)</code>
+
+<code>REXXHLQ(IBMZMIG)</code>
+
+<code>REXXTSO(YES)</code>
+
+<code>REXXIN(NO)</code>
+
+<code>MSGTBL(\*NONE) </code>
+
+<code>USS(NO)</code>
+
+<code>VERBOSE(NO)</code>
+
+<code>SEVERITY(MEDIUM)</code>
+
+<code>INTERVAL(168:00)</code>
+
+<code>ACTIVE</code>
+
+<code>EINTERVAL(SYSTEM)</code>
+
+<code>DATE(20140915)</code>
+
+<code>PARM('')</code>
+
+<code>REASON('Verify that the IBM HTTP Server Domino is not in use.') </code>
 
 4. Optionally, modify the INTERVAL and ACTIVE statements, as follows:  
   *  Set INTERVAL to the frequency in hours for running the health check.  By default, the health check runs once a week (every 168 hours).
