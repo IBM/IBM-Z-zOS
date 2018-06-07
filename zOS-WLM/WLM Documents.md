@@ -23,10 +23,10 @@ WLM Service Definition Controls
 * [WLM Resource Groups](Documents/WLMwscrg.pdf)
 * [Velocity Goals: What You Don't Know Can Hurt You](Documents/WLMvelocity.pdf)
 * [Effective Use of MVS Workload Manager Controls](Documents/WLMcmg95.pdf)
-* [Cheryl Watson's Articles](http://www.watsonwalker.com/articles.html) including "Why Go to Goal Mode?" and "Getting to Goal Mode"
-* [Cheryl Watson's WLM Quickstart Service Definition](http://www.watsonwalker.com/quickst.html) The Quickstart Service Definition contains basic goals that can serve as an example for installations just starting to define their own WLM Service Definition. It originally appeared in Cheryl Watson's Tuning Letter, May/June 1995, and has been updated continuously.
 * [The Washington Systems Center's Sample Service Definition Download](Samples/wlmsamp.bin) This sample service definition is intended to give examples of various WLM constructs.
 * [The Washington Systems Center's Sample Service Definition Description](Documents/WLMDEF_Sample_WLM_Service_Definition.pdf) PDF format description of the policy
+* [Cheryl Watson's WLM Quickstart Service Definition](http://www.watsonwalker.com/quickst.html) The Quickstart Service Definition contains basic goals that can serve as an example for installations just starting to define their own WLM Service Definition. It originally appeared in Cheryl Watson's Tuning Letter, May/June 1995, and has been updated continuously.
+
 
 Specific WLM Functions
 ======================
