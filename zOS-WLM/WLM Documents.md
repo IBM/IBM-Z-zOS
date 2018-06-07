@@ -1,6 +1,7 @@
 Inside WLM
 ==========
 * [Capping Technologies and Optimization of the Four Hour Rolling Average Consumption]
+(Documents/Capping_Technologies_and_4HRA_Optimization_2016.pdf)
 * [z/OS Workload Manager: How It Works and How to Use It White Paper]
 * [z/OS Workload Manager: How It Works and How to Use It Presentation]
 * [z/OS Workload Manager: Managing CICS and IMS Workloads]
