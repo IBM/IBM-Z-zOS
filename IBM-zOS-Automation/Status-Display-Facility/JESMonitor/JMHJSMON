@@ -1,0 +1,498 @@
+/** REXX **************************************************************
+**                                                                   **
+** Copyright 2015 IBM Corp.                                          **
+**                                                                   **
+**  Licensed under the Apache License, Version 2.0 (the "License");  **
+**  you may not use this file except in compliance with the License. **
+**  You may obtain a copy of the License at                          **
+**                                                                   **
+**     http://www.apache.org/licenses/LICENSE-2.0                    **
+**                                                                   **
+**  Unless required by applicable law or agreed to in writing,       **
+**  software distributed under the License is distributed on an      **
+**  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,     **
+**  either express or implied. See the License for the specific      **
+**  language governing permissions and limitations under the         **
+**  License.                                                         **
+**                                                                   **
+** ----------------------------------------------------------------- **
+**                                                                   **
+** Disclaimer of Warranties:                                         **
+**                                                                   **
+**   The following enclosed code is sample code created by IBM       **
+**   Corporation.  This sample code is not part of any standard      **
+**   IBM product and is provided to you solely for the purpose       **
+**   of assisting you in the development of your applications.       **
+**   The code is provided "AS IS", without warranty of any kind.     **
+**   IBM shall not be liable for any damages arising out of your     **
+**   use of the sample code, even if they have been advised of       **
+**   the possibility of such damages.                                **
+**                                                                   **
+** ----------------------------------------------------------------- **
+**                                                                   **
+** Name: JMHJSMON                                                    **
+**                                                                   **
+** Descriptive Name: JES2 SDF Data Collector                         **
+**                                                                   **
+**  This sample program illustrates the usage of AOCUPDT at          **
+**  the example of a JES2 monitor collecting information about:      **
+**                                                                   **
+**   o  Overall SPOOL utilization                                    **
+**   o  Top-15 list of SPOOL users                                   **
+**   o  Important JES2 resources                                     **
+**                                                                   **
+**  The script requires that the following user-defined status       **
+**  are defined in the System Automation for z/OS policy.  See       **
+**  policy SDF DETAILS in entry type SCR.                            **
+**                                                                   **
+**   o  JNORM                                                        **
+**   o  JWARN                                                        **
+**   o  JCRIT                                                        **
+**                                                                   **
+** The routine should be setup as a timer-driven monitor using       **
+** the System Automation policy or a NetView CHRON-command           **
+** directly. Example:                                                **
+**                                                                   **
+**   CHRON AT=XX.XX EVERY=(INTERVAL=(00.01)) ID=JESTMR               **
+**     ROUTE=PPT COMMAND=JMHJSMON                                    **
+**                                                                   **
+**   will schedule this REXX on the PPT-task once per minute on      **
+**   the minute boundary.                                            **
+**                                                                   **
+**********************************************************************/
+
+/**********************************************************************
+**                                                                   **
+** Constants used to define alert levels                             **
+**                                                                   **
+**********************************************************************/
+g.spoolpct = "0.0"                  /* All jobs greater than 0       */
+g.spoolnorm  = "1.0000"             /* Normal  for spool util < 1    */
+g.spoolwarn  = "5.0000"             /* Warning for spool util < 5    */
+g.spooljmax  = 15                   /* SDF updates for top-15 only   */
+
+
+/**********************************************************************
+**                                                                   **
+** Get JES command prefix as defined in policy                       **
+**                                                                   **
+**********************************************************************/
+  jes_pfx = cglobal(AOFJESPREFX)
+  if jes_pfx = "" then
+    jes_pfx = "$"
+
+/**********************************************************************
+**                                                                   **
+** Get jobs with 'high' SPOOL utilization.  You can modify variable  **
+**                                                                   **
+**   g.spoolpct (default 0.0)                                        **
+**                                                                   **
+** above to only return those jobs that have a greater utilization   **
+** than specified in this variable.                                  **
+**                                                                   **
+**********************************************************************/
+  p = 'FA'x
+  cmd = jes_pfx"D JOBQ,SPOOL=(%>"g.spoolpct"),L=Z"
+  "PIPE (STAGESEP | NAME JOBSPOOL)",
+    "MVS "cmd,
+    "| CORRWAIT 2",
+    "| TAKE 1",
+    "| SEP",
+    "| DROP 1",
+    "| JOINCONT LEADING / /",
+    "| EDIT W 1 1 SKIPTO /(/ SKIPTO 2 UPTO /)/ W 1 11 ",
+    "       RESET SKIPTO /PERCENT=/ SKIPTO 9 UPTO /)/ ",
+    "       W 1 RIGHT 7 20",
+    "| SORT D 20.7"       ,
+    "| STEM jl."
+
+
+/**********************************************************************
+**                                                                   **
+** Select 15 jobs with highest SPOOL utilization and create status   **
+** descriptors for SDF.                                              **
+**                                                                   **
+**********************************************************************/
+  do i=1 to jl.0
+    if i > g.spooljmax then
+      leave
+    parse var jl.i jnum jname jperc
+    jperc = strip(jperc)
+   /* -------------------------------------------------------------- */
+   /* Set Job SPOOL status to user-defined status depending on       */
+   /* actual SPOOL utilization.                                      */
+   /* -------------------------------------------------------------- */
+    select
+      when jperc < g.spoolnorm then
+        jstat = "JNORM"
+      when jperc < g.spoolwarn then
+        jstat = "JWARN"
+      otherwise
+        jstat = "JCRIT"
+    end
+
+   /* -------------------------------------------------------------- */
+   /* Creates new status components for each candidate job using     */
+   /* the following pattern:                                         */
+   /*                                                                */
+   /*  root = system name                                            */
+   /*  component = JSPLRANKi,      where i = 1..g.spooljmax          */
+   /*  alt-component = JSPLRANK                                      */
+   /*                                                                */
+   /* The alt-component is required, because the component itself    */
+   /* isn't defined in the tree.  All JSPLRANKi are chained under    */
+   /* the alt-component JSPLRANK.                                    */
+   /*                                                                */
+   /* -------------------------------------------------------------- */
+    resource = cursys()".JSPLRANK"i"/JSPLRANK"
+    info = '"'left(jnum,9) left(jname,9) format(jperc,3,4)'"'
+
+    cmd = "AOCUPDT" resource,
+            "STATUS="jstat "RESTYPE=JSPLRANK MSG=(NONE,"||jperc||")",
+            "INFO="info,
+            "LOG=NO RV=JSPLRANK"i
+
+    call Netvcmd cmd
+
+  end
+
+
+/**********************************************************************
+**                                                                   **
+** Gets overall SPOOL utilization and creates a status descriptor    **
+** for SDF.                                                          **
+**                                                                   **
+**********************************************************************/
+  cmd = jes_pfx"D SPOOLDEF,TGSPACE,L=Z"
+  "PIPE (STAGESEP | NAME DSPOOL)" ,
+    "MVS" cmd,
+    "| CORRWAIT 2",
+    "| TAKE 1" ,
+    "| LOC FIRST 2.8 /HASP636 /" ,
+    "| DROP FIRST 1 LINE" ,
+    "| SEP" ,
+    "| STRIP" ,
+    "| JOINCONT //" ,
+    "| VAR spl_data"
+
+/**********************************************************************
+**                                                                   **
+** Computes the SPOOL-utilization status based on the system-defined **
+** warning level.                                                    **
+**                                                                   **
+**********************************************************************/
+  parse var spl_data . "PERCENT=" pused ',' . "WARN=" pwarn ")" .
+  select
+    when pused >= 95 then
+      splstat = "JCRIT"
+    when pused >= pwarn then
+      splstat = "JWARN"
+    otherwise
+      splstat = "JNORM"
+  end
+
+/**********************************************************************
+**                                                                   **
+** The status component for SPOOL-utilization is constructed like    **
+** follows:                                                          **
+**                                                                   **
+**     root = system name                                            **
+**     component = JSPOOL                                            **
+**     alt-component = JSPOOL                                        **
+**                                                                   **
+** The alt-component is not really required, because JSPOOL is       **
+** defined in the status tree.  But for better style, it is          **
+** added here as well.                                               **
+**                                                                   **
+**********************************************************************/
+  imsg = pused" %"
+  info = imsg
+
+  cmd = "AOCUPDT" cursys()||".JSPOOL/JSPOOL",
+        "STATUS="splstat "RESTYPE=JSPOOL MSG=(NONE,'"||imsg||"')",
+        "INFO='"info"'" ,
+        "LOG=NO RV=JSPOOLUTIL"
+
+  call NetvCmd cmd
+
+/**********************************************************************
+**                                                                   **
+** Gets information about job numbers and job queue elements.        **
+**                                                                   **
+**********************************************************************/
+  cmd = jes_pfx"D JOBDEF,L=Z"
+  "PIPE (STAGESEP | NAME JOBDEF)" ,
+    "MVS" cmd,
+    "| CORRWAIT 2",
+    "| TAKE 1" ,
+    "| LOC FIRST 2.8 /HASP636 /" ,
+    "| DROP FIRST 1 LINE" ,
+    "| SEP" ,
+    "| STRIP" ,
+    "| JOINCONT //" ,
+    "| VAR jobdef_data"
+
+/**********************************************************************
+**                                                                   **
+** Computes the status of free job numbers and free job queue        **
+** elements based on system-defined warning levels.                  **
+**                                                                   **
+**********************************************************************/
+  parse var jobdef_data p1 "JNUMFREE=" jnumfree ',' p2 ,
+                      1 p1 "JNUMWARN=" jnumwarn ',' p2 ,
+                      1 p1 "RANGE="    jnumrng  ')' p2 ,
+                      1 p1 "JOBFREE=" jobqefree ',' p2 ,
+                      1 p1 "JOBWARN=" jobqewarn ',' p2 ,
+                      1 p1 "JOBNUM="  jobqenum  ',' p2
+
+   /* -------------------------------------------------------------- */
+   /* Compute job number used percentage from total - free           */
+   /* -------------------------------------------------------------- */
+  parse var jnumrng '(' rlow ',' rhigh ')'
+  jnumrng = rhigh - rlow + 1
+  jnum_perc = (jnumrng - jnumfree) / jnumrng * 100
+
+  select
+    when jnum_perc >= 95 then
+      jnumstat = "JCRIT"
+    when jnum_perc >= jnumwarn then
+      jnumstat = "JWARN"
+    otherwise
+      jnumstat = "JNORM"
+  end
+
+  jnumfree = thFormat(jnumfree)
+
+   /* -------------------------------------------------------------- */
+   /* Creates new status descriptor for component JSJNUM.            */
+   /* -------------------------------------------------------------- */
+  imsg = jnumfree" job numbers are free to use"
+  info = "'"right(jnumfree,8)" ("format(100-jnum_perc,2,2)"%)'"
+  cmd = "AOCUPDT" cursys()||".JSJNUM/JSJNUM",
+        "STATUS="jnumstat "RESTYPE=JSJNUM MSG=(NONE,'"||imsg||"')",
+        "INFO="info ,
+        "LOG=NO RV=JSJNUM"
+
+  call Netvcmd cmd
+
+   /* -------------------------------------------------------------- */
+   /* Compute job queue element used percentage from total - free.   */
+   /* -------------------------------------------------------------- */
+  job_queue_elem_free_perc = jobqefree / jobqenum * 100
+
+  job_queue_elem_used_perc = 100 - job_queue_elem_free_perc
+
+  select
+    when job_queue_elem_used_perc >= 95 then
+      jfreestat = "JCRIT"
+    when job_queue_elem_used_perc > jobqewarn then
+      jfreestat = "JWARN"
+    otherwise
+      jfreestat = "JNORM"
+  end
+
+  jobqefree = thFormat(jobqefree)
+
+   /* -------------------------------------------------------------- */
+   /* Creates new status descriptor for component JSJQE.             */
+   /* -------------------------------------------------------------- */
+  imsg = jobqefree" job queue elements free to use"
+  info = "'"right(jobqefree,8)" (" || ,
+           format(job_queue_elem_free_perc,2,2)"%)'"
+  cmd = "AOCUPDT" cursys()||".JSJQE/JSJQE",
+        "STATUS="jfreestat "RESTYPE=JSJQE MSG=(NONE,'"||imsg||"')",
+        "INFO="info ,
+        "LOG=NO RV=JSJQE"
+
+  call Netvcmd cmd
+
+/**********************************************************************
+**                                                                   **
+** Gets information about job output queue elements.                 **
+**                                                                   **
+**********************************************************************/
+  cmd = jes_pfx"D OUTDEF,L=Z"
+  "PIPE (STAGESEP | NAME OUTDEF)" ,
+    "MVS" cmd,
+    "| CORRWAIT 2",
+    "| TAKE 1" ,
+    "| LOC FIRST 2.8 /HASP636 /" ,
+    "| DROP FIRST 1 LINE" ,
+    "| SEP" ,
+    "| STRIP" ,
+    "| JOINCONT //" ,
+    "| VAR outdef_data"
+
+   /* -------------------------------------------------------------- */
+   /* Compute job output queue element used percentage from          */
+   /* total - free.                                                  */
+   /* -------------------------------------------------------------- */
+  parse var outdef_data p1 "JOEFREE=" joefree ',' p2 ,
+                      1 p1 "JOENUM="  joenum  ',' p2 ,
+                      1 p1 "JOEWARN=" joewarn ',' p2
+
+  job_output_elem_free_perc = joefree / joenum * 100
+
+  job_output_elem_used_perc = 100 - job_output_elem_free_perc
+
+  select
+    when joe_output_elem_used_perc >= 95 then
+      joefreestat = "JCRIT"
+    when joe_output_elem_used_perc >= joewarn then
+      joefreestat = "JWARN"
+    otherwise
+      joefreestat = "JNORM"
+  end
+
+   /* -------------------------------------------------------------- */
+   /* Creates new status descriptor for component JSJOE.             */
+   /* -------------------------------------------------------------- */
+  joefree = thFormat(joefree)
+
+  imsg = joefree" job output elements free to use"
+  info = "'"right(joefree,8)" (" || ,
+              format(job_output_elem_free_perc,2,2)"%)'"
+
+  cmd = "AOCUPDT" cursys()||".JSJOE/JSJOE",
+        "STATUS="joefreestat "RESTYPE=JSJOE MSG=(NONE,'"||imsg||"')",
+        "INFO="info ,
+        "LOG=YES RV=JSJOE"
+
+  Call Netvcmd cmd
+
+/**********************************************************************
+**                                                                   **
+** Gets information about Block Extension Reuse Tables               **
+**                                                                   **
+**********************************************************************/
+  cmd = jes_pfx"D CKPTSPACE,L=Z"
+  "PIPE (STAGESEP | NAME CKPTSPCE)" ,
+    "MVS" cmd,
+    "| CORRWAIT 2",
+    "| TAKE 1" ,
+    "| LOC FIRST 2.8 /HASP636 /" ,
+    "| DROP FIRST 1 LINE" ,
+    "| SEP" ,
+    "| STRIP" ,
+    "| JOINCONT // / / " ,
+    "| VAR ckptspace_data"
+
+   /* -------------------------------------------------------------- */
+   /* Compute total BERT usage from total - free.                    */
+   /* -------------------------------------------------------------- */
+  parse var ckptspace_data p1 "BERTNUM=" bertnum ',' p2 ,
+                         1 p1 "BERTFREE=" bertfree ',' p2 ,
+                         1 p1 "BERTWARN=" bertwarn ',' p2
+
+  bert_free_perc = bertfree / bertnum * 100
+
+  bert_used_perc = 100 - bert_free_perc
+
+  select
+    when bert_used_perc >= 95 then
+      bertfreestat = "JCRIT"
+    when bert_used_perc >= bertwarn then
+      bertfreestat = "JWARN"
+    otherwise
+      bertfreestat = "JNORM"
+  end
+
+   /* -------------------------------------------------------------- */
+   /* Creates new status descriptor for component JSBERT.            */
+   /* -------------------------------------------------------------- */
+  bertfree = thFormat(bertfree)
+
+  imsg = bertfree" BERTs free to use"
+  info = "'"right(bertfree,8)" (" || ,
+             format(bert_free_perc,2,2)"%)'"
+
+  cmd = "AOCUPDT" cursys()||".JSBERT/JSBERT",
+        "STATUS=JNORM"       "RESTYPE=JSBERT MSG=(NONE,'"||imsg||"')",
+        "INFO="info ,
+        "RV=JSBERT"
+
+  call NetvCmd cmd
+
+
+/**********************************************************************
+**                                                                   **
+** Gets detailed information about the specific BERT types.          **
+**                                                                   **
+**********************************************************************/
+  cmd = jes_pfx"D CKPTSPACE,BERTUSE,L=Z"
+  "PIPE (STAGESEP | NAME CKPTSPCE)" ,
+    "MVS" cmd,
+    "| CORRWAIT 2",
+    "| TAKE 1" ,
+    "| LOC FIRST 2.8 /HASP636 /" ,
+    "| DROP FIRST 1 LINE" ,
+    "| SEP" ,
+    "| STRIP" ,
+    "| JOINCONT // / / " ,
+    "| VAR ckptspace_data"
+
+  parse var ckptspace_data ,
+               p1 "INTERNAL" bert.INTERNAL.1  bert.INTERNAL.2 p2 ,
+             1 p1 "JQE"      bert.JQE.1       bert.JQE.2  p2 ,
+             1 p1 "CAT"      bert.CAT.1       bert.CAT.2  p2 ,
+             1 p1 "WSCQ"     bert.WSCQ.1      bert.WSCQ.2 p2 ,
+             1 p1 "DJBQ"     bert.DJBQ.1      bert.DJBQ.2 p2 ,
+             1 p1 "JOE"      bert.JOE.1       bert.JOE.2  p2 ,
+             1 p1 "DAS"      bert.DAS.1       bert.DAS.2  p2 ,
+             1 p1 "GRP"      bert.GRP.1       bert.GRP.2  p2
+
+  bert_types="INTERNAL JQE CAT WSCQ DJBQ JOE DAS GRP"
+
+  do w = 1 to words(bert_types)
+
+    type = word(bert_types,w)
+    info = "'"type || right(bert.type.1,9) || right(bert.type.2,9)"'"
+    imsg = info
+
+    cmd = "AOCUPDT" cursys()"."type"/JSBERT",
+        "STATUS=JNORM RESTYPE=JSBERT MSG=(NONE,'"||imsg||"')",
+        "INFO="info ,
+        "LOG=NO RV=JSBERT"
+
+    call Netvcmd cmd
+
+  end
+
+exit
+
+/**********************************************************************
+**                                                                   **
+** Run NETV command                                                  **
+**                                                                   **
+**********************************************************************/
+ NetvCmd: procedure
+
+  parse arg parms
+
+  Address Netvasis ,
+  "PIPE (STAGESEP | NAME RUNNV)" ,
+    "NETV (MOE)" parms           ,
+    "| LOGTO NETLOG"
+
+  return
+
+/**********************************************************************
+**                                                                   **
+** Routine that formats numbers for better readability.              **
+**                                                                   **
+**********************************************************************/
+ thFormat: procedure
+
+  parse arg parm
+  n = parm
+
+  if n > 1000 then do
+    r = n // 1000
+    r = thFormat(n % 1000) || "," || right(r,3,0)
+    return r
+   end
+  else
+   do
+    r = n
+    return r
+   end
