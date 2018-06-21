@@ -1,6 +1,6 @@
 # JES Status Monitoring on SDF
 
-This guide is an add-on to the document [OperatingDoneByException](../OperatingDoneByException.pdf) and describes how to configure your environment to use the sample SDF panel and tree for JES monitoring.
+This guide is an add-on to the document [OperatingDoneByExceptions](../OperatingDoneByExceptions.pdf) and describes how to configure your environment to use the sample SDF panel and tree for JES monitoring.
 
 ## Sample members
 
