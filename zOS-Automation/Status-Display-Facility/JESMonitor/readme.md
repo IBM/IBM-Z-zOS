@@ -150,13 +150,15 @@ of the local system and from there zoom into the JES status.
      SDF
 ```
 
-6.0  Comments and suggestions
-
 Please, let us know how you like this example and whether it helps you
 to get a deeper understanding about SDF and how to exploit it for even
 more than what comes with IBM System Automation for z/OS out of the box.
 
 If you have any comments or suggestions to improve the example or the
-product's use of SDF, please don't hesitate and write an e-mail to
+product's use of SDF, please let us know.  See also below.
 
-     holtz@de.ibm.com
+## Disclaimer
+
+There are no warranties of any kind, and there is no service or technical support available for these materials from IBM. As a recommended practice, review carefully any materials that you download from this site before using them on a live system.
+
+Though the materials provided herein are not supported by the IBM Service organization, your comments are welcomed by the developers, who reserve the right to revise or remove the materials at any time. To report a problem, or provide feedback, contact holtz@de.ibm.com.
