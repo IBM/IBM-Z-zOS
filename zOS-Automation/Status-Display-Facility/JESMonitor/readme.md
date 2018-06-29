@@ -136,6 +136,8 @@ resource in your automation policy and define the CHRON command as
 a startup command (see Note 1).  Similarly, use the PURGE command to purge this
 timer as a shutdown command.
 
+Another possibility is to setup the CHRON-timer in System Automation's initialization exit `AOFEXINT` which is called once initialization has completed.
+
 Note 1: Unfortunately, it is not possible today to define such a CHRON timer
 within the automation policy using entry type TMR.
 
