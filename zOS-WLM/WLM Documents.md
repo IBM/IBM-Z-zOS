@@ -32,6 +32,7 @@ Specific WLM Functions
 ======================
 * [z/OS Workload Manager Container Pricing](Documents/Container_Pricing_The_WLM_View.pdf)
 * [z/OS Workload Manager Sysplex Routing Services](Documents/WLMroutingservices.pdf)
+* [Route Me, Workload Manager – Functions for Dynamic Workload Routing](Documents/Route%20Me%2C%20Workload%20Manager.pdf)
 * [WLM and Hiperdispatch](Documents/WLMhiperdispatch.pdf)
 * [Managed Initiators Updated version with new section on Setting Goals for Batch Jobs](Documents/WLMinits.pdf)
 * [Goal-Based Initiator Management](Documents/WLMcmgbatch.pdf)
