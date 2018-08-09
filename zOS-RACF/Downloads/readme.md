@@ -14,22 +14,20 @@ The RACF development team has numerous tools that can assist you in managing you
 
 6. [IRRHFSU](http://ibm.biz/racf-irrhfsu): A utility which unloads your z/OS UNIX System Services hierarchical file system data (HFZ, TFS, or z/FS) in a manner which is complimentary to the RACF Data Base Unload Utility (IRRDBU00). d
 
-7. [IRRXUTIL](http://ibm.biz/racf-irrxutil): A utility which ??????
+7. [IRRXUTIL](http://ibm.biz/racf-irrxutil): RACF IRRXUTIL Sample prgrams.
 
-8. [JESNODES](http://ibm.biz/racf-jesnodes): A utility which ?????? 
+8. [JESNODES](http://ibm.biz/racf-jesnodes): A REXX exec which displays the names of trusted NODES profiles (those with a UACC greater than READ) and cover a defined node name in the context of inbound jobs and displays the local nodes defined in the &RACLNODE profile. 
 
-10. [LISTCDT](http://ibm.biz/racf-listcdt): A utility which ?????? 
+10. [LISTCDT](http://ibm.biz/racf-listcdt): A utility which lists the contents of your RACF Class Descriptor Table.
 
-11. [PWDCOPY](http://ibm.biz/racf-pwdcopy): A utility which ?????? 
+11. [PWDCOPY](http://ibm.biz/racf-pwdcopy): A utility which copies passwords from one RACF database to another. 
 
-12. [PWDPHRONLY](http://ibm.biz/racf-pwdphronly): A utility which ?????? 
+12. [PWDPHRONLY](http://ibm.biz/racf-pwdphronly): RACF sample ICHRIX02 exit which forces users to use password phrases.
 
-13. [RACFDB2](http://ibm.biz/racf-racfdb2): A utility which ?????? 
+14. [RACFICE2](http://ibm.biz/racf-racfice2): RACFICE examples, beyond those which are shipped in 'SYS1.SAMPLIB(IRRICE)'
 
-14. [RACFICE2](http://ibm.biz/racf-racfice): A utility which ?????? 
+15. [RACKILL](http://ibm.biz/racf-rackill): A utility deletes profiles from the RACF database that otherwise might not be deletable.  
 
-15. [RACKILL](http://ibm.biz/racf-rackill): A utility which ?????? 
+16. [RACSEQ](http://ibm.biz/racf-racseq): A TSO command which invokes the extract function of R_admin (IRRSEQ00) and displays every profile field to the display using PUTLINE.    
 
-16. [RACSEQ](http://ibm.biz/racf-racseq): A utility which ??????
-
-17. [REXXPWEXIT](http://ibm.biz/racf-rexxpwexit): A utility which ?????? 
+17. [REXXPWEXIT](http://ibm.biz/racf-rexxpwexit): A system-REXX based new password exit.
