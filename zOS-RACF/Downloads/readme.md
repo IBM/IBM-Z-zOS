@@ -6,13 +6,13 @@ The RACF development team has numerous tools that can assist you in managing you
 
 3. [CUTPWHIS](http://ibm.biz/racf-cutpwhis): A utility which trims the orphaned passwords created by decreasing the SETROPTS password history value.
 
-3. [DB2PRM](http://ibm.biz/racf-db2prm): A REXX exec which creates a RACF database parmlib member from your RACF environment.
+3. [DB2PRM](http://ibm.biz/racf-db2prm): A REXX exec which converts your  RACF data set names table (ICHRDSNT) or RACF range table (ICHRRNG) into a RACF PARMLIB member. 
 
-4. [DBSYNC](http://ibm.biz/racf-dbsync): A utility which ?????? 
+4. [DBSYNC](http://ibm.biz/racf-dbsync): REXX exec to find differences between two RACF databases and create commands to synchronize them. 
 
-5. [ICHDEX01](http://ibm.biz/racf-ichdex01): A utility which ?????? 
+5. [ICHDEX01](http://ibm.biz/racf-ichdex01): A sample RACF ICHDEX01 which ensures that the default for the encryption of passwords is not MASKED.
 
-6. [IRRHFSU](http://ibm.biz/racf-irrhfsu): A utility which ??????
+6. [IRRHFSU](http://ibm.biz/racf-irrhfsu): A utility which unloads your z/OS UNIX System Services hierarchical file system data (HFZ, TFS, or z/FS) in a manner which is complimentary to the RACF Data Base Unload Utility (IRRDBU00). d
 
 7. [IRRXUTIL](http://ibm.biz/racf-irrxutil): A utility which ??????
 
