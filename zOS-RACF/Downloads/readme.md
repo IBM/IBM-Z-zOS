@@ -1,8 +1,8 @@
 The RACF development team has numerous tools that can assist you in managing your RACF environment. These tools include:
 
-1. [BPXCHECK](http://ibm.biz/racf-bpxcheck): A utility which ?????? 
+1. [BPXCHECK](http://ibm.biz/racf-bpxcheck): A REXX exec which uses the RACF IRRXUTIL REXX interface to report the status of various UNIX- related settings in RACF.  
 
-2. [CDTDYN](http://ibm.biz/racf-cdtdyn): A utility which ?????? 
+2. [CDT2DYN](http://ibm.biz/racf-cdt2dyn): A REXX exec which examine the contents of the current classes in the RACF static class descriptor table and creates the commands to put those installation-defined classes into the ynamic CDT.
 
 3. [CUTPWHIS](http://ibm.biz/racf-cutpwhis): A utility which ??????
 
