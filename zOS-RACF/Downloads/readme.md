@@ -4,7 +4,9 @@ The RACF development team has numerous tools that can assist you in managing you
 
 2. [CDTDYN](http://ibm.biz/racf-cdtdyn): A utility which ?????? 
 
-3. [CUTPWHIS](http://ibm.biz/racf-cutpwhis): A utility which ?????? 
+3. [CUTPWHIS](http://ibm.biz/racf-cutpwhis): A utility which ??????
+
+3. [DB2PRM](http://ibm.biz/BdYY47): A utility which ??????
 
 4. [DBSYNC](http://ibm.biz/racf-dbsync): A utility which ?????? 
 
