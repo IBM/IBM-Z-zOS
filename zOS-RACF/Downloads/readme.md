@@ -4,9 +4,9 @@ The RACF development team has numerous tools that can assist you in managing you
 
 2. [CDT2DYN](http://ibm.biz/racf-cdt2dyn): A REXX exec which examine the contents of the current classes in the RACF static class descriptor table and creates the commands to put those installation-defined classes into the ynamic CDT.
 
-3. [CUTPWHIS](http://ibm.biz/racf-cutpwhis): A utility which ??????
+3. [CUTPWHIS](http://ibm.biz/racf-cutpwhis): A utility which trims the orphaned passwords created by decreasing the SETROPTS password history value.
 
-3. [DB2PRM](http://ibm.biz/racf-db2prm): A utility which ??????
+3. [DB2PRM](http://ibm.biz/racf-db2prm): A REXX exec which creates a RACF database parmlib member from your RACF environment.
 
 4. [DBSYNC](http://ibm.biz/racf-dbsync): A utility which ?????? 
 
