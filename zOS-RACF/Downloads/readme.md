@@ -9,7 +9,7 @@ The RACF development team has numerous tools that can assist you in managing you
 3. [DB2PRM](http://ibm.biz/racf-db2prm): A REXX exec which converts your  RACF data set names table (ICHRDSNT) or RACF range table (ICHRRNG) into a RACF PARMLIB member. 
 
 4. [DBSYNC](http://ibm.biz/racf-dbsync): REXX exec to find differences between two RACF databases and create commands to synchronize them. 
-
+b
 5. [ICHDEX01](http://ibm.biz/racf-ichdex01): A sample RACF ICHDEX01 which ensures that the default for the encryption of passwords is not MASKED.
 
 6. [IRRHFSU](http://ibm.biz/racf-irrhfsu): A utility which unloads your z/OS UNIX System Services hierarchical file system data (HFZ, TFS, or z/FS) in a manner which is complimentary to the RACF Data Base Unload Utility (IRRDBU00). d
@@ -42,7 +42,7 @@ Please note that though the materials provided herein are not supported by the I
 
 and include the following line in the body of the note, substituting your first name and last name as indicated:
 
-  subscribe racf-l first_name last_name
+     subscribe racf-l first_name last_name
 
 To post messages to RACF-L, send them to racf-l@listserv.uga.edu and include a relevant Subject: line.
 
