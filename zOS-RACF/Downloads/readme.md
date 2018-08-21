@@ -31,3 +31,18 @@ The RACF development team has numerous tools that can assist you in managing you
 16. [RACSEQ](http://ibm.biz/racf-racseq): A TSO command which invokes the extract function of R_admin (IRRSEQ00) and displays every profile field to the display using PUTLINE.    
 
 17. [REXXPWEXIT](http://ibm.biz/racf-rexxpwexit): A system-REXX based new password exit.
+
+There are no warranties of any kind, and there is no service or technical support available for these materials from IBM. As a recommended practice, review carefully any materials that you download from this site before using them on a live system.
+
+Your feedback is welcome.
+
+Please note that though the materials provided herein are not supported by the IBM Service organization, your comments are welcomed by the developers, who reserve the right to revise or remove the materials at any time. To report a problem, or provide suggestions or comments, please communicate them via the RACF-L mailing list.  To subscribe to RACF-L, you should send a note to:
+
+     listserv@listserv.uga.edu
+
+and include the following line in the body of the note, substituting your first name and last name as indicated:
+
+  subscribe racf-l first_name last_name
+
+To post messages to RACF-L, send them to racf-l@listserv.uga.edu and include a relevant Subject: line.
+
