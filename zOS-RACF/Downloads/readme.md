@@ -36,9 +36,7 @@ There are no warranties of any kind, and there is no service or technical suppor
 
 Your feedback is welcome.
 
-Please note that though the materials provided herein are not supported by the IBM Service organization, your comments are welcomed by the developers, who reserve the right to revise or remove the materials at any time. To report a problem, or provide suggestions or comments, please communicate them via the RACF-L mailing list.  To subscribe to RACF-L, you should send a note to:
-
-     listserv@listserv.uga.edu
+Please note that though the materials provided herein are not supported by the IBM Service organization, your comments are welcomed by the developers, who reserve the right to revise or remove the materials at any time. To report a problem or provide suggestions or comments, please communicate them via the RACF-L mailing list.  To subscribe to RACF-L, you should send a note to listserv@listserv.uga.edu
 
 and include the following line in the body of the note, substituting your first name and last name as indicated:
 
