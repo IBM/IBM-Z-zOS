@@ -1,7 +1,7 @@
 IBM RACF resources for the z/OS platform
 =======================================
 
-This repository contains SMF resources that might be useful to the RACF community. Here you might find items of interest about existing and new functions in z/OS. 
+This repository contains RACF resources that might be useful to the z/OS community. Here you might find items of interest about existing and new functions in z/OS. 
 
 We welcome your feedback on anything you see here. 
 
