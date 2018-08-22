@@ -1,0 +1,96 @@
+<!-- ** Beginning of Copyright and License **									-->
+<!--																			-->
+<!-- Copyright 2018 IBM Corp.              									 	-->                             
+<!--                                                   						 	-->                 
+<!-- Licensed under the Apache License, Version 2.0 (the "License"); 			-->    
+<!-- you may not use this file except in compliance with the License. 		 	--> 
+<!-- You may obtain a copy of the License at                          		 	-->
+<!--                                                                    		-->
+<!-- http://www.apache.org/licenses/LICENSE-2.0                   			 	-->    
+<!--                                                                   		 	-->
+<!-- Unless required by applicable law or agreed to in writing, software		-->
+<!-- distributed under the License is distributed on an "AS IS" BASIS,  		-->
+<!-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  	-->
+<!-- See the License for the specific language governing permissions and 		-->
+<!-- limitations under the License.                    							-->
+<!--																			-->
+<!-- ** End of Copyright and License **  										-->
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Demo of REST zOS Jobs service</title>
+    <script type="text/javascript">
+        function listJobs() {
+            var xhr = new XMLHttpRequest();
+            var url = "https://pev076.pok.ibm.com/zosmf/restjobs/jobs";
+            xhr.open("GET", url, true);
+            xhr.setRequestHeader("X-CSRF-ZOSMF-HEADER", "zosmf");
+            xhr.onreadystatechange = function (){
+                document.getElementById("result").innerHTML = xhr.responseText;
+            }
+            xhr.send();
+        }
+        function submitJob(){
+            var jcl=document.getElementById("jclArea").value;
+            var xhr = new XMLHttpRequest();
+            var url = "https://pev076.pok.ibm.com/zosmf/restjobs/jobs";
+            xhr.open("PUT", url, true);
+            xhr.setRequestHeader("X-CSRF-ZOSMF-HEADER", "zosmf");
+            xhr.setRequestHeader("Content-Type", "text/plain");
+            xhr.onreadystatechange = function (){
+                document.getElementById("result").innerHTML = xhr.responseText;  
+            }
+            xhr.send(jcl);
+        }
+        function getJobStatus(){
+            var jobname = document.getElementById("jobname").value;
+            var jobid = document.getElementById("jobid").value;
+            var xhr = new XMLHttpRequest();
+            var url = "https://pev076.pok.ibm.com/zosmf/restjobs/jobs/"+jobname+"/"+jobid;
+            xhr.open("GET", url, true);
+            xhr.setRequestHeader("X-CSRF-ZOSMF-HEADER", "zosmf");
+            xhr.onreadystatechange = function (){
+                document.getElementById("result").innerHTML = xhr.responseText;  
+            }
+           xhr.send();
+        }
+    </script>
+</head>
+<body>
+    <div>
+        <button id="listJobs" onclick="listJobs()">list my jobs</button>
+    </div>
+    <hr/>
+
+    <div id="submitArea">
+        <div>Input JCL into below textarea</div>
+        <textarea id="jclArea" style="width: 500px; height: 200px;">//CREATEDS  JOB (99999),'IBMUSER',
+//          CLASS=A,MSGLEVEL=(1,1),REGION=0M
+//***********************************************
+//STEP1 EXEC PGM=IEFBR14
+//DSN   DD DSN=ZTRIAL.ZOSMF.RESTDS,
+//      DISP=(NEW,CATLG,DELETE),
+//      DCB=(DSORG=PS,BLKSIZE=0,RECFM=FB,LRECL=80),
+//      SPACE=(TRK,(10,10)),
+//      UNIT=SYSALLDA,
+//      VOL=SER=PEVTS3
+/*
+        </textarea>
+    </div><br/>
+    <button id="submitJob" onclick="submitJob()">Submit a job</button><br/><br/>
+    <hr/>
+
+    <div id="getJobArea">
+            <label>Job Name:</label><input id="jobname" />
+            <label>Job ID:</label><input id="jobid" />
+    </div><br />
+    <button id="getJob" onclick="getJobStatus()">Get job status</button><br/>
+    <hr/>
+
+	<div id="resultArea">	
+		<div><h4>Response:</h4></div>
+		<div id="result"></div>
+	</div>	
+</body>
+</html>
