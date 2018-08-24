@@ -52,14 +52,14 @@ For the individual migration actions and for the entire migration effort, you ca
 If you are migrating from z/OS V2R2 to V2R3, transfer the appropriate three files as binary using File Transfer Protocol (FTP),
 and store them in the same z/OS UNIX directory:
 
-    * zOS Migration from V2.2 to V2.3-Level2.0.xml
+    * zOS Migration from V2.2 to V2.3-Level2.0.xml - download this file by clicking on RAW, not the DOWNLOAD button, or you will have create problems in the z/OSMF Workflow.
     * HC_rexx.txt
     * discovery.txt    
 
 If you are migrating from z/OS V2R1 to V2R3, transfer the appropriate three files as binary using File Transfer Protocol (FTP),
 and store them in the same z/OS UNIX directory:
 
-    * zOS Migration from V2.1 to V2.3-Level2.0.xml
+    * zOS Migration from V2.1 to V2.3-Level2.0.xml - download this file by clicking on RAW, not the DOWNLOAD button, or you will have create problems in the z/OSMF Workflow.
     * HC_rexx.txt
     * discovery.txt
  
