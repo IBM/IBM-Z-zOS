@@ -25,7 +25,7 @@ For the individual migration actions and for the entire migration effort, you ca
 Currently, you cannot copy an existing workflow into a new or existing workflow. Take this limitation into consideration if you want to upgrade a workflow to a higher level when one is provided. Therefore, you should use the latest level of the workflow for your z/OS V2R2 migration. If subsequent levels of the workflow are released after you start, you can refer to those levels of the z/OS V2R2 Migration book and see (from the Summary of Changes) the migration actions that are not represented in your existing workflow.
  
  If you are migrating from z/OS V2R1 to V2R2, transfer the following three files as binary using File Transfer Protocol (FTP), and store them in the same z/OS UNIX directory:
-* zosV2R1_to_V2R2_migration_workflow03.xml 
+* zosV2R1_to_V2R2_migration_workflow03.xml  - download this file by clicking on RAW, not the DOWNLOAD button, or you will have create problems in the z/OSMF Workflow.
 * migration_feedback_gather_zos_v2r1.txt
 * HC_rexx.txt 
  
