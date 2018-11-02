@@ -8,4 +8,6 @@ well as Anaconda and Python environments.
 <dt>workflow_izodatune.xml</dt>
 <dd>Tuning and allocating resources.
 </dl>
+<p>A new, dynamic workflow is available for z/OS Spark 2.2. This new workflow is delivered as part of IBM Open Data Analytics for z/OS in APAR PH01619 (SPARK 2.2.0.6).  However, the dynamic workflow does not support z/OS Spark 2.1. See the IBM Open Data Analytics for z/OS Installation and Customization Guide (https://www.ibm.com/servers/resourcelink/svc00100.nsf/pages/izodav110sc279033/$file/azk1a100.pdf) for details.</p>
+<p>We suggest that you use workflow_izodaic.xml included here for Spark 2.1 releases and the dynamic workflow included in the IzODA product for Spark 2.2 releases.</p>
 <p>For more information about IBM Open Data Analytics, see https://www.ibm.com/support/knowledgecenter/en/SS3H8V_1.1.0
