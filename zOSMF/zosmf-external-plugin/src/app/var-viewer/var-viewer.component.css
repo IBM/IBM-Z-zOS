@@ -1,0 +1,62 @@
+.ext-result {
+    color: blue;
+}
+.ext-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.ext-introduct {
+    padding: 0 10%;
+    height: 25%;
+    background-color: #283593;
+    color: white;
+    font-size: large;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ext-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+}
+
+.ext-info {
+    display: block;
+    height: 30%;
+    padding-top: 5%;
+}
+
+.ext-bad {
+    color: red;
+}
+
+.ext-start {
+    height: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ext-var {
+    display: block;
+    height: 23%;
+    padding-top: 3%;
+}
+
+.ext-bar {
+    height: 5px;
+}
+
+.ext-field {
+    margin-right: 30px;
+}
+
+.ext-clean {
+    margin-top: 30%;
+}
