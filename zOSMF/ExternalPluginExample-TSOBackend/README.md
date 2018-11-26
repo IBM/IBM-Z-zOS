@@ -2,16 +2,18 @@
 
 In this exercise, you will learn how to create and deploy your own z/OSMF external plug-in. Included is a sample plug-in (an application), which contains a user interface that is based on the popular Angular framework. The plug-in uses several z/OSMF Representational State Transfer (REST) APIs to perform operations on a z/OS host system.  
 
-## Sample plug-in
-The UI front-end code is based on [Angular](https://angular.io/). It is comprised of widgets from [Angular Material](https://material.angular.io/). 
+## Introduction of sample plug-in
 
-Besides the front-end code, the sample plug-in includes:
-* A component, which is called VarViewerComponent.  
-* A REXX program, which runs on the back-end system. 
-* A properties file, which is used for adding the plug-in to z/OSMF.
+This sample plug-in consists of 3 parts:
+* Front-end code  
+  The front-end code of this sample plug-in is based on [Angular](https://angular.io/). It is comprised of widgets from [Angular Material](https://material.angular.io/). This README file assumes you have basic knowledge of Angular. 
+  The major front-end code of this sample plug-in is component VarViewerComponent.
+* A REXX program  
+  which runs as the back-end program in z/OS side for this sample plug-in.
+* A properties file  
+  which is used to describe meta data of the sample plug-in.
 
-### File structure
-
+Below is the detailed source code structure:
 * **/src/app/var-viewer/**            
   This directory contains the component `VarViewerComponent`. This component is used for displaying data, handling user interaction, and calling services for communicating with z/OSMF.  
 * **/src/app/service/tso.service.ts**  
@@ -29,23 +31,20 @@ Besides the front-end code, the sample plug-in includes:
 * **/myextapp.properties**       
   This properties file contains settings for the external plug-in, such as the plug-in name and the file path of the binary code. z/OSMF uses these settings to configure the plug-in when you deploy it.        
 
-### REST services included with z/OSMF
-The external plug-in uses the following z/OSMF REST services:
-* TSO/E address space services
-* Data persistence services  
+This sample plug-in (in particular, front-end code) also invokes some services provided by z/OSMF:
+* REST TSO/E address space services  
+This REST service is used by the sample plug-in to allow front-end code communicate with back end TSO application which is the REXX program in this sample.  
+* REST Data persistence services  
+This REST service is used by the sample plug-in to read/write persistent data from/in z/OS side.
+* Javascript log service  
+This service is used by the sample plug-in to write UI log into z/OSMF IZUG*.log file. 
+* Javascript clean-up mechanism  
+This service is used by the sample plug-in to register clean-up work.
 
-For details about these services, refer to the programs `/src/app/service/tso.service.ts` and `/src/app/service/persist.service.ts` in this example.  
-
+For details about how to invoke z/OSMF REST services from front-end code, refer to source code `/src/app/service/tso.service.ts` and `/src/app/service/persist.service.ts` in this example.  
 Note that z/OSMF includes [other useful REST services](https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.izua700/IZUHPINFO_RESTServices.htm), such as the
-z/OS jobs REST services and the z/OS data set and file REST services.
-
-### javascript functions
-The sample plug-in uses the following javascript APIs, which are included with z/OSMF:
-* log service
-* clean-up mechanism
-
-For details, refer to the programs `/src/app/service/log.service.ts` and `/src/app/tool/zosmfTools.ts` in this example.  
-
+z/OS jobs REST services and the z/OS data set and file REST services.  
+For details about how to invoke z/OSMF Javascript services from front-end code, refer to the programs `/src/app/service/log.service.ts` and `/src/app/tool/zosmfTools.ts` in this example.  
 [z/OSMF core JavaScript APIs](https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.izua700/izuprog_CoreAPIs.htm) lists the available javascript APIs.
 
 ## Deploy the external plug-in into z/OSMF
@@ -73,14 +72,14 @@ rexx = "VAREXX";
 Remember to **catalog** the PDS.
 
 ### 3. Build the UI and upload it to z/OS
-This example uploads the UI binary files to the directory `/dist/zosmf-external-plugin/`. However, if you changed the source code, you might need to build the binary files again. To do so, use the following command. The binary files will reside in the same directory `/dist/zosmf-external-plugin/`.
+This example uploads the UI binary files to the directory `/dist/zosmf-external-plugin/`. However, if you changed the source code, you might need to build the binary files again. To do so, use the following command. The binary files will reside in the another directory `/dist/ExternalPluginExample-TSOBackend/`.
 ```shell
 ng build --base-href='./'
 ```
-In this example, you must upload the binary files from the z/OS directory `/dist/zosmf-external-plugin/` to the z/OS directory `/usr/lpp/zosmf/myextapp/zosmf-external-plugin/`.
+In this example, you must upload the binary files from the source code directory `/dist/zosmf-external-plugin/` or `/dist/ExternalPluginExample-TSOBackend`(if you re-build the project) to the z/OS directory `/usr/lpp/myextapp/dist/`.
 
 ### 4. Prepare the properties file
-Upload the properties file `/myextapp.properties` to the directory `/usr/lpp/zosmf/myextapp/`. Included in this file are the following properties: 
+Upload the properties file `/myextapp.properties` to the directory `/usr/lpp/myextapp/`. Included in this file are the following properties: 
 ```shell
 # below properties are for the plug-in
 izu.externalapp.local.context.root=myextapp
@@ -107,7 +106,7 @@ Complete your work by importing the plug-in into z/OSMF.
 Do the following:
 1. Log into z/OSMF
 2. Access the z/OSMF Import Manager task. If you selected the z/OSMF classic view, click the `Import Manager` task in the `z/OSMF Administration` category. Otherwise, if you selected the z/OSMF desktop view, click the `Import Manager` icon on the desktop.
-3. In the `Import Manager` task, select the `Import` tab and specify the full file path and name of the property file that you created:  `/usr/lpp/zosmf/myextapp/myextapp.properties`. 
+3. In the `Import Manager` task, select the `Import` tab and specify the full file path and name of the property file that you created:  `/usr/lpp/myextapp/myextapp.properties`. 
 4. Click `Import`. A message is displayed to indicate whether the plug-in was added.
 
 ### Try the plug-in
