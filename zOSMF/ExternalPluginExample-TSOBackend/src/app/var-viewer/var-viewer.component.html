@@ -1,0 +1,142 @@
+<!-- ** Beginning of Copyright and License **                                -->
+<!--                                                                         -->
+<!-- Copyright 2018 IBM Corp.                                                -->
+<!--                                                                         -->
+<!-- Licensed under the Apache License, Version 2.0 (the "License");         -->
+<!-- you may not use this file except in compliance with the License.        -->
+<!-- You may obtain a copy of the License at                                 -->
+<!--                                                                         -->
+<!-- http://www.apache.org/licenses/LICENSE-2.0                              -->
+<!--                                                                         -->
+<!-- Unless required by applicable law or agreed to in writing, software     -->
+<!-- distributed under the License is distributed on an "AS IS" BASIS,       -->
+<!-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.-->
+<!-- See the License for the specific language governing permissions and     -->
+<!-- limitations under the License.                                          -->
+<!--                                                                         -->
+<!-- ** End of Copyright and License **                                      -->
+<div class="ext-container" *ngIf="progress.introduct.show">
+  <div class="ext-introduct">
+    <p>Introduct</p>
+    <p>
+      This task will guide you to retrieve a system variable from long-run back-end REXX program
+      through below steps
+    </p>
+  </div>
+  <div class="ext-content">
+    <div>
+      <mat-list>
+        <mat-list-item>1. Create a TSO/E address space</mat-list-item>
+        <mat-list-item>2. Start the long-run rexx in the created TSO/E address space</mat-list-item>
+        <mat-list-item>3. Retrieve system variable from the long-run rexx</mat-list-item>
+        <mat-list-item>4. Delete the TSO/E address space</mat-list-item>
+      </mat-list>
+    </div>
+  </div>
+  <div class="ext-start">
+    <button mat-raised-button color="primary" (click)="next()">Start</button>
+  </div>
+</div>
+<div class="ext-container" *ngIf="progress.createTSO.show">
+  <div class="ext-introduct">
+    <p>Step 1</p>
+    <p>
+      Create a TSO/E address space with PROC: {{proc}}, change it if you don't
+      want to use default PROC
+    </p>
+  </div>
+  <div class="ext-bar">
+    <mat-progress-bar *ngIf="progress.createTSO.try" [mode]="progress.createTSO.done? 'determinate' : 'indeterminate'"
+      value=100>
+    </mat-progress-bar>
+  </div>
+  <div class="ext-content">
+    <div class="ext-info">
+      <p *ngIf="progress.createTSO.done">TSO/E address space is successfully created! <b>Will go to Step 2 within 5 seconds.</b></p>
+      <p class="ext-bad" *ngIf="progress.createTSO.bad">PROC: <b>{{proc}}</b> is not valid for creating TSO/E address space! Please re-enter a valid PROC</p>
+    </div>
+    <div>
+      <mat-form-field class="ext-field">
+        <input matInput placeholder="PROC" (focus)="clearBad()" [(ngModel)]="proc" required />
+      </mat-form-field>
+      <button mat-raised-button [disabled]="progress.createTSO.try" (click)="startTSO()" color="primary">Create TSO AS</button>
+    </div>
+  </div>
+</div>
+<div class="ext-container" *ngIf="progress.startApp.show">
+  <div class="ext-introduct">
+    <p>Step 2</p>
+    <p>
+      Start the long-run REXX {{_tsoService.rexxLib}}({{rexx}}) in previous created TSO/E address space.
+      Change the member name if you don't want to use default one.
+    </p>
+  </div>
+  <div class="ext-bar">
+    <mat-progress-bar *ngIf="progress.startApp.try" [mode]="progress.startApp.done? 'determinate' : 'indeterminate'"
+      value=100>
+    </mat-progress-bar>
+  </div>
+  <div class="ext-content">
+    <div class="ext-info">
+      <p *ngIf="progress.startApp.done">Rexx has been started! <b>Will go to step 3 within 5 seconds.</b></p>
+      <p class="ext-bad" *ngIf="progress.startApp.bad"><b>{{rexx}}</b> can not be found, please enter an exist member name!</p>
+    </div>
+    <div>
+      <mat-form-field class="ext-field">
+        <input matInput placeholder="REXX" (focus)="clearBad()" [(ngModel)]="rexx" required />
+      </mat-form-field>
+      <button mat-raised-button [disabled]="progress.startApp.try" (click)="startApp()" color="primary">Start REXX</button>
+    </div>
+  </div>
+</div>
+<div class="ext-container" *ngIf="progress.getVar.show">
+  <div class="ext-introduct">
+    <p>Step 3</p>
+    <p>
+      Now, select the variable you want to retrieve and click 'Retrieve variable' button to get it.
+      You could retrieve different variables for several times. Or you could also click 'Next' button to 'Step 4'
+    </p>
+  </div>
+  <div class="ext-bar">
+    <mat-progress-bar *ngIf="progress.getVar.try" [mode]="progress.getVar.done? 'determinate' : 'indeterminate'"
+      value=100>
+    </mat-progress-bar>
+  </div>
+  <div class="ext-content">
+    <div class="ext-var">
+      <p *ngIf="progress.getVar.done" class="ext-result">Value of {{mvsvar}} is: <b>{{result}}</b></p>
+    </div>
+    <div class="ext-var">
+      <mat-form-field id="var-select" class="ext-field">
+        <mat-select placeholder="Select a property of MVS, TSO/E" [(ngModel)]="mvsvar" (focus)="this.progress.getVar.done=false;">
+          <mat-option *ngFor="let p of MVSVARS" [value]="p">
+            {{p}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="ext-var">
+      <button mat-raised-button class="ext-field" [disabled]="progress.getVar.try" (click)="getVar()" color="primary">Retrieve variable</button>
+      <button mat-raised-button (click)="next()" [disabled]="!progress.getVar.ready" color="primary">Next</button>
+    </div>
+  </div>
+</div>
+<div class="ext-container" *ngIf="progress.cleanup.show">
+  <div class="ext-introduct">
+    <p>Step 4</p>
+    <p>
+      After retrieving variables, don't forget to do the cleanup job!
+    </p>
+  </div>
+  <div class="ext-bar">
+    <mat-progress-bar *ngIf="progress.cleanup.try" [mode]="progress.cleanup.done? 'determinate' : 'indeterminate'"
+      value=100>
+    </mat-progress-bar>
+  </div>
+  <div class="ext-content">
+    <div class="ext-clean">
+      <button mat-raised-button class="ext-field" [disabled]="progress.cleanup.try" (click)="deleteAS()" color="primary">Delete TSO AS</button>
+      <button mat-raised-button (click)="next()" [disabled]="!progress.cleanup.done" color="primary">Try again</button>
+    </div>
+  </div>
+</div>

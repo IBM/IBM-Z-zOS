@@ -1,0 +1,334 @@
+/*** REXX ************************************************************/
+/* ----------------------------------------------------------------- */
+/* ** Beginning of Copyright and License **                          */
+/*                                                                   */
+/* Copyright 2018 IBM Corp.                                          */
+/*                                                                   */
+/* Licensed under the Apache License, Version 2.0 (the "License"); 	 */
+/* you may not use this file except in compliance with the License.  */
+/* You may obtain a copy of the License at                           */
+/*                                                                   */
+/* http://www.apache.org/licenses/LICENSE-2.0                        */
+/*                                                                   */
+/* Unless required by applicable law or agreed to in writing,        */
+/* software distributed under the License is distributed on an       */
+/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      */
+/* either express or implied. See the License for the specific       */
+/* language governing permissions and limitations under the License. */
+/*                                                                   */
+/* ** End of Copyright and License **                                */
+/* ----------------------------------------------------------------- */
+/*                                                                   */
+/* Exec Name = HELLOW                                                */
+/*                                                                   */
+/* This REXX exec is intended to be called using the z/OSMF TSO/E    */
+/* REST API.  It is a sample that returns a simple MVSVAR response   */
+/* message to the caller.  This sample demonstrates how to read      */
+/* application input from the UNIX message queue, how to convert     */
+/* the input from ASCII to EBCDIC, how to convert the output from    */
+/* EBCDIC to ASCII, and how to write the output response to the      */
+/* UNIX message queue.                                               */
+/*                                                                   */
+/* Input:                                                            */
+/*   The positional input parameters (arguments) expected by this    */
+/*   exec are as follows:                                            */
+/*                                                                   */
+/*     1 -- Message queue output message type.                       */
+/*     2 -- Message queue input message type.                        */
+/*     3 -- Message queue identifier.                                */
+/*                                                                   */
+/*   Input messages are read from the message queue by the exec.     */
+/*   Output messages are written to the message queue by this exec.  */
+/*                                                                   */
+/*   The input message read from the message queue is a parameter to */
+/*   be transfered to function MVSVAR .                              */
+/*                                                                   */
+/* Output:                                                           */
+/*   The output from this exec is a response message written to the  */
+/*   UNIX message queue, like this:                                  */
+/*                                                                   */
+/*     "SY1"                                                         */
+/*                                                                   */
+/*   Where response is the returned by MVSVAR('SYSNAME')             */
+/*                                                                   */
+/* ----------------------------------------------------------------- */
+/*                                                                   */
+/* The sequence of steps to use the z/OSMF TSO/E REST API to invoke  */
+/* this sample exec are as follows:                                  */
+/*                                                                   */
+/* 1. Start a TSO/E address space.  Use an HTTPS POST method like    */
+/*    this:                                                          */
+/*                                                                   */
+/*      POST /zosmf/tsoApp/tso?proc=<name>&chset=0&cpage=0rows=0&    */
+/*      cols=0 HTTP/1.1                                              */
+/*      Host: host.name.com                                          */
+/*                                                                   */
+/*    The response from the POST request will contain messages       */
+/*    written to the TSO terminal output, a "servlet key" value      */
+/*    to identify the started TSO/E address space, and the           */
+/*    identifier for the UNIX message queue used for communication   */
+/*    between the caller and the REXX EXEC, like this:               */
+/*                                                                   */
+/*      {"servletKey":"servletKey-value",                            */
+/*       "queueID":"queue-id",                                       */
+/*       "sessionID":"0x39",                                         */
+/*       "ver":"0100",                                               */
+/*       "tsoData": [                                                */
+/*       {"TSO MESSAGE":                                             */
+/*        {"VERSION":"0100",                                         */
+/*         "DATA":"userid LOGON IN PROGRESS AT time ON date"}}],     */
+/*       "reused":false,                                             */
+/*       "timeout":false}                                            */
+/*                                                                   */
+/*    The servlet key value must be specificed in subsequent methods */
+/*    to reference the started address space, and the UNIX message   */
+/*    queue ID must be passed to the REXX EXEC as a parameter.       */
+/*                                                                   */
+/* 2. Start the sample REXX EXEC in the started TSO/E address space. */
+/*    Use an HTTPS POST method like this:                            */
+/*                                                                   */
+/*      POST /zosmf/tsoApp/app/<servletKey>/<appKey> HTTP/1.1        */
+/*      Host: host.name.com                                          */
+/*                                                                   */
+/*      {"startcmd":"HELLOW &1 &2 <queue-id>"}                       */
+/*                                                                   */
+/*    Where:                                                         */
+/*      HELLOW     the name for this sample REXX EXEC                */
+/*                                                                   */
+/*      &1         a place holder parameter variable to hold the     */
+/*                 output message type value.  When the TSO REST API */
+/*                 calls the exec, the API substitutes the &1 place  */
+/*                 holder with the actual message type value.  Thus, */
+/*                 the exec receives the real message type as the    */
+/*                 value of this input parameter.                    */
+/*                                                                   */
+/*      &2         a place holder parameter variable to hold the     */
+/*                 input message type value.  When the TSO REST API  */
+/*                 calls the exec, the API substitutes the &2 place  */
+/*                 holder with the actual message type value.  Thus, */
+/*                 the exec receives the real message type as the    */
+/*                 value of this input parameter.                    */
+/*                                                                   */
+/*      <queue-id> the numeric UNIX message queue identifier         */
+/*                 obtained from the response for starting the TSO   */
+/*                 address space.                                    */
+/*                                                                   */
+/*    The response from the POST request will contain output written */
+/*    to the TSO terminal.  This may include messages from TSO and   */
+/*    output written to the TSO terminal by the REXX EXEC.           */
+/*                                                                   */
+/* 3. Send application input to the REXX EXEC.  Use an HTTPS PUT     */
+/*    method like this:                                              */
+/*                                                                   */
+/*      PUT /zosmf/tsoApp/app/<servletKey>/<appKey> HTTP/1.1         */
+/*      Host: host.name.com                                          */
+/*                                                                   */
+/*      SYSNAME                                                      */
+/*                                                                   */
+/*    The request content is written to the UNIX message queue by    */
+/*    z/OSMF.  The REXX EXEC then reads this content from the UNIX   */
+/*    message queue.  The input value expected by this sample REXX   */
+/*    is the parameter sent to MVSVAR function.                      */
+/*                                                                   */
+/*    The response from the PUT request will contain output written  */
+/*    to the TSO terminal.  This may include messages from TSO and   */
+/*    output written to the TSO terminal by the REXX EXEC.           */
+/*                                                                   */
+/* 4. Get application output from the REXX EXEC.  Use an HTTPS GET   */
+/*    method like this:                                              */
+/*                                                                   */
+/*      GET /zosmf/tsoApp/app/<servletKey>/<appKey> HTTP/1.1         */
+/*      Host: host.name.com                                          */
+/*                                                                   */
+/*    The response from the GET request will contain the application */
+/*    output data, which is the message written to the UNIX message  */
+/*    queue by this REXX EXEC, and indicated by "appData" in the     */
+/*    response.  Like this:                                          */
+/*                                                                   */
+/*      {"servletKey": "<servletKey>",                               */
+/*       "ver": "0100",                                              */
+/*       "appData": "SYS1",                          */
+/*       "reused": false,                                            */
+/*       "timeout": false}                                           */
+/*                                                                   */
+/*    The response may also contain TSO terminal output, in addition */
+/*    to or instead of the application output data.  More than one   */
+/*    GET request may be necessary to get all of the TSO terminal    */
+/*    output and the application output data.                        */
+/*                                                                   */
+/* 5. Shut down the started TSO/E address space.  Use an HTTPS       */
+/*    DELETE method, like this:                                      */
+/*                                                                   */
+/*      DELETE /zosmf/tsoApp/tso/<servletKey> HTTP/1.1               */
+/*      Host: host.name.com                                          */
+/*                                                                   */
+/* ----------------------------------------------------------------- */
+/*                                                                   */
+/* Change Activity:                                                  */
+/*   --------------------------------------------------------------- */
+/*   FLAG REASON  RELEASE   DATE    Auth   DESCRIPTION               */
+/*   ---- ------- ------- -------- ------  ------------------------- */
+/*   $L0= XXXXXXX  23.00  09/12/18 wuhuan External plugin rexx       */
+/*                                                                   */
+/*********************************************************************/
+
+mainRc=0
+
+PARSE ARG oMsgType iMsgType msgQueueId . /* Pick up 3 input parms.   */
+
+say 'HELLOW exec processing has started.'
+
+say 'UNIX message queue id = 'msgQueueId
+say 'Input message type = 'iMsgType
+say 'Output message type = 'oMsgType
+iMsgType = D2C(iMsgType, 4)
+oMsgType = D2C(oMsgType, 4)
+
+if syscalls('ON')>3 then
+  do
+    say 'Unable to establish the UNIX SYSCALL environment.'
+    mainRc=-1
+  end
+
+/* Perform a blocking read on the message queue to get the application
+   input.
+*/
+if mainRc=0 then
+  do
+    say 'Reading application input from the UNIX message queue.'
+    ADDRESS SYSCALL 'msgrcv (msgQueueId) iMsg 999 0 iMsgType'
+    if rc<>0 then
+      do
+        say 'Error reading input.  ''msgrcv'' rc = 'mainrc
+        mainRc=-1
+      end
+    else
+      do
+        iMsg = atoe(iMsg)     /* Convert input from ASCII to EBCDIC. */
+        say 'Application input = 'iMsg
+      end
+  end
+
+k1 = 'SYMDEF'
+
+do while iMsg \== 'EXIT'
+    /* Generate the application response.                        */
+    if mainRc=0 then
+      do
+        select
+            when SUBSTR(iMsg,1,6) = k1 then
+                do
+                symname = SUBSTR('iMsg',8)
+                oMsg = MVSVAR(k1,symname)
+                end
+            otherwise
+                oMsg = MVSVAR(iMsg)
+        end
+        if oMsg = '' then
+          oMsg = 'No information returned'
+        /*oMsg = '"Hello 'iMsg'!"'       */
+        say 'Response = 'oMsg
+
+        /* Write the response to the UNIX message queue.    */
+        oMsg = etoa(oMsg)    /* Convert EBCDIC to ASCII.       */
+        say 'Writing response to the UNIX message queue.'
+  ADDRESS SYSCALL 'msgsnd (msgQueueId) oMsg' length(oMsg) '0 oMsgType'
+        if rc<>0 then
+          do
+         say 'Error writing response to the UNIX message queue.  ',
+                '''msgsnd'' rc = 'rc'.'
+            mainRc=-1
+            leave
+          end
+      end
+  say 'Reading application input from the UNIX message queue2.'
+  ADDRESS SYSCALL 'msgrcv (msgQueueId) iMsg 999 0 iMsgType'
+  if rc<>0 then
+    do
+      say 'Error reading input.  ''msgrcv'' rc = 'mainrc
+      mainRc=-1
+    end
+  else
+    do
+      iMsg = atoe(iMsg)    /* Convert input from ASCII to EBCDIC. */
+      say 'Application input2 = 'iMsg
+    end
+end
+
+say 'HELLOW exec processing is complete with rc = 'mainRc'.'
+
+return mainRc
+
+
+/* Convert an ASCII string to EBCDIC.                                 */
+atoe:
+  parse arg msg                     /*                                */
+  msg = convertstring('ATOE' msg)   /*                                */
+  return msg                        /*                                */
+/* Convert an EBCDIC string to ASCII.                                 */
+etoa:
+  parse arg msg                     /*                                */
+  msg = convertstring('ETOA' msg)   /*                                */
+  return msg                        /*                                */
+
+/*
+   Convert ASCII to EBCDIC and EBCDIC to ASCII.  Use the UNIX iconv
+   command.  Positional input parameters:
+
+   1 -- conversion type, either "ATOE" or "ETOA"
+   2 -- string to be converted.
+*/
+convertstring:
+   parse arg conv msg
+   /* Create temporary file names. */
+   fn = '/tmp/' || USERID() || '.' || TIME('L')
+   ifn = fn || '.i'  /* Name of file to contain input text. */
+   ofn = fn || '.o'  /* Name of file to contain output text. */
+   address syscall 'creat (ifn) 700'
+   fd=retval
+   if retval=-1 then
+     do
+       say 'Error creating temporary file 'ifn'. ',
+           'errno: 'errno' errnojr: 'errnojr
+       return -1
+     end
+   /* Write the input text to the temporary file. */
+   address syscall 'write (fd) msg' length(msg)
+   address syscall 'close (fd)'
+   /*
+      Call iconv to read the temp file containg intput text, and write
+      the converted text to the output file.
+   */
+   select                           /* Which conversion was requested?*/
+     when conv = 'ATOE' then        /* ASCII to EBCDIC?               */
+       retcode=bpxwunix('iconv -f ISO8859-1 -t IBM-1047 'ifn' > 'ofn)
+     when conv = 'ETOA' then        /* EBCDIC to ASCII?               */
+       retcode=bpxwunix('iconv -f IBM-1047 -t ISO8859-1 'ifn' > 'ofn)
+     otherwise
+        do
+          say 'Unknown conversion type: "'conv'".  ',
+              'Acceptable values are "ATOE" or "ETOA".'
+          return -1
+        end
+   end
+   if retcode<>0 then
+     do
+       say conv' iconv failed with rc = 'retcode'.'
+       return -1
+     end
+   /* Read the converted text from the output file. */
+   address syscall 'open (ofn)' o_rdonly
+   fd=retval
+   if retval=-1 then
+     do
+       say 'Open failed for file 'ofn'. ',
+           'errno: 'errno' errnojr: 'errnojr
+       return -1
+     end
+   address syscall 'fstat (fd) st.' /* Get file status, to get size.  */
+   address syscall 'read (fd) msg' st.st_size /* Read entire file.    */
+   address syscall 'close (fd)'
+   /* Delete the temporary files. */
+   address syscall 'unlink (ofn)'
+   address syscall 'unlink (ifn)'
+   return msg                       /* Return the converted string.   */
