@@ -27,6 +27,8 @@ Some migration actions have associated health checks. For those steps, the healt
 
 For the individual migration actions and for the entire migration effort, you can optionally provide your feedback to IBM. Just follow the instructions that are shown in the workflow. You do not need to provide feedback to complete each step of the workflow. 
 
+*Github Transfer Tips!*  Because this Workflow contains large XML files, you must click on "RAW" to load the entire xml file into the browser, and then right mouse click for "Save as..." to store the file.  Do not skip the "RAW" step or you will be saving the web page (that is, the HTML) which is inacceptable input to z/OSMF Workflow.  If you are saving the file and the file type is HTML, this indicates you did not use the "RAW" view.  Using the right mouse button for "Save as..." from the "RAW" file should give you the proper contents of the file saved.  Do not use "Select All", then "Copy" from the "RAW" file to save the xml file as the file will not save correctly. 
+
 If you are migrating from z/OS V2R2 to V2R3, transfer the appropriate three files as binary using File Transfer Protocol (FTP),
 and store them in the same z/OS UNIX directory:
 
@@ -40,7 +42,7 @@ and store them in the same z/OS UNIX directory:
     * zOS Migration from V2.1 to V2.3-Level2.0.xml
     * HC_rexx.txt
     * discovery.txt
- 
+
 We welcome any contributions or feedback on anything you find. Keep in mind, there are no warranties for any of the files or contributions that you find here. This is a z/OS community that is sharing with others and it is expected that you review what you are using in your environment. This tool is not supported by the IBM Service organization, but rather by the tool owner on a best-can-do basis.
 
 Please report any problems, suggestions, or comments to zosmig@us.ibm.com.
