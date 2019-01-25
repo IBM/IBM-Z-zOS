@@ -6,7 +6,7 @@ The RACF development team has numerous tools that can assist you in managing you
 
 3. [CUTPWHIS](http://ibm.biz/racf-cutpwhis): A utility which trims the orphaned passwords created by decreasing the SETROPTS password history value.
 
-3. [DB2PRM](http://ibm.biz/racf-db2prm): A REXX exec which converts your  RACF data set names table (ICHRDSNT) or RACF range table (ICHRRNG) into a RACF PARMLIB member. 
+3. [DSNT2PRM](http://ibm.biz/racf-db2prm): A REXX exec which converts your  RACF data set names table (ICHRDSNT) or RACF range table (ICHRRNG) into a RACF PARMLIB member. 
 
 4. [DBSYNC](http://ibm.biz/racf-dbsync): REXX exec to find differences between two RACF databases and create commands to synchronize them. 
 b
