@@ -6,7 +6,7 @@ With z/OS Workload Management (WLM), you define performance goals and assign a b
 
 This repository contains WLM resources that might be useful to the z/OS community
 
-The official WLM documentation can be found [here](https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieaw100/toc.htm)
+The official WLM documentation can be found [here](https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieaw100/ieaw10016.htm)
 
 WLM tools, like the Topology Report, can be found here:  ftp://public.dhe.ibm.com/eserver/zseries/zos/wlm/
 
