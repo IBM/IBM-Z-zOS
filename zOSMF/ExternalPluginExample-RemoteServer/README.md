@@ -26,7 +26,7 @@ This sample plug-in consists of 4 parts:
 
 ## Depoly the sample external plug-in into z/OSMF
 1. upload binary UI files to z/OS UNIX environment
-    * create a directory on z/OS to put the sample plug-in related files. In this example, let's say the directory is `/usr/lpp/zosmfPlugin`. 
+    * create a directory on z/OS to put the sample plug-in related files. In this example, let's say the directory is `/usr/lpp/zosmfPlugin`.
     * upload binary UI files under directory `./dist/ExternalPluginExample-RemoteServer/` to a sub-directory under `/usr/lpp/zosmfPlugin/`. In this example, let's say the directory is `content`. So the files should be uploaded to `/usr/lpp/zosmfPlugin/content/`.
 2. prepare myplugin.properties file
     go through `./myplugin.properties` file. Then upload the file to `/usr/lpp/zosmfPlugin/`.
@@ -170,17 +170,17 @@ As mentioned before, the sample plug-in needs to communicate with the sample ser
 ### Associate the sample plug-in with the sample remote server
 1. create System Entry in `Systems` task.
     * open `Systems` task under `z/OSMF Settings` category.
-    * click `Actions` and chose `Add` -> `System...`, click `Next`.
-    * Enter `System name`, `System nickname` and `Sysplex name`, click `Next`.
-    * this step is a little tricky. Although z/OSMF is not running on your own remote system, but we need to choose the option `z/OSMF is running on the system` to Secify a URL. enter the url of the sample remote server, for example, `https://host:9080/MypluginService/`, click `Next`.
+    * click `Actions` and choose `Add` -> `System...`, click `Next`.
+    * **since mySys is hard coded in the front-end code**, so you need to Enter `mySys` as `System name` and `System nickname`, then enter whatever you want as `Sysplex name`, click `Next`.
+    * this step is a little tricky. Although z/OSMF is not running on your own remote system, but we need to choose the option `z/OSMF is running on the system` to Secify a URL. enter the url of the sample remote server, for example, `https://host:9443/MypluginService/`, click `Next`.
     * click `Next`.
     * click `Next`.
     * click `Finish`.
 2. associate the imported plugin to the System Entry you defined.
     * open `Import Manager` task under `z/OSMF Administration` category.
     * click `Imported Plug-ins` tab of the task.
-    * click `Actions` and chose `Associate Server` button.
-    * chose the `System Entry` you just defined, and associate it with `MyTask` task you just imported.
+    * click `Actions` and choose `Associate Server` button.
+    * choose the System Entry `mySys` you just defined, and associate it with `MyTask` task you just imported.
 > NOTE: After associate the sample plug-in with the sample remote server. z/OSMF application server routing service could find the url of remote system, but z/OSMF still can not set up HTTPS connection to remote system because the certificate of remote server can not be trusted.
 
 ### Import Certificate Auth to z/OSMF Keyring
