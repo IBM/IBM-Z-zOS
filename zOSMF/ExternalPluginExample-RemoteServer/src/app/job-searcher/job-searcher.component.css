@@ -1,0 +1,26 @@
+.zmf-ext-input-s {
+  width: 8rem;
+  min-width: 5rem;
+}
+
+.zmf-ext-label-inline {
+  margin-bottom: 0;
+  margin-right: 1rem;
+}
+
+.zmf-ext-div-flex-row-even {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  flex: 1;
+}
+
+.zmf-ext-div-flex-row-center {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.zmf-ext-table-padding {
+  padding: 2rem;
+}
