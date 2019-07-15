@@ -1,0 +1,1879 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../workflow/schemas/workflow_v1.xsd">
+	<workflowInfo>
+		<workflowID>z13_z13s_Workflow_GA</workflowID>
+		<workflowDescription>z13_z13s_Workflow_GA</workflowDescription>
+		<workflowVersion>1.0</workflowVersion>
+		<vendor>IBM</vendor>
+	</workflowInfo>
+	<variable name="HelpfulOv"> 
+		<label>1.</label>  
+		<abstract>Do you think using z/OSMF Workflow was helpful for your migration?</abstract>  
+		<description><![CDATA[ Do you think using the z/OSMF Workflow for the migration process was helpful?]]></description>  
+		<category>Overall feedback (optional)</category>  
+		<string valueMustBeChoice="false"> 
+			<choice>Yes, very helpful.</choice>  
+			<choice>Yes, somewhat helpful.</choice>  
+			<choice>Not helpful.</choice>  
+			<choice>Other. Use Comments below.</choice> 
+		</string> 
+	</variable>
+	<variable name="ExperOv"> 
+		<label>2.</label>  
+		<abstract>How would you rate your experience with this migration?</abstract>  
+		<description><![CDATA[ How would you rate your experience with this migration overall?]]></description>  
+		<category>Overall feedback (optional)</category>  
+		<string valueMustBeChoice="false"> 
+			<choice>Better than expected.</choice>  
+			<choice>About what was expected.</choice>  
+			<choice>Worse than expected.</choice>  
+			<choice>Other. Use comments below.</choice> 
+		</string> 
+	</variable>
+	<variable name="CommentOv"> 
+		<label>3.</label>  
+		<abstract>Comments:</abstract>  
+		<description><![CDATA[ Provide any comments you wish.]]></description>  
+		<category>Overall feedback (optional)</category>  
+		<string multiLine="true"/> 
+	</variable>
+	<variable name="ContactInfo"> 
+		<label>4.</label>  
+		<abstract>If we may contact you about your answers, provide your contact information. This is optional.</abstract>  
+		<description><![CDATA[ Provide any contact information, if you like.]]></description>  
+		<category>Overall feedback (optional)</category>  
+		<string multiLine="true"/> 
+	</variable>
+	<variable name="TargetFile"> 
+		<label>Target z/OS UNIX directory</label>  
+		<abstract>Target z/OS UNIX directory you will save the feedback.</abstract>  
+		<description><![CDATA[ Target z/OS UNIX directory you will save the feedback.]]></description>  
+		<category>Save variables to</category>  
+		<string> 
+			<default>/etc/zosmf/</default> 
+		</string> 
+	</variable>
+	<variable name="check"> 
+		<label>Check name</label>  
+		<abstract>IBM Health Check name</abstract>  
+		<description><![CDATA[ This health check will be invoked in association with this migration action.]]></description>  
+		<category/>  
+		<string> 
+			<default>IBMZMIG,ZOSMIG_HTTP_SERVER_DOMINO</default> 
+		</string> 
+	</variable>
+	<step name="id-2193fa0b-441f-43cb-a464-cd047bcac744"> 
+		<!--<step level="step_1">-->  
+		<title>Migrate to an IBM z13 server or IBM z13s server</title>  
+		<description><![CDATA[  
+			<h6>Description</h6>  
+			<p>The IBM z13™ and IBM z13s 
+				<sup>TM</sup> are the newest IBM z Systems™ servers, and are distinct from the earlier zEnterprise® and other servers. In this publication, these servers are referred to as the z13™ and the z13s 
+				<sup>TM</sup>. z/OS® V2R2 running on the z13 or z13s sets the groundwork for digital business by providing the foundation you need to support demanding workloads, such as operational analytics and clouds, and your traditional mission-critical applications.
+			</p>  
+			<p>In a Parallel Sysplex® that includes a z13 or z13s with either a z/OS system running in at least one LPAR or at least one LPAR being used as a coupling facility (CF), you can include the following servers:</p>  
+			<ul> 
+				<li> 
+					<p>z13 and z13s servers</p> 
+				</li>  
+				<li> 
+					<p>zEC12 and zBC12 servers</p> 
+				</li>  
+				<li> 
+					<p>zEnterprise servers (z196 or z114)</p> 
+				</li> 
+			</ul>  
+			<p>The specific z13 and z13s functions, including base support, that are used by z/OS depend on the z/OS release. PTFs might be required for many of these functions. See 
+				<a href="e0z3m11228.htm#z13bef21">Actions you can take before you order a z13 or z13s server</a> for information about finding the appropriate PTFs.
+			</p>  
+			<table id="z13__znextfuncbc" width="100%" summary="" border="1" frame="border" rules="all"> 
+				<caption>Table 28. z13 and z13s server functions included in the base support for z/OS V1R13, z/OS V2R1, and z/OS V2R2</caption>  
+				<thead valign="bottom"> 
+					<tr> 
+						<th id="wq559" width="37%" align="left"> 
+							<p>z13 and z13s function included in base z/OS support (Y/N)</p> 
+						</th>  
+						<th id="wq560" width="20%" align="left"> 
+							<p>V1R13 
+								<sup>1</sup> 
+							</p> 
+						</th>  
+						<th id="wq561" width="20%" align="left"> 
+							<p>V2R1 
+								<sup>1</sup> 
+							</p> 
+						</th>  
+						<th id="wq562" width="20%" align="left"> 
+							<p>V2R2 
+								<sup>1</sup> 
+							</p> 
+						</th> 
+					</tr> 
+				</thead>  
+				<tbody> 
+					<tr> 
+						<th align="left" id="wq563" headers="wq559"> 
+							<p>Base support</p> 
+						</th>  
+						<td align="left" headers="wq560 wq563"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq563"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq563"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq564" headers="wq559"> 
+							<p>CHPID type CS5 for coupling</p> 
+						</th>  
+						<td align="left" headers="wq560 wq564"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq564"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq564"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq565" headers="wq559"> 
+							<p>CHPID type OSE supporting 4 or 2 ports per feature</p> 
+						</th>  
+						<td align="left" headers="wq560 wq565"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq565"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq565"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq566" headers="wq559"> 
+							<p>CHPID type OSM for intranode management network (INMN)</p> 
+						</th>  
+						<td align="left" headers="wq560 wq566"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq566"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq566"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq567" headers="wq559"> 
+							<p>CHPID type OSN for OSA-Express for NCP (LPAR-to-LPAR)</p> 
+						</th>  
+						<td align="left" headers="wq560 wq567"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq567"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq567"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq568" headers="wq559"> 
+							<p>CPU measurement facility</p> 
+						</th>  
+						<td align="left" headers="wq560 wq568"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq568"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq568"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq569" headers="wq559"> 
+							<p>Crypto Express5S Toleration</p> 
+						</th>  
+						<td align="left" headers="wq560 wq569"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq569"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq569"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq570" headers="wq559"> 
+							<p>FICON® Express® 8S (CHPID FC)</p> 
+						</th>  
+						<td align="left" headers="wq560 wq570"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq570"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq570"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq571" headers="wq559"> 
+							<p>FICON Express16S (CHPID FC)</p> 
+						</th>  
+						<td align="left" headers="wq560 wq571"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq571"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq571"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq572" headers="wq559"> 
+							<p>IBM® z BladeCenter Extension (zBX) Model 004</p> 
+						</th>  
+						<td align="left" headers="wq560 wq572"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq572"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq572"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq573" headers="wq559"> 
+							<p>IBM z Unified Resource Manager</p> 
+						</th>  
+						<td align="left" headers="wq560 wq573"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq573"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq573"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq574" headers="wq559"> 
+							<p>New z13 machine instruction (assembler support)</p> 
+						</th>  
+						<td align="left" headers="wq560 wq574"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq574"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq574"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq575" headers="wq559"> 
+							<p>OSA-Express4S (GbE LX and SX, 1000BASE-T, 10 GbE LR and SR)</p> 
+						</th>  
+						<td align="left" headers="wq560 wq575"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq575"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq575"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq576" headers="wq559"> 
+							<p>OSA-Express5S (GbE LX and SX, 1000BASE-T, 10 GbE LR and SR)</p> 
+						</th>  
+						<td align="left" headers="wq560 wq576"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq576"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq576"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq577" headers="wq559"> 
+							<p>Parallel Sysplex InfiniBand (PSIFB) Coupling Link</p> 
+						</th>  
+						<td align="left" headers="wq560 wq577"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq577"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq577"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq578" headers="wq559"> 
+							<p>z/OS global resource serialization (GRS) support for FICON CTCs</p> 
+						</th>  
+						<td align="left" headers="wq560 wq578"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq561 wq578"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq562 wq578"> 
+							<p>Y</p> 
+						</td> 
+					</tr> 
+				</tbody> 
+			</table> Note: 
+			<ol> 
+				<li> 
+					<p>PTFs for base support have the following fix category:</p>  
+					<ul> 
+						<li> 
+							<p>For z13: "IBM.Device.Server.z13-2964.RequiredService"</p> 
+						</li>  
+						<li> 
+							<p>For z13s: "IBM.Device.Server.z13S-2965.RequiredService"</p> 
+						</li> 
+					</ul> 
+				</li> 
+			</ol>  
+			<table id="z13__z13exploitation" width="100%" summary="" border="1" frame="border" rules="all"> 
+				<caption>Table 29. Exploitation of z13 and z13s server functions supported by z/OS V1R13, z/OS V2R1, and z/OS V2R2</caption>  
+				<thead valign="bottom"> 
+					<tr> 
+						<th id="wq581" width="37%" align="left"> 
+							<p>z13 and z13s function included in base z/OS support (Y/N)</p> 
+						</th>  
+						<th id="wq582" width="20%" align="left"> 
+							<p>V1R13 
+								<sup>2</sup> 
+							</p> 
+						</th>  
+						<th id="wq583" width="20%" align="left"> 
+							<p>V2R1 
+								<sup>2</sup> 
+							</p> 
+						</th>  
+						<th id="wq584" width="20%" align="left"> 
+							<p>V2R2 
+								<sup>2</sup> 
+							</p> 
+						</th> 
+					</tr> 
+				</thead>  
+				<tbody> 
+					<tr> 
+						<th align="left" id="wq585" headers="wq581"> 
+							<p>Coupling Facility Control Code (CFCC) Level 20</p> 
+						</th>  
+						<td align="left" headers="wq582 wq585"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq585"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq585"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq586" headers="wq581"> 
+							<p>CFCC Dump Reasons support for CFCC Level 21</p> 
+						</th>  
+						<td align="left" headers="wq582 wq586"> 
+							<p>N</p> 
+						</td>  
+						<td align="left" headers="wq583 wq586"> 
+							<p>N</p> 
+						</td>  
+						<td align="left" headers="wq584 wq586"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq587" headers="wq581"> 
+							<p>Crypto Express5S support for up to 85 Domains</p> 
+						</th>  
+						<td align="left" headers="wq582 wq587"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq587"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq587"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq588" headers="wq581"> 
+							<p>High Performance FICON (zHPF)</p> 
+						</th>  
+						<td align="left" headers="wq582 wq588"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq588"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq588"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq589" headers="wq581"> 
+							<p>IBM Integrated Coupling Adapter (ICA SR)</p> 
+						</th>  
+						<td align="left" headers="wq582 wq589"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq589"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq589"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq590" headers="wq581"> 
+							<p>Support for 256 coupling CHPIDs</p> 
+						</th>  
+						<td align="left" headers="wq582 wq590"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq590"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq590"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq591" headers="wq581"> 
+							<p>2 GB Large Pages</p> 
+						</th>  
+						<td align="left" headers="wq582 wq591"> 
+							<p>Y (with the z/OS V1.13 RSM Enablement Offering web deliverable installed)</p> 
+						</td>  
+						<td align="left" headers="wq583 wq591"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq591"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq592" headers="wq581"> 
+							<p>Checksum offload for IPv6 packets (CHPID OSD)</p> 
+						</th>  
+						<td align="left" headers="wq582 wq592"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq592"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq592"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq593" headers="wq581"> 
+							<p>Checksum offload for LPAR-to-LPAR traffic for IPv4 and IPv6 packets (CHPID OSD)</p> 
+						</th>  
+						<td align="left" headers="wq582 wq593"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq593"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq593"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq594" headers="wq581"> 
+							<p>Crypto Express5S support of VISA Format Preserving Encryption (FPE), Next Generation Coprocessor support</p> 
+						</th>  
+						<td align="left" headers="wq582 wq594"> 
+							<p>Y (with the Enhanced Cryptographic Support for z/OS V1.13 - V2.1 web deliverable installed)</p> 
+						</td>  
+						<td align="left" headers="wq583 wq594"> 
+							<p>Y (with the Enhanced Cryptographic Support for z/OS V1.13 - V2.1 web deliverable installed)</p> 
+						</td>  
+						<td align="left" headers="wq584 wq594"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq595" headers="wq581"> 
+							<p>Flash Express (Storage Class Memory or SCM)</p> 
+						</th>  
+						<td align="left" headers="wq582 wq595"> 
+							<p>Y (with the z/OS V1.13 RSM Enablement Offering web deliverable installed)</p> 
+						</td>  
+						<td align="left" headers="wq583 wq595"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq595"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq596" headers="wq581"> 
+							<p>IBM System Advanced Workload Analysis Reporter (IBM zAware)</p> 
+						</th>  
+						<td align="left" headers="wq582 wq596"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq596"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq596"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq597" headers="wq581"> 
+							<p>Inbound workload queuing for Enterprise Extender (CHPID OSD)</p> 
+						</th>  
+						<td align="left" headers="wq582 wq597"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq597"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq597"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq598" headers="wq581"> 
+							<p>Large Send for IPv6 packets (CHPID OSD)</p> 
+						</th>  
+						<td align="left" headers="wq582 wq598"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq598"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq598"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq599" headers="wq581"> 
+							<p>Manage FICON Dynamic Routing Support</p> 
+						</th>  
+						<td align="left" headers="wq582 wq599"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq599"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq599"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq600" headers="wq581"> 
+							<p>Transactional memory</p> 
+						</th>  
+						<td align="left" headers="wq582 wq600"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq600"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq600"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq601" headers="wq581"> 
+							<p>Up to 4 Subchannels Sets per CSS (z13)</p> 
+						</th>  
+						<td align="left" headers="wq582 wq601"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq601"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq601"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq602" headers="wq581"> 
+							<p>Up to 3 Subchannels Sets per CSS (z13s)</p> 
+						</th>  
+						<td align="left" headers="wq582 wq602"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq602"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq602"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq603" headers="wq581"> 
+							<p>Up to 85 LPARs (z13)</p> 
+						</th>  
+						<td align="left" headers="wq582 wq603"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq603"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq603"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq604" headers="wq581"> 
+							<p>Up to 40 LPARs (z13s)</p> 
+						</th>  
+						<td align="left" headers="wq582 wq604"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq583 wq604"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq604"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq605" headers="wq581"> 
+							<p>Greater than 100 CPs per z/OS system image</p> 
+						</th>  
+						<td align="left" headers="wq582 wq605"> 
+							<p>N</p> 
+						</td>  
+						<td align="left" headers="wq583 wq605"> 
+							<p>Y (z13 only). The z13 can have a maximum of 128 CPs in non-SMT mode, or up to 213 threads in SMT mode.</p>  
+							<p>The z13s can have a maximum of 40 CPs in non-SMT mode, or up to 66 threads in SMT mode.</p> 
+						</td>  
+						<td align="left" headers="wq584 wq605"> 
+							<p>Y (z13 only). The z13 can have a maximum of 128 CPs in non-SMT mode, or up to 213 threads in SMT mode.</p>  
+							<p>The z13s can have a maximum of 40 CPs in non-SMT mode, or up to 66 threads in SMT mode.</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq606" headers="wq581"> 
+							<p>Miscellaneous PCIe enhancements</p> 
+						</th>  
+						<td align="left" headers="wq582 wq606"> 
+							<p>N</p> 
+						</td>  
+						<td align="left" headers="wq583 wq606"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq606"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq607" headers="wq581"> 
+							<p>RoCE Express for Shared Memory Communications-Remote (SMC-R) Direct Memory Access including shared RoCE Express support</p> 
+						</th>  
+						<td align="left" headers="wq582 wq607"> 
+							<p>N</p> 
+						</td>  
+						<td align="left" headers="wq583 wq607"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq607"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq608" headers="wq581"> 
+							<p>Shared Memory Communications-Direct Memory Access (SMC-D)</p> 
+						</th>  
+						<td align="left" headers="wq582 wq608"> 
+							<p>N</p> 
+						</td>  
+						<td align="left" headers="wq583 wq608"> 
+							<p>N</p> 
+						</td>  
+						<td align="left" headers="wq584 wq608"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq609" headers="wq581"> 
+							<p>Simultaneous multithreading (SMT)</p> 
+						</th>  
+						<td align="left" headers="wq582 wq609"> 
+							<p>N</p> 
+						</td>  
+						<td align="left" headers="wq583 wq609"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq609"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq610" headers="wq581"> 
+							<p>Single Instruction Multiple Data (SIMD) instruction set</p> 
+						</th>  
+						<td align="left" headers="wq582 wq610"> 
+							<p>N</p> 
+						</td>  
+						<td align="left" headers="wq583 wq610"> 
+							<p>Y</p> 
+						</td>  
+						<td align="left" headers="wq584 wq610"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq611" headers="wq581"> 
+							<p>XL C/C++ support of ARCH(11) and TUNE(11) parameters</p> 
+						</th>  
+						<td align="left" headers="wq582 wq611"> 
+							<p>N</p> 
+						</td>  
+						<td align="left" headers="wq583 wq611"> 
+							<p>Y (with XL C/C++ V2R1M1 web deliverable with z13 support for z/OS V2.1 installed)</p> 
+						</td>  
+						<td align="left" headers="wq584 wq611"> 
+							<p>Y</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq612" headers="wq581"> 
+							<p>zEDC capability using zEDC Express</p> 
+						</th>  
+						<td align="left" headers="wq582 wq612"> 
+							<p>N (toleration support provided for software decompression)</p> 
+						</td>  
+						<td align="left" headers="wq583 wq612"> 
+							<p>Y (requires the z/OS zEDC software feature to be enabled)</p> 
+						</td>  
+						<td align="left" headers="wq584 wq612"> 
+							<p>Y (requires the z/OS zEDC software feature to be enabled)</p> 
+						</td> 
+					</tr> 
+				</tbody> 
+			</table> Notes: 
+			<ol> 
+				<li> 
+					<p>PTFs for base support have the following fix category:</p>  
+					<ul> 
+						<li> 
+							<p>For z13: "IBM.Device.Server.z13-2964.RequiredService"</p> 
+						</li>  
+						<li> 
+							<p>For z13s: "IBM.Device.Server.z13S-2965.RequiredService"</p> 
+						</li> 
+					</ul> 
+				</li>  
+				<li> 
+					<p>PTFs for exploitation have the following fix category:</p>  
+					<ul> 
+						<li> 
+							<p>For z13: "IBM.Device.Server.z13-2964.Exploitation"</p> 
+						</li>  
+						<li> 
+							<p>For z13s: "IBM.Device.Server.z13S-2965.Exploitation"</p> 
+						</li> 
+					</ul> 
+				</li> 
+			</ol>  
+			<p>Web deliverables are available from the z/OS downloads page: 
+				<a href="http://www.ibm.com/systems/z/os/zos/tools/downloads/index.html" target="_blank">http://www.ibm.com/systems/z/os/zos/tools/downloads/index.html</a>.
+			</p>  
+			<p> 
+				<a href="e0z3m11228.htm#z13__migration_details">Table 30</a> provides more details about this migration action. Use this information to plan your changes to the system.
+			</p>  
+			<table id="z13__migration_details" width="100%" summary="" border="1" frame="hsides" rules="rows"> 
+				<caption>Table 30. Information about this migration action</caption>  
+				<tbody> 
+					<tr> 
+						<th align="left" id="wq615"> 
+							<p>Element or feature:</p> 
+						</th>  
+						<td headers="wq615"> 
+							<p>Multiple.</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq616"> 
+							<p>When change was introduced:</p> 
+						</th>  
+						<td headers="wq616"> 
+							<ul> 
+								<li> 
+									<p>IBM z13, which first shipped March 2015.</p> 
+								</li>  
+								<li> 
+									<p>z13s, which first shipped March 2016.</p> 
+								</li> 
+							</ul> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq617"> 
+							<p>Applies to migration from:</p> 
+						</th>  
+						<td headers="wq617"> 
+							<p>z/OS V2R2, z/OS V2R1, and z/OS V1R13.</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq618"> 
+							<p>Timing:</p> 
+						</th>  
+						<td headers="wq618"> 
+							<p>Anytime before you introduce a z13 or z13s server into your environment.</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq619"> 
+							<p>Is the migration action required?</p> 
+						</th>  
+						<td headers="wq619"> 
+							<p>Yes, if you want to run z/OS V2R2, z/OS V2R1, or z/OS V1R13 on a z13 or z13s server, or if you want to run a coupling facility on a z13 or z13s server. If you plan to run only a coupling facility on a z13 or z13s system, only the sysplex-related actions are relevant. However, you must install the appropriate z/OS service for systems that are running on other servers that use the z13 or z13s coupling facilities.</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq620"> 
+							<p>Target system hardware requirements:</p> 
+						</th>  
+						<td headers="wq620"> 
+							<ul> 
+								<li> 
+									<p>A z13 or z13s</p> 
+								</li>  
+								<li> 
+									<p>Additional hardware required for specific functions.</p>  
+									<ul> 
+										<li> 
+											<p>IBM devices previously attached to zEC12, zBC12, and zEnterprise servers are supported for attachment to z13 or z13s channels, unless otherwise noted. The subject I/O devices must meet FICON architecture requirements</p> 
+										</li>  
+										<li> 
+											<p>IBM zAware requires the following server firmware:</p>  
+											<ul> 
+												<li> 
+													<p>IBM zAware 10 pack FC #1010</p> 
+												</li>  
+												<li> 
+													<p>IBM zAware 10 pack on a Disaster Recovery Server FC #1011</p> 
+												</li> 
+											</ul> 
+										</li>  
+										<li> 
+											<p>Flash Express requires FC #0403</p> 
+										</li>  
+										<li> 
+											<p>zEDC Express requires FC #0420</p> 
+										</li>  
+										<li> 
+											<p>10 GbE RoCE Express FC #0411</p> 
+										</li>  
+										<li> 
+											<p>Use of IBMWebSphere DataPower® Integration Appliance XI50 for zEnterprise (DataPower XI50z) or select IBM BladeCenter PS701 Express blades or IBM BladeCenter HX5 blades requires a z BladeCenter Extension (zBX) Model 004</p> 
+										</li>  
+										<li> 
+											<p>z BladeCenter Extension (zBX) Model 004 requires:</p>  
+											<ul> 
+												<li> 
+													<p>AIX® 5.3, AIX 6.1, AIX 7.1 and up, and PowerVM® Enterprise Edition (on POWER7® blade)</p> 
+												</li>  
+												<li> 
+													<p>Red Hat RHEL 5.5, 6.0, 7.0 and up, SLES 10 (SP4), 11 (SP1), 12 and up, 64-bit only (on HX5 blade)</p> 
+												</li>  
+												<li> 
+													<p>Microsoft Windows Server 2012, Microsoft Windows Server 2012 R2, Microsoft Windows Server 2008 R2, and Microsoft Windows Server 2008 (SP2) (Datacenter Edition recommended), 64-bit only (on HX5 blade)</p> 
+												</li> 
+											</ul> 
+										</li>  
+										<li> 
+											<p>Use of hardware acceleration for cryptographic operations, including the use of Visa Data Secure Platform (DSP) functions requires a CPACF (FC #3863) or a CEX5S (FC #0890) feature, or both.</p>  
+											<p>See Table Note 1.</p> 
+										</li> 
+									</ul> 
+								</li>  
+								<li> 
+									<p>- Use of a Trusted Key Entry (TKE) workstation requires FC #0878.</p> 
+								</li> 
+							</ul> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq621"> 
+							<p>Target system software requirements:</p> 
+						</th>  
+						<td headers="wq621"> 
+							<p>See the topic "Support is delivered by service, z/OS features, and web deliverables" in 
+								<a href="e0z3m11228.htm#znextrec21">General recommendations and considerations for a z13 or z13s server</a> and "Install the necessary z/OS service", as indicated in the PSP buckets that are described in 
+								<a href="e0z3m11228.htm#z13bef21">Actions you can take before you order a z13 or z13s server</a>.
+							</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq622"> 
+							<p>Other system (coexistence or fallback) requirements:</p> 
+						</th>  
+						<td headers="wq622"> 
+							<ul> 
+								<li> 
+									<p>It is recommended that you install and run the required service on your existing server. This will enable you to fall back from a hardware perspective, yet maintain your software level.</p> 
+								</li>  
+								<li> 
+									<p>If you have not installed the preconditioning and exploitation PTFs for CFCC Levels 17-19, note that those PTFs are required to be installed throughout your sysplex before implementing CFCC Level 20 or CFCC Level 21..</p> 
+								</li>  
+								<li> 
+									<p>If you plan to implement zEDC, you should install the z/OS toleration PTFs on systems that access data that is compressed using zEDC Express on a z13 or z13s server.</p> 
+								</li>  
+								<li> 
+									<p>If you are using ICSF and plan to share keys with other z/OS systems that have an earlier level of ICSF, you should install the ICSF coexistence PTFs on those earlier levels of ICSF.</p> 
+								</li> 
+							</ul> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq623"> 
+							<p>Restrictions:</p> 
+						</th>  
+						<td headers="wq623"> 
+							<p>See 
+								<a href="e0z3m11228.htm#z13res21">Restrictions for a z13 or z13s server</a>.
+							</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq624"> 
+							<p>System impacts:</p> 
+						</th>  
+						<td headers="wq624"> 
+							<p>None.</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th align="left" id="wq625"> 
+							<p>Related IBM Health Checker for z/OS check:</p> 
+						</th>  
+						<td headers="wq625"> 
+							<p>A health check for FICON dynamic routing, CHECK(IBMIOS,IOS_FABRIC_MONITOR), is available with the PTF for APAR OA40548 for z/OS V1R13 and V2R1, and included in z/OS V2R2. This health check is designed to check all components of a dynamic routing fabric, the channel subsystem, and disk control units to make sure that dynamic routing requirements are met if dynamic routing is enabled for one or more FICON switches. This support is intended to help you identify misconfiguration errors that can result in data integrity exposures.</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<th colspan="2" align="left" id="wq626">Table Note: 
+							<ol> 
+								<li> 
+									<p>IBM z Systems cryptography features include Visa Format Preserving Encryption technology (FPE), which is owned by Visa. Clients who wish to use the FPE functionality of IBM z Systems cryptography features must first enter into a separate agreement with Visa for use of this advanced technology; such Clients should contact either their Visa account manager or Visa at P2PE@visa.com. Clients who use IBM z Systems cryptography features, but do not make use of the FPE functionality, are not required to enter into any such agreement with Visa.</p> 
+								</li> 
+							</ol> 
+						</th> 
+					</tr> 
+				</tbody> 
+			</table>  
+			<h6>Steps to take</h6>  
+			<p>Follow the 
+				<a href="e0z3m11228.htm#znextrec21">General recommendations and considerations for a z13 or z13s server</a>, adhere to the 
+				<a href="e0z3m11228.htm#z13res21">Restrictions for a z13 or z13s server</a>, and perform the tasks that are described in the following topics.
+			</p>  
+			<h6>Reference information</h6>  
+			<p>None.</p> 
+		]]></description>  
+		<step name="id-081b2f2b-3542-4083-ab57-a49440871b6b"> 
+			<!--<step level="step_1_1">-->  
+			<title>General recommendations and considerations for a z13 or z13s server</title>  
+			<description><![CDATA[  
+				<p>As you plan your migration to a z13 or z13s 
+					<sup>TM</sup> server, consider the following:
+				</p> 
+			]]></description>  
+			<step name="id-99f75286-953b-4397-9101-6e583f474440"> 
+				<!--<step level="step_1_1_1">-->  
+				<title>Relatively few migration actions are new when coming from an IBM zEnterprise EC12 or zEnterprise BC</title>  
+				<description><![CDATA[  
+					<p>Migration to an IBM z13 or IBM z13s server has, as its base, a migration to the IBM zEnterprise EC12 or zEnterprise BC12 servers. This means that if you are migrating to a z13 or z13s server from a zEC12 or zBC12 server, and have performed the migration actions associated with the zEC12 or zBC12, you have fewer migration actions than if you were migrating from an earlier generation server and have not yet performed the migration actions associated with these servers. It is important to note that you can migrate directly to a z13 or z13s server without installing the intermediate servers, but you still need to ensure that any migration considerations are satisfied for the servers that you "skipped." To read about z196, z114, zEC12, and zBC12 server migration actions, see 
+						<a href="e0z3m11230.htm#mignext">Migrate to an IBM zEnterprise z196 or z114 server</a> and 
+						<a href="e0z3m11229.htm#znext21">Migrate to an IBM zEnterprise EC12 server or IBM zEnterprise BC12 server</a>.
+					</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-65937c1e-f9d8-438e-ad28-a6937b0a1e79"> 
+				<!--<step level="step_1_1_2">-->  
+				<title>Support is delivered by service, z/OS features, and web deliverables.</title>  
+				<description><![CDATA[  
+					<p>The base support for the z13 and z13s is delivered by service (PTFs).</p>  
+					<ul> 
+						<li> 
+							<p>The PSP bucket that contains the required list of PTFs for the z13 server is: Upgrade 2964DEVICE, Subset 2964/ZOS and is identified by the following SMP/E Fix Category IBM.Device.Server.z13-2964.RequiredService</p> 
+						</li>  
+						<li> 
+							<p>The PSP bucket that contains the required list of PTFs for the z13s server is: Upgrade 2965DEVICE, Subset 2965/ZOS and is identified by the following SMP/E Fix Category IBM.Device.Server.z13S-2965.RequiredService.</p> 
+						</li> 
+					</ul>  
+					<p>Exploitation of some functions requires a web deliverable. Specifically:</p>  
+					<ul> 
+						<li> 
+							<p>If you are running z/OS V2R1 and require Crypto Express4S functionality for CCA 4.4 and other EP11 cryptographic enhancement support which includes: RKX Key Export Wrap, UDX Reduction/simplification, additional EP11 algorithms, expanded EMV support, AP Configuration simplification, CTRACE Enhancements, and KDS Key Utilization Stats, then you must download and install the Cryptographic Support for z/OS V1R13-z/OS V2R1 web deliverable (FMID HCR77A1) or the Cryptographic Support for z/OS V1R13 - z/OS V2R2 web deliverable (HCR77B1).</p>  
+							<p>If you are using either of these web deliverables (HCR77A1 or HCR77B1) and sharing keys with other z/OS systems that have a lower-level of ICSF, you require the coexistence PTFs identified by the appropriate Fix Category: IBM.Coexistence.ICSF.z/OS_V1R13-z/OS_V2R1-HCR77A1 or IBM.Coexistence.ICSF.z/OS_V1R13-z/OS_V2R1-HCR77B1.</p> 
+						</li>  
+						<li> 
+							<p>If you are running z/OS V2R1 and require Crypto Express5S exploitation support for the next Generation Coprocessor support or VISA Format Preserving Encryption (FPE), you must download and install the Enhanced Cryptographic Support for z/OS V1R13-z/OS V2R1 web deliverable (FMID HCR77B0) or the Cryptographic Support for z/OS V1R13 - z/OS V2R2 web deliverable (HCR77B1).</p>  
+							<p>If you are using either of these web deliverables (HCR77B0 or HCR77B1) and sharing keys with other z/OS systems that have a lower-level of ICSF, you require the coexistence PTFs identified by the appropriate Fix Category: IBM.Coexistence.ICSF.z/OS_V1R13-z/OS_V2R1-HCR77B0 or IBM.Coexistence.ICSF.z/OS_V1R13-z/OS_V2R1-HCR77B1.</p> 
+						</li>  
+						<li> 
+							<p>If you are running z/OS V2R1 and require exploitation of new hardware instructions using XL C/C++ ARCH(11) and TUNE(11) including SIMD, vector programming, MASS and ATLAS libraries, you must download and install the XL C/C++ V2R1M1 web deliverable with z13 support for z/OS 2.1.</p> 
+						</li>  
+						<li> 
+							<p>If you are running z/OS V1R13 and want to exploit Flash Express (including pageable 1 MB Large Page Support, optional paging of PLPA and Common (CSA, ECSA) pages to Flash Express, and Dynamic reconfiguration support for Flash Express); or 2 GB Large Page support, you must download and install the z/OS V1.13 RSM Enablement Offering Web deliverable and install the required PTFs identified by the Fix Category.</p> 
+						</li>  
+						<li> 
+							<p>If you are running z/OS V1R13, you might need to install a Cryptographic Support web deliverable, depending on which ICSF functions you require.</p> 
+						</li> 
+					</ul> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-c9405a55-b40c-4d95-995c-2f67e840c537"> 
+				<!--<step level="step_1_1_3">-->  
+				<title>Larger coupling facility structure sizes might be necessary.</title>  
+				<description><![CDATA[  
+					<p>When you change coupling facility control code (CFCC) levels, your coupling facility structure sizes might change. If, as part of your migration to a z13 server, you change CFCC levels, you might have larger structure sizes than you did previously. If your CFCC levels are identical, structure sizes are not expected to change when you migrate from a previous server to a newer generation server. In addition, similar to CF Level 17 and later, ensure that the CF LPAR has at least 512MB of storage. CFCC Levels 20 and 21, introduced on the z13 and 13s, support the Coupling Facility use of Large Memory to improve availability for larger CF cache structures and data sharing performance with larger DB2® Group Buffer Pools (GBP). This support removes inhibitors to using large CF cache structures, enabling use of Large Memory to appropriately scale to larger DB2 Local Buffer Pools (LBP) and Group Buffer Pools (GBP) in data sharing environments.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-55e37f4e-e933-4e5c-8870-e646404b5528"> 
+				<!--<step level="step_1_1_4">-->  
+				<title>Use the same software level throughout a sysplex.</title>  
+				<description><![CDATA[  
+					<p>Having members of a sysplex at the same software level (other than during brief migration periods) is good software management policy.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-9eb0656c-16cf-45e5-8be3-ec6786feb7cb"> 
+				<!--<step level="step_1_1_5">-->  
+				<title>Migrate hardware and software at different times.</title>  
+				<description><![CDATA[  
+					<p>To minimize the amount of change (and therefore risk) that you experience at one time, do not migrate your software release level at the same time that you migrate your hardware.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-df89fd79-d68b-4511-9df8-ba46bc8fcd1f"> 
+				<!--<step level="step_1_1_6">-->  
+				<title>Update SCRT to latest version.</title>  
+				<description><![CDATA[  
+					<p>If you use SCRT, make sure it is at the latest level. This is a requirement for sub-capacity pricing, as well as when you upgrade servers. The latest level of SCRT can be downloaded from the SCRT web site at 
+						<a href="http://www.ibm.com/systems/z/resources/swprice/subcap/scrt/">http://www.ibm.com/eserver/zseries/swprice/scrt/</a>.
+					</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step> 
+		</step>  
+		<step name="id-f4bca46c-9433-4d61-a9c4-80c1c461ac95"> 
+			<!--<step level="step_1_2">-->  
+			<title>Restrictions for a z13 or z13s server</title>  
+			<description><![CDATA[  
+				<p>Restrictions associated with z13 and z13s 
+					<sup>TM</sup> servers are described as follows:
+				</p> 
+			]]></description>  
+			<step name="id-d8bf33aa-dd71-496a-b83f-18ad63b55814"> 
+				<!--<step level="step_1_2_1">-->  
+				<title>Functional limitations.</title>  
+				<description><![CDATA[  
+					<p>Not all z13 or z13s functions are available in every z/OS release. See 
+						<a href="e0z3m11228.htm#z13__znextfuncbc">Table 28</a> and 
+						<a href="e0z3m11228.htm#z13__z13exploitation">Table 29</a> for a list of the z13 and z13s functions available in each z/OS release. Some functions have migration or exploitation considerations (see 
+						<a href="e0z3m11228.htm#z13bef21">Actions you can take before you order a z13 or z13s server</a> and 
+						<a href="e0z3m11228.htm#znextaft21">Migration and exploitation considerations for z13 and z13s server functions</a>. ) Many functions are enabled or disabled, based on the presence or absence of the required hardware and software. If you plan to exploit new z13 or z13s functions, you can install the software and hardware in either order; that is, there is no requirement to install either software or hardware first to exploit a specific function. However, because of outage windows and testing considerations, you might want to consider installing all the software and PTFs required for the machine and the functions you plan to exploit first, then upgrade the hardware and, finally, update your customization to exploit the new functions.
+					</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-d99c8c36-7fe9-4c07-aa93-5963d94842de"> 
+				<!--<step level="step_1_2_2">-->  
+				<title>z13 and z13s servers in a sysplex.</title>  
+				<description><![CDATA[  
+					<ul> 
+						<li> 
+							<p>A Parallel Sysplex that contains a z13 or z13s server either for a z/OS image or a CF image can only contain other z13 or z13s servers, or z196, z114, zEC12, or zBC12 servers.</p>  
+							<p>If you are running z/OS on any servers earlier than a z196 or z114 server, you cannot add a z13 or z13s server to that sysplex; that is, you will not be able to perform rolling IPLs to introduce a z13 or z13s server if you have any of the earlier servers as z/OS images or coupling facility images in the sysplex.</p>  
+							<p>The earlier servers in the sysplex must be upgraded to z196, z114, or later to have z13 or z13s servers supported in the sysplex. If you have any z/OS images or coupling facility images on an earlier server, and you intend to introduce a z13 or z13s server into that sysplex, you must migrate those images to a z196, z114, or later server before introducing the z13 or z13s server.</p>  
+							<p>GRS supports the use of FICON CTCs for Ring configurations on z/OS V1R13 with a PTF and on z/OS Version 2. However, if you are currently using ESCON CTCs for GRS ring configurations within a sysplex, consider converting to GRS Star if possible, or using XCF signalling in a GRS ring configuration. XCF sysplex signalling is preferred instead of GRS CTC connections.</p> 
+						</li>  
+						<li> 
+							<p>InterSystem Channel 3 (ISC-3) and Integrated Cluster Bus 4 (ICB-4) Coupling Links are not supported on z13 or z13s CPC. Instead, the IBM Integrated Coupling Adapter (ICA SR), introduced on the z13 and z13s, is a two-port, short distance coupling fanout that utilizes a new coupling channel type: CS5. The ICA SR can only be used for coupling connectivity between z13 or z13s servers, and the ICA SR can only connect to another ICA SR. IBM recommends that you order ICA SR (#0172) on the z13 processors used in a Parallel Sysplex to help ensure coupling compatibility with future processor generations. You can also use 12x InfiniBand coupling links, which are designed to replace Integrated Cluster Bus 4 (ICB-4), and to complement 1x InfiniBand and ISC-3 on a z13 or z13s server. InfiniBand coupling can provide significantly improved service times compared to ISC-3s for distances up to 150 meters. You can read about coupling links in 
+								<em>IBM System z® Connectivity Handbook</em> (SG24-5444).
+							</p> 
+						</li>  
+						<li> 
+							<p>The z13 or z13s server cannot be connected to a Sysplex Timer (9037-002). The Server Time Protocol (STP) feature is the follow-on to the Sysplex Timer. STP is designed to allow multiple servers and coupling facilities to maintain time synchronization with each other without requiring a Sysplex Timer. STP is a hardware feature of the z13, z13s, zEC12, zBC12, z196, and z114. To implement STP, see the STP web site and the publications and other resources listed there. The STP web site is at 
+								<a href="http://www.ibm.com/systems/z/advantages/pso/stp.html" target="_blank">http://www.ibm.com/systems/z/advantages/pso/stp.html</a> .
+							</p>  
+							<p>The STP design introduced a concept called Coordinated Timing Network (CTN). A CTN is a collection of servers and coupling facilities that are time-synchronized to a time value called Coordinated Server Time. A CTN can be configured in two ways:</p>  
+							<ul> 
+								<li> 
+									<p>STP-only CTN, which does not require a Sysplex Timer. A z13 or z13s must participate in an STP-only CTN.</p> 
+								</li>  
+								<li> 
+									<p>Mixed-CTN (External Time Reference and STP), which does require a Sysplex Timer. zEC12 and zBC12 were the last servers to support mixed-CTN. The z13 and z13s do not support connections to a Mixed-CTN. All servers in the network must be configured in STP-only mode. Consider migrating servers that require time synchronization, such as to support a base or Parallel Sysplex, to the Server Time Protocol (STP).</p> 
+								</li> 
+							</ul> 
+						</li> 
+					</ul>  
+					<p>For more information, see the following references:</p>  
+					<ul> 
+						<li> 
+							<p>For more information about GRS, see 
+								<cite>z/OS MVS Planning: Global Resource Serialization</cite>.
+							</p> 
+						</li>  
+						<li> 
+							<p>For more information on CTC definitions, see:</p>  
+							<ul> 
+								<li> 
+									<cite>z/OS HCD User's Guide</cite> 
+								</li>  
+								<li> 
+									<cite>z/OS HCD Planning</cite> 
+								</li> 
+							</ul> 
+						</li> 
+					</ul> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-2fa21aca-a1b2-43e7-a51b-f19d4b50bdac"> 
+				<!--<step level="step_1_2_3">-->  
+				<title>Plan for discontinued functions.</title>  
+				<description><![CDATA[  
+					<p>For a list of functions on the z13 server that are planned to be discontinued on future servers, see 
+						<a href="e0z3m11228.htm#z132012hw1">Accommodate functions for the z13 server or z13s to be discontinued on future servers</a>.
+					</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-10e92a08-1e80-4375-a74a-c6dc760110d9"> 
+				<!--<step level="step_1_2_4">-->  
+				<title>Unsupported hardware features.</title>  
+				<description><![CDATA[  
+					<p>The following hardware features cannot be ordered and cannot be carried forward from an upgrade on an earlier server to the z13 server.</p>  
+					<ul> 
+						<li> 
+							<p>HCA2-O</p> 
+						</li>  
+						<li> 
+							<p>HCA2-O LR</p> 
+						</li>  
+						<li> 
+							<p>ISC-3 links</p> 
+						</li>  
+						<li> 
+							<p>CHPID type OSN (OSA-Express for NCP) is not supported on the OSA-Express5S GbE LX feature</p> 
+						</li>  
+						<li> 
+							<p>Crypto Express3 (#0864)</p> 
+						</li>  
+						<li> 
+							<p>Crypto Express4S (#0865)</p> 
+						</li>  
+						<li> 
+							<p>STP Mixed CTN. The zEC12 and zBC12 were the last z Systems™ servers to support connections to an STP Mixed CTN. This also includes the Sysplex Timer (9037). Starting with z13, servers that require Time synchronization, such as to support a base or Parallel Sysplex, will require Server Time Protocol (STP) and all servers in that network must be configured in STP-only mode.</p> 
+						</li>  
+						<li> 
+							<p>IBM System z Application Assist Processor (zAAP). IBM continues to support running zAAP workloads on IBM System z Integrated Information Processors (zIIPs). IBM has removed the restriction preventing zAAP-eligible workloads from running on zIIPs when a zAAP is installed on the CEC. This was intended to help facilitate migration and testing of zAAP workloads on zIIPs. With a z13, one CP must be installed with the installation of any zIIPs or prior to the installation of any zIIPs. The total number of zIIPs purchased cannot exceed twice the number of CPs purchased. However, for upgrades from zEC12s with zAAPs, conversions from zAAPs may increase this ratio to 4:1.</p> 
+						</li> 
+					</ul> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-d797c925-b8fe-4dd7-ae3c-e08e6fd7cebc"> 
+				<!--<step level="step_1_2_5">-->  
+				<title>Carry forward hardware features.</title>  
+				<description><![CDATA[  
+					<p>The following hardware features are not orderable on z13 servers. If they are installed on your existing server at the time of an upgrade to a z13 server, they can be retained or carried forward.</p>  
+					<ul> 
+						<li> 
+							<p>HMC #0091</p> 
+						</li>  
+						<li> 
+							<p>HCA2-C Fanout #0162</p> 
+						</li>  
+						<li> 
+							<p>IFB-MP Daughter Card #0326</p> 
+						</li>  
+						<li> 
+							<p>STI-A8 Mother Card #0327</p> 
+						</li>  
+						<li> 
+							<p>Flash Express #0402 and #0403</p> 
+						</li>  
+						<li> 
+							<p>OSA-Express4S 1 GbE LX #0404</p> 
+						</li>  
+						<li> 
+							<p>OSA-Express4S 1 GbE SX #0405</p> 
+						</li>  
+						<li> 
+							<p>OSA-Express4S 10 GbE LR #0406</p> 
+						</li>  
+						<li> 
+							<p>OSA-Express4S 10 GbE SR #0407</p> 
+						</li>  
+						<li> 
+							<p>OSA-Express4S 1000BASE-T #0408</p> 
+						</li>  
+						<li> 
+							<p>OSA-Express5S GbE LX #0413</p> 
+						</li>  
+						<li> 
+							<p>OSA-Express5S GbE SX #0414</p> 
+						</li>  
+						<li> 
+							<p>OSA-Express5S 10 GbE LR #0415</p> 
+						</li>  
+						<li> 
+							<p>OSA-Express5S 10 GbE SR #0416</p> 
+						</li>  
+						<li> 
+							<p>OSA-Express5S 1000BASE-T #0417</p> 
+						</li>  
+						<li> 
+							<p>TKE workstation #0842</p> 
+						</li>  
+						<li> 
+							<p>Addl smart cards #0884</p> 
+						</li>  
+						<li> 
+							<p>TKE Smart Card Reader #0885</p> 
+						</li>  
+						<li> 
+							<p>FICON Express8 10KM LX #3325</p> 
+						</li>  
+						<li> 
+							<p>FICON Express8 SX #3326</p> 
+						</li>  
+						<li> 
+							<p>FICON Express8S 10Km LX #0409</p> 
+						</li>  
+						<li> 
+							<p>FICON Express8S SX #0410</p> 
+						</li>  
+						<li> 
+							<p>10GbE RoCE Express #0411</p> 
+						</li>  
+						<li> 
+							<p>zEDC Express #0420</p> 
+						</li>  
+						<li> 
+							<p>Fill and Drain Kit #3378</p> 
+						</li>  
+						<li> 
+							<p>Universal Lift Tool/Ladder #3759</p> 
+						</li> 
+					</ul>  
+					<p>Also, FICON Express8 will not be supported on future high-end z Systems servers as carry forward on an upgrade. The z13 and z13s servers will be the last z Systems servers to offer ordering of FICON Express8S channel features. Enterprises that have 2GB device connectivity requirements must carry forward these channels.</p>  
+					<p>See 
+						<a href="e0z3m11231.htm#orga">Ensure that you are running on supported servers and storage controllers</a> for more information.
+					</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step> 
+		</step>  
+		<step name="id-874e3b03-6e91-4dd9-8305-332d96605b60"> 
+			<!--<step level="step_1_3">-->  
+			<title>Actions you can take before you order a z13 or z13s server</title>  
+			<description><![CDATA[  
+				<p>You can perform the following migration actions before you order or install a z13 or z13s 
+					<sup>TM</sup> server:
+				</p> 
+			]]></description>  
+			<step name="id-93d91487-faa2-4fba-95d7-f668f817ecb9"> 
+				<!--<step level="step_1_3_1">-->  
+				<title>Review the sysplex configuration in which the z13 or z13s server will participate.</title>  
+				<description><![CDATA[  
+					<p>See 
+						<a href="e0z3m11228.htm#z13res21">Restrictions for a z13 or z13s server</a> for a description of the limitations when using z13 or z13s servers with certain earlier servers in a Parallel Sysplex.
+					</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-f4607e70-dfe9-40a8-bb96-a9f9d61c2fa4"> 
+				<!--<step level="step_1_3_2">-->  
+				<title>Implement an STP timing network.</title>  
+				<description><![CDATA[  
+					<p>This action is needed because Sysplex Timers (9037-002) are not supported on z13 or z13s servers.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-2ebb2f33-f0f2-4cca-a74c-ae86f62b0957"> 
+				<!--<step level="step_1_3_3">-->  
+				<title>Migrate from ISC-3 links to Infinband or Integrated Coupling Adapter (ICA) links.</title>  
+				<description><![CDATA[  
+					<p>This action is needed because ISC-3 links are not supported on z13 or z13s servers. If desired, you can take this action after you order a z13 or z13s server, as you upgrade to the new server.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-303d2727-a57e-4edd-a61f-53dbfb6898b6"> 
+				<!--<step level="step_1_3_4">-->  
+				<title>Migrate from unsupported hardware features to newer technology.</title>  
+				<description><![CDATA[  
+					<p>This action is needed because ESCON, FICON Express4, Crypto Express3, and OSA-Express3 are not supported on z13 or z13s servers. See 
+						<a href="e0z3m11228.htm#z13res21">Restrictions for a z13 or z13s server</a>, 
+						<a href="e0z3m11232.htm#at3ruio">Replace unsupported devices</a>, and 
+						<a href="e0z3m11233.htm#au3ndv">Provide for new device installations</a>.
+					</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-35dcf6ff-b097-431a-bf7b-12d3fdb8248a"> 
+				<!--<step level="step_1_3_5">-->  
+				<title>Determine the level of cryptographic support you require on a z13 or z13s server.</title>  
+				<description><![CDATA[  
+					<p>The level of function provided for cryptographic support differs by z/OS release and the installed ICSF web deliverable. Also, toleration PTFs are available for some cryptographic web deliverables.</p>  
+					<p>For z/OS V2R2, consider the following:</p>  
+					<ul> 
+						<li> 
+							<p>If you are using the level of ICSF that is shipped as part of z/OS V2R2, you can use the most functions of the Crypto Express5 feature on a z13 or z13s server.</p> 
+						</li>  
+						<li> 
+							<p>The Cryptographic Support for z/OS V1R13 - z/OS V2R2 web deliverable (FMID HCR77B1) provides some additional function and also incorporates enhancements that are available in PTFs for the base level of ICSF included in z/OS V2R1. The web deliverable includes new operator commands with Parallel Sysplex wide scope that can be used to perform certain cryptographic administrative functions. These functions include activating, deactivating, and restarting cryptographic coprocessors. This support can also be used to display status for available cryptographic devices and information about active key data sets (KDSs).</p> 
+						</li> 
+					</ul>  
+					<p>For z/OS V2R1, consider the following:</p>  
+					<ul> 
+						<li> 
+							<p>If you are using the level of ICSF that is shipped as part of z/OS V2R1, you can tolerate Crypto Express5 on a z13 or z13s server, which treats Crypto Express5S cryptographic coprocessors and accelerators as Crypto Express4S coprocessors and accelerators. However, you must install the required PTFs identified by the SMP/E fix category:</p>  
+							<ul> 
+								<li> 
+									<p>For the z13: IBM.Device.Server.z13-2964.RequiredService</p> 
+								</li>  
+								<li> 
+									<p>For the z13s: IBM.Device.Server.z13S-2965.RequiredService</p> 
+								</li> 
+							</ul> 
+						</li>  
+						<li> 
+							<p>If you require support for greater than 16 domains (up to 85) on Crypto Express5S, you must install the PTFs that are identified by the appropriate fix category IBM.Device.Server.z13-2964.Exploitation or IBM.Device.Server.z13S-2965.Exploitation, or install the Enhanced Cryptographic Support for z/OS V1R13-z/OS V2R1 web deliverable (FMID HCR77B0) or a later ICSF web deliverable.</p> 
+						</li>  
+						<li> 
+							<p>If you require Crypto Express4S functionality for CCA 4.4 and other EP11 cryptographic enhancement support which includes: RKX Key Export Wrap, UDX simplification, additional EP11 algorithms, expanded EMV support, AP Configuration simplification, CTRACE Enhancements, and KDS Key Utilization stats, you must download and install the Cryptographic Support for z/OS V1R13-z/OS V2R1 web deliverable (FMID HCR77A1) or the Enhanced Cryptographic Support for z/OS V1R13-z/OS V2R1 web deliverable (FMID HCR77B0) or a later ICSF web deliverable.</p> Note: If you are using the Cryptographic Support for z/OS V1R13-z/OS V2R1 web deliverable (FMID HCR77A1) or a later ICSF web deliverable, and sharing keys with other z/OS systems that have a lower-level of ICSF, you require the coexistence PTFs listed here, which are identified by fix category: IBM.Coexistence.ICSF.z/OS_V1R13-z/OS_V2R1-HCR77A1, or the FIXCAT for the ICSF level that you are using.
+						</li>  
+						<li> 
+							<p>If you require Crypto Express5S exploitation support for the next Generation Coprocessor support or VISA Format Preserving Encryption (FPE), you must download and install the Enhanced Cryptographic Support for z/OS V1R13-z/OS V2R1 web deliverable (FMID HCR77B0) or a later ICSF web deliverable.</p> Note: If you are using the Enhanced Cryptographic Support for z/OS V1R13-z/OS V2R1 Web Deliverable (FMID HCR77B0) or a later ICSF web deliverable, and sharing keys with other z/OS systems that have a lower-level of ICSF, you require the coexistence PTFs listed here, which are identified by fix category: IBM.Coexistence.ICSF.z/OS_V1R13-z/OS_V2R1-HCR77B0, or a later ICSF web deliverable.
+						</li> 
+					</ul>  
+					<p>For z/OS V1R13, consider the following:</p>  
+					<ul> 
+						<li> 
+							<p>If you are using the level of ICSF that is shipped as part of z/OS V1.13 you can tolerate Crypto Express5 on a z13 server which treats Crypto Express5S cryptographic coprocessors and accelerators as Crypto Express4S coprocessors and accelerators. However you must install the required PTFs identified by the fix category:</p>  
+							<ul> 
+								<li> 
+									<p>For the z13: IBM.Device.Server.z13-2964.RequiredService</p> 
+								</li>  
+								<li> 
+									<p>For the z13s: IBM.Device.Server.z13S-2965.RequiredService</p> 
+								</li> 
+							</ul> 
+						</li>  
+						<li> 
+							<p>If you require Crypto Express4S support of expanded key support for AES algorithm, enhanced ANSI TR-31 Secure Key Exchange, PIN block decimalization table protection, PKA RSA OAEP with SHA-256 algorithm, or additional Elliptic Curve Cryptography (ECC) functions, then you must download and install the Cryptographic Support for z/OS V1R11-V1R13 (or higher) web deliverable (FMID HCR7790) and the PTFs identified by the fix category:</p>  
+							<ul> 
+								<li> 
+									<p>For the z13: IBM.Device.Server.z13-2964.Exploitation</p> 
+								</li>  
+								<li> 
+									<p>For the z13s: IBM.Device.Server.z13S-2965.Exploitation</p> 
+								</li> 
+							</ul> Note: If you are using the Cryptographic Support for z/OS V1R11-V1R13 Web Deliverable (FMID HCR7790) and sharing keys with other z/OS systems that have a lower-level of ICSF, you require the coexistence PTFs that are identified by fix category IBM.Coexistence.ICSF.z/OS_V1R11-V1R13-HCR7790, or a later ICSF web deliverable.
+						</li>  
+						<li> 
+							<p>If you require Crypto Express4S functionality including: Enterprise Security PKCS #11-Hardware Security Module (HSM), DUKPT for MAC and Data Encryption, Cipher Text Translate CCA Verb, PKDS/TKDS Constraint Relief, Random Number Cache, FIPS on Demand, or Wrapping Keys with Strong Keys, then you must download and install the Cryptographic Support for z/OS V1R12-V1R13 (or higher) web deliverable (FMID HCR77A0). The APARs/PTFs required to provide support for PKCS#11 are identified by the fix category:</p>  
+							<ul> 
+								<li> 
+									<p>For the z13: IBM.Device.Server.z13-2964.Exploitation</p> 
+								</li>  
+								<li> 
+									<p>For the z13s: IBM.Device.Server.z13S-2965.Exploitation</p> 
+								</li> 
+							</ul> Note: If you are using the Cryptographic Support for z/OS V1R12-V1R13 Web Deliverable (FMID HCR77A0) and sharing keys with other z/OS systems that have a lower-level of ICSF, you require the coexistence PTFs listed here, which are identified by fix category IBM.Coexistence.ICSF.z/OS_V1R12-V1R13-HCR77A0.
+						</li>  
+						<li> 
+							<p>If you require Crypto Express4S functionality for CCA 4.4 and other EP11 cryptographic enhancement support which includes: RKX Key Export Wrap, UDX Reduction/simplification, additional EP11 algorithms, expanded EMV support, AP Configuration simplification, CTRACE Enhancements, and KDS Key Utilization Stats; then you must download and install the Cryptographic Support for z/OS V1R13-z/OS V2R1 (or higher) web deliverable (FMID HCR77A1). The APARs and PTFs that are required to provide support for PKCS#11 are identified by the fix category:</p>  
+							<ul> 
+								<li> 
+									<p>For the z13: IBM.Device.Server.z13-2964.Exploitation</p> 
+								</li>  
+								<li> 
+									<p>For the z13s: IBM.Device.Server.z13S-2965.Exploitation</p> 
+								</li> 
+							</ul> Note: If you are using the Cryptographic Support for z/OS V1R13-z/OS V2R1 Web Deliverable (FMID HCR77A1) and sharing keys with other z/OS systems that have a lower-level of ICSF, you require the coexistence PTFs that are identified by fix category IBM.Coexistence.ICSF.z/OS_V1R13-z/OS_V2R1-HCR77A1, or the FIXCAT for the ICSF level that you are using.
+						</li>  
+						<li> 
+							<p>If you require support for greater than 16 domains (up to 85) on Crypto Express5S, you must install the PTFs that are identified by the fix category: IBM.Device.Server.z13-2964.Exploitation or IBM.Device.Server.z13S-2965.Exploitation, or install the Enhanced Cryptographic Support for z/OS V1R13-z/OS V2R1 web deliverable (FMID HCR77B0)</p> 
+						</li>  
+						<li> 
+							<p>If you require Crypto Express5S exploitation support for the next Generation Coprocessor support or VISA Format Preserving Encryption (FPE), you must download and install the Enhanced Cryptographic Support for z/OS V1R13-z/OS V2R1 web deliverable (FMID HCR77B0).</p> Note: If you are using the Enhanced Cryptographic Support for z/OS V1R13-z/OS V2R1 Web Deliverable (FMID HCR77B0) and sharing keys with other z/OS systems that have a lower-level of ICSF, you require the coexistence PTFs listed here, which are identified by fix category IBM.Coexistence.ICSF.z/OS_V1R13-z/OS_V2R1-HCR77B0, or the FIXCAT for the ICSF level that you are using.
+						</li> 
+					</ul> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-19b2849d-0546-4a49-a176-a3517c8bd974"> 
+				<!--<step level="step_1_3_6">-->  
+				<title>Install the necessary z/OS service, as indicated in PSP buckets.</title>  
+				<description><![CDATA[  
+					<p>You must obtain all of the appropriate Preventive Service Planning (PSP) buckets. In addition to the hardware PSP buckets, you must also obtain the software PSP buckets. Use the Fix Categories that are specified in the associated FIXCAT HOLDDATA to identify PTFs required for the z13 server, PTFs needed to exploit z13 capabilities, and PTFs recommended to fix known problems. Specifically, fixes in the following categories:</p>  
+					<ul> 
+						<li> 
+							<p>For the z13:</p>  
+							<ul> 
+								<li>IBM.Device.Server.z13-2964.RequiredService</li>  
+								<li>IBM.Device.Server.z13-2964.Exploitation</li>  
+								<li>IBM.Device.Server.z13-2964.RecommendedService</li> 
+							</ul> 
+						</li>  
+						<li> 
+							<p>For the z13s:</p>  
+							<ul> 
+								<li>IBM.Device.Server.z13S-2965.RequiredService</li>  
+								<li>IBM.Device.Server.z13S-2965.Exploitation</li>  
+								<li>IBM.Device.Server.z13S-2965.RecommendedService</li> 
+							</ul> 
+						</li> 
+					</ul>  
+					<p>Fixes required for several zEnterprise functions (such as Parallel Sysplex InfiniBand Coupling Links, Server Time Protocol (STP), the Unified Resource Manager, High Performance FICON (zHPF), and zEnterprise Data Compression (zEDC) are not listed in the hardware PSP bucket, but can be found by using the following Fix Categories:</p>  
+					<ul> 
+						<li> 
+							<p>For the z13:</p>  
+							<ul> 
+								<li>IBM.Device.Server.z13-2964.ParallelSysplexInfiniBandCoupling</li>  
+								<li>IBM.Device.Server.z13-2964.ServerTimeProtocol</li>  
+								<li>IBM.Device.Server.z13-2964.UnifiedResourceManager</li>  
+								<li>IBM.Device.Server.z13-2964.zHighPerformanceFICON</li>  
+								<li>IBM.Function.zEDC</li> 
+							</ul> 
+						</li>  
+						<li> 
+							<p>For the z13s:</p>  
+							<ul> 
+								<li>IBM.Device.Server.z13S-2965.ParallelSysplexInfiniBandCoupling</li>  
+								<li>IBM.Device.Server.z13S-2965.ServerTimeProtocol</li>  
+								<li>IBM.Device.Server.z13S-2965.UnifiedResourceManager</li>  
+								<li>IBM.Device.Server.z13S-2965.zHighPerformanceFICON</li>  
+								<li>IBM.Function.zEDC</li> 
+							</ul> 
+						</li> 
+					</ul>  
+					<p>Note that because the PTFs associated with these Fix Categories are not specific to a z13 server, you should consider specifying a generic wildcard for the server to ensure that you have all the appropriate service installed. For example:</p>  
+					<ul> 
+						<li>IBM.Device.Server.*.ParallelSysplexInfiniBandCoupling</li>  
+						<li>IBM.Device.Server.*.ServerTimeProtocol</li>  
+						<li>IBM.Device.Server.*.UnifiedResourceManager</li>  
+						<li>IBM.Device.Server.*.zHighPerformanceFICON</li> 
+					</ul>  
+					<p>Similarly, fixes needed for zBX or to support the IBM DB2 Analytics Accelerator (IDAA) are not listed in the hardware PSP bucket, but can be found by using the following Fix Categories:</p>  
+					<ul> 
+						<li>IBM.Device.Server.zBX-2458</li>  
+						<li>IBM.DB2.AnalyticsAccelerator.*</li> 
+					</ul>  
+					<p>If you are upgrading from a server generation prior to the zEC12 or zBC12 servers (such as a z196, z114, z10™ EC, z10 BC, z9® EC, or z9 BC), you must install all the maintenance and perform required migration actions for the servers that you are skipping. To read about z196, z114, zEC12, and zBC12 server migration actions, see 
+						<a href="e0z3m11230.htm#mignext">Migrate to an IBM zEnterprise z196 or z114 server</a> and 
+						<a href="e0z3m11229.htm#znext21">Migrate to an IBM zEnterprise EC12 server or IBM zEnterprise BC12 server</a>.
+					</p>  
+					<p>If you are exploiting z13 capabilities by installing a web deliverable, you must install the PTFs listed in the software PSP buckets for each of the web deliverables that you are installing. See the Program Directory associated with the web deliverable to identify the required software PSP buckets.</p>  
+					<p>The REPORT MISSINGFIX command checks your GLOBAL zone for FIXCAT HOLDDATA matching the FIXCAT values specified on the command. The command then compares the APARs identified in that FIXCAT HOLDDATA with the PTFs installed in the specified zones, and produces a report to identify any APARs not resolved. In other words, it reports which PTFs (fixes) are missing for the specified fix categories. Furthermore, the command produces a customized job used to obtain any PTFs not already RECEIVEd via the RECEIVE ORDER command, and install any missing service via the APPLY CHECK command.</p>  
+					<p>Note the FIXCAT operand on the REPORT MISSINGFIX command can list multiple fix categories, as well as using the same wildcarding techniques described in this topic for the SOURCEID operand. Because both of these techniques are simple and integrated into basic SMP/E commands, use them periodically to ensure the latest PTFs specified in the hardware and software PSP buckets are installed (since PSP buckets can be updated daily). SMP/E also provides an Explorer function which helps in identifying new fix categories which may be of interest. See the IBM fix category Values and Descriptions page for a description of all the fix categories: 
+						<a href="http://www.ibm.com/systems/z/os/zos/features/smpe/fix-category.html">http://www.ibm.com/systems/z/os/zos/features/smpe/fix-category.html</a>. For complete information about the REPORT MISSINGFIX command, see 
+						<cite>SMP/E for z/OS Commands</cite>.
+					</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-8bf1cfb9-9a8b-44ea-b445-5a99bd479c0b"> 
+				<!--<step level="step_1_3_7">-->  
+				<title>Run the CFSIZER tool.</title>  
+				<description><![CDATA[  
+					<p>If you are moving your coupling facilities and the coupling facility structures will be on higher CFCC levels than they were previously, run the Coupling Facility Structure Sizer (CFSIZER) tool to find out if you have to increase coupling facility structure sizes. Prepare to make the necessary changes to the CFCC level as indicated by the tool.</p>  
+					<p>You can download the CFSIZER tool at 
+						<a href="http://www.ibm.com/systems/support/z/cfsizer/" target="_blank">Coupling Facility sizer (http://www.ibm.com/systems/support/z/cfsizer/)</a>. Also see 
+						<a href="e0z3m11234.htm#au3cpfl">Update your CFRM policy with coupling facility structure size changes</a>.
+					</p> Note: After you make a coupling facility available on the new hardware, you can run the Sizer utility, an authorized z/OS program, to evaluate structure size changes. The Sizer utility is distinct from CFSizer, and should be run after the new hardware (CFLEVEL) is installed, but before any CF LPAR on the new hardware is populated with structures. You can download the Sizer utility at 
+					<a href="http://www.ibm.com/systems/support/z/cfsizer/altsize.html" target="_blank">http://www.ibm.com/systems/support/z/cfsizer/altsize.html</a>.
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-6c77d811-7a02-4d64-b6ff-d223262d0081"> 
+				<!--<step level="step_1_3_8">-->  
+				<title>Prepare for the new machine instruction mnemonics.</title>  
+				<description><![CDATA[  
+					<p>In support of the z13 server, there are new machine instructions. The new machine instructions (mnemonics) may collide with (be identical to) the names of Assembler macro instructions you use. In the event of such collisions, the Assembler’s default opcode table (UNI) will treat specification of these names as instructions when the z13 required service is installed, probably causing Assembler error messages and possibly causing generation of incorrect object code. If you write programs in Assembler Language, compare the names of Assembler macro instructions used to the new machine instructions (documented in the latest 
+						<cite>z/Architecture Principles of Operation</cite>, SA22-7832) to identify any such conflicts or collisions that would occur. Identical names will cause Assembler errors or the generation of incorrect object code when you assemble your programs. For a tool to help in identifying mnemonic conflicts, see 
+						<cite>Techdoc PRS5289</cite> at the 
+						<a href="http://www-03.ibm.com/support/techdocs/atsmastr.nsf/WebIndex/PRS5289">IBM Techdocs website</a>.
+					</p>  
+					<p>If a conflict is identified, take one of these actions:</p>  
+					<ul> 
+						<li> 
+							<p>Change the name of your macro instruction.</p> 
+						</li>  
+						<li> 
+							<p>Specify PARM=’...OPTABLE(YOP)...’ (or some other earlier opcode table).</p> 
+						</li>  
+						<li> 
+							<p>Specify a separate ASMAOPT file containing assembler options such as in the previous method (this method requires no changes to source code or JCL).</p> 
+						</li>  
+						<li> 
+							<p>Add as the first statement of your source program: *PROCESS OPTABLE(YOP) (or some other earlier opcode table).</p> 
+						</li>  
+						<li> 
+							<p>Specify the PROFILE option either in JCL or the ASMAOPT file, and the specified or default member of the SYSLIB data set is copied into the front of the source program.</p> 
+						</li>  
+						<li> 
+							<p>If you must use both a new instruction and a macro with the same name in an assembly you can use a coding technique that permits both use of a new instruction and a macro with the same name in an assembly such as HLASM mnemonic tags (:MAC :ASM).</p> 
+						</li> 
+					</ul>  
+					<ul> 
+						<li> 
+							<strong>Decide on the steps to take for your migration to a z13 server.</strong>  
+							<p>Besides the steps listed here, see the following topic for guidance 
+								<a href="e0z3m11228.htm#znextaft21">Migration and exploitation considerations for z13 and z13s server functions</a>.
+							</p> 
+						</li> 
+					</ul> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step> 
+		</step>  
+		<step name="id-1b66f082-6c5e-4516-8e9c-8c05fcae5cef"> 
+			<!--<step level="step_1_4">-->  
+			<title>Migration and exploitation considerations for z13 and z13s server functions</title>  
+			<description><![CDATA[  
+				<p>The following z13 and z13s 
+					<sup>TM</sup> functions have considerations when you are planning for migration and exploitation. For PTF information, see the Notes® for 
+					<a href="e0z3m11228.htm#z13__znextfuncbc">Table 28</a>.
+				</p> 
+			]]></description>  
+			<step name="id-53d82959-3502-499c-9ce8-41c54f17809f"> 
+				<!--<step level="step_1_4_1">-->  
+				<title>Large Systems Performance Reference (LSPR) method</title>  
+				<description><![CDATA[  
+					<p>LSPR is designed to provide comprehensive z/Architecture® processor capacity ratios for different configurations of central processors (CPs) across a wide variety of system control programs and workload environments.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-d3d1168c-fbe5-4c8d-a62a-6f46685badbd"> 
+				<!--<step level="step_1_4_2">-->  
+				<title>Simultaneous multithreading (SMT).</title>  
+				<description><![CDATA[  
+					<p>Incremental throughput is achieved partly because the new processor chip offers intelligently implemented 2-way simultaneous multithreading. Simultaneous multithreading allows two active instruction streams per core, each dynamically sharing the core's execution resources. SMT is available on the z13 for workloads that are running on the Integrated Facility for Linux (IFL) and the IBM z Integrated Information Processor (zIIP).</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-745c31ae-0ba9-404a-8eec-cad85a4c94db"> 
+				<!--<step level="step_1_4_3">-->  
+				<title>CFCC Level 20 and CFCC Level 21 support.</title>  
+				<description><![CDATA[  
+					<p>CFCC Levels 20 and 21 support the Coupling Facility use of Large Memory to improve availability for larger CF cache structures and data sharing performance with larger DB2 Group Buffer Pools. This support removes inhibitors to using large CF cache structures, enabling use of Large Memory to appropriately scale to larger DB2 Local Buffer Pools and Group Buffer Pools in data sharing environments.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-51b3f75b-9406-4a35-be7b-95ce2b1e7092"> 
+				<!--<step level="step_1_4_4">-->  
+				<title>Coupling links.</title>  
+				<description><![CDATA[  
+					<p>IBM z13 introduced new PCIe (Integrated Coupling Adapter - ICA SR) based Short Reach coupling links using a new CHPID type, CS5. ICA-SR links can only connect z13 and z13s CPCs to other z13 and z13s CPCs.</p>  
+					<p>IBM z13 and z13s CPC now support up to 256 links. A single z/OS or a CF Image supports a maximum of 128 links. When displaying STP (DISPLAY ETR) from a z/OS image, information is provided for the entire CPC. If more than 128 links are defined, the z/OS support must be installed on all z/OS releases running on that CPC, so that information about more than 128 links, including STP timing information, can be displayed.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-57a797fb-ea03-4788-907d-f1928971524f"> 
+				<!--<step level="step_1_4_5">-->  
+				<title>SIMD.</title>  
+				<description><![CDATA[  
+					<p>z/OS V2R1 (and later) is designed to support the new vector extension facility (Single Instruction Multiple Data, SIMD) instructions available on IBM z13 servers. SIMD provides a powerful framework for development of new Business Analytics workloads, porting math-intensive workloads from other platforms, and accelerating Business Analytics workloads on IBM z13 and z13s servers. High Data Intensity, High Computational Intensity, Predictive IT Analytics, Advanced Security/Crypto, BI Reporting, Perspective Analytics, and Next-Generation Data Warehousing are some of the workloads that may benefit from Data Parallelism (SIMD). z/OS support includes enablement of Vector Registers (VR) on IBM z13 and z13s servers, Mathematical Acceleration Subsystem (MASS), and Automatically Tuned Linear Algebra Software (ATLAS) support, as well as Language Environment enablement for C runtime functions.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-c5116388-cd86-4af9-9ab9-389326632c84"> 
+				<!--<step level="step_1_4_6">-->  
+				<title>Cryptographic Enhancements</title>  
+				<description><![CDATA[  
+					<p>Cryptographic enhancements for z/OS V2R1 (and later) on z13 servers include:</p>  
+					<ul> 
+						<li> 
+							<p>VISA Format Preserving Encryption (VFPE). Support for VFPE algorithms in CCA-based callable services helps legacy databases to contain encrypted data of sensitive fields without having to restructure the database or applications. This support relies on the Crypto Express5S coprocessor.</p> 
+						</li>  
+						<li> 
+							<p>Greater than 16 Domain support. This support allows a cryptographic coprocessor to be shared across more than 16 domains, up to the maximum number of LPARs on the system. This support relies on enhanced firmware available with a minimum microcode level for the Crypto Express5S coprocessor.</p> 
+						</li>  
+						<li> 
+							<p>Trusted Key Entry (TKE) 8.0 Licensed Internal Code (LIC). This support includes Crypto Express5S Coprocessor support, FIPS Certified Smart Card, Crypto Coprocessors with more than 16 domains, a full-function migration wizard for EP11 coprocessors, new master key management functions, a Smart Card Readers Available indicator, a Configure Displayed Hash Size utility, ECC Authority Signature Keys, print capability, new features in the Crypto Node Management (CNM) utility, ENC-Zero verification pattern for 24-byte DES operational keys, and usability enhancements.</p> 
+						</li> 
+					</ul>  
+					<p>See 
+						<strong>Decide on the steps you will take for your migration to a z13 server</strong> in 
+						<a href="e0z3m11228.htm#z13bef21">Actions you can take before you order a z13 or z13s server</a> 
+					</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-2abb8a07-632f-4282-a911-64b3fa81f3a9"> 
+				<!--<step level="step_1_4_7">-->  
+				<title>IBM zAware system</title>  
+				<description><![CDATA[  
+					<p>The IBM zAware feature is designed to offer a near real-time, continuous learning, and diagnostics capability intended to help you pinpoint and resolve potential problems quickly enough to minimize impacts to your business. The new version of IBM zAware introduces a new generation of technology with improved analytics to provide better results. After you order a z13 or z13s server, you can prepare to set up an IBM zAware environment by defining the IBM zAware logical partition, defining and using OPERLOG log streams, and network definitions to connect the z/OS LPAR to the zAware LPAR. For more information, see 
+						<cite>IBM System z Advanced Workload Analysis Reporter (IBM zAware) Guide</cite>, (SC27-2623), and 
+						<cite>z/OS MVS Setting Up a Sysplex</cite>.
+					</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-8a383265-c71c-445d-bbba-036e1988370a"> 
+				<!--<step level="step_1_4_8">-->  
+				<title>Java™ exploitation</title>  
+				<description><![CDATA[  
+					<p>This support is added by:</p>  
+					<ul> 
+						<li> 
+							<p>IBM 31-bit SDK for z/OS, Java Technology Edition, Version 8 (5655-DGG)</p> 
+						</li>  
+						<li> 
+							<p>IBM 64-bit SDK for z/OS, Java Technology Edition, Version 8 (5655-DGH)</p> 
+						</li> 
+					</ul> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-5afab7fd-3095-42a8-96de-f19b92c3a289"> 
+				<!--<step level="step_1_4_9">-->  
+				<title>Flash Express</title>  
+				<description><![CDATA[  
+					<p>With this support, z/OS is designed to help improve system availability and responsiveness by using Flash Express across transitional workload events such as market openings, and diagnostic data collection. z/OS is also designed to help improve processor performance by supporting middleware exploitation of pageable large (1 MB) pages. This support requires the Flash Express hardware feature.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-a97784bf-f218-46bf-8e47-331686b51411"> 
+				<!--<step level="step_1_4_10">-->  
+				<title>2GB Large Page support</title>  
+				<description><![CDATA[  
+					<p>This support includes support for 2 GB large fixed pages.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-2f1eaf05-7cd8-422f-8e06-349c2ce5c38b"> 
+				<!--<step level="step_1_4_11">-->  
+				<title>New z/Architecture instructions: XL C/C++ ARCH(11) and TUNE(11) parameters</title>  
+				<description><![CDATA[  
+					<p>This function provides new hardware instruction support, including support for the vector facility, the decimal floating point packed conversion facility, and numerous performance improvements (machine model scheduling and code generation updates). Single Instruction Multiple Data (SIMD) instruction set and execution support is provided through the new vector support in the compiler, including Business Analytics vector processing through the MASS and ATLAS libraries. Unlike prior generations of servers, to use any of these functions on z/OS V2R1, you must download and install the XL C/C++ V2R1M1 web deliverable with z13 support for z/OS 2.1.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-181b22f9-b40a-4743-940a-6c19d5cac84f"> 
+				<!--<step level="step_1_4_12">-->  
+				<title>FICON Express16S</title>  
+				<description><![CDATA[  
+					<p>FICON Express16S supports a link data rate of 16 gigabits per second (GBPS) and auto-negotiation to 4 or 8 GBPS for synergy with existing switches, directors, and storage devices. With support for native FICON, High Performance FICON for System z (zHPF), and Fibre Channel Protocol (FCP), the new FICON Express16S channel is designed to work with your existing fiber optic cabling environment. The FICON Express16S feature running at end-to-end 16 GBPS link speeds provides reduced latency for large read/write operations, and increased bandwidth compared to the FICON Express8S feature.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-b0eb84d3-5b00-42d8-8835-a3d92b6a13b8"> 
+				<!--<step level="step_1_4_13">-->  
+				<title>FICON Dynamic Routing</title>  
+				<description><![CDATA[  
+					<p>With z13, FICON channels are no longer restricted to the use of static Storage Area Network (SAN) routing policies for Inter-Switch Links (ISLs) for cascaded FICON directors. You need to ensure that all devices in your FICON SAN support FICON Dynamic Routing before implementing this feature.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-9bd5e5f3-92eb-4836-a555-34b380ae1f7f"> 
+				<!--<step level="step_1_4_14">-->  
+				<title>Improved High Performance FICON for System z (zHPF) I/O Execution at Distance</title>  
+				<description><![CDATA[  
+					<p>High Performance FICON for System z (zHPF) has been enhanced to allow all large write operations (&gt; 64 KB) at distances up to 100 km to be executed in a single return trip to the control unit, thereby not elongating the I/O service time for these write operations at extended distances.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-0dd34c1a-a1d4-4cf5-bee0-d7dfb90d88ae"> 
+				<!--<step level="step_1_4_15">-->  
+				<title>Improved Channel Subsystem (CSS) Scalability</title>  
+				<description><![CDATA[  
+					<p>The IBM z Systems servers have improved the channel subsystem (CSS) scalability, as follows:</p>  
+					<ul> 
+						<li> 
+							<p>The z13 server improves CSS scalability with support for six logical channel subsystems (LCSSs), which are required to support the 85 LPARs for z13, four subchannel sets (to support more devices per logical channel subsystem), and 32K devices per FICON channel, up from 24K channels in the previous generation. Additionally, a fourth subchannel set for each LCSS is provided to facilitate elimination of single points of failure for storage after a disk failure.</p> 
+						</li>  
+						<li> 
+							<p>The z13s server improves CSS scalability with support for three logical channel subsystems (LCSSs) which are required to support the 40 LPARs for IBM z13s, three subchannel sets (to support more devices per logical channel subsystem), and 32K devices per FICON channel up from 24K channels in the previous generation. Additionally, a third subchannel set for each logical channel subsystem (LCSS) is provided to facilitate elimination of single points of failure for disk storage devices.</p> 
+						</li> 
+					</ul> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-9e007794-be94-4c44-b3fd-57ccfc6889dc"> 
+				<!--<step level="step_1_4_16">-->  
+				<title>PCIe and HCD Definitions.</title>  
+				<description><![CDATA[  
+					<p>z/OS V2R1, and z/OS V2R1 HCD (FMID HCS7790) support full exploitation for z13 and z13s processors ( types 2964 and 2965) with support for up to 6 channel subsystems and 4 subchannel sets. To support PCIe functions for systems that are running on zEC12, zBC12, z13, or z13s servers, HCD introduced a new dialog for defining PCIe functions and assigning the functions to LPARs.</p>  
+					<p>z/OS V1R13 HCD (HCS7780) supports limited exploitation for z13 and z13s servers ( types 2964 and 2965). For PCIE functions, it is possible to define complete types 2964 and 2965 servers, including PCIe functions and the new channel types and capabilities. However, a processor configuration can be dynamically changed or activated only if it contains neither PCIe function nor a PNETID attribute. For a software activation with hardware validation, PCIe functions and the PNETID attribute are ignored.</p>  
+					<p>IBM recommends that you define and activate all the new hardware definitions on a z/OS V2R2 system, or on a V2R1 system with the appropriate HCD PTF (APAR OA44294) installed and perform software activations (with hardware validation) only on lower-level systems.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-d296c376-0cdd-4559-a7ee-1c61da13134b"> 
+				<!--<step level="step_1_4_17">-->  
+				<title>Consider the changes in the CPU Measurement Facility counters.</title>  
+				<description><![CDATA[  
+					<p>The number of CPU measurement facility counters for z13 and z13s servers remains at 128. Though the structure of the SMF 113 record does not change, the values, interpretations, and frequency of certain sections do change; therefore, current tools that use the data must be updated for the z13 and z13s servers.</p>  
+					<p>For example, consider the following SMF record field:</p>  
+					<ul> 
+						<li> 
+							<p>SMF113_2_CtrVN2 identifies how to interpret the MT-Diagnostic, Crypto, and Extended Counter Sets. As described in 
+								<cite>The IBM CPU Measurement Facility Extended Counters Definition for z10 and z196</cite>, SA23-2260, this field is set to 1 (for z10), 2 (for z196 or z114), 3 (for zEC12 and zBC12), or 4 (for z13 and z13s).
+							</p> 
+						</li> 
+					</ul> Note: As of z/OS V2R1, if you use the CPU Measurement Facility, IBM recommends that your installation collect SMF 113 subtype 1 and 2 records. IBM also recommends that products process SMF 113 subtype 1 records when available because that is where future enhancements will be made. If subtype 1 records are not available, products can process subtype 2 records.
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step> 
+		</step>  
+		<step name="id-a69ff5b2-f4c9-468d-8dbe-287381bc63fa"> 
+			<!--<step level="step_1_5">-->  
+			<title>Accommodate functions for the z13 server or z13s to be discontinued on future servers</title>  
+			<description><![CDATA[ Note: IBM's statements regarding its plans, directions, and intent are subject to change or withdrawal without notice at IBM's sole discretion. Information regarding potential future products is intended to outline our general product direction and it should not be relied on in making a purchasing decision. The information mentioned regarding potential future products is not a commitment, promise, or legal obligation to deliver any material, code, or functionality. Information about potential future products may not be incorporated into any contract. The development, release, and timing of any future features or functionality described for our products remains at our sole discretion. 
+				<h6>Description</h6>  
+				<p>The following changes in hardware support could affect your environment. Make the appropriate changes, as needed.</p> 
+			]]></description>  
+			<step name="id-5ddbf4e4-8901-4840-97f7-b90bbd67a31c"> 
+				<!--<step level="step_1_5_1">-->  
+				<title>Removal of support for running an operating system in ESA/390 architecture mode.</title>  
+				<description><![CDATA[  
+					<p>The z13 and z13s 
+						<sup>TM</sup> are the last z Systems servers to support running in ESA/390 mode. All future systems will only support operating systems running in z/Architecture mode. However, all 24-bit and 31-bit problem-state application programs originally written to run on the ESA/390 architecture will be unaffected by this change.
+					</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-f405d1de-fceb-4574-82a0-481c705d7b4e"> 
+				<!--<step level="step_1_5_2">-->  
+				<title>Removal of support for Classic Style User Interface on the Hardware Management Console and Support</title>  
+				<description><![CDATA[  
+					<p>The z13 and z13s are the last z Systems servers to support Classic Style User Interface. In the future, user interface enhancements will be focused on the Tree Style User Interface.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-7b61c8fe-429a-4254-bd66-27460aaed447"> 
+				<!--<step level="step_1_5_3">-->  
+				<title>Removal of support for the Hardware Management Console Common Infrastructure Model (CIM) Management</title>  
+				<description><![CDATA[  
+					<p>The z13 and z13s are the last z Systems servers to support the Hardware Console Common Infrastructure module (CIM) Management Interface. The Hardware Management Console Simple Network Management Protocol (SNMP), and Web Services Application Programming Interfaces (APIs) will continue to be supported.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-7d3f5a39-a24f-42fa-92f8-454f4b8ccc96"> 
+				<!--<step level="step_1_5_4">-->  
+				<title>Removal of FICON Express8 support.</title>  
+				<description><![CDATA[  
+					<p>The z13 and z13s are the last z Systems servers to support FICON Express8. You should begin migrating from FICON Express8 channel features (#3325, #3326) to FICON Express16S channel features (#0418, #0419). FICON Express8 will not be supported on future high-end z Systems servers as carry forward on an upgrade.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-28234305-8d23-414c-a700-41e1545096a7"> 
+				<!--<step level="step_1_5_5">-->  
+				<title>Removal of support for ordering FICON Express8S channel features.</title>  
+				<description><![CDATA[  
+					<p>Enterprises that have 2GB device connectivity requirements must carry forward these channels.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-d0d0389f-a059-46da-8cf9-a2dcdc3be510"> 
+				<!--<step level="step_1_5_6">-->  
+				<title>Removal of an option for the way shared logical processors are managed under PR/SM™ LPAR.</title>  
+				<description><![CDATA[  
+					<p>The z13 and z13s are the last z Systems servers to support selection of the option "Do not end the timeslice if a partition enters a wait state" when the option to set a processor run-time value has been previously selected in the CPC RESET profile. The CPC RESET profile applies to all shared logical partitions on the machine, and is not selectable by logical partition.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step>  
+			<step name="id-e559c498-b325-4bde-aa62-f2b8f1d11437"> 
+				<!--<step level="step_1_5_7">-->  
+				<title>Removal of support for configuring OSN CHPID types.</title>  
+				<description><![CDATA[  
+					<p>OSN CHPIDs are used to communicate between an operating system instance running in one logical partition and the Communications Controller for Linux (CCL) product in another logical partition on the same CPC. See announcement letter #914-227 dated 12/02/2014 for details regarding withdrawal from marketing for the CCL product.</p> 
+				]]></description>  
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>  
+				<weight>10</weight> 
+			</step> 
+		</step> 
+	</step>
+	<step name="id-5dc11753-4f5d-457f-b6ed-04c03d294a2d"> 
+		<title>Provide feedback to IBM on your migration experience</title>  
+		<description><![CDATA[ IBM would like your feedback on your migration experience]]></description>  
+		<variableValue name="HelpfulOv"/>  
+		<variableValue name="ExperOv"/>  
+		<variableValue name="CommentOv"/>  
+		<variableValue name="ContactInfo"/>  
+		<variableValue name="TargetFile"/>  
+		<instructions substitution="false">In this example step, you create a migration feedback file, based on the values that were entered previously. This step is optional. You may edit the file as you wish after it has been produced. You may re-produce the file, if you change your feedback answers. Once you would like to send it to IBM, attach the file in an email and sent it to zosmig@us.ibm.com. As you can see in the produced feedback file, only the information you wish to provide will be seen by IBM. No other information will be gathered. Thank you for providing your feedback to IBM.</instructions>  
+		<weight>10</weight>  
+		<skills>System Programmer</skills>  
+		<template> 
+			<fileTemplate substitution="true">z13_migration_feedback_gather.txt</fileTemplate>  
+			<saveAsUnixFile substitution="true">${instance-TargetFile}z13_migration_feedback.txt</saveAsUnixFile> 
+		</template> 
+	</step>
+</workflow>
