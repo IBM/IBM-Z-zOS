@@ -16,8 +16,7 @@ Using a z/OSMF workflow, you can perform a z/OS V2R4 upgrade as an interactive, 
  
 In order to use the z/OSMF Upgrade Workflow, you will need z/OSMF up and running, and Workflow access.  The "z/OS Migration" book is not
 available for z/OS V2.4.  Although z/OSMF is the strongly encouraged method to consume the z/OS V2.4 upgrade materials, we have provided
-an exported file of the contents of both the V2.3 and the V2.2 in HTML format.  You can find those exported formats on z/OS V2.4 Knowledge
-Center.  The exported format is suitable for browsing, printing, and searching.
+an exported file of the contents of both the V2.3 and the V2.2 in HTML format.  You can find links to those exported formats on z/OS V2.4 Knowledge Center at the bottom of this web page [here](https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zos.v2r4.e0zm100/abstract.htm).  The exported format is suitable for browsing, printing, and searching.
 
 **Want to see a demo?**
 
