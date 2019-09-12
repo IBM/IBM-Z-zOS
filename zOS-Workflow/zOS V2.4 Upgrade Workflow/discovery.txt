@@ -65,6 +65,7 @@
 /* ----  ------  ---------  ---------------------------------------- */
 /*  N/A  KMILLER 06/03/15   Initial Version                          */
 /*  1703 BLAND   03/20/17   Validate Program number first            */
+/*  N/A  WALLEN	 08/09/19   Update for the z15 hardware              */
 /*********************************************************************/
 /*                                                                   */
 /*********************************************************************/
@@ -574,6 +575,7 @@ CHECK_HARDWARE_LEVEL:
   z12_status = "z12_status     = Enabled"
   z13_status = "z13_status     = Enabled"
   z14_status = "z14_status     = Enabled"
+  z15_status = "z15_status     = Enabled"
 
   hardchoice = '$instance-hardware_status'
   if hardchoice = 'Yes' then do
@@ -592,6 +594,7 @@ CHECK_HARDWARE_LEVEL:
       z12_status = "z12_status     = Disabled"
       z13_status = "z13_status     = Enabled"
       z14_status = "z14_status     = Enabled"
+      z15_status = "z15_status     = Enabled"
     end
     else if POS(MODEL,"2964 2965") <> 0 then do
       say "-------------------------------"
@@ -600,6 +603,7 @@ CHECK_HARDWARE_LEVEL:
       z12_status = "z12_status     = Disabled"
       z13_status = "z13_status     = Disabled"
       z14_status = "z14_status     = Enabled"
+      z15_status = "z15_status     = Enabled"
     end
     else if POS(MODEL,"3906 3907") <> 0 then do
       say "-------------------------------"
@@ -608,15 +612,25 @@ CHECK_HARDWARE_LEVEL:
       z12_status = "z12_status     = Disabled"
       z13_status = "z13_status     = Disabled"
       z14_status = "z14_status     = Disabled"
+      z15_status = "z15_status     = Enabled"
+    end
+    else if POS(MODEL,"8561") <> 0 then do
+      say "-------------------------------"
+      say "System was detected to be a z15"
+      say "-------------------------------"
+      z12_status = "z12_status     = Disabled"
+      z13_status = "z13_status     = Disabled"
+      z14_status = "z14_status     = Disabled"
+      z15_status = "z15_status     = Disabled"
     end
     else do
-      say "------------------------------------------------"
-      say "System is an earlier version (not z12, z13, z14)"
-      say "------------------------------------------------"
+      say "-----------------------------------------------------"
+      say "System is an earlier version (not z12, z13, z14, z15)"
+      say "-----------------------------------------------------"
     end
     say;say
     n = 2
-    do i = 1 to 3
+    do i = 1 to 4    /* Increase by one with next level of hardware */
       wcnt = writedata.0
       wcnt = wcnt + 1
       writedata.wcnt = space(value("z1"n"_status"))
@@ -629,7 +643,7 @@ CHECK_HARDWARE_LEVEL:
     say " No steps will be SKIPPED based off the hardware level."
     say
     n = 2
-    do i = 1 to 3
+    do i = 1 to 4     /* Increase by one with next level of hardware */
       wcnt = writedata.0
       wcnt = wcnt + 1
       writedata.wcnt = space(value("z1"n"_status"))
