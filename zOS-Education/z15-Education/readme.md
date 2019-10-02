@@ -7,10 +7,6 @@ IBM Education Assistant is a collection of modules to help you better use IBM pr
 
 The modules are intended to provide information about using a specific function. Though they do not replace the product publications, these modules can help you understand the value, configuration effort, and impacts of a particular function.
 
-Modules are provided for the following:
-
-* [z15](z15-Education)
-
 Your feedback is welcome. 
 
 Though the materials provided herein are not supported by the IBM Service organization, your comments are welcomed by the developers, who reserve the right to revise or remove the materials at any time. To report a problem, or provide suggestions or comments, contact zosmig@us.ibm.com.  
