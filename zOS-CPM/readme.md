@@ -8,32 +8,15 @@ Capacity Provisioning is designed to simplify the management of temporary capaci
 
 Capacity Provisioning can help you to manage processor capacity on IBM System z10 or later when a suitable On/Off Capacity on Demand record is available. Capacity Provisioning allows you to change the activation level of that On/Off CoD record with respect to general purpose capacity, and the number of zAAP or zIIP processors. Capacity Provisioning can also help you to manage Defined Capacity on IBM System z10 or later and LPARs with defined capacity, or IBM System z196 or later and LPARs with group capacity.
 
-For general purpose capacity on subcapacity models CPM differentiates between „speed“ demand for higher capacity levels, and “unqualified” demand that could be satisfied by a capacity level increase as well as by additional processors.
-
-Optionally, CPM can recommend to adjust the amount of logical processors of a monitored system.
+For general purpose capacity on subcapacity models it differentiates between „speed“ demand for higher capacity levels, and “unqualified” demand that could be satisfied by a capacity level increase as well as by additional processors.
 
 CPM differentiates between different types of Provisioning Requests:
 
     Manually through commands (SE/HMC actions still possible, of course)
     Scheduled (time condition only)
-    Conditional (based on workload condition or CPC-wide utilization condition).
+    Conditional (based on workload or utilization condition)
 
-Manual commands allow the adjustment of temporary capacity available on an On/Off Capacity on Demand record, for processor types:
-
-    General purpose
-    zAAP
-    zIIP
-    IFL
-    ICF
-    SAP.
-
-as well as the adjustment of:
-
-    Defined LPAR Capacity
-    Defined Group Capacity
-    Initial LPAR weights for processor types General purpose, zIIP or IFL.
-    
-The official CPM documentation can be found [here](https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zos.v2r4.ieau100/ieauch1.htm).
+The official CPM documentation can be found [here](https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieau100/ieauch1.htm)
 
 This repository contains CPM  resources that might be useful to the z/OS community. Here you will find items of interest about new functions in z/OS CPM.
 
