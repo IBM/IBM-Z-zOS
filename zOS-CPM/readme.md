@@ -33,7 +33,7 @@ as well as the adjustment of:
     Defined Group Capacity
     Initial LPAR weights for processor types General purpose, zIIP or IFL.
     
-The official CPM documentation can be found [here](https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zos.v2r4.ieau100/ieauch1.htm)
+The official CPM documentation can be found [here](https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zos.v2r4.ieau100/ieauch1.htm).
 
 This repository contains CPM  resources that might be useful to the z/OS community. Here you will find items of interest about new functions in z/OS CPM.
 
