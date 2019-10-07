@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../workflow/schemas/workflow_v1.xsd">                          
+		  
+	<workflowInfo>
+		<workflowID>zEDC Setup Workflow</workflowID>
+		<workflowDescription>Workflow for setting up zEDC on z/OS</workflowDescription>
+		<workflowVersion>1.0</workflowVersion>
+		<vendor>IBM</vendor>
+		<Configuration>
+			<productID>xxxxxx</productID>
+			<productName>z/OS</productName>
+			<productVersion>V2R1</productVersion>
+		</Configuration>
+	</workflowInfo>
+
+	<step name="Step1">
+		<title>Configure a zEDC Express Adapter</title>
+		<description>These steps will</description>
+		<step name="subStep1_1">
+			<title>IODF Updates</title>
+			<description>
+				Starting with processor type 2827, Peripheral Component Interconnect Express
+				(PCIe) adapters attached to a system can provide the operating system with a
+				variety of so-called PCIe functions to be exploited by entitled logical partitions(LPARs).
+			</description>
+
+			<step name="subStep1_1_1">
+				<title>IODF Configuration Changes</title>
+				<description>
+					Update the IODF for zEDC Express devices
+				</description>
+				<instructions>
+					<ol>
+					<li>On the Primary Task Selection panel, select Define, modify, or view
+					configuration data and on the resulting panel, select Processors. HCD displays
+					the Processor List of defined processors.<br/></li>
+					
+					<li>On the Processor List panel, select an eligible processor and action Work with
+					PCIe functions from the context menu (or action code F). HCD displays the PCIe Function List
+					showing all PCIe functions defined for the selected processor.<br/>
+					
+					A PCIe function is defined by a unique identifier, the function ID (FID). Each function specifies 
+					a function type (<code>ROCE</code> or <code>ZEDC-EXPRESS</code>) and a physical channel identifier PCHID. Multiple functions may be specified to the same
+					PCHID value provided that each of these functions defines a unique virtual function (VF)
+					number. When defining a PCIe function, you may specify a description which is shown in this list.
+					Use PF20=Right to scroll to the partition assignments for the displayed PCIe functions, one panel for each defined channel subsystem.<br/></li>
+					
+					<li>Use F11=Add to define a new PCIe function.<br/>
+					
+					You define a new PCIe function specified by its required function ID, function
+					type and PCHID value, the virtual function number (if possible for the
+					specified function type), and a description. After pressing the Enter key, the
+					LPARs can be selected that should be entitled to access the function. If you
+					specified an Add-like action, the data entry fields, except the function ID, and
+					the LPAR connections are preset with the values of the selected source function.<br/><br/>
+					
+					Each PCIe function is identified by a three-digit hexadecimal function ID that is
+					unique within a processor configuration. You must specify a function type
+					(ROCE or ZEDC-EXPRESS), and a PCHID value which describes the related
+					PCIe adapter card in the assigned slot of the I/O drawer. Depending on the
+					function type, multiple PCIe functions may be defined for the same PCHID by
+					assigning a unique virtual function number to each of these functions.
+					HCD also supports overgenned PCIe functions. You define overgenned PCIe
+					functions by providing an asterisk (*) for the PCHID value. Overgenned
+					functions are validated like other PCIe functions but they are excluded from the
+					IOCP input statements and from dynamic activation<br/></li>
+					</ol>
+				</instructions>
+				<weight>1</weight>
+			</step>
+			
+			<step name="subStep1_1_2">
+				<title>Perform Dynamic Activate</title>
+				<description>Activate the new IODF</description>
+				<prereqStep name="subStep1_1_1"/>
+				<instructions>
+					Activate the new IODF with zEDC Express devices defined.
+				</instructions>
+				<weight>1</weight>
+			</step>
+		</step>
+		<step name="subStep1_2">
+			<title>Confirm zEDC Express is active</title>
+			<description>Use z/OS displays to confirm zEDC Express is available</description>
+			<instructions>
+			Use the 'D PCIE' and 'D PCIE,PFID=xxxx' command to verify that the zEDC Express
+			devices are available to z/OS.
+			</instructions>
+			<weight>1</weight>
+		</step>
+	</step>
+
+	<step name="Step2">
+		<title>Update an Application to use zEDC enabled zlib</title>
+		<description>
+			The zlib data compression library provides in-memory compression and
+			decompression functions, including integrity checks of the uncompressed data. A
+			modified version of the zlib compression library is used by zEDC. The
+			IBM-provided zlib compatible C library provides a set of wrapper functions that
+			use zEDC compression when appropriate and when zEDC is not appropriate,
+			software-based compression services are used.
+		</description>
+		<prereqStep name="Step1"/> 
+		<step name="subStep1">
+			<title>Re-link applications</title>
+			<description></description>
+			<instructions>
+				Link or re-link applications to use the IBM-provided zlib.
+				The IBM-provided zlib is an archive file in the z/OS UNIX System Services file
+				system and can be statically linked into your applications. The paths for the
+				zlib archive file and the zlib header files are:
+
+				Path for the zlib archive file: /usr/lpp/hzc/lib/libzz.a
+
+				Path for the zlib header files: /usr/lpp/hzc/include/
+
+				Note: When a new IBM service is provided for zlib, all applications that
+				statically link zlib must re-link in order to use the updated IBM-provided zlib
+				and take advantage of the new function
+			</instructions>
+			<weight>1</weight>
+		</step>
+		<step name="subStep2">
+			<title>Provide System Authorization Facility (SAF) Access</title>
+			<description></description>
+			<instructions>
+				Access to zEDC is protected by the SAF FACILITY resource class:
+					FPZ.ACCELERATOR.COMPRESSION.
+
+				Give READ access to FPZ.ACCELERATOR.COMPRESSION to the identity of
+				the address space(s) that the zlib task will run in.
+			</instructions>
+			<weight>1</weight>
+		</step>
+		<step name="subStep3">
+			<title>Verify application input buffer sizes</title>
+			<description></description>
+			<instructions>
+				Ensure that adequately sized input buffers are available. If the input buffer size
+				falls below the minimum threshold, data compression occurs using zlib
+				software compression and not zEDC. This threshold can be controlled at a
+				system level using the PARMLIB member IQPPRMxx.
+			</instructions>
+			<weight>1</weight>
+		</step>
+		<step name="subStep4">
+			<title>Adjust Pre-allocated Buffer sizes</title>
+			<description></description>
+			<instructions>
+				Allocate the correct amount of storage for I/O buffers. The zEDC requests
+				generated by zlib use predefined I/O buffer pools. The size of these I/O buffer
+				pools can be set using PARMLIB member IQPPRMxx.
+			</instructions>
+			<weight>1</weight>
+		</step>
+		<step name="subStep6" optional="true">
+			<title>Disable zEDC for an application</title>
+			<description></description>
+			<instructions>
+				Use the z/OS UNIX environmental variable, _HZC_COMPRESSION_METHOD, to control if zEDC is used for data
+				compression.
+
+				Note: If the value of software is set, software-based compression services are
+				used. All other values result in the default behaviour of attempting to use zEDC
+				for data compression.
+			</instructions>
+			<weight>1</weight>
+		</step>
+	</step>
+
+	<step name="Step3">
+		<title>Enable SMF Compression</title>
+		<description>
+			With z/OS V2R1 SMF was updated to support using zEDC to compress SMF records 
+			that are stored in a logstream
+		</description>
+		<prereqStep name="Step1"/> 
+		
+		<step name="subStep3_1">
+			<title>Update SMFPRMxx</title>
+			<description></description>
+			<instructions>
+				LSNAME(logstreamname,TYPE({aa,bb}|{aa,bb:zz}|{aa,bb:zz,...}),NOBUFFS(MSG|HALT),
+					BUFUSEWARN(nn),DSPSIZMAX(nnnnM|nG),COMPRESS(PERMFIX(nnnnM)))
+					
+				or
+				
+				DEFAULTLSNAME(logstreamname,NOBUFFS(MSG|HALT),BUFUSEWARN(nn),
+					DSPSIZMAX(nnnnM|nG),COMPRESS(PERMFIX(nnnnM)))
+					
+					The PERMFIX parameter specifies the default amount of storage SMF can keep
+					permanently fixed for each log stream for purposes of communicating with the
+					zEDC Express feature. Storage used by the zEDC Express feature must be page
+					fixed; however, fixed pages are a constrained resource. Increasing this number can
+					improve performance of SMF, but decrease the fixed storage available to the other
+					applications. Decreasing this number can increase the fixed storage available to
+					other applications, but may degrade SMF performance. PERMFIX can range from a
+					minimum of 1M to a maximum of 2GB. The default value is NOPERMFIX. Due to
+					processing needs, even if this value is NOPERMFIX, SMF may use up to 2MB of
+					fixed storage for zEDC usage.
+			</instructions>
+			<weight>1</weight>
+		</step>
+		
+		<step name="subStep3_2">
+			<title>Review IFASMFDL Procedure</title>
+			<description></description>
+			<instructions>
+				When reading SMF records from a log stream that has been compressed with
+				zEDC, IBM recommends that you run the IFASMFDL utility on a system running
+				with z/OS V2R1 or higher that has access to a zEDC Express feature. If the
+				IFASMFDL utility is run with the default NOSOFTINFLATE option and the system
+				does not currently have access to a zEDC Express feature, IFASMFDL halts
+				processing log streams containing zEDC compressed SMF records and generates a
+				return code of 4. When SOFTINFLATE is specified, the IFASMFDL utility uses
+				software decompression to read the records when hardware is unavailable. Note
+				that the SOFTINFLATE option may cause the IFASMFDL utility to use additional
+				time and CPU resources.
+			</instructions>
+			<weight>1</weight>
+		</step>
+		
+		<step name="subStep3_x" optional="true">
+			<title>Verify with SMF23 Records</title>
+			<description></description>
+			<instructions>
+				The SMF23 record was updated to provide new information for SMF logstreams that
+				are using zEDC for compression
+			</instructions>
+			<weight>1</weight>
+		</step>
+
+	</step>
+
+</workflow>
