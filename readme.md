@@ -13,12 +13,6 @@ The following major categories are used:
 
 * [SMF Tools](SMF-Tools)
 
-* [zOS Print](zOS-Print)
-
-* [zOS RMF](zOS-RMF)
-
-* [zOS WLM](zOS-WLM)
-
 * [zOS Automation](zOS-Automation)
 
 * [zOS CPM](zOS-CPM)
@@ -26,6 +20,16 @@ The following major categories are used:
 * [zOS HCD HCM](zOS-HCD_HCM)
 
 * [zOS Health Checks](zOS-HealthChecks)
+
+* [zOS Print](zOS-Print)
+
+* [zOS RACF](zOS-RACF)
+
+* [zOS RMF](zOS-RMF)
+
+* [zOS WLM](zOS-WLM)
+
+* [zOSMF](zOSMF)
 
 
 There are no warranties of any kind, and there is no service or technical support available for these materials from IBM®. As a recommended practice, review carefully any materials that you download from this site before using them on a live system.
