@@ -12,6 +12,10 @@ Upgrade Workflow to see both the hardware and z/OS software upgrade actions in a
 
 You can provide feedback to IBM for any of the steps in the workflow, if you wish.
 
+**Exported worfklow link**
+
+You can find a link to z15 exported workflow on z/OS V2.4 Knowledge Center [AT THE BOTTOM OF THIS WEB PAGE](https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zos.v2r4.e0zm100/abstract.htm).  The exported format is suitable for browsing, printing, and searching.
+
 **What's new**
 
 The IBM z/OS z15 Workflow is updated with new information for the IBM z15 (type 8561). The z15 is the newest addition to the 
