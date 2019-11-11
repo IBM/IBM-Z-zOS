@@ -1,7 +1,7 @@
 Downloads for the z/OS platform
 ===============================
 
-This repository contains sample programs and other resources that might be useful to the z/OS® community. Here you will find tools for exploring the various capabilities of z/OS. Perhaps, you might even share in the development of a community resource.
+This repository contains sample programs and other resources that might be useful to the [z/OS® operating system](https://www.ibm.com/it-infrastructure/z/zos) community. Here you will find tools for exploring the various capabilities of z/OS. Perhaps, you might even share in the development of a community resource.
 
 The materials in this repository are organized by type and release level.
 
