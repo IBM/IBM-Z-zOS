@@ -25,12 +25,12 @@ You may specify either `COPY` or `DELETE` or both.  If you specify both they mus
 * `CENTURY`: A 4-digit year will appear in the output records. The DLOGLINE mapping will be used to map the JES3 DLOG format output records.
 
 An optional DD - JES3IN - can be used in the JCL to allow for a more customized format.  (It is assumed that the customer will use the same set of processors in JES2 as were used in JES3.)  Two JES3 Initialization statements are supported:
-* MAINPROC
-* MSGROUTE
+* `MAINPROC`
+* `MSGROUTE`
 
 Other statements, if provided, are ignored.  No error messages for extranous statements or syntax errors found are issued.
 
-The MAINPROC is used to extract the format of the Receive id for each processor defined in the configuration. The MSGROUTE is used to determine what JES3 Destination code and/or console name should be displayed on the output line based on the routing code. If neither statement is provided, the receive id will be the same as system name.  The routing code will be used to display the JES3 Destination class with no further changes.
+The `MAINPROC` is used to extract the format of the Receive id for each processor defined in the configuration. The `MSGROUTE` is used to determine what JES3 Destination code and/or console name should be displayed on the output line based on the routing code. If neither statement is provided, the receive id will be the same as system name.  The routing code will be used to display the JES3 Destination class with no further changes.
 
 ## Warnings
 When copying records, this program detects the end of a day's records when it either reads the first record for the next day or attempts to read past the newest record in the log stream.  This means that, if `end_date` is today and the log stream is being written at the time this program runs, the records that are copied may not be predictable.  In particular, if both `COPY` with an ending date of today and `DELETE` with a date of today are specified, there may be more records deleted than copied.
@@ -51,7 +51,7 @@ Records could be missing based on prior activities. In these cases, a message wi
 2. If `DELETE` was specified, get delete date.
 3. If `HCFORMAT` was specified, set the appropriate flags to indicate if `HCFORMAT(YEAR)` or `HCFORMAT(CENTURY)` was
 specified.
-4. Open the JES3IN DD, if present, and parse the MAINPROC and MSGROUTE initialization statements.  Build tables to be used during output formatting.
+4. Open the JES3IN DD, if present, and parse the `MAINPROC` and `MSGROUTE` initialization statements.  Build tables to be used during output formatting.
 5. Obtain a buffer area for logger record and set up its base
 6. Connect to the log stream
 #### Copy
