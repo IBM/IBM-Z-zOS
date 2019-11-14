@@ -1,0 +1,1131 @@
+ /* REXX */                                                                     
+ /**********************************************************************/       
+ /* SMF type 113 Formatter                                             */       
+ /*                                                                    */       
+ /**********************************************************************/       
+ /* Copyright 2019 IBM Corp.                                           */       
+ /*                                                                    */       
+ /* Licensed under the Apache License, Version 2.0 (the "License");    */       
+ /* you may not use this file except in compliance with the License.   */       
+ /* You may obtain a copy of the License at                            */       
+ /*                                                                    */       
+ /* http://www.apache.org/licenses/LICENSE-2.0                         */       
+ /*                                                                    */       
+ /* Unless required by applicable law or agreed to in writing,         */       
+ /* software distributed under the License is distributed on an "AS    */       
+ /* IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either    */       
+ /* express or implied.  See the License for the specific language     */       
+ /* governing permissions and limitations under the License.           */       
+ /*                                                                    */       
+ /**********************************************************************/       
+ /* EXEC:      HIS113                                                  */       
+ /* FUNCTION: Diagnostic tool to report the contents of SMF type 113   */       
+ /*           records from an input smf data set.                      */       
+ /*                                                                    */       
+ /**********************************************************************/       
+ /* Input:                                                             */       
+ /*  InFile - specify the file name containing the SMF records         */       
+ /*  OutFile - specify the file name to store the SMF records, data    */       
+ /*   set must not exist.                                              */       
+ /*  DebugIndicator - specify DEBUG to show miscelaneous data such as  */       
+ /*   tripplet offsets.                                                */       
+ /*  MSGS - specify VERBOSE to get verbose steps of what is being done */       
+ /*       - specify QUIET to get summary steps progress being made     */       
+ /*  StartTime - specify the time in HH:MM:SS which to start reporting */       
+ /*   on SMF113 records.                                               */       
+ /*  EndTime - specify the time in HH:MM:SS which to stop reporting    */       
+ /*   on SMF113 records.                                               */       
+ /*                                                                    */       
+ /*  EX 'USERID.EXEC(HIS113)' 'HLQ.SMF.DATA.D000001                    */       
+ /*        USERID.SMF113.OUT DEBUG'                                    */       
+ /*     This runs the exec on input HLQ.SMF.DATA.D000001 and generates */       
+ /*       USERID.SMF113.OUTPUT                                         */       
+ /*                                                                    */       
+ /* Note: This exec is intended as a starting point to format the SMF  */       
+ /*  type 113. It may not show all data and is suggested that this     */       
+ /*  exec be modified to meet your needs.                              */       
+ /*                                                                    */       
+ /**********************************************************************/       
+ PARSE UPPER ARG inFile OutFile DebugIndicator Msgs,                            
+                 StartTime EndTime                                              
+ NUMERIC DIGITS 30                                                              
+                                                                                
+ ADDRESS TSO                                                                    
+                                                                                
+ /********************************************************************/         
+ /* RecordOffset: for some reason records read in start at +4 into   */         
+ /*  the SMF record.  Offsets will need to subtract 4 to get an      */         
+ /*  accurate location into the record.                              */         
+ /********************************************************************/         
+ RecordOffset = -4                                                              
+                                                                                
+ /********************************************************************/         
+ /* Miscellaneous variables                                          */         
+ /********************************************************************/         
+ ExecName = HIS113                                                              
+ SMF113out. = ''                                                                
+ SMF113out.0 = 0                                                                
+ NumRecOut = 0                                                                  
+ NumT1 = 0                                                                      
+ NumT2 = 0                                                                      
+ numT1.1 = 0                                                                    
+ numT1.2 = 0                                                                    
+ numT1.3 = 0                                                                    
+ numT1.4 = 0                                                                    
+ numT1.5 = 0                                                                    
+ numT1.6 = 0                                                                    
+ numT2.1 = 0                                                                    
+ numT2.2 = 0                                                                    
+ numT2.3 = 0                                                                    
+ numT2.4 = 0                                                                    
+ numT2.5 = 0                                                                    
+ numT2.6 = 0                                                                    
+                                                                                
+ /********************************************************************/         
+ /* Mapping - IFASMF 113                                             */         
+ /********************************************************************/         
+ o.SMF113LEN                 = '000'; l.SMF113LEN                 =2;           
+ o.SMF113SEG                 = '002'; l.SMF113SEG                 =2;           
+ o.SMF113FLG                 = '004'; l.SMF113FLG                 =1;           
+ o.SMF113RTY                 = '005'; l.SMF113RTY                 =1;           
+ o.SMF113TME                 = '006'; l.SMF113TME                 =4;           
+ o.SMF113DTE                 = '00A'; l.SMF113DTE                 =4;           
+ o.SMF113SID                 = '00E'; l.SMF113SID                 =4;           
+ o.SMF113WID                 = '012'; l.SMF113WID                 =4;           
+ o.SMF113STY                 = '016'; l.SMF113STY                 =2;           
+ o.SMF113SDL                 = '01A'; l.SMF113SDL                 =2;           
+ o.SMF113SOF                 = '01C'; l.SMF113SOF                 =4;           
+ o.SMF113SLN                 = '020'; l.SMF113SLN                 =2;           
+ o.SMF113SON                 = '022'; l.SMF113SON                 =2;           
+ o.SMF113IOF                 = '024'; l.SMF113IOF                 =4;           
+ o.SMF113ILN                 = '028'; l.SMF113ILN                 =2;           
+ o.SMF113ION                 = '02A'; l.SMF113ION                 =2;           
+ o.SMF113DOF                 = '02C'; l.SMF113DOF                 =4;           
+ o.SMF113DLN                 = '030'; l.SMF113DLN                 =2;           
+ o.SMF113DON                 = '032'; l.SMF113DON                 =2;           
+ o.SMF113SSF                =0;                                                 
+ o.SMF113SBT                =1;                                                 
+                                                                                
+ /********************************************************************/         
+ /* Mapping - IFASMF 113 Subsystem section                           */         
+ /********************************************************************/         
+ o.SMF113RVN                 = '002'; l.SMF113RVN                 =2;           
+ o.SMF113PNM                 = '004'; l.SMF113PNM                 =8;           
+ o.SMF113OSL                 = '00C'; l.SMF113OSL                 =8;           
+                                                                                
+ /********************************************************************/         
+ /* Mapping - IFASMF 113 Identification Section                      */         
+ /********************************************************************/         
+ o.SMF113JBN                 = '000'; l.SMF113JBN                 =8;           
+ o.SMF113RST                 = '008'; l.SMF113RST                 =4;           
+ o.SMF113RSD                 = '00C'; l.SMF113RSD                 =4;           
+ o.SMF113STP                 = '010'; l.SMF113STP                 =8;           
+ o.SMF113IntervalStart       = '018'; l.SMF113IntervalStart       =8;           
+ o.SMF113IntervalEnd         = '020'; l.SMF113IntervalEnd         =8;           
+                                                                                
+ /********************************************************************/         
+ /* Mapping - IFASMF 113 ST 1 Counters  (deltas)                     */         
+ /********************************************************************/         
+ o.SMF113_1_CTS             = '000'; l.SMF113_1_CTS                =8;          
+ o.SMF113_1_CTM             = '008'; l.SMF113_1_CTM                =8;          
+ o.SMF113_1_CpuId           = '010'; l.SMF113_1_CpuId              =2;          
+ o.SMF113_1_CpuProcClass    = '012'; l.SMF113_1_CpuProcClass       =1;          
+ o.SMF113_1_CpuSpeed        = '014'; l.SMF113_1_CpuSpeed           =4;          
+ o.SMF113_1_MachType        = '018'; l.SMF113_1_MachType           =4;          
+ o.SMF113_1_MachModel       = '01C'; l.SMF113_1_MachModel          =16;         
+ o.SMF113_1_CtrVersion0     = '02C'; l.SMF113_1_CtrVersion0        =2;          
+ o.SMF113_1_CtrVersion1     = '02E'; l.SMF113_1_CtrVersion1        =2;          
+ o.SMF113_1_CtrVersion2     = '030'; l.SMF113_1_CtrVersion2        =2;          
+ o.SMF113_1_Flags           = '032'; l.SMF113_1_Flags              =2;          
+ o.SMF113_1_CSOF            = '034'; l.SMF113_1_CSOF               =4;          
+ o.SMF113_1_CSLN            = '038'; l.SMF113_1_CSLN               =2;          
+ o.SMF113_1_CSON            = '03A'; l.SMF113_1_CSON               =2;          
+ o.SMF113_1_MachSeqCode     = '03C'; l.SMF113_1_MachSeqCode        =16;         
+ o.SMF113_1_CoreID          = '04C'; l.SMF113_1_CoreID             =2;          
+ o.SMF113_1_LostCtrData =0;                                                     
+ o.SMF113_1_LostData    =0;                                                     
+ o.SMF113_1_LostMTData  =1;                                                     
+ o.SMF113_1_zCBP        =2;                                                     
+                                                                                
+ /********************************************************************/         
+ /* Mapping - IFASMF 113 ST 1 Counter set section (deltas)           */         
+ /********************************************************************/         
+ o.SMF113_1_CSType          = '000'; l.SMF113_1_CSType             =2;          
+ o.SMF113_1_CSFlags         = '002'; l.SMF113_1_CSFlags            =2;          
+ o.SMF113_1_CDOF            = '004'; l.SMF113_1_CDOF               =4;          
+ o.SMF113_1_CDLN            = '008'; l.SMF113_1_CDLN               =2;          
+ o.SMF113_1_CDON            = '00A'; l.SMF113_1_CDON               =2;          
+ o.SMF113_Basic          ='01';                                                 
+ o.SMF113_ProblemState   ='02';                                                 
+ o.SMF113_CryptoActivity ='03';                                                 
+ o.SMF113_Extended       ='04';                                                 
+ o.SMF113_zOS            ='05';                                                 
+ o.SMF113_MTDiagnostic   ='06';                                                 
+ o.SMF113_1_CSUseLCDS = 0;                                                      
+                                                                                
+ /********************************************************************/         
+ /* Mapping - IFASMF 113 ST 2 Counters (Absolutes)                   */         
+ /********************************************************************/         
+ o.SMF113_2_CTS             = '000'; l.SMF113_2_CTS                =8;          
+ o.SMF113_2_CTM             = '008'; l.SMF113_2_CTM                =8;          
+ o.SMF113_2_CPU#            = '010'; l.SMF113_2_CPU#               =1;          
+ o.SMF113_2_CpuProcClass    = '011'; l.SMF113_2_CpuProcClass       =1;          
+ o.SMF113_2_CF              = '012'; l.SMF113_2_CF                 =2;          
+ o.SMF113_2_CtrVN1          = '014'; l.SMF113_2_CtrVN1             =2;          
+ o.SMF113_2_CtrVN2          = '016'; l.SMF113_2_CtrVN2             =2;          
+ o.SMF113_2_CSOF            = '018'; l.SMF113_2_CSOF               =4;          
+ o.SMF113_2_CSLN            = '01C'; l.SMF113_2_CSLN               =2;          
+ o.SMF113_2_CSON            = '01E'; l.SMF113_2_CSON               =2;          
+ o.SMF113_2_CDOF            = '020'; l.SMF113_2_CDOF               =4;          
+ o.SMF113_2_CDLN            = '024'; l.SMF113_2_CDLN               =2;          
+ o.SMF113_2_CDON            = '026'; l.SMF113_2_CDON               =2;          
+ o.SMF113_2_CPSP            = '028'; l.SMF113_2_CPSP               =4;          
+ o.SMF113_2_MachType        = '02C'; l.SMF113_2_MachType           =4;          
+ o.SMF113_2_MachModel       = '030'; l.SMF113_2_MachModel          =16;         
+ o.SMF113_2_CpuId           = '040'; l.SMF113_2_CpuId              =2;          
+ o.SMF113_2_MachSeqCode     = '044'; l.SMF113_2_MachSeqCode        =16;         
+ o.SMF113_2_CFF      =0;                                                        
+ o.SMF113_2_CFM      =1;                                                        
+ o.SMF113_2_CFL      =2;                                                        
+ o.SMF113_2_CFNS     =3;                                                        
+ o.SMF113_2_LostData =4;                                                        
+ o.SMF113_2_zCBP     =5;                                                        
+                                                                                
+ /********************************************************************/         
+ /* Mapping - IFASMF 113 ST 2 Counter set section (Absolutes)        */         
+ /********************************************************************/         
+ o.SMF113_2_CST             = '000'; l.SMF113_2_CST                =1;          
+ o.SMF113_2_CSN             = '002'; l.SMF113_2_CSN                =2;          
+ o.SMF113_2_CSP             = '004'; l.SMF113_2_CSP                =8;          
+                                                                                
+ /********************************************************************/         
+ /* Start of mainline                                                */         
+ /********************************************************************/         
+                                                                                
+ /* Check command line input */                                                 
+ If inFile = '' Then                                                            
+  Do                                                                            
+   Say ExecName' terminating - first parameter - inFile - not specified'        
+   Call Halt                                                                    
+  End                                                                           
+                                                                                
+ If outFile = '' Then                                                           
+  Do                                                                            
+   Say ExecName' terminating - second paramter - outFile - not specified'       
+   Call Halt                                                                    
+  End                                                                           
+                                                                                
+ If DebugIndicator ^= '' &,                                                     
+    DebugIndicator ^= 'NODEBUG' &,                                              
+    DebugIndicator ^= 'DEBUG' Then                                              
+  Do                                                                            
+   Say ExecName' terminating - third parameter - Debug - not null, NODEBUG,',   
+               'or DEBUG'                                                       
+   Call Halt                                                                    
+  End                                                                           
+                                                                                
+ If Msgs ^= '' &,                                                               
+    Msgs ^= 'VERBOSE' &,                                                        
+    Msgs ^= 'QUIET' Then                                                        
+  Do                                                                            
+   Say ExecName' terminating - Fourth parameter not valid '                     
+   Call Halt                                                                    
+  End                                                                           
+                                                                                
+ If StartTime ^= '' &,                                                          
+    Substr(StartTime,3,1) ^= ':' &,                                             
+    Substr(StartTime,6,1) ^= ':' &,                                             
+    Substr(StartTime,1,2) > 23 &,                                               
+    Substr(StartTime,4,2) > 59 &,                                               
+    Substr(StartTime,7,2) > 59 Then                                             
+  Do                                                                            
+   Say ExecName' terminating - Fifth parameter not valid '                      
+   Call Halt                                                                    
+  End                                                                           
+ If EndTime ^= '' &,                                                            
+    Substr(EndTime,3,1) ^= ':' &,                                               
+    Substr(EndTime,6,1) ^= ':' &,                                               
+    Substr(EndTime,1,2) > 23 &,                                                 
+    Substr(EndTime,4,2) > 59 &,                                                 
+    Substr(EndTime,7,2) > 59 Then                                               
+  Do                                                                            
+   Say ExecName' terminating - Sixth parameter not valid '                      
+   Call Halt                                                                    
+  End                                                                           
+                                                                                
+ /* Open and read the input file */                                             
+ INFILE_DSI = LISTDSI("IN113  FILE")                                            
+ If SYSREASON ^= 0 Then                                                         
+  Do                                                                            
+   'Allocate DSNAME('''inFile''') DDNAME(IN113) SHR'                            
+   If RC > 0 Then                                                               
+    Do                                                                          
+     Say ExecName' terminating - can not open inFile: 'inFile                   
+     Call Halt                                                                  
+    End                                                                         
+  End                                                                           
+                                                                                
+ If Msgs = 'VERBOSE' Then                                                       
+   Say ExecName' Opening input SMF 113 dataset.'                                
+                                                                                
+ FileReads = 1                                                                  
+ 'EXECIO 1000 DISKR IN113 (STEM smf113recs.' /* Get 1k records        */        
+ If smf113recs0 = 0 Then                                                        
+  Do                                                                            
+   Say ExecName' terminating - inFile is empty: 'inFile                         
+   Call Halt                                                                    
+  End                                                                           
+                                                                                
+ If Msgs = 'VERBOSE' Then                                                       
+   Say ExecName' SMF 113 open complete, processing records.'                    
+                                                                                
+ Do While smf113recs.0 > 0        /* For each file read               */        
+ /* Loop through all the records read */                                        
+ Do I = 1 to smf113recs.0         /* For each record                  */        
+                                                                                
+  /********************************************************************/        
+  /* Read the SMF record header                                       */        
+  /********************************************************************/        
+  SMF113. = ''                                                                  
+                                                                                
+  Parse VAR smf113recs.I ,                                                      
+     SMF113.FLG           +(l.SMF113FLG          ) ,                            
+     SMF113.RTY           +(l.SMF113RTY          ) ,                            
+     SMF113.TME           +(l.SMF113TME          ) ,                            
+     SMF113.DTE           +(l.SMF113DTE          ) ,                            
+     SMF113.SID           +(l.SMF113SID          ) ,                            
+     SMF113.WID           +(l.SMF113WID          ) ,                            
+     SMF113.STY           +(l.SMF113STY          ) ,                            
+     .                    +2 ,                                                  
+     SMF113.SDL           +(l.SMF113SDL          ) ,                            
+     SMF113.SOF           +(l.SMF113SOF          ) ,                            
+     SMF113.SLN           +(l.SMF113SLN          ) ,                            
+     SMF113.SON           +(l.SMF113SON          ) ,                            
+     SMF113.IOF           +(l.SMF113IOF          ) ,                            
+     SMF113.ILN           +(l.SMF113ILN          ) ,                            
+     SMF113.ION           +(l.SMF113ION          ) ,                            
+     SMF113.DOF           +(l.SMF113DOF          ) ,                            
+     SMF113.DLN           +(l.SMF113DLN          ) ,                            
+     SMF113.DON           +(l.SMF113DON          )                              
+                                                                                
+  SMF113.FLG          = C2X(SMF113.FLG          )                               
+  SMF113.RTY          = C2X(SMF113.RTY          )                               
+  SMF113.hexTime      = C2X(SMF113.TME          )                               
+  SMF113.TME   =GetSMFTime(C2X(SMF113.TME       ))                              
+  SMF113.DTE          = C2X(SMF113.DTE          )                               
+  SMF113.STY          = C2X(SMF113.STY          )                               
+  SMF113.SDL          = C2X(SMF113.SDL          )                               
+                                                                                
+  SMF113.SOF          = C2D(SMF113.SOF          )  + RecordOffset               
+  SMF113.SLN          = C2D(SMF113.SLN          )                               
+  SMF113.SON          = C2D(SMF113.SON          )                               
+  SMF113.IOF          = C2D(SMF113.IOF          )  + RecordOffset               
+  SMF113.ILN          = C2D(SMF113.ILN          )                               
+  SMF113.ION          = C2D(SMF113.ION          )                               
+  SMF113.DOF          = C2D(SMF113.DOF          )  + RecordOffset               
+  SMF113.DLN          = C2D(SMF113.DLN          )                               
+  SMF113.DON          = C2D(SMF113.DON          )                               
+                                                                                
+  If I//1000 = 0  Then                                                          
+    Say ExecName' SMF Records processed: 'FileReads*I                           
+                                                                                
+  /********************************************************************/        
+  /* Filter out non SMF type 113 records                              */        
+  /********************************************************************/        
+                                                                                
+  IF SMF113.RTY ^= '71' Then                                                    
+    Iterate                                                                     
+  If StartTime ^='' Then                                                        
+   If X2D(SMF113.hexTime) < X2D(MakeSMFTime(StartTime)) Then                    
+    Iterate                                                                     
+                                                                                
+  If EndTime ^= '' Then                                                         
+   If X2D(SMF113.hexTime) > X2D(MakeSMFTime(EndTime)) Then                      
+    Iterate                                                                     
+                                                                                
+  NumRecOut = NumRecOut + 1                                                     
+  If Msgs = 'VERBOSE' & NumRecOut // 10 = 0  Then                               
+    Say ExecName' SMF 113s processed: 'NumRecOut                                
+                                                                                
+  /********************************************************************/        
+  /* Read the Subsystem section                                       */        
+  /********************************************************************/        
+  Parse VAR smf113recs.I . +(SMF113.SOF),                                       
+     .                    +2 ,                                                  
+     SMF113.RVN           +(l.SMF113RVN          ) ,                            
+     SMF113.PNM           +(l.SMF113PNM          ) ,                            
+     SMF113.OSL           +(l.SMF113OSL          )                              
+                                                                                
+  /********************************************************************/        
+  /* Read the Identification section                                  */        
+  /********************************************************************/        
+  Parse VAR smf113recs.I . +(SMF113.IOF),                                       
+     SMF113.JBN           +(l.SMF113JBN          ) ,                            
+     SMF113.RST           +(l.SMF113RST          ) ,                            
+     SMF113.RSD           +(l.SMF113RSD          ) ,                            
+     SMF113.STP           +(l.SMF113STP          ) ,                            
+     SMF113.IntervalStart +(l.SMF113IntervalStart) ,                            
+     SMF113.IntervalEnd   +(l.SMF113IntervalEnd  )                              
+  SMF113.RSD           = C2X(SMF113.RSD)                                        
+  SMF113.RST           = GetSMFTime(C2X(SMF113.RST))                            
+  SMF113.IntervalStart = C2X(SMF113.IntervalStart )                             
+  SMF113.IntervalEnd   = C2X(SMF113.IntervalEnd   )                             
+  SMF113.FIntervalStart = GetTodTime(SMF113.IntervalStart )                     
+  SMF113.FIntervalEnd   = GetTodTime(SMF113.IntervalEnd   )                     
+                                                                                
+  /********************************************************************/        
+  /* Save general data to print for this record                       */        
+  /* Note: change this section to put out different tripplets of      */        
+  /*  interest                                                        */        
+  /********************************************************************/        
+  Out.NumRecOut = SMF113.TME ,                                                  
+                  Right(NumRecOut,2,'0'),                                       
+                  D2X(Length(smf113recs.I),4) ,                                 
+                  SMF113.STY,                                                   
+                  D2X(SMF113.SOF ,8),                                           
+                  D2X(SMF113.SLN ,4),                                           
+                  D2X(SMF113.SON ,4),                                           
+                  D2X(SMF113.IOF ,8),                                           
+                  D2X(SMF113.ILN ,4),                                           
+                  D2X(SMF113.ION ,4),                                           
+                  D2X(SMF113.DOF ,8),                                           
+                  D2X(SMF113.DLN ,4),                                           
+                  D2X(SMF113.DON ,4)                                            
+                                                                                
+  IOut.NumRecOut = SMF113.TME ,                                                 
+                  SMF113.STY,                                                   
+                  SMF113.JBN ,                                                  
+                  SMF113.STP ,                                                  
+                  SMF113.PNM ,                                                  
+                  SMF113.OSL ,                                                  
+                  SMF113.SID ,                                                  
+                  SMF113.WID ,                                                  
+                  SMF113.RVN ,                                                  
+                  SMF113.DTE ,                                                  
+                  SMF113.RSD ,                                                  
+                  SMF113.RST ,                                                  
+                  SMF113.FIntervalStart,                                        
+                  SMF113.FIntervalEnd                                           
+                                                                                
+  Select;                                                                       
+   When(SMF113.STY = '01') Then                                                 
+    Do;                                                                         
+     NumT1 = NumT1 + 1                                                          
+     Parse VAR smf113recs.I . +(SMF113.DOF),                                    
+       SMF113.1_CTS                +(l.SMF113_1_CTS                ) ,          
+       SMF113.1_CTM                +(l.SMF113_1_CTM                ) ,          
+       SMF113.1_CpuId              +(l.SMF113_1_CpuId              ) ,          
+       SMF113.1_CpuProcClass       +(l.SMF113_1_CpuProcClass       ) ,          
+       .                           +1 ,                                         
+       SMF113.1_CpuSpeed           +(l.SMF113_1_CpuSpeed           ) ,          
+       SMF113.1_MachType           +(l.SMF113_1_MachType           ) ,          
+       SMF113.1_MachModel          +(l.SMF113_1_MachModel          ) ,          
+       SMF113.1_CtrVersion0        +(l.SMF113_1_CtrVersion0        ) ,          
+       SMF113.1_CtrVersion1        +(l.SMF113_1_CtrVersion1        ) ,          
+       SMF113.1_CtrVersion2        +(l.SMF113_1_CtrVersion2        ) ,          
+       SMF113.1_Flags              +(l.SMF113_1_Flags              ) ,          
+       SMF113.1_CSOF               +(l.SMF113_1_CSOF               ) ,          
+       SMF113.1_CSLN               +(l.SMF113_1_CSLN               ) ,          
+       SMF113.1_CSON               +(l.SMF113_1_CSON               ) ,          
+       SMF113.1_MachSeqCode        +(l.SMF113_1_MachSeqCode        ) ,          
+       SMF113.1_CoreID             +(l.SMF113_1_CoreID             )            
+                                                                                
+     SMF113.1_CTS              = GetTodTime(C2X(SMF113.1_CTS ))                 
+     SMF113.1_CTM              = GetTodTime(C2X(SMF113.1_CTM ))                 
+     SMF113.1_CpuId            = C2X(SMF113.1_CpuId       )                     
+     SMF113.1_CpuProcClass     = C2X(SMF113.1_CpuProcClass)                     
+     SMF113.1_CpuSpeed         = C2X(SMF113.1_CpuSpeed    )                     
+     SMF113.1_CtrVersion0      = C2X(SMF113.1_CtrVersion0 )                     
+     SMF113.1_CtrVersion1      = C2X(SMF113.1_CtrVersion1 )                     
+     SMF113.1_CtrVersion2      = C2X(SMF113.1_CtrVersion2 )                     
+     SMF113.1_Flags            = C2X(SMF113.1_Flags       )                     
+     SMF113.1xCSOF             = C2X(SMF113.1_CSOF        )                     
+     SMF113.1xCSLN             = C2X(SMF113.1_CSLN        )                     
+     SMF113.1xCSON             = C2X(SMF113.1_CSON        )                     
+     SMF113.1_CSOF             = C2D(SMF113.1_CSOF        ) + RecordOffset      
+     SMF113.1_CSLN             = C2D(SMF113.1_CSLN        )                     
+     SMF113.1_CSON             = C2D(SMF113.1_CSON        )                     
+     SMF113.1_CoreID           = C2X(SMF113.1_CoreID      )                     
+                                                                                
+     SMF113.zCBP               =IsBitOn(SMF113.1_Flags,o.SMF113_1_zCBP       )  
+     If SMF113.zCBP Then                                                        
+      SMF113.zCBP_C = 'Y'                                                       
+     Else                                                                       
+      SMF113.zCBP_C = 'N'                                                       
+                                                                                
+     Select;                                                                    
+      When SMF113.1_CpuProcClass = '00' Then                                    
+       SMF113.ProcClass = "CP  "                                                
+      When SMF113.1_CpuProcClass = '02' Then                                    
+       If SMF113.zCBP Then                                                      
+        SMF113.ProcClass = "zCBP"                                               
+       Else                                                                     
+        SMF113.ProcClass = "zAAP"                                               
+      When SMF113.1_CpuProcClass = '04' Then                                    
+       SMF113.ProcClass = "zIIP"                                                
+      Otherwise SMF113.ProcClass = "xxxx"                                       
+     End;                                                                       
+                                                                                
+     T1Out.NumT1 = SMF113.TME ,                                                 
+                   SMF113.1_CpuId         ,                                     
+                   SMF113.ProcClass       ,                                     
+                   SMF113.1_CtrVersion0   ,                                     
+                   SMF113.1_CtrVersion1   ,                                     
+                   SMF113.1_CtrVersion2   ,                                     
+                   SMF113.1_Flags         ,                                     
+                   SMF113.1xCSOF          ,                                     
+                   SMF113.1xCSLN          ,                                     
+                   SMF113.1xCSON          ,                                     
+                   SMF113.1_CoreID        ,                                     
+                   SMF113.1_CpuSpeed      ,                                     
+                   SMF113.1_CTS           ,                                     
+                   SMF113.1_CTM           ,                                     
+                   SMF113.1_MachType      ,                                     
+                   SMF113.1_MachModel     ,                                     
+                   SMF113.1_MachSeqCode                                         
+     CsetOff = SMF113.1_CSOF                                                    
+     Do CSN = 1 to SMF113.1_CSON                                                
+      Parse VAR smf113recs.I . +(CsetOff),                                      
+       SMF113.1_CSType             +(l.SMF113_1_CSType             ) ,          
+       SMF113.1_CSFlags            +(l.SMF113_1_CSFlags            ) ,          
+       SMF113.1_CDOF               +(l.SMF113_1_CDOF               ) ,          
+       SMF113.1_CDLN               +(l.SMF113_1_CDLN               ) ,          
+       SMF113.1_CDON               +(l.SMF113_1_CDON               )            
+                                                                                
+      SMF113.1_CSType          = C2D(SMF113.1_CSType      )                     
+      SMF113.1_CSFlags         = C2X(SMF113.1_CSFlags     )                     
+      SMF113.1xCDOF            = C2X(SMF113.1_CDOF        )                     
+      SMF113.1xCDLN            = C2X(SMF113.1_CDLN        )                     
+      SMF113.1xCDON            = C2X(SMF113.1_CDON        )                     
+      SMF113.1_CDOF            = C2D(SMF113.1_CDOF        ) + RecordOffset      
+      SMF113.1_CDLN            = C2D(SMF113.1_CDLN        )                     
+      SMF113.1_CDON            = C2D(SMF113.1_CDON        )                     
+      CounterOff = SMF113.1_CDOF                                                
+      Select;                                                                   
+       When SMF113.1_CSType = 1 Then                                            
+        Do;                                                                     
+         myTN = 1                                                               
+         myType = 'Basic '                                                      
+         myVer = SMF113.1_CtrVersion1                                           
+        End;                                                                    
+       When SMF113.1_CSType = 2 Then                                            
+        Do;                                                                     
+         myTN = 2                                                               
+         myType = 'Prob  '                                                      
+         myVer = SMF113.1_CtrVersion1                                           
+        End;                                                                    
+       When SMF113.1_CSType = 3 Then                                            
+        Do;                                                                     
+         myTN = 3                                                               
+         myType = 'Crypto'                                                      
+         myVer = SMF113.1_CtrVersion2                                           
+        End;                                                                    
+       When SMF113.1_CSType = 4 Then                                            
+        Do;                                                                     
+         myTN = 4                                                               
+         myType = 'Ext   '                                                      
+         myVer = SMF113.1_CtrVersion2                                           
+        End;                                                                    
+       When SMF113.1_CSType = 5 Then                                            
+        Do;                                                                     
+         myTN = 5                                                               
+         myType = 'ZOS   '                                                      
+         myVer = SMF113.1_CtrVersion0                                           
+        End;                                                                    
+       When SMF113.1_CSType = 6 Then                                            
+        Do;                                                                     
+         myTN = 6                                                               
+         myType = 'MTDiag'                                                      
+         myVer = SMF113.1_CtrVersion2                                           
+        End;                                                                    
+       Otherwise                                                                
+        Do;                                                                     
+         myType = '******'                                                      
+        End;                                                                    
+      End;                                                                      
+      numT1.myTN = numT1.myTN + 1                                               
+      myNum = numT1.myTN                                                        
+                                                                                
+      T1.myTN.myNum = SMF113.TME  ,                                             
+                   SMF113.1_CpuId   ,                                           
+                   SMF113.ProcClass ,                                           
+                   SMF113.1xCDON                                                
+                                                                                
+      Do CN = 1 to SMF113.1_CDON                                                
+       Parse VAR smf113recs.I . +(CounterOff),                                  
+        SMF113.T1Count           +(SMF113.1_CDLN)                               
+       SMF113.T1Count = C2X(SMF113.T1Count)                                     
+       CounterOff = CounterOff + SMF113.1_CDLN                                  
+       T1.myTN.myNum = T1.myTN.myNum,                                           
+                       SMF113.T1Count                                           
+        If (CN+1<=SMF113.1_CDON) & (CN//8 = 0) Then                             
+         Do;                                                                    
+          numT1.myTN = numT1.myTN + 1                                           
+          myNum = numT1.myTN                                                    
+          T1.myTN.myNum = "                       "                             
+         End;                                                                   
+      End                                                                       
+                                                                                
+      CsetOff = CsetOff+SMF113.1_CSLN                                           
+     End                                                                        
+    End;                                                                        
+   When(SMF113.STY = '02') Then                                                 
+    Do;                                                                         
+     NumT2 = NumT2 + 1                                                          
+     Parse VAR smf113recs.I . +(SMF113.DOF),                                    
+       SMF113.2_CTS                +(l.SMF113_2_CTS                ) ,          
+       SMF113.2_CTM                +(l.SMF113_2_CTM                ) ,          
+       SMF113.2_CPU#               +(l.SMF113_2_CPU#               ) ,          
+       SMF113.2_CpuProcClass       +(l.SMF113_2_CpuProcClass       ) ,          
+       SMF113.2_CF                 +(l.SMF113_2_CF                 ) ,          
+       SMF113.2_CtrVN1             +(l.SMF113_2_CtrVN1             ) ,          
+       SMF113.2_CtrVN2             +(l.SMF113_2_CtrVN2             ) ,          
+       SMF113.2_CSOF               +(l.SMF113_2_CSOF               ) ,          
+       SMF113.2_CSLN               +(l.SMF113_2_CSLN               ) ,          
+       SMF113.2_CSON               +(l.SMF113_2_CSON               ) ,          
+       SMF113.2_CDOF               +(l.SMF113_2_CDOF               ) ,          
+       SMF113.2_CDLN               +(l.SMF113_2_CDLN               ) ,          
+       SMF113.2_CDON               +(l.SMF113_2_CDON               ) ,          
+       SMF113.2_CPSP               +(l.SMF113_2_CPSP               ) ,          
+       SMF113.2_MachType           +(l.SMF113_2_MachType           ) ,          
+       SMF113.2_MachModel          +(l.SMF113_2_MachModel          ) ,          
+       SMF113.2_CpuId              +(l.SMF113_2_CpuId              ) ,          
+       .                           +2 ,                                         
+       SMF113.2_MachSeqCode        +(l.SMF113_2_MachSeqCode        )            
+                                                                                
+     SMF113.2_CTS              = GetTodTime(C2X(SMF113.2_CTS ))                 
+     SMF113.2_CTM              = GetTodTime(C2X(SMF113.2_CTM ))                 
+     SMF113.2_CPU#             = C2X(SMF113.2_CPU#        )                     
+     SMF113.2_CpuProcClass     = C2X(SMF113.2_CpuProcClass)                     
+     SMF113.2_CF               = C2X(SMF113.2_CF          )                     
+     SMF113.2_CtrVN1           = C2X(SMF113.2_CtrVN1      )                     
+     SMF113.2_CtrVN2           = C2X(SMF113.2_CtrVN2      )                     
+     SMF113.2xCSOF             = C2X(SMF113.2_CSOF        )                     
+     SMF113.2xCSLN             = C2X(SMF113.2_CSLN        )                     
+     SMF113.2xCSON             = C2X(SMF113.2_CSON        )                     
+     SMF113.2xCDOF             = C2X(SMF113.2_CDOF        )                     
+     SMF113.2xCDLN             = C2X(SMF113.2_CDLN        )                     
+     SMF113.2xCDON             = C2X(SMF113.2_CDON        )                     
+     SMF113.2_CSOF             = C2D(SMF113.2_CSOF        ) + RecordOffset      
+     SMF113.2_CSLN             = C2D(SMF113.2_CSLN        )                     
+     SMF113.2_CSON             = C2D(SMF113.2_CSON        )                     
+     SMF113.2_CDOF             = C2D(SMF113.2_CDOF        ) + RecordOffset      
+     SMF113.2_CDLN             = C2D(SMF113.2_CDLN        )                     
+     SMF113.2_CDON             = C2D(SMF113.2_CDON        )                     
+     SMF113.2_CPSP             = C2X(SMF113.2_CPSP        )                     
+     SMF113.2_CpuId            = C2X(SMF113.2_CpuId       )                     
+                                                                                
+     SMF113.zCBP               =IsBitOn(SMF113.2_CF,o.SMF113_2_zCBP       )     
+     If SMF113.zCBP Then                                                        
+      SMF113.zCBP_C = 'Y'                                                       
+     Else                                                                       
+      SMF113.zCBP_C = 'N'                                                       
+                                                                                
+     Select;                                                                    
+      When SMF113.2_CpuProcClass = '00' Then                                    
+       SMF113.ProcClass = "CP  "                                                
+      When SMF113.2_CpuProcClass = '02' Then                                    
+       If SMF113.zCBP Then                                                      
+        SMF113.ProcClass = "zCBP"                                               
+       Else                                                                     
+        SMF113.ProcClass = "zAAP"                                               
+      When SMF113.2_CpuProcClass = '04' Then                                    
+       SMF113.ProcClass = "zIIP"                                                
+      Otherwise SMF113.ProcClass = "xxxx"                                       
+     End;                                                                       
+                                                                                
+     T2Out.NumT2 = SMF113.TME ,                                                 
+                   SMF113.2_CpuId         ,                                     
+                   SMF113.ProcClass       ,                                     
+                   SMF113.2_CtrVN1        ,                                     
+                   SMF113.2_CtrVN2        ,                                     
+                   SMF113.2_CF            ,                                     
+                   SMF113.2xCSOF          ,                                     
+                   SMF113.2xCSLN          ,                                     
+                   SMF113.2xCSON          ,                                     
+                   SMF113.2xCDOF          ,                                     
+                   SMF113.2xCDLN          ,                                     
+                   SMF113.2xCDON          ,                                     
+                   SMF113.2_CPSP          ,                                     
+                   SMF113.2_CTS           ,                                     
+                   SMF113.2_CTM           ,                                     
+                   SMF113.2_MachType      ,                                     
+                   SMF113.2_MachModel     ,                                     
+                   SMF113.2_MachSeqCode                                         
+     CsetOff = SMF113.2_CSOF                                                    
+     CounterOff = SMF113.2_CDOF                                                 
+     Do CSN = 1 to SMF113.2_CSON                                                
+      Parse VAR smf113recs.I . +(CsetOff),                                      
+       SMF113.2_CST                +(l.SMF113_2_CST                ) ,          
+       .                           +1,                                          
+       SMF113.2_CSN                +(l.SMF113_2_CSN                ) ,          
+       SMF113.2_CSP                +(l.SMF113_2_CSP                )            
+                                                                                
+      SMF113.2_CST              = C2D(SMF113.2_CST         )                    
+      SMF113.2xCSN              = C2X(SMF113.2_CSN         )                    
+      SMF113.2_CSN              = C2D(SMF113.2_CSN         )                    
+      SMF113.2_CSP              = C2X(SMF113.2_CSP         )                    
+                                                                                
+      Select;                                                                   
+       When SMF113.2_CST = 1 Then                                               
+        Do;                                                                     
+         myTN = 1                                                               
+         myType = 'Basic '                                                      
+         myVer = SMF113.2_CtrVersion1                                           
+        End;                                                                    
+       When SMF113.2_CST = 2 Then                                               
+        Do;                                                                     
+         myTN = 2                                                               
+         myType = 'Prob  '                                                      
+         myVer = SMF113.2_CtrVersion1                                           
+        End;                                                                    
+       When SMF113.2_CST = 3 Then                                               
+        Do;                                                                     
+         myTN = 3                                                               
+         myType = 'Crypto'                                                      
+         myVer = SMF113.2_CtrVersion2                                           
+        End;                                                                    
+       When SMF113.2_CST = 4 Then                                               
+        Do;                                                                     
+         myTN = 4                                                               
+         myType = 'Ext   '                                                      
+         myVer = SMF113.2_CtrVersion2                                           
+        End;                                                                    
+       When SMF113.2_CST = 5 Then                                               
+        Do;                                                                     
+         myTN = 5                                                               
+         myType = 'ZOS   '                                                      
+         myVer = SMF113.2_CtrVersion1                                           
+        End;                                                                    
+       When SMF113.2_CST = 6 Then                                               
+        Do;                                                                     
+         myTN = 6                                                               
+         myType = 'MTDiag'                                                      
+         myVer = SMF113.2_CtrVersion2                                           
+        End;                                                                    
+       Otherwise                                                                
+        Do;                                                                     
+         myType = '******'                                                      
+        End;                                                                    
+      End;                                                                      
+     numT2.myTN = numT2.myTN + 1                                                
+     myNum = numT2.myTN                                                         
+                                                                                
+     T2.myTN.myNum = SMF113.TME  ,                                              
+                   SMF113.2_CpuId   ,                                           
+                   SMF113.ProcClass ,                                           
+                   SMF113.2xCSN                                                 
+                                                                                
+       Do CN = 1 to SMF113.2_CSN                                                
+        Parse VAR smf113recs.I . +(CounterOff),                                 
+         SMF113.T2Count           +8                                            
+        SMF113.T2Count = C2X(SMF113.T2Count)                                    
+        CounterOff = CounterOff + SMF113.2_CDLN                                 
+        T2.myTN.myNum = T2.myTN.myNum,                                          
+                        SMF113.T2Count                                          
+        If (CN+1<=SMF113.2_CSN) & (CN//8 = 0) Then                              
+         Do;                                                                    
+          numT2.myTN = numT2.myTN + 1                                           
+          myNum = numT2.myTN                                                    
+          T2.myTN.myNum = "                       "                             
+         End;                                                                   
+       End                                                                      
+                                                                                
+      CsetOff = CsetOff+SMF113.2_CSLN                                           
+     End                                                                        
+    End;                                                                        
+   Otherwise;                                                                   
+  End;                                                                          
+                                                                                
+ End                                /* End for each record             */       
+ 'EXECIO 1000 DISKR IN113 (STEM smf113recs.' /* Get next 1k records    */       
+ FileReads = FileReads + 1                                                      
+ End                                /* End for file read               */       
+                                                                                
+ If Msgs = 'VERBOSE' Then                                                       
+   Say ExecName' SMF record processing complete, closing SMF file.'             
+                                                                                
+ 'EXECIO 0 DISKR IN113 (FINIS'      /* Close SMF input file            */       
+                                                                                
+ If Msgs = 'VERBOSE' Then                                                       
+   Say ExecName' SMF file closed, freeing SMF dataset'                          
+                                                                                
+ /**********************************************************************/       
+ /* Free the Input DD                                                  */       
+ /**********************************************************************/       
+ 'Free DDNAME(IN113)'                                                           
+                                                                                
+ If Msgs = 'VERBOSE' Then                                                       
+   Say ExecName' SMF dataset closed, building output.'                          
+                                                                                
+ If DebugIndicator = 'DEBUG' Then                                               
+  Do                                                                            
+                                                                                
+  Sum.H.1 = "************************************************************"      
+  Sum.H.2 = "TIME    |Nu|Leng|Sub |Subsystem         |identification    |"      
+  Sum.H.3 = "        |m |th  |Type|Offset  |Len |Num |Offset  |Len |Num |"      
+  Sum.H.4 = "------------------------------------------------------------"      
+  Sum.H.1 = Sum.H.1 || "********************"                                   
+  Sum.H.2 = Sum.H.2 || "data               |"                                   
+  Sum.H.3 = Sum.H.3 || "Offset   |Len |Num |"                                   
+  Sum.H.4 = Sum.H.4 || "-------------------"                                    
+  ID.H.1 = "***************************************************************"    
+  ID.H.2 = "TIME    |SUB |JOB NAME|Step    |product |Product |SID |WID |RV|"    
+  ID.H.3 = "        |Type|        | Name   |name    |level   |    |    |N |"    
+  ID.H.4 = "---------------------------------------------------------------"    
+  ID.H.1 = ID.H.1 || "*******************************************"              
+  ID.H.2 = ID.H.2 || "SMF     |READER START     |Interval       |"              
+  ID.H.3 = ID.H.3 || "Date    |TIME    |DATE    |start time     |"              
+  ID.H.4 = ID.H.4 || "-------------------------------------------"              
+  ID.H.1 = ID.H.1 || "****************"                                         
+  ID.H.2 = ID.H.2 || "Interval       |"                                         
+  ID.H.3 = ID.H.3 || "end  time      |"                                         
+  ID.H.4 = ID.H.4 || "----------------"                                         
+  T1.H.1 = "***************************************************************"    
+  T1.H.2 = "TIME    |CPU |CPU |Ctr Version   |Flag|Counter set       |Core|"    
+  T1.H.3 = "        |Num |TYPE|0   |1   |2   |    |Offset  |len |num |ID  |"    
+  T1.H.4 = "---------------------------------------------------------------"    
+  T1.H.1 = T1.H.1 || "**********************************************"           
+  T1.H.2 = T1.H.2 || "CPU     |cts            |ctm            |mach|"           
+  T1.H.3 = T1.H.3 || "Speed   |               |               |type|"           
+  T1.H.4 = T1.H.4 || "---------------------------------------------"            
+  T1.H.1 = T1.H.1 || "**********************************************"           
+  T1.H.2 = T1.H.2 || "Machine         |Machine sequence code       |"           
+  T1.H.3 = T1.H.3 || "Model           |                            |"           
+  T1.H.4 = T1.H.4 || "---------------------------------------------"            
+  T2.H.1 = "*****************************************************"              
+  T2.H.2 = "TIME    |CPU |CPU |CTR VER. |FLAG|COUNTER SET       |"              
+  T2.H.3 = "        |NUM |TYPE|0   |1   |    |OFFSET  |LEN |NUM |"              
+  T2.H.4 = "-----------------------------------------------------"              
+  T2.H.1 = T2.H.1 || "*******************"                                      
+  T2.H.2 = T2.H.2 || "COUNTERS          |"                                      
+  T2.H.3 = T2.H.3 || "OFFSET  |LEN |NUM |"                                      
+  T2.H.4 = T2.H.4 || "-------------------"                                      
+  T2.H.1 = T2.H.1 || "**********************************************"           
+  T2.H.2 = T2.H.2 || "CPU     |cts            |ctm            |mach|"           
+  T2.H.3 = T2.H.3 || "Speed   |               |               |type|"           
+  T2.H.4 = T2.H.4 || "---------------------------------------------"            
+  T2.H.1 = T2.H.1 || "**********************************************"           
+  T2.H.2 = T2.H.2 || "Machine         |Machine sequence code       |"           
+  T2.H.3 = T2.H.3 || "Model           |                            |"           
+  T2.H.4 = T2.H.4 || "---------------------------------------------"            
+  CH.1 = "*********************************"                                    
+  CH.2 = "TIME    |CPU |CPU |NUM |Counts..."                                    
+  CH.3 = "        |Num |TYPE|CNTS|"                                             
+  CH.4 = "---------------------------------"                                    
+   /********************************************************************/       
+   /* Output for general SMF record -- adjust when finalized           */       
+   /********************************************************************/       
+   If NumRecOut > 0 Then                                                        
+    Do                                                                          
+     Call Put " "                                                               
+     Call Put " SMF113 Records: "                                               
+     Call Put Sum.H.1                                                           
+     Call Put Sum.H.2                                                           
+     Call Put Sum.H.3                                                           
+     Call Put Sum.H.4                                                           
+     Do I = 1 to NumRecOut                                                      
+      Call Put Out.I                                                            
+     End                                                                        
+     Call Put " "                                                               
+     Call Put " SMF113 Identification Records: "                                
+     Call Put ID.H.1                                                            
+     Call Put ID.H.2                                                            
+     Call Put ID.H.3                                                            
+     Call Put ID.H.4                                                            
+     Do I = 1 to NumRecOut                                                      
+      Call Put IOut.I                                                           
+     End                                                                        
+     Call Put " "                                                               
+     Call Put " SMF113 Type 1 Records: "                                        
+     Call Put T1.H.1                                                            
+     Call Put T1.H.2                                                            
+     Call Put T1.H.3                                                            
+     Call Put T1.H.4                                                            
+     Do I = 1 to NumT1                                                          
+      Call Put T1Out.I                                                          
+     End                                                                        
+     Call Put " "                                                               
+     Call Put " SMF113 Type 2 Records: "                                        
+     Call Put T2.H.1                                                            
+     Call Put T2.H.2                                                            
+     Call Put T2.H.3                                                            
+     Call Put T2.H.4                                                            
+     Do I = 1 to NumT2                                                          
+      Call Put T2Out.I                                                          
+     End                                                                        
+    End                                                                         
+  End                                                                           
+                                                                                
+     Call Put " "                                                               
+     Call Put " SMF113 Type 1 Basic Counts "                                    
+     Call Put CH.1                                                              
+     Call Put CH.2                                                              
+     Call Put CH.3                                                              
+     Call Put CH.4                                                              
+     Do I = 1 to numT1.1                                                        
+      Call Put T1.1.I                                                           
+     End                                                                        
+     Call Put " "                                                               
+     Call Put " SMF113 Type 1 Problem Counts "                                  
+     Call Put CH.1                                                              
+     Call Put CH.2                                                              
+     Call Put CH.3                                                              
+     Call Put CH.4                                                              
+     Do I = 1 to numT1.2                                                        
+      Call Put T1.2.I                                                           
+     End                                                                        
+     Call Put " "                                                               
+     Call Put " SMF113 Type 1 Crypto Counts "                                   
+     Call Put CH.1                                                              
+     Call Put CH.2                                                              
+     Call Put CH.3                                                              
+     Call Put CH.4                                                              
+     Do I = 1 to numT1.3                                                        
+      Call Put T1.3.I                                                           
+     End                                                                        
+     Call Put " "                                                               
+     Call Put " SMF113 Type 1 Extended Counts "                                 
+     Call Put CH.1                                                              
+     Call Put CH.2                                                              
+     Call Put CH.3                                                              
+     Call Put CH.4                                                              
+     Do I = 1 to numT1.4                                                        
+      Call Put T1.4.I                                                           
+     End                                                                        
+     Call Put " "                                                               
+     Call Put " SMF113 Type 1 z/OS Counts "                                     
+     Call Put CH.1                                                              
+     Call Put CH.2                                                              
+     Call Put CH.3                                                              
+     Call Put CH.4                                                              
+     Do I = 1 to numT1.5                                                        
+      Call Put T1.5.I                                                           
+     End                                                                        
+     Call Put " "                                                               
+     Call Put " SMF113 Type 1 MT Diagnostic Counts "                            
+     Call Put CH.1                                                              
+     Call Put CH.2                                                              
+     Call Put CH.3                                                              
+     Call Put CH.4                                                              
+     Do I = 1 to numT1.6                                                        
+      Call Put T1.6.I                                                           
+     End                                                                        
+     Call Put " "                                                               
+     Call Put " SMF113 Type 2 Basic Counts "                                    
+     Call Put CH.1                                                              
+     Call Put CH.2                                                              
+     Call Put CH.3                                                              
+     Call Put CH.4                                                              
+     Do I = 1 to numT2.1                                                        
+      Call Put T2.1.I                                                           
+     End                                                                        
+     Call Put " "                                                               
+     Call Put " SMF113 Type 2 Problem Counts "                                  
+     Call Put CH.1                                                              
+     Call Put CH.2                                                              
+     Call Put CH.3                                                              
+     Call Put CH.4                                                              
+     Do I = 1 to numT2.2                                                        
+      Call Put T2.2.I                                                           
+     End                                                                        
+     Call Put " "                                                               
+     Call Put " SMF113 Type 2 Crypto Counts "                                   
+     Call Put CH.1                                                              
+     Call Put CH.2                                                              
+     Call Put CH.3                                                              
+     Call Put CH.4                                                              
+     Do I = 1 to numT2.3                                                        
+      Call Put T2.3.I                                                           
+     End                                                                        
+     Call Put " "                                                               
+     Call Put " SMF113 Type 2 Extended Counts "                                 
+     Call Put CH.1                                                              
+     Call Put CH.2                                                              
+     Call Put CH.3                                                              
+     Call Put CH.4                                                              
+     Do I = 1 to numT2.4                                                        
+      Call Put T2.4.I                                                           
+     End                                                                        
+     Call Put " "                                                               
+     Call Put " SMF113 Type 2 z/OS Counts "                                     
+     Call Put CH.1                                                              
+     Call Put CH.2                                                              
+     Call Put CH.3                                                              
+     Call Put CH.4                                                              
+     Do I = 1 to numT2.5                                                        
+      Call Put T2.5.I                                                           
+     End                                                                        
+     Call Put " "                                                               
+     Call Put " SMF113 Type 2 MT Diagnostic Counts "                            
+     Call Put CH.1                                                              
+     Call Put CH.2                                                              
+     Call Put CH.3                                                              
+     Call Put CH.4                                                              
+     Do I = 1 to numT2.6                                                        
+      Call Put T2.6.I                                                           
+     End                                                                        
+                                                                                
+ CALL Put "***********************************************************"         
+                                                                                
+ If Msgs = 'VERBOSE' Then                                                       
+   Say ExecName' Output built, allocating output DD'                            
+                                                                                
+ /********************************************************************/         
+ /* Allocate the Output DD                                           */         
+ /********************************************************************/         
+ INFILE_DSI = LISTDSI("OUT113  FILE")                                           
+ If SYSREASON ^= 0 Then                                                         
+  Do                                                                            
+   'Allocate DSNAME('''outFile''') DDNAME(OUT113) NEW SPACE(100,100) ',         
+     'CYLINDERS BLKSIZE(250) LRECL(250)'                                        
+   If RC > 0 Then                                                               
+    Do                                                                          
+     Say ExecName' terminating - can not open outFile'                          
+     Call Halt                                                                  
+    End                                                                         
+  End                                                                           
+                                                                                
+ If Msgs = 'VERBOSE' Then                                                       
+   Say ExecName' Allocate Output DD complete, writing to file'                  
+                                                                                
+ /********************************************************************/         
+ /* Write the output to the file                                     */         
+ /********************************************************************/         
+ 'EXECIO 'SMF113out.0' DISKW OUT113 (STEM SMF113out.'                           
+ 'EXECIO 0 DISKW OUT113 (FINIS'                                                 
+                                                                                
+ If Msgs = 'VERBOSE' Then                                                       
+   Say ExecName' Write to file complete, freeing output dataset'                
+                                                                                
+ 'Free DDNAME(OUT113)'                                                          
+ Say ExecName' successful'                                                      
+                                                                                
+                                                                                
+ CALL HALT                                                                      
+ /********************************************************************/         
+ /* End of mainline                                                  */         
+ /********************************************************************/         
+                                                                                
+ /********************************************************************/         
+ /* Procedure:  ISBITON                                              */         
+ /*                                                                  */         
+ /* Purpose:    Determine if the ith bit (0 based) is on in the      */         
+ /*             provided hex string.                                 */         
+ /*                                                                  */         
+ /* Input:      hex_data   - The data to check against               */         
+ /*             bit_offset - The bit to check (0 based) in hex_data  */         
+ /*                                                                  */         
+ /* Output:     1 if the bit is on                                   */         
+ /*             0 if the bit is off                                  */         
+ /*                                                                  */         
+ /********************************************************************/         
+ ISBITON:  PROCEDURE                                                            
+   ARG hex_data , bit_offset                                                    
+   bin_data = X2B(hex_data)                                                     
+   IF LENGTH(bin_data) <= bit_offset THEN DO                                    
+     RETURN 0                                                                   
+   END                                                                          
+ RETURN SUBSTR(bin_data, (bit_offset+1), 1)                                     
+                                                                                
+ /********************************************************************/         
+ /* Procedure:  PUT                                                  */         
+ /*                                                                  */         
+ /* Purpose:    Saves the data to be moved to output                 */         
+ /*                                                                  */         
+ /* INPUT:      GEN$ - The data to transmit                          */         
+ /*                                                                  */         
+ /********************************************************************/         
+ PUT: PROCEDURE Expose(SMF113out.)                                              
+   ARG GEN$                                                                     
+   OutNum = SMF113out.0                                                         
+   OutNum = OutNum + 1                                                          
+   SMF113out.0 = OutNum                                                         
+   SMF113out.OutNum = GEN$                                                      
+ RETURN                                                                         
+                                                                                
+ /********************************************************************/         
+ /* Procedure:  GetSmfTime                                           */         
+ /*                                                                  */         
+ /* Purpose:    Get a printable time format from the SMF Time        */         
+ /*                                                                  */         
+ /* INPUT:      HexTime - The input time in hex                      */         
+ /*                                                                  */         
+ /* Output:     Time is formated in HH:MM:SS                         */         
+ /*                                                                  */         
+ /*                                                                  */         
+ /********************************************************************/         
+ GetSMFTime: PROCEDURE                                                          
+   ARG HexTime                                                                  
+   GetSMFTime. = ''                                                             
+   GetSMFTime.Time = X2D(HexTime)                                               
+   GetSMFTime.Hundreths = GetSMFTime.Time//100                                  
+   GetSMFTime.TotSeconds = GetSMFTime.Time%100                                  
+   GetSMFTime.TotMinutes = GetSMFTime.TotSeconds%60                             
+   GetSMFTime.Seconds = GetSMFTime.TotSeconds//60                               
+   GetSMFTime.Minutes = GetSMFTime.TotMinutes//60                               
+   GetSMFTime.Hours   = GetSMFTime.TotMinutes%60                                
+ Return right(GetSMFTime.Hours,2,'0')":"right(GetSMFTime.Minutes,2,'0')":"||,   
+        right(GetSMFTime.Seconds,2,'0')                                         
+                                                                                
+ /********************************************************************/         
+ /* Procedure:  MakeSMFTime                                          */         
+ /*                                                                  */         
+ /* Purpose:    Make an SMF 4 byte time format from inoput text      */         
+ /*                                                                  */         
+ /* INPUT:      Time is formated in HH:MM:SS                         */         
+ /*                                                                  */         
+ /* Output:     HexTime - The input time in SMF Format Hex           */         
+ /*                                                                  */         
+ /*                                                                  */         
+ /********************************************************************/         
+ MakeSMFTime: PROCEDURE                                                         
+   ARG InTime                                                                   
+   InHours =  Substr(InTime,1,2)                                                
+   InMinutes = Substr(InTime,4,2)                                               
+   InSeconds = Substr(InTime,7,2)                                               
+   InTimeDec = InSeconds + InMinutes * 60 + InHours * 60 * 60                   
+ Return D2X(InTimeDec*100,8)                                                    
+                                                                                
+ /********************************************************************/         
+ /* Procedure:  GetTodTime                                           */         
+ /*                                                                  */         
+ /* Purpose:    Get a printable time format from an 8 byte TOD       */         
+ /*                                                                  */         
+ /* INPUT:      HexTime - The input time in hex                      */         
+ /*                                                                  */         
+ /* Output:     Time is formated in HH:MM:SS.xxxxxxx                 */         
+ /*                                                                  */         
+ /*                                                                  */         
+ /********************************************************************/         
+ GetTODTime: PROCEDURE                                                          
+   ARG HexTime                                                                  
+   GetTODTime. = ''                                                             
+   If HexTime ^= '0000000000000000' Then                                        
+    Do                                                                          
+   GetTODTime.Time = X2D(Substr(HexTime,1,13))                                  
+   GetTODTime.Microsecs = GetTODTime.Time//1000000                              
+   GetTODTime.TotSeconds = GetTODTime.Time%1000000                              
+   GetTODTime.TotMinutes = GetTODTime.TotSeconds%60                             
+   GetTODTime.TotHours = GetTODTime.TotMinutes%60                               
+   GetTODTime.Seconds = GetTODTime.TotSeconds//60                               
+   GetTODTime.Minutes = GetTODTime.TotMinutes//60                               
+   GetTODTime.Hours   = GetTODTime.TotHours//24                                 
+    End                                                                         
+ Return right(GetTODTime.Hours,2,'0')":"right(GetTODTime.Minutes,2,'0')":"||,   
+        right(GetTODTime.Seconds,2,'0')"."right(GetTODTime.Microsecs,6,'0')     
+                                                                                
+                                                                                
+ /********************************************************************/         
+ /* Procedure:  HALT                                                 */         
+ /*                                                                  */         
+ /* Purpose:    Exit                                                 */         
+ /*                                                                  */         
+ /* Input:      None                                                 */         
+ /*                                                                  */         
+ /* Output:     None                                                 */         
+ /*                                                                  */         
+ /********************************************************************/         
+ HALT:                                                                          
+   EXIT                                                                         
+                                                                                
