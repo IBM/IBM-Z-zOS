@@ -13,7 +13,7 @@
 *                                                                     * 00220118
 * Beginning of Copyright and License                                  * 00220200
 *                                                                     * 00220300
-* Copyright 2017 IBM Corp.                                            * 00220400
+* Copyright 2019 IBM Corp.                                            * 00220400
 *                                                                     * 00220500
 * Licensed under the Apache License, Version 2.0 (the "License");     * 00220600
 * you may not use this file except in compliance with the License.    * 00220700
