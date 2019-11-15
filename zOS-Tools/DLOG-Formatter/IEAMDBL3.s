@@ -11,23 +11,23 @@
 *                                                                     * 00110018
 *01* COPYRIGHT =                                                      * 00220000
 *                                                                     * 00220118
-* Beginning of Copyright and License                                  * 00220200
+*    Beginning of Copyright and License                               * 00220200
 *                                                                     * 00220300
-* Copyright 2019 IBM Corp.                                            * 00220400
+*    Copyright 2019 IBM Corp.                                         * 00220400
 *                                                                     * 00220500
-* Licensed under the Apache License, Version 2.0 (the "License");     * 00220600
-* you may not use this file except in compliance with the License.    * 00220700
-* You may obtain a copy of the License at                             * 00220800
+*    Licensed under the Apache License, Version 2.0 (the "License");  * 00220600
+*    you may not use this file except in compliance with the License. * 00220700
+*    You may obtain a copy of the License at                          * 00220800
 *                                                                     * 00220900
-* http://www.apache.org/licenses/LICENSE-2.0                          * 00221000
+*    http://www.apache.org/licenses/LICENSE-2.0                       * 00221000
 *                                                                     * 00222018
-* Unless required by applicable law or agreed to in writing,          * 00223018
-* software distributed under the License is distributed on an         * 00224018
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,        * 00225018
-* either express or implied.  See the License for the specific        * 00226018
-* language governing permissions and limitations under the License.   * 00227018
+*    Unless required by applicable law or agreed to in writing,       * 00223018
+*    software distributed under the License is distributed on an      * 00224018
+*    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,     * 00225018
+*    either express or implied.  See the License for the specific     * 00226018
+*    language governing permissions and limitations under the License.* 00227018
 *                                                                     * 00228018
-* End of Copyright and License                                        * 00229018
+*    End of Copyright and License                                     * 00229018
 *                                                                     * 00230018
 *********************************************************************** 00230118
 *                                                                     * 00230200
