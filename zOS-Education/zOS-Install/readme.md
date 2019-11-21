@@ -9,7 +9,7 @@ The modules are intended to provide information about using a specific function.
 
 Modules are provided for the following:
 
-* [z/OSMF Software Management - Packaging a Portable Software Instance]()
+* [z/OSMF Software Management - Packaging a Portable Software Instance](https://github.com/marnawalle/IBM-Z-zOS/blob/master/zOS-Education/zOS-Install/zOSMF%20SM%20Packaging%20Install%20Strategy%20Education.pdf)
 
 * [z/OSMF Software Management - Installing a Portable Software Instance](https://github.com/marnawalle/IBM-Z-zOS/blob/master/zOS-Education/zOS-Install/zOSMF%20SM%20Deploying%20Install%20Strategy%20Education.pdf)
 
