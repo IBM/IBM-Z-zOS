@@ -13,6 +13,10 @@ Modules are provided for the following:
 
 * [z/OSMF Software Management - Installing a Portable Software Instance](https://github.com/marnawalle/IBM-Z-zOS/blob/master/zOS-Education/zOS-Install/zOSMF%20SM%20Deploying%20Install%20Strategy%20Education.pdf)
 
+Helpful links
+=============
+
+* [John Eells' SHARE 2017 Presentation](https://www.youtube.com/watch?v=11pxP2cpce0&t=22s)
 
 Your feedback is welcome. 
 
