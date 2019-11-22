@@ -16,7 +16,11 @@ Modules are provided for the following:
 Helpful links
 =============
 
+* [IBM Content Solution for CICS ServerPac Installation using z/OSMF](https://www.ibm.com/support/z-content-solutions/serverpac-install-zosmf/)  Use this location to see the overall value and process for installing a CICS ServerPac with z/OSMF.
+
 * [John Eells' SHARE 2017 Presentation](https://www.youtube.com/watch?v=11pxP2cpce0&t=22s)
+
+* Also, don't forget to use those z/OSMF Help links, when you want to read more about a screen you are on!
 
 Your feedback is welcome. 
 
