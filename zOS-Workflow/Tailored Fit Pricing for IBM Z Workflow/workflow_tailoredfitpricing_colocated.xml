@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!-- 
 /*********************************************************************/
-/* Copyright 2017 IBM Corp.                                                                */
+/* Copyright 2019 IBM Corp.                                                                */
 /*                                                                                                               */
 /* Licensed under the Apache License, Version 2.0 (the "License");   */
 /* you may not use this file except in compliance with the License.  */
@@ -19,9 +19,9 @@
 <workflow>
     <autoTakeOwnership>false</autoTakeOwnership>
     <workflowInfo>
-        <workflowID scope="none">Container Pricing Colocated Solution</workflowID>
-        <workflowDefaultName>Container Pricing for IBM Z Colocated Solution</workflowDefaultName>
-        <workflowDescription>Implement a colocated solution for Container Pricing for IBM Z</workflowDescription>
+        <workflowID scope="none">Tailored Fit Pricing Colocated Solution</workflowID>
+        <workflowDefaultName>Tailored Fit Pricing for IBM Z Colocated Solution</workflowDefaultName>
+        <workflowDescription>Implement a colocated solution for Tailored Fit Pricing for IBM Z</workflowDescription>
         <workflowVersion>1.0</workflowVersion>
         <vendor>IBM</vendor>
         <General/>
@@ -55,8 +55,8 @@ Although the sub-steps are listed below the step, you cannot navigate to the sub
         <description>
             <h3>Before you begin</h3> 
         <ul>
-                <li>You must have a contract with IBM for a Container Pricing for IBM Z solution.</li>
-        <li>You should have an existing Workload Manager service definition that you will modify for Container Pricing.
+                <li>You must have a contract with IBM for a Tailored Fit Pricing for IBM Z solution.</li>
+        <li>You should have an existing Workload Manager service definition that you will modify for Tailored Fit Pricing.
 </li>
         <li>The person performing the Workload Manager steps should be familiar with Workload Manager service definitions.</li>
         <li>The person performing the Sub Capacity Reporting Tool (SCRT) steps should be familiar with SCRT.</li>
@@ -65,9 +65,9 @@ Although the sub-steps are listed below the step, you cannot navigate to the sub
             <p>You will modify the service definition to do the following.
 <ul>
                     <li>Add a tenant resource group and a tenant report class. Tenant resource groups and tenant report classes
-support mapping workloads directly to Container Pricing for IBM Z.  For information about tenant resource groups, see
-        &lt;a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zosmfworkloadmgmt.help.doc/izuW00hpSDTRG.html" target="_blank"&gt;Tenant resource groups&lt;/a&gt;. For information about tenant report classes, see
-        &lt;a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zosmfworkloadmgmt.help.doc/izuW00hpSDTRC.html" target="_blank"&gt;Tenant report classes&lt;/a&gt;.</li>
+support mapping workloads directly to Tailored Fit Pricing for IBM Z.  For information about tenant resource groups, see
+        &lt;a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zosmfworkloadmgmt.help.doc/izuW00hpSDTRG.html" target="_blank"&gt;Tenant resource groups&lt;/a&gt;. For information about tenant report classes, see
+        &lt;a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zosmfworkloadmgmt.help.doc/izuW00hpSDTRC.html" target="_blank"&gt;Tenant report classes&lt;/a&gt;.</li>
         <li>Define classification rules to categorize work into service classes and the new tenant report class.</li>
                 </ul>
             </p>
@@ -81,7 +81,7 @@ group in the next substep. The solution ID is available on the License Managemen
 &lt;ol&gt;
 &lt;li&gt;Sign in to the LMS web portal: &lt;a href="https://www.ibm.com/software/lms/OpenServlet.wss" target="_blank"&gt;LMS&lt;/a&gt; 
 (www.ibm.com/software/lms/OpenServlet.wss)&lt;/li&gt;
-&lt;li&gt;Click &lt;b&gt;Container Pricing Solutions&lt;/b&gt;. Your solutions, along with the solution IDs, are displayed.&lt;/li&gt;
+&lt;li&gt;Click &lt;b&gt;Tailored Fit Pricing Solutions&lt;/b&gt;. Your solutions, along with the solution IDs, are displayed.&lt;/li&gt;
 &lt;li&gt;If someone else will be creating the tenant resource group, provide that person
 with the appropriate solution ID, for example, by copying and pasting it from LMS into an email.&lt;/li&gt;
 &lt;/ol&gt;</instructions>
@@ -92,7 +92,7 @@ with the appropriate solution ID, for example, by copying and pasting it from LM
         <step name="CreateTRGLeaf" optional="false">
             <title>Define the tenant resource group</title>
             <description>Define the tenant resource group in z/OSMF Workload Management.
-Tenant resource groups support mapping workloads directly to Container Pricing for IBM Z.</description>
+Tenant resource groups support mapping workloads directly to Tailored Fit Pricing for IBM Z.</description>
             <instructions substitution="false">&lt;h3&gt;Before you begin&lt;/h3&gt;
 You will be working with the z/OSMF Workload Management task. 
 You might want to open it in another browser window
@@ -147,9 +147,9 @@ there are any error messages, correct them before continuing.&lt;/li&gt;
         <title>Create a tenant report class</title>
         <description>Create a tenant report class that is associated with the new tenant report group,
 using the z/OSMF Workload Management task. A tenant report class allows the ability 
-to map workloads directly to Container Pricing for IBM Z.
+to map workloads directly to Tailored Fit Pricing for IBM Z.
 &lt;p&gt;For information about tenant report classes, see
-&lt;a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zosmfworkloadmgmt.help.doc/izuW00hpSDTRC.html" target="_blank"&gt;Tenant report classes&lt;/a&gt;.
+&lt;a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zosmfworkloadmgmt.help.doc/izuW00hpSDTRC.html" target="_blank"&gt;Tenant report classes&lt;/a&gt;.
 &lt;/p&gt;</description>
         <instructions substitution="false">&lt;h3&gt;Summary&lt;/h3&gt;
 Create a tenant report class, specifying values as needed, including
@@ -191,7 +191,7 @@ there are any error messages, correct them before continuing.&lt;/li&gt;
         <description>A service class is a named group of work within a workload with similar performance characteristics.
 
 &lt;p&gt;For information about service classes, see
-&lt;a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieaw100/sclg.htm" target="_blank"&gt;Service classes&lt;/a&gt;.
+&lt;a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zos.v2r4.ieaw100/sclg.htm" target="_blank"&gt;Service classes&lt;/a&gt;.
 &lt;p&gt;
 The instructions include an example, which is continued in subsequent steps.</description>
         <instructions substitution="false">&lt;h3&gt;Summary&lt;/h3&gt;
@@ -254,12 +254,12 @@ Classification rules categorize work into service classes, and report classes or
 based on WLM subsystem type and work qualifiers.
 &lt;p&gt;The available work qualifiers depend on the subsystem.
 For more information, see
-&lt;a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieaw100/clsf.html" target="_blank"&gt;Classification rules.&lt;/a&gt;
+&lt;a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.4.0/com.ibm.zos.v2r4.ieaw100/clsf.html" target="_blank"&gt;Classification rules.&lt;/a&gt;
  &lt;/p&gt;</description>
         <instructions substitution="false">&lt;h3&gt;Summary&lt;/h3&gt;
 Define classification rules for the solution work, specifying the tenant report class that you created.
 The tenant report class is associated with the tenant report group, which maps the workload 
-to Container Pricing for IBM Z.
+to Tailored Fit Pricing for IBM Z.
 &lt;h3&gt;Details&lt;/h3&gt;
 This section includes the steps for defining classification rules, as well as
 an example of values that you might specify.
@@ -302,7 +302,7 @@ service class and report class to be assigned.
 click &lt;b&gt;Help&lt;/b&gt; above &lt;b&gt;Switch To&lt;/b&gt; on the Properties for Classification page.&lt;/p&gt;
 &lt;p&gt;
 For more information about classification rules, see
-&lt;a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.ieaw100/clsf.html" target="_blank"&gt;Classification rules.&lt;/a&gt;
+&lt;a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.4.0/com.ibm.zos.v2r4.ieaw100/clsf.html" target="_blank"&gt;Classification rules.&lt;/a&gt;
  &lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;When you are finished, click &lt;b&gt;OK&lt;/b&gt; at the bottom of the page.&lt;/li&gt;
@@ -342,9 +342,9 @@ by clicking the checkbox next to the name.&lt;/li&gt;
     </step>
     <step name="GenerateSCRTReport" optional="false">
         <title>Prepare to generate an SCRT report</title>
-        <description>After your container pricing solution is implemented in the colocated LPAR configuration and 
+        <description>After your Tailored Fit Pricing solution is implemented in the colocated LPAR configuration and 
 the workload runs, you update your Sub Capacity Reporting Tool (SCRT) configuration. 
-After the update, SCRT uses the container pricing data to understand the 
+After the update, SCRT uses the Tailored Fit Pricing data to understand the 
 resource consumption, and it removes the 
 container’s MSU consumption from the LPAR’s rolling four-hour
 average (R4HA). This change is reflected in your next monthly SCRT usage report.
@@ -356,7 +356,7 @@ average (R4HA). This change is reflected in your next monthly SCRT usage report.
 &lt;li&gt;Sign in to the LMS web portal:
 &lt;a href="https://www-304.ibm.com/software/lms/index.wss" target="_blank"&gt;LMS&lt;/a&gt; 
 (www-304.ibm.com/software/lms/index.wss).&lt;/li&gt;
-&lt;li&gt;Click &lt;b&gt;Container Pricing Solutions&lt;/b&gt;
+&lt;li&gt;Click &lt;b&gt;Tailored Fit Pricing Solutions&lt;/b&gt;
 to display the list of approved solutions.&lt;/li&gt;
 &lt;li&gt;Find the solution.
 The information for the solution includes

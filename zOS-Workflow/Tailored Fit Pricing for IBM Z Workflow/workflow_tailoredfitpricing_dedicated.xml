@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!-- 
 /*********************************************************************/
-/* Copyright 2017 IBM Corp.                                                                */
+/* Copyright 2019 IBM Corp.                                                                */
 /*                                                                                                               */
 /* Licensed under the Apache License, Version 2.0 (the "License");   */
 /* you may not use this file except in compliance with the License.  */
@@ -19,9 +19,9 @@
 <workflow>
     <autoTakeOwnership>false</autoTakeOwnership>
     <workflowInfo>
-        <workflowID scope="none">Container Pricing Dedicated Solution</workflowID>
-        <workflowDefaultName>Container Pricing for IBM Z Dedicated Solution</workflowDefaultName>
-        <workflowDescription>Implement a dedicated LPAR solution for Container Pricing for IBM Z</workflowDescription>
+        <workflowID scope="none">Tailored Fit Pricing Dedicated Solution</workflowID>
+        <workflowDefaultName>Tailored Fit Pricing for IBM Z Dedicated Solution</workflowDefaultName>
+        <workflowDescription>Implement a dedicated LPAR solution for Tailored Fit Pricing for IBM Z</workflowDescription>
         <workflowVersion>1.0</workflowVersion>
         <vendor>IBM</vendor>
         <General/>
@@ -71,7 +71,7 @@ Although the sub-steps are listed below the step, you cannot navigate to the sub
             &lt;h3&gt;Overview&lt;/h3&gt;
 &lt;p&gt;You update your Sub Capacity Reporting Tool (SCRT) configuration, to identify the LPARs that are the container,
 and set the solution name.
-After the update, SCRT uses the container pricing data to understand the 
+After the update, SCRT uses the tailored fit pricing data to understand the 
 resource consumption, and it removes the container’s MSU consumption from the LPAR’s rolling four-hour average (R4HA). This change is reflected 
 in your next monthly SCRT usage report. 
 &lt;/p&gt;
@@ -81,7 +81,7 @@ In this step, you obtain information about special commands that you will use to
         <instructions substitution="false">&lt;ol&gt;
 &lt;li&gt;Sign in to the LMS web portal:
 &lt;a href="https://www-304.ibm.com/software/lms/index.wss" target="_blank"&gt;LMS&lt;/a&gt; (www-304.ibm.com/software/lms/index.wss).&lt;/li&gt;
-&lt;li&gt;Click &lt;b&gt;Container Pricing Solutions&lt;/b&gt;
+&lt;li&gt;Click &lt;b&gt;Tailored Fit Pricing Solutions&lt;/b&gt;
 to display the list of approved solutions.&lt;/li&gt;
 &lt;li&gt;Find the solution that you are interested in.
 The entry for the solution includes information for
