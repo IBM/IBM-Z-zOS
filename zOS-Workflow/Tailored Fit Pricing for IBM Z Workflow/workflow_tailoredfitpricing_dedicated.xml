@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- 
+/*********************************************************************/
+/* Copyright 2019 IBM Corp.                                                                */
+/*                                                                                                               */
+/* Licensed under the Apache License, Version 2.0 (the "License");   */
+/* you may not use this file except in compliance with the License.  */
+/* You may obtain a copy of the License at                                           */
+/*                                                                                                               */
+/* http://www.apache.org/licenses/LICENSE-2.0                               */
+/*                                                                                                                */
+/* Unless required by applicable law or agreed to in writing, software*/
+/* distributed under the License is distributed on an "AS IS" BASIS, */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/* See the License for the specific language governing permissions and */
+/* limitations under the License.                                   */
+/*********************************************************************/    
+ -->
+<workflow>
+    <autoTakeOwnership>false</autoTakeOwnership>
+    <workflowInfo>
+        <workflowID scope="none">Tailored Fit Pricing Dedicated Solution</workflowID>
+        <workflowDefaultName>Tailored Fit Pricing for IBM Z Dedicated Solution</workflowDefaultName>
+        <workflowDescription>Implement a dedicated LPAR solution for Tailored Fit Pricing for IBM Z</workflowDescription>
+        <workflowVersion>1.0</workflowVersion>
+        <vendor>IBM</vendor>
+        <General/>
+    </workflowInfo>
+    <step name="HowToUseWorkflow" optional="true">
+        <title>How to use this workflow</title>
+        <description>To use this workflow, note the following:<ul>
+                <li>
+                    <b>Take ownership!</b>  Make sure that you have ownership of workflow steps that you want to perform, and assign other steps to the appropriate users, 
+using the <b>Assignment and Ownership</b> action in the Workflow Steps table. 
+Taking ownership is important, because without it you will not see the <b>Perform</b> tab, which contains the meat of the instructions for each step. <p>If you're the owner of the workflow, you can take ownership of all steps. 
+If you were assigned one or more steps by the owner, you can take ownership of those steps.</p>
+                    <p>Do the following:
+<ul>
+                            <li>From the table listing the steps for the workflow (the Workflow Steps table), select the step or steps to be owned by you. This action is disabled if the step is not assigned to you. </li>
+<li>Click <b>Actions</b>, then select <b>Assignment and Ownership</b> &gt; <b>Take Ownership</b>. The Take Ownership window is displayed. This page includes the Selected Steps table. 
+You can expand this section to review the steps for which this action applies. </li>
+<li>Optionally, enter a comment in the Comments field to document this action. </li>
+<li>Click OK to complete the transfer of step ownership to yourself. </li>
+                        </ul>
+</p>
+                </li>
+                <li>
+                    <b>Expand all steps for ease of navigation:</b> You might find it easier to navigate through all the steps in the workflow if you expand the view so that all the sub-steps show as follows:
+<ol>
+<li>Click <b>Actions</b>, then select <b>Select All</b>.</li>
+<li>Click <b>Actions</b>, then select <b>Expand</b>.</li>
+                    </ol>
+                </li>
+<li>
+                    <b>Track your progress:</b> When you have performed the work of a step, click the <b>Finish</b> box below the instructions to track your progress through the workflow. 
+This also takes you back out to the list of steps for the workflow so that you are ready to go on to the next one.</li>
+<b>Substeps:</b> To navigate to the substeps contained within a step, click on the workflow title of the workflow at the top of the screen. 
+Although the sub-steps are listed below the step, you cannot navigate to the sub-steps from within a step.<p>Note that a step containing substeps does not include a <b>Perform</b> tab.</p>
+            </ul> </description>
+        <instructions substitution="false">Congratulations! If you can read this, you have successfully taken ownership of this workflow step!</instructions>
+        <weight>1</weight>
+        <autoEnable>false</autoEnable>
+        <canMarkAsFailed>false</canMarkAsFailed>
+    </step>
+    <step name="ObtainSCRTCommandLeaf" optional="false">
+        <title>Obtain the container solution information from LMS</title>
+        <description>
+            &lt;h3&gt;Before you begin&lt;/h3&gt;
+            &lt;p&gt;The LPARs should be defined and the qualified solution should be deployed and generating data.
+&lt;/p&gt;
+            &lt;h3&gt;Overview&lt;/h3&gt;
+&lt;p&gt;You update your Sub Capacity Reporting Tool (SCRT) configuration, to identify the LPARs that are the container,
+and set the solution name.
+After the update, SCRT uses the tailored fit pricing data to understand the 
+resource consumption, and it removes the container’s MSU consumption from the LPAR’s rolling four-hour average (R4HA). This change is reflected 
+in your next monthly SCRT usage report. 
+&lt;/p&gt;
+            &lt;p&gt;
+In this step, you obtain information about special commands that you will use to update the SCRT configuration.&lt;/p&gt;
+        </description>
+        <instructions substitution="false">&lt;ol&gt;
+&lt;li&gt;Sign in to the LMS web portal:
+&lt;a href="https://www-304.ibm.com/software/lms/index.wss" target="_blank"&gt;LMS&lt;/a&gt; (www-304.ibm.com/software/lms/index.wss).&lt;/li&gt;
+&lt;li&gt;Click &lt;b&gt;Tailored Fit Pricing Solutions&lt;/b&gt;
+to display the list of approved solutions.&lt;/li&gt;
+&lt;li&gt;Find the solution that you are interested in.
+The entry for the solution includes information for
+special commands that update the SCRT 
+configuration:&lt;ul&gt;
+&lt;li&gt;
+CONTAINER indicates which LPARs are part of the 
+container. Obtain the solution ID for this command from LMS.
+For more information about this command, see 
+Using the Sub-Capacity Reporting Tool, which is
+available here:
+&lt;a href="https://www.ibm.com/it-infrastructure/z/software/pricing-resources" target="_blank"&gt;SCRT home page&lt;/a&gt; (www.ibm.com/it-infrastructure/z/software/pricing-resources).
+&lt;/li&gt;
+&lt;li&gt;UPDATE CONTAINER sets the 
+solution name, which is associated 
+with the container through the specified solution ID.
+Obtain this command from LMS.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;li&gt;If someone else will be updating the SCRT configuration, provide that person with the 
+information for the special commands, 
+for example, by copying and pasting it from LMS into an email.&lt;/li&gt;
+&lt;/ol&gt;</instructions>
+        <weight>1</weight>
+        <autoEnable>false</autoEnable>
+        <canMarkAsFailed>false</canMarkAsFailed>
+    </step>
+    <step name="UpdateSCRTJCL" optional="false">
+        <title>Update the SCRT Configuration</title>
+        <description>Update the SCRT configuration.</description>
+        <instructions substitution="false">Open your SCRT JCL, find the SPECIAL DD statement, and update it with the special commands:
+&lt;ol&gt;
+&lt;li&gt;CONTAINER. Use the solution ID that you obtained from LMS.
+For more information about this command, see 
+Using the Sub-Capacity Reporting Tool, which is
+available here:
+&lt;a href="https://www.ibm.com/it-infrastructure/z/software/pricing-resources" target="_blank"&gt;SCRT home page&lt;/a&gt; (www.ibm.com/it-infrastructure/z/software/pricing-resources).
+&lt;/li&gt;
+&lt;li&gt;UPDATE CONTAINER. Use the command that you obtained from LMS.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+Copy and paste the information directly from LMS,
+or, if another person has the responsibility for using LMS, from communication
+such as an email from that person.&lt;/p&gt;</instructions>
+        <weight>1</weight>
+        <autoEnable>false</autoEnable>
+        <canMarkAsFailed>false</canMarkAsFailed>
+    </step>
+    <step name="SubmitUsageReport" optional="false">
+        <title>Submit the usage report to IBM</title>
+        <description>Submit the next SCRT usage report to IBM.</description>
+        <instructions substitution="false">Submit the next SCRT usage report through LMS. 
+&lt;ol&gt;
+&lt;li&gt;Login to the LMS web portal: &lt;a href="https://www.ibm.com/software/lms/OpenServlet.wss" target="_blank"&gt;LMS&lt;/a&gt;
+(www-304.ibm.com/software/lms/index.wss).&lt;/li&gt;
+&lt;li&gt;Submit the report that was generated by SCRT.&lt;/li&gt;
+&lt;/ol&gt;</instructions>
+        <weight>1</weight>
+        <autoEnable>false</autoEnable>
+        <canMarkAsFailed>false</canMarkAsFailed>
+    </step>
+</workflow>

@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- 
+/*********************************************************************/
+/* Copyright 2019 IBM Corp.                                                                */
+/*                                                                                                               */
+/* Licensed under the Apache License, Version 2.0 (the "License");   */
+/* you may not use this file except in compliance with the License.  */
+/* You may obtain a copy of the License at                                           */
+/*                                                                                                               */
+/* http://www.apache.org/licenses/LICENSE-2.0                               */
+/*                                                                                                                */
+/* Unless required by applicable law or agreed to in writing, software*/
+/* distributed under the License is distributed on an "AS IS" BASIS, */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/* See the License for the specific language governing permissions and */
+/* limitations under the License.                                   */
+/*********************************************************************/    
+ -->
+<workflow>
+    <autoTakeOwnership>false</autoTakeOwnership>
+    <workflowInfo>
+        <workflowID scope="none">Tailored Fit Pricing Colocated Solution</workflowID>
+        <workflowDefaultName>Tailored Fit Pricing for IBM Z Colocated Solution</workflowDefaultName>
+        <workflowDescription>Implement a colocated solution for Tailored Fit Pricing for IBM Z</workflowDescription>
+        <workflowVersion>1.0</workflowVersion>
+        <vendor>IBM</vendor>
+        <General/>
+    </workflowInfo>
+    <step name="HowToUseWorkflow" optional="true">
+        <title>How to use this workflow</title>
+        <description>To use this workflow, note the following:&lt;ul&gt;&lt;li&gt;&lt;b&gt;Take ownership!&lt;/b&gt;  Make sure that you have ownership of workflow steps that you want to perform, and assign other steps to the appropriate users, 
+using the &lt;b&gt;Assignment and Ownership&lt;/b&gt; action in the Workflow Steps table. 
+Taking ownership is important, because without it you will not see the &lt;b&gt;Perform&lt;/b&gt; tab, which contains the meat of the instructions for each step. &lt;p&gt;If you're the owner of the workflow, you can take ownership of all steps. 
+If you were assigned one or more steps by the owner, you can take ownership of those steps.&lt;/p&gt;&lt;p&gt;Do the following:
+&lt;ul&gt;&lt;li&gt;From the table listing the steps for the workflow (the Workflow Steps table), select the step or steps to be owned by you. This action is disabled if the step is not assigned to you. &lt;/li&gt;
+&lt;li&gt;Click &lt;b&gt;Actions&lt;/b&gt;, then select &lt;b&gt;Assignment and Ownership&lt;/b&gt; &gt; &lt;b&gt;Take Ownership&lt;/b&gt;. The Take Ownership window is displayed. This page includes the Selected Steps table. 
+You can expand this section to review the steps for which this action applies. &lt;/li&gt;
+&lt;li&gt;Optionally, enter a comment in the Comments field to document this action. &lt;/li&gt;
+&lt;li&gt;Click OK to complete the transfer of step ownership to yourself. &lt;/li&gt;&lt;/ul&gt;
+&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;b&gt;Expand all steps for ease of navigation:&lt;/b&gt; You might find it easier to navigate through all the steps in the workflow if you expand the view so that all the sub-steps show as follows:
+&lt;ol&gt;
+&lt;li&gt;Click &lt;b&gt;Actions&lt;/b&gt;, then select &lt;b&gt;Select All&lt;/b&gt;.&lt;/li&gt;
+&lt;li&gt;Click &lt;b&gt;Actions&lt;/b&gt;, then select &lt;b&gt;Expand&lt;/b&gt;.&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Track your progress:&lt;/b&gt; When you have performed the work of a step, click the &lt;b&gt;Finish&lt;/b&gt; box below the instructions to track your progress through the workflow. 
+This also takes you back out to the list of steps for the workflow so that you are ready to go on to the next one.&lt;/li&gt;
+&lt;b&gt;Substeps:&lt;/b&gt; To navigate to the substeps contained within a step, click on the workflow title of the workflow at the top of the screen. 
+Although the sub-steps are listed below the step, you cannot navigate to the sub-steps from within a step.&lt;p&gt;Note that a step containing substeps does not include a &lt;b&gt;Perform&lt;/b&gt; tab.&lt;/p&gt;&lt;/ul&gt; </description>
+        <instructions substitution="false">Congratulations! If you can read this, you have successfully taken ownership of this workflow step!</instructions>
+        <weight>1</weight>
+        <autoEnable>false</autoEnable>
+        <canMarkAsFailed>false</canMarkAsFailed>
+    </step>
+    <step name="CreateTRGParent" optional="false">
+        <title>Create a tenant resource group</title>
+        <description>
+            <h3>Before you begin</h3> 
+        <ul>
+                <li>You must have a contract with IBM for a Tailored Fit Pricing for IBM Z solution.</li>
+        <li>You should have an existing Workload Manager service definition that you will modify for Tailored Fit Pricing.
+</li>
+        <li>The person performing the Workload Manager steps should be familiar with Workload Manager service definitions.</li>
+        <li>The person performing the Sub Capacity Reporting Tool (SCRT) steps should be familiar with SCRT.</li>
+</ul>
+        <h3>Overview</h3>
+            <p>You will modify the service definition to do the following.
+<ul>
+                    <li>Add a tenant resource group and a tenant report class. Tenant resource groups and tenant report classes
+support mapping workloads directly to Tailored Fit Pricing for IBM Z.  For information about tenant resource groups, see
+        &lt;a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zosmfworkloadmgmt.help.doc/izuW00hpSDTRG.html" target="_blank"&gt;Tenant resource groups&lt;/a&gt;. For information about tenant report classes, see
+        &lt;a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zosmfworkloadmgmt.help.doc/izuW00hpSDTRC.html" target="_blank"&gt;Tenant report classes&lt;/a&gt;.</li>
+        <li>Define classification rules to categorize work into service classes and the new tenant report class.</li>
+                </ul>
+            </p>
+            <p>You begin by creating a tenant resource group with the z/OSMF Workload Management task.</p> <p>Click <b>Close</b> to return to the table of steps, and complete the substeps for this step.</p>
+        </description>
+        <step name="ObtainSolutionID" optional="false">
+            <title>Obtain the solution ID</title>
+            <description>Obtain the solution ID that is required for the tenant resource group.</description>
+            <instructions substitution="false">The solution ID that was provided by IBM is required to create a tenant resource
+group in the next substep. The solution ID is available on the License Management Support  (LMS) web portal.
+&lt;ol&gt;
+&lt;li&gt;Sign in to the LMS web portal: &lt;a href="https://www.ibm.com/software/lms/OpenServlet.wss" target="_blank"&gt;LMS&lt;/a&gt; 
+(www.ibm.com/software/lms/OpenServlet.wss)&lt;/li&gt;
+&lt;li&gt;Click &lt;b&gt;Tailored Fit Pricing Solutions&lt;/b&gt;. Your solutions, along with the solution IDs, are displayed.&lt;/li&gt;
+&lt;li&gt;If someone else will be creating the tenant resource group, provide that person
+with the appropriate solution ID, for example, by copying and pasting it from LMS into an email.&lt;/li&gt;
+&lt;/ol&gt;</instructions>
+            <weight>1</weight>
+            <autoEnable>false</autoEnable>
+            <canMarkAsFailed>false</canMarkAsFailed>
+        </step>
+        <step name="CreateTRGLeaf" optional="false">
+            <title>Define the tenant resource group</title>
+            <description>Define the tenant resource group in z/OSMF Workload Management.
+Tenant resource groups support mapping workloads directly to Tailored Fit Pricing for IBM Z.</description>
+            <instructions substitution="false">&lt;h3&gt;Before you begin&lt;/h3&gt;
+You will be working with the z/OSMF Workload Management task. 
+You might want to open it in another browser window
+so that you can see this workflow and the Workload Management task at the same time.
+You can cut and paste the information from the address bar in the current browser window into the new browser
+window, so that you will be immediately logged into z/OSMF there.
+&lt;h3&gt;Summary&lt;/h3&gt;
+Create a tenant resource group, specifying values as needed, including
+the 64-character Solution ID that was provided by IBM.
+&lt;h3&gt;Details&lt;/h3&gt;
+To create a tenant resource group using the z/OSMF Workload Management task:
+&lt;ol&gt;&lt;li&gt;Expand the Performance category in the navigation area, 
+then select &lt;b&gt;Workload Management&lt;/b&gt;.
+The Overview tab of Workload Management is displayed.&lt;/li&gt;
+&lt;li&gt;Click &lt;b&gt;Service Definitions&lt;/b&gt;. The Service Definitions page is displayed.&lt;/li&gt;
+&lt;li&gt;Select the service definition that you want to work with, by
+clicking the checkbox before its name.&lt;/li&gt;
+&lt;li&gt;Click &lt;b&gt;Actions&lt;/b&gt;, then click &lt;b&gt;Modify Service Definition&lt;/b&gt;, then &lt;b&gt;Tenant Resource Groups&lt;/b&gt;. 
+The Tenant Resource Groups table is displayed.&lt;/li&gt;
+&lt;li&gt;To create a tenant resource group, click &lt;b&gt;Actions&lt;/b&gt;, then select &lt;b&gt;New&lt;/b&gt;.
+A table for creating a new tenant resource group is displayed.&lt;/li&gt;
+&lt;li&gt;Supply the values for the tenant resource group that you want to create.
+Double-click in a field to make it editable.
+For complete information on the fields, click the Help link above the table, near &lt;b&gt;Switch To&lt;/b&gt;.
+&lt;ul&gt;&lt;li&gt;Name: Name of the tenant resource group, unique and up to 8 characters. 
+&lt;/li&gt;
+&lt;li&gt;Description: Optional, up to 32 characters.&lt;/li&gt;
+&lt;li&gt;Tenant ID: ID of the tenant, up to 8 characters.&lt;/li&gt;
+&lt;li&gt;Tenant name: Name of the tenant, up to 8 characters.&lt;/li&gt;
+&lt;li&gt;Solution ID: Solution ID that was provided by IBM, 64-characters.
+You should be able to copy and paste it directly from LMS,
+or, if another person has the responsibility for using LMS, you might cut and paste from communication,
+such as an email, from that person.
+&lt;/li&gt;
+&lt;li&gt;Type: Optional, use with the 
+Capacity Maximum field to specify capping. &lt;/li&gt;
+&lt;/ul&gt; 
+&lt;li&gt;Click &lt;b&gt;Apply&lt;/b&gt; at the bottom of the page to save your work but continue
+with the service definition.
+This keeps you on the Tenant Report Groups table.
+&lt;/li&gt;
+&lt;li&gt;Ensure that the tenant resource group was created, that is, no error messages are displayed. If
+there are any error messages, correct them before continuing.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/ol&gt;</instructions>
+            <weight>1</weight>
+            <autoEnable>false</autoEnable>
+            <canMarkAsFailed>false</canMarkAsFailed>
+        </step>
+    </step>
+    <step name="CreateTRC" optional="false">
+        <title>Create a tenant report class</title>
+        <description>Create a tenant report class that is associated with the new tenant report group,
+using the z/OSMF Workload Management task. A tenant report class allows the ability 
+to map workloads directly to Tailored Fit Pricing for IBM Z.
+&lt;p&gt;For information about tenant report classes, see
+&lt;a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zosmfworkloadmgmt.help.doc/izuW00hpSDTRC.html" target="_blank"&gt;Tenant report classes&lt;/a&gt;.
+&lt;/p&gt;</description>
+        <instructions substitution="false">&lt;h3&gt;Summary&lt;/h3&gt;
+Create a tenant report class, specifying values as needed, including
+the tenant resource group that you created.
+&lt;h3&gt;Details&lt;/h3&gt;
+To create a tenant report class that is associated with the 
+tenant report group using the z/OSMF Workload Management task:
+&lt;ol&gt;
+&lt;li&gt;On the tenant resource group page, click &lt;b&gt;Switch To&lt;/b&gt;, 
+then select &lt;b&gt;Tenant Report Classes&lt;/b&gt;.
+&lt;b&gt;Switch To&lt;/b&gt; is above the Tenant Report Groups table on the right side of the page.
+&lt;p&gt;If you already left the Tenant Resource Group page,
+from the Service Definitions page,
+select the service definition that you want to work with, 
+by clicking the checkbox before its name.
+Click &lt;b&gt;Actions&lt;/b&gt;, then click &lt;b&gt;Modify Service Definition&lt;/b&gt;, then &lt;b&gt;Tenant Report Classes&lt;/b&gt;. 
+&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;To create a tenant report class, click &lt;b&gt;Actions&lt;/b&gt;, then select &lt;b&gt;New&lt;/b&gt;.
+A table for creating a new tenant report class is displayed.&lt;/li&gt;
+&lt;li&gt;Supply the values for the tenant report class that you want to create.
+Double-click in a field to make it editable.
+&lt;ul&gt;&lt;li&gt;Name: Name of the tenant report class, unique and up to 8 characters.
+&lt;/li&gt;
+&lt;li&gt;Tenant Resource Group: Select the tenant resource group that you created.&lt;/li&gt;
+&lt;li&gt;Description: Optional, up to 32 characters.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For complete information on the fields, click the Help link above the table.
+&lt;/li&gt;
+&lt;li&gt;Click &lt;b&gt;Apply&lt;/b&gt; at the bottom of the page.&lt;/li&gt;
+&lt;li&gt;Ensure that the tenant report class was created and that no error messages are displayed. If
+there are any error messages, correct them before continuing.&lt;/li&gt;
+&lt;/ol&gt;</instructions>
+        <weight>1</weight>
+        <autoEnable>false</autoEnable>
+        <canMarkAsFailed>false</canMarkAsFailed>
+    </step>
+    <step name="DefineServiceClass" optional="false">
+        <title>Define a service class</title>
+        <description>A service class is a named group of work within a workload with similar performance characteristics.
+
+&lt;p&gt;For information about service classes, see
+&lt;a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zos.v2r4.ieaw100/sclg.htm" target="_blank"&gt;Service classes&lt;/a&gt;.
+&lt;p&gt;
+The instructions include an example, which is continued in subsequent steps.</description>
+        <instructions substitution="false">&lt;h3&gt;Summary&lt;/h3&gt;
+Define a service class for use with the new container.
+You might begin by examining the service classes in your existing WLM service policy. 
+If an existing service class meets 
+the SLA requirements of the new container, you can use it in the next step in defining the 
+classification rules. Otherwise, create a service class.
+&lt;h3&gt;Details&lt;/h3&gt;
+This section includes the steps for creating a new service class as well as
+an example of the values you might specify when creating a service class.
+This example is continued in the next step.
+&lt;table style="width:100%"&gt;
+&lt;tr&gt;
+&lt;th&gt;Steps for creating a new service class&lt;/th&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;Example&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td width="60%" valign="top"&gt;When creating a new service class, you might begin by identifying an existing service class for a group of work with 
+similar performance characteristics, and use that as a model. To create the new service class using the z/OSMF Workload Management task:
+&lt;ol&gt;
+&lt;li&gt;Click &lt;b&gt;Switch To&lt;/b&gt;, then select &lt;b&gt;Service Classes&lt;/b&gt;.
+&lt;b&gt;Switch To&lt;/b&gt; is above the table on the right side of the page. The Service Classes page is displayed.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;In the table, click &lt;b&gt;Actions&lt;/b&gt;,
+then select &lt;b&gt;New Service Class&lt;/b&gt;.
+A table for creating a new service class is displayed.&lt;/li&gt;
+&lt;p&gt;Supply the values for the service class that you want to create,
+including the workload.
+Double-click in a field to make it editable.
+For information on the fields, click the Help link above the table, near &lt;b&gt;Switch To&lt;/b&gt;.&lt;/p&gt;
+&lt;p&gt;If you create a new service class, verify that the service class is 
+created (that is, no errors are displayed, and z/OSMF allows you to switch 
+to another tab).&lt;/p&gt;&lt;/li&gt;&lt;/ol&gt;
+&lt;/td&gt;
+&lt;td width="5%"&gt;
+&lt;td width="35%" valign="top"&gt;
+Create a service class for the DB2 CRC Replication server based on the JES workload.  
+Include performance goals, resource requirements, and business importance.
+Specify these values:&lt;p&gt;
+&lt;b&gt;Name:&lt;/b&gt; DB2CRCS&lt;br&gt;
+&lt;b&gt;CPU Critical:&lt;/b&gt; NO&lt;br&gt;
+&lt;b&gt;I/O Priority Group:&lt;/b&gt; Normal&lt;br&gt;
+&lt;b&gt;Honor Priority:&lt;/b&gt; Default&lt;br&gt;
+&lt;b&gt;Workload:&lt;/b&gt; DB2_WLD&lt;br&gt;
+&lt;b&gt;Description:&lt;/b&gt; DB2 CRC Replication Server&lt;br&gt;
+&lt;b&gt;Importance:&lt;/b&gt; 2&lt;br&gt;
+&lt;b&gt;Goal type:&lt;/b&gt; Velocity&lt;br&gt;
+&lt;b&gt;Velocity Goal:&lt;/b&gt; 40
+&lt;/p&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;</instructions>
+        <weight>1</weight>
+        <autoEnable>false</autoEnable>
+        <canMarkAsFailed>false</canMarkAsFailed>
+    </step>
+    <step name="CreateClassificationRules" optional="false">
+        <title>Define classification rules for the workload</title>
+        <description>Define classification rules for the address spaces and started tasks in the workload. 
+Classification rules categorize work into service classes, and report classes or tenant report classes, 
+based on WLM subsystem type and work qualifiers.
+&lt;p&gt;The available work qualifiers depend on the subsystem.
+For more information, see
+&lt;a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.4.0/com.ibm.zos.v2r4.ieaw100/clsf.html" target="_blank"&gt;Classification rules.&lt;/a&gt;
+ &lt;/p&gt;</description>
+        <instructions substitution="false">&lt;h3&gt;Summary&lt;/h3&gt;
+Define classification rules for the solution work, specifying the tenant report class that you created.
+The tenant report class is associated with the tenant report group, which maps the workload 
+to Tailored Fit Pricing for IBM Z.
+&lt;h3&gt;Details&lt;/h3&gt;
+This section includes the steps for defining classification rules, as well as
+an example of values that you might specify.
+The example is continued from the previous step.
+&lt;table style="width:100%"&gt;
+&lt;tr&gt;
+&lt;th&gt;Steps for classification&lt;/th&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;Example (continued)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td width="60%" valign="top"&gt;
+&lt;p&gt;To define classification rules for the workload using the z/OSMF Workload Management task:
+&lt;ol&gt;
+&lt;li&gt;Click &lt;b&gt;Switch To&lt;/b&gt;, 
+then select &lt;b&gt;Classifications&lt;/b&gt;.
+&lt;/li&gt;
+&lt;li&gt;
+To modify a classification, select it in the classifications table,
+then click &lt;b&gt;Actions,&lt;/b&gt; then select &lt;b&gt;Properties.&lt;/b&gt; 
+&lt;p&gt;To define a new classification, in the classifications table, click &lt;b&gt;Actions,&lt;/b&gt; then select &lt;b&gt;New.&lt;/b&gt; 
+A page for creating a classification is displayed.&lt;/p&gt;
+&lt;p&gt;Then, specify the appropriate values.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Subsystem type: Subsystem type, for example, DB2.&lt;/li&gt;
+&lt;li&gt;Service class: Service class that you defined for use with the container.&lt;/li&gt;
+&lt;li&gt;Report class: Tenant report class that you created.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;Classification Rules&lt;/h4&gt;
+To create a new classification rule, click &lt;b&gt;Actions,&lt;/b&gt; then select &lt;b&gt;New Level 1 Rule.&lt;/b&gt;
+&lt;p&gt;Classification rules are organized in a nested hierarchy. 
+The top level or container is the subsystem type or classification. You can define up to four levels of nesting within the classification. To do so, add rules to the Classification Rules table. The order in which z/OS® Workload Manager (WLM) searches the rules is determined by the order in which you specify the rules. You can use a different hierarchy for each subsystem type.
+When a subsystem receives a work request, WLM uses the work qualifiers to 
+sequentially check for a match against each level one rule defined within the 
+classification. When it finds a match, it continues through the level two rules 
+nested within the matching level one rule until it finds a match. 
+WLM continues searching the levels and the sub-rules of the matching levels 
+until the last matching rule is found. The last matching rule determines the 
+service class and report class to be assigned.
+&lt;p&gt;For more information on defining classification rules
+ with the z/OSMF Workload Management task,
+click &lt;b&gt;Help&lt;/b&gt; above &lt;b&gt;Switch To&lt;/b&gt; on the Properties for Classification page.&lt;/p&gt;
+&lt;p&gt;
+For more information about classification rules, see
+&lt;a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.4.0/com.ibm.zos.v2r4.ieaw100/clsf.html" target="_blank"&gt;Classification rules.&lt;/a&gt;
+ &lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;When you are finished, click &lt;b&gt;OK&lt;/b&gt; at the bottom of the page.&lt;/li&gt;
+&lt;li&gt;Ensure that the classification rules were created and that no error messages are displayed. If
+there are any error messages, correct them before continuing.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/td&gt;
+&lt;td width="5%"&gt;&lt;/td&gt;
+&lt;td width="35%" valign="top"&gt;
+&lt;p&gt;Specify these values for classification.
+&lt;br&gt;
+&lt;b&gt;Subsystem type:&lt;/b&gt; DB2&lt;br&gt;
+&lt;b&gt;Service class:&lt;/b&gt; DB2CRCS&lt;br&gt;
+&lt;b&gt;Report class:&lt;/b&gt; DB2TRC (the name of the tenant report class)
+&lt;/p&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;</instructions>
+        <weight>1</weight>
+        <autoEnable>false</autoEnable>
+        <canMarkAsFailed>false</canMarkAsFailed>
+    </step>
+    <step name="InstallActivate" optional="false">
+        <title>Install and activate the service definition</title>
+        <description>Install the service definition into the WLM couple data set for the sysplex and activate a service policy. </description>
+        <instructions substitution="false">To install the service definition into the WLM couple data set and activate the service policy:
+&lt;ol&gt;
+&lt;li&gt;Click the Service Definitions tab. You may have several tabs showing on the Workload Management page.
+&lt;/li&gt;
+&lt;li&gt;In the service definitions table, select the service definition you want to install and activate,
+by clicking the checkbox next to the name.&lt;/li&gt;
+&lt;li&gt;Click &lt;b&gt;Actions&lt;/b&gt;, then click &lt;b&gt;Install and Activate&lt;/b&gt;.&lt;/li&gt;
+&lt;/ol&gt;</instructions>
+        <weight>1</weight>
+        <autoEnable>false</autoEnable>
+        <canMarkAsFailed>false</canMarkAsFailed>
+    </step>
+    <step name="GenerateSCRTReport" optional="false">
+        <title>Prepare to generate an SCRT report</title>
+        <description>After your Tailored Fit Pricing solution is implemented in the colocated LPAR configuration and 
+the workload runs, you update your Sub Capacity Reporting Tool (SCRT) configuration. 
+After the update, SCRT uses the Tailored Fit Pricing data to understand the 
+resource consumption, and it removes the 
+container’s MSU consumption from the LPAR’s rolling four-hour
+average (R4HA). This change is reflected in your next monthly SCRT usage report.
+&lt;p&gt;Click &lt;b&gt;Close&lt;/b&gt; to return to the table of steps, and complete the substeps for this step.&lt;/p&gt;</description>
+        <step name="ObtainSCRTCommand" optional="false">
+            <title>Obtain the container solution information from LMS</title>
+            <description>Obtain the container solution information that will be used to update the SCRT configuration.</description>
+            <instructions substitution="false">&lt;ol&gt;
+&lt;li&gt;Sign in to the LMS web portal:
+&lt;a href="https://www-304.ibm.com/software/lms/index.wss" target="_blank"&gt;LMS&lt;/a&gt; 
+(www-304.ibm.com/software/lms/index.wss).&lt;/li&gt;
+&lt;li&gt;Click &lt;b&gt;Tailored Fit Pricing Solutions&lt;/b&gt;
+to display the list of approved solutions.&lt;/li&gt;
+&lt;li&gt;Find the solution.
+The information for the solution includes
+an UPDATE CONTAINER command that updates the SCRT 
+configuration. It sets the 
+solution name, which is associated 
+with the container through the specified solution ID.&lt;/li&gt;
+&lt;li&gt;If someone else will be updating the SCRT configuration, provide that person with the container solution information, 
+for example, by copying and pasting it from LMS into an email.&lt;/li&gt;
+&lt;/ol&gt;</instructions>
+            <weight>1</weight>
+            <autoEnable>false</autoEnable>
+            <canMarkAsFailed>false</canMarkAsFailed>
+        </step>
+        <step name="UpdateSCRTConfiguration" optional="false">
+            <title>Update your SCRT configuration</title>
+            <description>Update your SCRT configuration.</description>
+            <instructions substitution="false">Open your SCRT JCL, find the SPECIAL DD statement, and update it 
+with the command that was obtained from LMS.
+You might copy and paste the command directly from LMS,
+or, if another person has the responsibility for using LMS, from communication
+such as an email from that person.</instructions>
+            <weight>1</weight>
+            <autoEnable>false</autoEnable>
+            <canMarkAsFailed>false</canMarkAsFailed>
+        </step>
+    </step>
+    <step name="SubmitUsageReport" optional="false">
+        <title>Submit the usage report to IBM</title>
+        <description>Submit the next SCRT usage report to IBM.</description>
+        <instructions substitution="false">Submit the next SCRT usage report through LMS. 
+&lt;ol&gt;
+&lt;li&gt;Login to the LMS web portal: &lt;a href="https://www.ibm.com/software/lms/OpenServlet.wss" target="_blank" target="_blank"&gt;LMS&lt;/a&gt; 
+(www.ibm.com/software/lms/OpenServlet.wss).&lt;/li&gt;
+&lt;li&gt;Submit the report that was generated by SCRT.&lt;/li&gt;
+&lt;/ol&gt;</instructions>
+        <weight>1</weight>
+        <autoEnable>false</autoEnable>
+        <canMarkAsFailed>false</canMarkAsFailed>
+    </step>
+</workflow>
