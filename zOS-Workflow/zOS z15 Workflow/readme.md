@@ -29,9 +29,10 @@ Transfer the appropriate two files as binary using File Transfer Protocol (FTP),
 
     * z15_zOS_Upgrade_Workflow.xml
     * HC_rexx.txt
- 
-We welcome any contributions or feedback on anything you find. Keep in mind, there are no warranties for any of the files or contributions
-that you find here. This is a z/OS community that is sharing with others and it is expected that you review what you are using in your
-environment. This tool is not supported by the IBM Service organization, but rather by the tool owner on a best-can-do basis.
+
+**Common Problem**
+Most people that have problems creating the Upgrade Workflow have this as the cause! Github Transfer Tips! Because this Workflow contains large XML files, you must click on "View raw" to load the entire xml file into the browser, and then right mouse click for "Save as..." to store the file. Do not skip the "View raw" step or you will be saving the web page (that is, the HTML) which is unacceptable input to z/OSMF Workflow. If you are saving the file and the file type is HTML, this indicates you did not use the raw view. Using the right mouse button for "Save as..." from the "View raw" file should give you the proper contents of the file saved. Ensure you are saving the large workflow XML files, as XML. (There are two other files which are .txt, and should remain as .txt.) Do not use "Select All", then "Copy" from the raw file to save the xml file as the file will not save correctly.
+
+We welcome any contributions or feedback on anything you find. Keep in mind, there are no warranties for any of the files or contributions that you find here. This is a z/OS community that is sharing with others and it is expected that you review what you are using in your environment. This tool is not supported by the IBM Service organization, but rather by the tool owner on a best-can-do basis.
 
 Please report any problems, suggestions, or comments to zosmig@us.ibm.com.
