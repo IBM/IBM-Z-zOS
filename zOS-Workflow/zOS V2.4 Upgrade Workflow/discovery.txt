@@ -614,7 +614,7 @@ CHECK_HARDWARE_LEVEL:
       z14_status = "z14_status     = Disabled"
       z15_status = "z15_status     = Enabled"
     end
-    else if POS(MODEL,"8561") <> 0 then do
+    else if POS(MODEL,"8561 8562") <> 0 then do
       say "-------------------------------"
       say "System was detected to be a z15"
       say "-------------------------------"
