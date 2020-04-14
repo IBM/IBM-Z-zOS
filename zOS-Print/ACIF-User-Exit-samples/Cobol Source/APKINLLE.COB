@@ -30,6 +30,20 @@
 002900 DATE-COMPILED.
 003000 SECURITY. IBM SAMPLE CODE ONLY.
 003100*/**************************************************************/
+003120*/* Licensed under the Apache License, Version 2.0 (the        */
+003130*/* "License"); you may not use this file except in compliance */
+003140*/* with the License. You may obtain a copy of the License at  */
+003150*/*                                                            */
+003160*/* http://www.apache.org/licenses/LICENSE-2.0                 */
+003170*/*                                                            */
+003180*/* Unless required by applicable law or agreed to in writing, */
+003190*/* software distributed under the License is distributed on an*/
+003191*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+003192*/* KIND, either express or implied.  See the License for the  */
+003193*/* specific language governing permissions and limitations    */
+003194*/* under the License.                                         */
+003195*/*------------------------------------------------------------*/
+003196*/*                                                            */
 003200*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
 003300*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
 003400*/*                                                            */
@@ -59,7 +73,7 @@
 005800 DATA DIVISION.
 005900 WORKING-STORAGE SECTION.
 006000 77  PGMNAME                 PIC X(8) VALUE 'APKINLLE'.
-006100 77  ABND-PGM                PIC X(8) VALUE 'CEE3ABD'.
+006120 77  ABND-PGM                PIC X(8) VALUE 'CEE3ABD '.
 006200 77  ABEND-CODE              PIC 9(4) BINARY VALUE 12.
 006300 77  LINE-COUNT              PIC S9(8) BINARY VALUE ZERO.
 006400 77  PAGE-COUNT              PIC S9(8) BINARY VALUE ZERO.

@@ -1,0 +1,498 @@
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211                 Date 04/08/2020  Time 15:51:23   Page     1
+0Invocation parameters:
+  APOST,MAP,NORENT,TRUNC(BIN),CP(1140),X,DYNAM,RMODE(24),S,NOOFF,DATA(24),TEST(SOURCE)
+0PROCESS(CBL) statements:
+  PROCESS DYNAM NUMPROC(PFD) TRUNC(OPT) APOST     NOSEQ     RENT
+0Options in effect:
+  NOADATA
+    ADV
+    AFP(NOVOLATILE)
+    APOST
+    ARCH(7)
+    ARITH(COMPAT)
+  NOAWO
+  NOBLOCK0
+    BUFSIZE(4096)
+  NOCICS
+    CODEPAGE(1140)
+  NOCOMPILE(S)
+  NOCOPYLOC
+  NOCOPYRIGHT
+  NOCURRENCY
+    DATA(24)
+    DBCS
+  NODECK
+  NODEFINE
+  NODIAGTRUNC
+    DISPSIGN(COMPAT)
+  NODLL
+  NODUMP
+    DYNAM
+  NOEXIT
+  NOEXPORTALL
+  NOFASTSRT
+    FLAG(I,I)
+  NOFLAGSTD
+    HGPR(PRESERVE)
+  NOINITCHECK
+  NOINITIAL
+    INLINE
+    INTDATE(ANSI)
+    LANGUAGE(EN)
+    LINECOUNT(60)
+  NOLIST
+    MAP(HEX)
+    MAXPCF(100000)
+  NOMDECK
+  NONAME
+    NSYMBOL(NATIONAL)
+  NONUMBER
+  NONUMCHECK
+    NUMPROC(PFD)
+    OBJECT
+  NOOFFSET
+    OPTIMIZE(0)
+    OUTDD(SYSOUT)
+  NOPARMCHECK
+    PGMNAME(COMPAT)
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211                 Date 04/08/2020  Time 15:51:23   Page     2
+0   QUALIFY(COMPAT)
+    RENT
+    RMODE(24)
+  NORULES
+  NOSERVICE
+  NOSEQUENCE
+    SOURCE
+    SPACE(1)
+  NOSQL
+    SQLCCSID
+  NOSQLIMS
+  NOSSRANGE
+  NOSTGOPT
+    SUPPRESS
+  NOTERM
+    TEST(NOEJPD,DWARF,SOURCE,NOSEPARATE)
+  NOTHREAD
+    TRUNC(OPT)
+  NOVBREF
+    VLR(STANDARD)
+    VSAMOPENFS(COMPAT)
+  NOWORD
+    XMLPARSE(XMLSS)
+    XREF(FULL)
+    ZONEDATA(PFD)
+    ZWB
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211       APKXPSEG  Date 04/08/2020  Time 15:51:23   Page     3
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0/* APKXPSEG
+   000001         000200* LAST UPDATE ON 9 Apr 2018 AT 15:49:14 BY  HOWARDT VERSION 01   *
+   000002         000300 ID DIVISION.
+   000003         000400 PROGRAM-ID. APKXPSEG.
+   000004         000500 AUTHOR. TURETZKY--HYDRA.
+   000005         000600 INSTALLATION. IBM BOULDER PROGRAMMING CENTER.
+   000006         000700               This program is an exit for ACIF (APKACIF,5648-062)
+   000007         000800               that will print a list page segments referenced in
+   000008         000900               a print job, and cause them to be excluded from the
+   000009         001000               output resource library.
+   000010         001100
+   000011         001200               In order to use this exit, you must use the ACIF
+   000012         001300               control statement RESTYPE=ALL for the list to be
+   000013         001400               complete. RESTYPE=NONE will produce no list at all.
+   000014         001500               If you only wish to see certain type of resource,
+   000015         001600               use RESTYPE to select it. Include the control
+   000016         001700               RESEXIT=APKXPSEG to enable this exit, and include
+   000017         001800               the load module in a dataset referenced in STEPLIB
+   000018         001900               or elsewhere in the module search order.
+   000019         002000
+   000020         002100               To control resource inclusion in the output
+   000021         002200               resource library, set the value of RES-ACTION
+   000022         002300               appropriately.  Note that if resources are
+   000023         002400               excluded, resources contained in overlays will not
+   000024         002500               appear in the report because overlay contents will
+   000025         002600               not be processed by ACIF.
+   000026         002700
+   000027         002800               Method of operation: each resource name is saved in
+   000028         002900               a table for that type of resource. The table may be
+   000029         003000               searched to eliminate duplicates. When the last
+   000030         003100               call flag is set, the contents of the tables are
+   000031         003200               printed.
+   000032         003300
+   000033         003400               You must allocate a DD named PAPKRSLS for the print
+   000034         003500               file, with an LRECL of 84, BLKSIZE of n*84+4, VBA.
+   000035         003600
+   000036         003700               This program must either be compiled with the
+   000037         003800               NORENT option or linked with IGZOPT with the
+   000038         003900               RTEREUS option.  (See VS COBOL II Application
+   000039         004000               Programming Guide, SC26-4045).
+   000040         004100
+   000041         004200 DATE-WRITTEN. 23 FEB 93.
+   000042         004300 DATE-COMPILED. 04/08/20.
+   000043         004400 SECURITY. IBM SAMPLE CODE ONLY.
+   000044         004500*/**************************************************************/
+   000045         004510*/* Licensed under the Apache License, Version 2.0 (the        */
+   000046         004520*/* "License"); you may not use this file except in compliance */
+   000047         004530*/* with the License. You may obtain a copy of the License at  */
+   000048         004540*/*                                                            */
+   000049         004550*/* http://www.apache.org/licenses/LICENSE-2.0                 */
+   000050         004560*/*                                                            */
+   000051         004570*/* Unless required by applicable law or agreed to in writing, */
+   000052         004580*/* software distributed under the License is distributed on an*/
+   000053         004590*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+   000054         004591*/* KIND, either express or implied.  See the License for the  */
+   000055         004592*/* specific language governing permissions and limitations    */
+   000056         004593*/* under the License.                                         */
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211       APKXPSEG  Date 04/08/2020  Time 15:51:23   Page     4
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0  000057         004594*/*------------------------------------------------------------*/
+   000058         004595*/*                                                            */
+   000059         004600*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
+   000060         004700*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
+   000061         004800*/*                                                            */
+   000062         004900*/*   Permission to use, copy, modify, and distribute          */
+   000063         005000*/*   this software for any purpose with or without fee        */
+   000064         005100*/*   is hereby granted, provided that the above               */
+   000065         005200*/*   copyright notices appear in all copies.                  */
+   000066         005300*/*                                                            */
+   000067         005400*/*   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY       */
+   000068         005500*/*   OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT       */
+   000069         005600*/*   LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            */
+   000070         005700*/*   FITNESS FOR A PARTICULAR PURPOSE AND                     */
+   000071         005800*/*   NONINFRINGEMENT.  IN NO EVENT SHALL RICOH, RICOH         */
+   000072         005900*/*   SUBSIDIARIES, ANY OF ITS SUPPLIERS OR ANY OF THE         */
+   000073         006000*/*   OTHER COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,         */
+   000074         006100*/*   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF      */
+   000075         006200*/*   CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF        */
+   000076         006300*/*   OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR         */
+   000077         006400*/*   OTHER DEALINGS IN THE SOFTWARE.                          */
+   000078         006500*/**************************************************************/
+1ACIF RESOURCE REPORT EXIT                                      APKXPSEG  Date 04/08/2020  Time 15:51:23   Page     5
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000080         006700 ENVIRONMENT DIVISION.
+   000081         006800 CONFIGURATION SECTION.
+   000082         006900 SOURCE-COMPUTER. IBM-370.
+   000083         007000 OBJECT-COMPUTER. IBM-370.
+   000084         007100 INPUT-OUTPUT SECTION.
+   000085         007200 FILE-CONTROL.
+   000086         007300     SELECT PRINT-FILE ASSIGN TO PAPKXPSE.                                 90
+0
+   000088         007500 DATA DIVISION.
+   000089         007600 FILE SECTION.
+   000090         007700 FD  PRINT-FILE
+   000091         007800     BLOCK CONTAINS 0
+   000092         007900     LABEL RECORDS STANDARD
+   000093         008000     RECORD VARYING DEPENDING ON PRINT-REC-LEN                             106
+   000094         008100     RECORDING MODE V.
+   000095         008200 01  PRINT-RECORD.                                                         BLF=00001,000000000 0CL80
+   000096         008300     05  PRINT-DATA          OCCURS 1 TO 80,                               BLF=00001,000000000 1C
+   000097         008400                             DEPENDING ON PRINT-REC-LEN,                   106
+   000098         008500                             PIC X.
+1ACIF RESOURCE REPORT EXIT                                      APKXPSEG  Date 04/08/2020  Time 15:51:23   Page     6
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000100         008700 WORKING-STORAGE SECTION.
+   000101         008800 77  PGMNAME                 PIC X(8) VALUE 'APKXPSEG'.                              000000000 8C
+   000102         008911 77  ABND-PGM                PIC X(8) VALUE 'CEE3DMP'.            !@01               000000000 8C
+   000103         009000 77  ABEND-CODE              PIC 9(4) BINARY VALUE 12.                               000000000 2C
+   000104         009010 77  ABEND-OPTS              PIC X(255)                           !@01               000000000 255C
+   000105         009020     VALUE 'ENC(CUR) THR(CUR) FILE VAR NOBLOCK NOSTOR SF(ALL)' .  !@01
+   000106         009100 77  PRINT-REC-LEN           PIC 9(8) BINARY VALUE ZERO.                             000000000 4C
+                                                                                                   IMP
+   000107         009200 77  MIN-REC-LEN             PIC 9(4) BINARY VALUE 9.                                000000000 2C
+   000108         009300 77  MAX-REC-LEN             PIC 9(4) BINARY VALUE 81.                               000000000 2C
+   000109         009400 77  LINE-COUNT              PIC S9(8) BINARY VALUE ZERO.                            000000000 4C
+                                                                                                   IMP
+   000110         009500 77  PAGE-COUNT              PIC S9(8) BINARY VALUE ZERO.                            000000000 4C
+                                                                                                   IMP
+   000111         009600 77  PAGE-LEN                PIC S9(8) BINARY VALUE 50.                              000000000 4C
+   000112         009700 77  PSEG-CNTR               PIC S9(8) BINARY VALUE ZERO.                            000000000 4C
+                                                                                                   IMP
+   000113         009800 77  OVLY-CNTR               PIC S9(8) BINARY VALUE ZERO.                            000000000 4C
+                                                                                                   IMP
+   000114         009900 77  CSET-CNTR               PIC S9(8) BINARY VALUE ZERO.                            000000000 4C
+                                                                                                   IMP
+   000115         010000 77  CPAGE-CNTR              PIC S9(8) BINARY VALUE ZERO.                            000000000 4C
+                                                                                                   IMP
+   000116         010100 77  UNKNOWN-CNTR            PIC 9(4) BINARY VALUE ZERO.                             000000000 2C
+                                                                                                   IMP
+   000117         010200 77  INCLUDE-RESOURCE        PIC X VALUE X'00'.                                      000000000 1C
+   000118         010300 77  IGNORE-RESOURCE         PIC X VALUE X'01'.                                      000000000 1C
+   000119         010400 77  FIRST-TIME-FLAG         PIC X VALUE LOW-VALUE.                                  000000000 1C
+                                                                                                   IMP
+   000120         010500     88  FIRST-TIME          VALUE LOW-VALUE.                              IMP
+   000121         010600     88  NOT-FIRST-TIME      VALUE HIGH-VALUE.                             IMP
+   000122         010700 77  CPAGE                   PIC X VALUE X'41'.                                      000000000 1C
+   000123         010800 77  CSET                    PIC X VALUE X'40'.                                      000000000 1C
+   000124         010900 77  PSEG                    PIC X VALUE X'FB'.                                      000000000 1C
+   000125         011000 77  OVLY                    PIC X VALUE X'FC'.                                      000000000 1C
+   000126         011100 77  FDEF-NAME               PIC X(14) VALUE 'FORMDEF'.                              000000000 14C
+   000127         011200 77  CPAGE-NAME              PIC X(14) VALUE 'CODEPAGE'.                             000000000 14C
+   000128         011300 77  CSET-NAME               PIC X(14) VALUE 'CHARACTER-SET'.                        000000000 14C
+   000129         011400 77  PSEG-NAME               PIC X(14) VALUE 'PAGE-SEGMENT'.                         000000000 14C
+   000130         011500 77  OVLY-NAME               PIC X(14) VALUE 'OVERLAY'.                              000000000 14C
+0
+
+   000133         011800 01  LINE-DETAIL.                                                                    000000000 0CL27
+   000134         011900     05  LINE-CC             PIC X   VALUE SPACE.                                    000000000 1C
+                                                                                                   IMP
+   000135         012000     05  FILLER              PIC X(02) VALUE SPACES.                                 000000001 2C
+                                                                                                   IMP
+   000136         012100     05  LINE-TYPE           PIC X(14) VALUE SPACES.                                 000000003 14C
+                                                                                                   IMP
+   000137         012200     05  FILLER              PIC X(02) VALUE SPACES.                                 000000011 2C
+                                                                                                   IMP
+   000138         012300     05  LINE-RESNAME        PIC X(8).                                               000000013 8C
+
+   000140         012500 01  TIME-STAMP.                                                                     000000000 0CL12
+   000141         012600     05  T-S-DAY             PIC 9(5).                                               000000000 5C
+   000142         012700     05  FILLER              PIC X VALUE '/'.                                        000000005 1C
+   000143         012800     05  T-S-TIME            PIC X(6).                                               000000006 6C
+1ACIF RESOURCE REPORT EXIT                                      APKXPSEG  Date 04/08/2020  Time 15:51:23   Page     7
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0
+1ACIF RESOURCE REPORT EXIT                                      APKXPSEG  Date 04/08/2020  Time 15:51:23   Page     8
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000145         013000/ PASSED PARAMETERS.
+   000146         013100 LINKAGE SECTION.
+   000147         013200 01  RES-PARMS.                                                            BLL=00001,000000000 0CL19
+   000148         013300     05  RES-USTOR           POINTER.                                      BLL=00001,000000000 4C
+   000149         013400     05  RES-PFATTR          POINTER.                                      BLL=00001,000000004 4C
+   000150         013500     05  RES-RSNAME          PIC X(8).                                     BLL=00001,000000008 8C
+   000151         013600     05  RES-RSTYPE          PIC X.                                        BLL=00001,000000010 1C
+   000152         013700     05  RES-ACTION          PIC X.                                        BLL=00001,000000011 1C
+   000153         013800     05  RES-EOF-FLAG        PIC X.                                        BLL=00001,000000012 1C
+   000154         013900         88  RES-EOF         VALUE 'Y'.
+   000155         014000
+   000156         014100 01  RES-UAREA               PIC X(16).                                    BLL=00002,000000000 16C
+   000157         014200
+   000158         014300 01  RES-ATTR.                                                             BLL=00003,000000000 0CL51
+   000159         014400     05  RES-CC              PIC XXX.                                      BLL=00003,000000000 3C
+   000160         014500     05  RES-CCTYPE          PIC X.                                        BLL=00003,000000003 1C
+   000161         014600     05  RES-CHARS           PIC X(20).                                    BLL=00003,000000004 20C
+   000162         014700     05  RES-FORMDEF         PIC X(8).                                     BLL=00003,000000018 8C
+   000163         014800     05  RES-PAGEDEF         PIC X(8).                                     BLL=00003,000000020 8C
+   000164         014900     05  RES-PRMODE          PIC X(8).                                     BLL=00003,000000028 8C
+   000165         015000     05  RES-TRC             PIC XXX.                                      BLL=00003,000000030 3C
+1INITIALIZATION AND MAIN LINE                                   APKXPSEG  Date 04/08/2020  Time 15:51:23   Page     9
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000167         015200 PROCEDURE DIVISION USING RES-PARMS.                                       147
+   000168         015300 0010-UPDATE-TABLE.
+   000169         015400     SET ADDRESS OF RES-UAREA TO RES-USTOR.                                IMP 156 148
+   000170         015500     SET ADDRESS OF RES-ATTR TO RES-PFATTR.                                IMP 158 149
+
+   000172         015700     IF FIRST-TIME                                                         120
+   000173         015800      THEN
+   000174      1  015900       OPEN OUTPUT PRINT-FILE;                                             90
+   000175      1  016000       MOVE FDEF-NAME TO LINE-TYPE;                                        126 136
+   000176      1  016100       MOVE RES-FORMDEF TO LINE-RESNAME;                                   162 138
+   000177      1  016200       PERFORM 0120-PRINT-DETAIL;                                          220
+   000178      1  016300       SET NOT-FIRST-TIME TO TRUE;                                         121
+   000179         016400     END-IF.
+
+   000181         016600     IF RES-EOF                                                            154
+   000182         016700      THEN
+   000183      1  016800       CLOSE PRINT-FILE;                                                   90
+   000184      1  016900       SET FIRST-TIME TO TRUE;                                             120
+   000185      1  017000       GOBACK;
+   000186         017100     END-IF.
+
+   000188         017300     EVALUATE RES-RSTYPE                                                   151
+   000189         017400* ACIF presents code pages each time they appear in a font, so
+   000190         017500* there may be many occurences of the same codepage. Make sure
+   000191         017600* we save only 1 of each.
+   000192         017700      WHEN CPAGE                                                           122
+   000193      1  017800       ADD 1 TO CPAGE-CNTR;                                                115
+   000194      1  017900       MOVE CPAGE-NAME TO LINE-TYPE;                                       127 136
+   000195      1  018000       MOVE RES-RSNAME TO LINE-RESNAME;                                    150 138
+   000196      1  018100       PERFORM 0120-PRINT-DETAIL;                                          220
+   000197         018200      WHEN CSET                                                            123
+   000198      1  018300       ADD 1 TO CSET-CNTR;                                                 114
+   000199      1  018400       MOVE CSET-NAME TO LINE-TYPE;                                        128 136
+   000200      1  018500       MOVE RES-RSNAME TO LINE-RESNAME;                                    150 138
+   000201      1  018600       PERFORM 0120-PRINT-DETAIL;                                          220
+   000202         018700      WHEN PSEG                                                            124
+   000203      1  018800       ADD 1 TO PSEG-CNTR;                                                 112
+   000204      1  018900       MOVE PSEG-NAME TO LINE-TYPE;                                        129 136
+   000205      1  019000       MOVE RES-RSNAME TO LINE-RESNAME;                                    150 138
+   000206      1  019100       PERFORM 0120-PRINT-DETAIL;                                          220
+   000207         019200      WHEN OVLY                                                            125
+   000208      1  019300       ADD 1 TO OVLY-CNTR;                                                 113
+   000209      1  019400       MOVE OVLY-NAME TO LINE-TYPE;                                        130 136
+   000210      1  019500       MOVE RES-RSNAME TO LINE-RESNAME;                                    150 138
+   000211      1  019600       PERFORM 0120-PRINT-DETAIL;                                          220
+   000212         019700      WHEN OTHER
+   000213      1  019800       ADD 1 TO UNKNOWN-CNTR;                                              116
+   000214         019900     END-EVALUATE.
+   000215         020000* The following omits or includes all resources.
+   000216         020100     MOVE IGNORE-RESOURCE TO RES-ACTION.                                   118 152
+   000217         020200*    MOVE INCLUDE-RESOURCE TO RES-ACTION.
+   000218         020300     GOBACK.
+1Produce Resource Used Report                                   APKXPSEG  Date 04/08/2020  Time 15:51:23   Page    10
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000220         020500 0120-PRINT-DETAIL.
+   000221         020600     MOVE LENGTH OF LINE-DETAIL TO PRINT-REC-LEN.                          IMP 133 106
+   000222         020700     WRITE PRINT-RECORD FROM LINE-DETAIL.                                  95 133
+ */ APKXPSEG
+1Produce Resource Used Report                                   APKXPSEG  Date 04/08/2020  Time 15:51:23   Page    11
+0An "M" preceding a data-name reference indicates that the data-name is modified by this reference.
+
+  Defined   Cross-reference of data names   References
+
+      103   ABEND-CODE
+      104   ABEND-OPTS
+      102   ABND-PGM
+      122   CPAGE. . . . . . . . . . . . .  192
+      115   CPAGE-CNTR . . . . . . . . . .  M193
+      127   CPAGE-NAME . . . . . . . . . .  194
+      123   CSET . . . . . . . . . . . . .  197
+      114   CSET-CNTR. . . . . . . . . . .  M198
+      128   CSET-NAME. . . . . . . . . . .  199
+      126   FDEF-NAME. . . . . . . . . . .  175
+      120   FIRST-TIME . . . . . . . . . .  172 M184
+      119   FIRST-TIME-FLAG
+      118   IGNORE-RESOURCE. . . . . . . .  216
+      117   INCLUDE-RESOURCE
+      134   LINE-CC
+      109   LINE-COUNT
+      133   LINE-DETAIL. . . . . . . . . .  221 222
+      138   LINE-RESNAME . . . . . . . . .  M176 M195 M200 M205 M210
+      136   LINE-TYPE. . . . . . . . . . .  M175 M194 M199 M204 M209
+      108   MAX-REC-LEN
+      107   MIN-REC-LEN
+      121   NOT-FIRST-TIME . . . . . . . .  M178
+      125   OVLY . . . . . . . . . . . . .  207
+      113   OVLY-CNTR. . . . . . . . . . .  M208
+      130   OVLY-NAME. . . . . . . . . . .  209
+      110   PAGE-COUNT
+      111   PAGE-LEN
+      101   PGMNAME
+       96   PRINT-DATA
+       90   PRINT-FILE . . . . . . . . . .  86 174 183
+      106   PRINT-REC-LEN. . . . . . . . .  93 97 M221
+       95   PRINT-RECORD . . . . . . . . .  M222
+      124   PSEG . . . . . . . . . . . . .  202
+      112   PSEG-CNTR. . . . . . . . . . .  M203
+      129   PSEG-NAME. . . . . . . . . . .  204
+      152   RES-ACTION . . . . . . . . . .  M216
+      158   RES-ATTR . . . . . . . . . . .  170
+      159   RES-CC
+      160   RES-CCTYPE
+      161   RES-CHARS
+      154   RES-EOF. . . . . . . . . . . .  181
+      153   RES-EOF-FLAG
+      162   RES-FORMDEF. . . . . . . . . .  176
+      163   RES-PAGEDEF
+      147   RES-PARMS. . . . . . . . . . .  167
+      149   RES-PFATTR . . . . . . . . . .  170
+      164   RES-PRMODE
+      150   RES-RSNAME . . . . . . . . . .  195 200 205 210
+      151   RES-RSTYPE . . . . . . . . . .  188
+      165   RES-TRC
+      156   RES-UAREA. . . . . . . . . . .  169
+      148   RES-USTOR. . . . . . . . . . .  169
+      141   T-S-DAY
+      143   T-S-TIME
+1Produce Resource Used Report                                   APKXPSEG  Date 04/08/2020  Time 15:51:23   Page    12
+0 Defined   Cross-reference of data names   References
+
+0     140   TIME-STAMP
+      116   UNKNOWN-CNTR . . . . . . . . .  M213
+1Produce Resource Used Report                                   APKXPSEG  Date 04/08/2020  Time 15:51:23   Page    13
+0Context usage is indicated by the letter preceding a procedure-name reference.
+ These letters and their meanings are:
+     A = ALTER (procedure-name)
+     D = GO TO (procedure-name) DEPENDING ON
+     E = End of range of (PERFORM) through (procedure-name)
+     G = GO TO (procedure-name)
+     P = PERFORM (procedure-name)
+     T = (ALTER) TO PROCEED TO (procedure-name)
+     U = USE FOR DEBUGGING (procedure-name)
+
+  Defined   Cross-reference of procedures   References
+
+      168   0010-UPDATE-TABLE
+      220   0120-PRINT-DETAIL. . . . . . .  P177 P196 P201 P206 P211
+1Produce Resource Used Report                                   APKXPSEG  Date 04/08/2020  Time 15:51:23   Page    14
+0 Defined   Cross-reference of programs     References
+
+        3   APKXPSEG
+1Produce Resource Used Report                                   APKXPSEG  Date 04/08/2020  Time 15:51:23   Page    15
+0Data Division Map
+0Data Definition Attribute codes (rightmost column) have the following meanings:
+     D = Object of OCCURS DEPENDING    G = GLOBAL                             S = Spanned file
+     E = EXTERNAL                      O = Has OCCURS clause                  U = Undefined format file
+     F = Fixed-length file             OG= Group has own length definition    V = Variable-length file
+     FB= Fixed-length blocked file     R = REDEFINES                          VB= Variable-length blocked file
+     X = Unallocated
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+      3  PROGRAM-ID APKXPSEG----------------------------------------------------------------------------------------------------*
+     90   FD PRINT-FILE. . . . . . . . . . . . . . . . . . BLF=00001                                 QSAM           VB
+     95   1  PRINT-RECORD. . . . . . . . . . . . . . . . . BLF=00001   000000000   DS 0CL80          Grp-VarLen
+     96     2  PRINT-DATA. . . . . . . . . . . . . . . . . BLF=00001   000000000   DS 1C             Display        O
+    101   77 PGMNAME . . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+    102   77 ABND-PGM. . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+    103   77 ABEND-CODE. . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+    104   77 ABEND-OPTS. . . . . . . . . . . . . . . . . .             000000000   DS 255C           Display
+    106   77 PRINT-REC-LEN . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary         D
+    107   77 MIN-REC-LEN . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+    108   77 MAX-REC-LEN . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+    109   77 LINE-COUNT. . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+    110   77 PAGE-COUNT. . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+    111   77 PAGE-LEN. . . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+    112   77 PSEG-CNTR . . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+    113   77 OVLY-CNTR . . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+    114   77 CSET-CNTR . . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+    115   77 CPAGE-CNTR. . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+    116   77 UNKNOWN-CNTR. . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+    117   77 INCLUDE-RESOURCE. . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    118   77 IGNORE-RESOURCE . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    119   77 FIRST-TIME-FLAG . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    120   88 FIRST-TIME. . . . . . . . . . . . . . . . . .
+    121   88 NOT-FIRST-TIME. . . . . . . . . . . . . . . .
+    122   77 CPAGE . . . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    123   77 CSET. . . . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    124   77 PSEG. . . . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    125   77 OVLY. . . . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    126   77 FDEF-NAME . . . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    127   77 CPAGE-NAME. . . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    128   77 CSET-NAME . . . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    129   77 PSEG-NAME . . . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    130   77 OVLY-NAME . . . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    133   1  LINE-DETAIL . . . . . . . . . . . . . . . . .             000000000   DS 0CL27          Group
+    134     2  LINE-CC . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    135     2  FILLER. . . . . . . . . . . . . . . . . . .             000000001   DS 2C             Display
+    136     2  LINE-TYPE . . . . . . . . . . . . . . . . .             000000003   DS 14C            Display
+    137     2  FILLER. . . . . . . . . . . . . . . . . . .             000000011   DS 2C             Display
+    138     2  LINE-RESNAME. . . . . . . . . . . . . . . .             000000013   DS 8C             Display
+    140   1  TIME-STAMP. . . . . . . . . . . . . . . . . .             000000000   DS 0CL12          Group
+    141     2  T-S-DAY . . . . . . . . . . . . . . . . . .             000000000   DS 5C             Disp-Num
+    142     2  FILLER. . . . . . . . . . . . . . . . . . .             000000005   DS 1C             Display
+    143     2  T-S-TIME. . . . . . . . . . . . . . . . . .             000000006   DS 6C             Display
+    147   1  RES-PARMS . . . . . . . . . . . . . . . . . . BLL=00001   000000000   DS 0CL19          Group
+    148     2  RES-USTOR . . . . . . . . . . . . . . . . . BLL=00001   000000000   DS 4C             Pointer
+    149     2  RES-PFATTR. . . . . . . . . . . . . . . . . BLL=00001   000000004   DS 4C             Pointer
+    150     2  RES-RSNAME. . . . . . . . . . . . . . . . . BLL=00001   000000008   DS 8C             Display
+1Produce Resource Used Report                                   APKXPSEG  Date 04/08/2020  Time 15:51:23   Page    16
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    151     2  RES-RSTYPE. . . . . . . . . . . . . . . . . BLL=00001   000000010   DS 1C             Display
+    152     2  RES-ACTION. . . . . . . . . . . . . . . . . BLL=00001   000000011   DS 1C             Display
+    153     2  RES-EOF-FLAG. . . . . . . . . . . . . . . . BLL=00001   000000012   DS 1C             Display
+    154     88 RES-EOF . . . . . . . . . . . . . . . . . . BLL=00001
+    156   1  RES-UAREA . . . . . . . . . . . . . . . . . . BLL=00002   000000000   DS 16C            Display
+    158   1  RES-ATTR. . . . . . . . . . . . . . . . . . . BLL=00003   000000000   DS 0CL51          Group
+    159     2  RES-CC. . . . . . . . . . . . . . . . . . . BLL=00003   000000000   DS 3C             Display
+    160     2  RES-CCTYPE. . . . . . . . . . . . . . . . . BLL=00003   000000003   DS 1C             Display
+    161     2  RES-CHARS . . . . . . . . . . . . . . . . . BLL=00003   000000004   DS 20C            Display
+    162     2  RES-FORMDEF . . . . . . . . . . . . . . . . BLL=00003   000000018   DS 8C             Display
+    163     2  RES-PAGEDEF . . . . . . . . . . . . . . . . BLL=00003   000000020   DS 8C             Display
+    164     2  RES-PRMODE. . . . . . . . . . . . . . . . . BLL=00003   000000028   DS 8C             Display
+    165     2  RES-TRC . . . . . . . . . . . . . . . . . . BLL=00003   000000030   DS 3C             Display
+ End of Data Division Map
+-* Statistics for COBOL program APKXPSEG:
+ *    Source records = 222
+ *    Data Division statements = 55
+ *    Procedure Division statements = 34
+ *    Generated COBOL statements = 0
+ *    Program complexity factor = 41
+0End of compilation 1,  program APKXPSEG,  no statements flagged.
+0Return code 0

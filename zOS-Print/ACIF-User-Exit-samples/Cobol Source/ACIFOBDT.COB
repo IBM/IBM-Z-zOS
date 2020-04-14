@@ -31,6 +31,20 @@
 003200 DATE-COMPILED.                                                   00320002
 003300 SECURITY. IBM SAMPLE CODE ONLY.                                  00330002
 003400*/**************************************************************/ 00340003
+003410*/* Licensed under the Apache License, Version 2.0 (the        */
+003430*/* "License"); you may not use this file except in compliance */
+003440*/* with the License. You may obtain a copy of the License at  */
+003450*/*                                                            */
+003460*/* http://www.apache.org/licenses/LICENSE-2.0                 */
+003470*/*                                                            */
+003480*/* Unless required by applicable law or agreed to in writing, */
+003490*/* software distributed under the License is distributed on an*/
+003491*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+003492*/* KIND, either express or implied.  See the License for the  */
+003493*/* specific language governing permissions and limitations    */
+003494*/* under the License.                                         */
+003495*/*------------------------------------------------------------*/
+003496*/*                                                            */ 00370003
 003500*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */ 00350003
 003600*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */ 00360003
 003700*/*                                                            */ 00370003

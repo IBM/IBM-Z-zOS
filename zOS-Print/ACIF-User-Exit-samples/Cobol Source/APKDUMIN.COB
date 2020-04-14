@@ -1,4 +1,4 @@
-000100 PROCESS NUMPROC(PFD) TRUNC(OPT) APOST NOSEQ LIST
+000100 PROCESS NUMPROC(PFD) TRUNC(OPT) APOST NOSEQ NOLIST
 000200* LAST UPDATE ON 5 Apr 2018 AT 15:52:20 BY  HOWARDT VERSION 01   *
 000300 ID DIVISION.
 000400 PROGRAM-ID. APKDUMIN.
@@ -21,26 +21,40 @@
 002100 SECURITY. IBM SAMPLE CODE ONLY.
 002200 TITLE 'ACIF Test Input Exit'.
 002300*/**************************************************************/
-002400*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
-002500*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
-002600*/*                                                            */
-002700*/*   Permission to use, copy, modify, and distribute          */
-002800*/*   this software for any purpose with or without fee        */
-002900*/*   is hereby granted, provided that the above               */
-003000*/*   copyright notices appear in all copies.                  */
-003100*/*                                                            */
-003200*/*   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY       */
-003300*/*   OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT       */
-003400*/*   LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            */
-003500*/*   FITNESS FOR A PARTICULAR PURPOSE AND                     */
-003600*/*   NONINFRINGEMENT.  IN NO EVENT SHALL RICOH, RICOH         */
-003700*/*   SUBSIDIARIES, ANY OF ITS SUPPLIERS OR ANY OF THE         */
-003800*/*   OTHER COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,         */
-003900*/*   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF      */
-004000*/*   CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF        */
-004100*/*   OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR         */
-004200*/*   OTHER DEALINGS IN THE SOFTWARE.                          */
-004300*/**************************************************************/
+002400*/* LICENSED UNDER THE APACHE LICENSE, VERSION 2.0 (THE        */
+002500*/* "LICENSE"); YOU MAY NOT USE THIS FILE EXCEPT IN COMPLIANCE */
+002600*/* WITH THE LICENSE. YOU MAY OBTAIN A COPY OF THE LICENSE AT  */
+002700*/*                                                            */
+002800*/* HTTP://WWW.APACHE.ORG/LICENSES/LICENSE-2.0                 */
+002900*/*                                                            */
+003000*/* UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING, */
+003100*/* SOFTWARE DISTRIBUTED UNDER THE LICENSE IS DISTRIBUTED ON AN*/
+003200*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+003300*/* KIND, EITHER EXPRESS OR IMPLIED.  SEE THE LICENSE FOR THE  */
+003400*/* SPECIFIC LANGUAGE GOVERNING PERMISSIONS AND LIMITATIONS    */
+003500*/* UNDER THE LICENSE.                                         */
+003600*/*------------------------------------------------------------*/
+003700*/*                                                            */
+004410*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
+004420*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
+004430*/*                                                            */
+004440*/*   Permission to use, copy, modify, and distribute          */
+004450*/*   this software for any purpose with or without fee        */
+004460*/*   is hereby granted, provided that the above               */
+004470*/*   copyright notices appear in all copies.                  */
+004480*/*                                                            */
+004490*/*   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY       */
+004491*/*   OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT       */
+004492*/*   LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            */
+004493*/*   FITNESS FOR A PARTICULAR PURPOSE AND                     */
+004494*/*   NONINFRINGEMENT.  IN NO EVENT SHALL RICOH, RICOH         */
+004495*/*   SUBSIDIARIES, ANY OF ITS SUPPLIERS OR ANY OF THE         */
+004496*/*   OTHER COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,         */
+004497*/*   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF      */
+004498*/*   CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF        */
+004499*/*   OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR         */
+004500*/*   OTHER DEALINGS IN THE SOFTWARE.                          */
+004510*/**************************************************************/
 004400 ENVIRONMENT DIVISION.
 004500 CONFIGURATION SECTION.
 004600 SOURCE-COMPUTER. IBM-370.

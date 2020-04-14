@@ -1,4 +1,4 @@
-000100 PROCESS DYNAM NUMPROC(PFD) TRUNC(OPT)           NOSEQ     RENT
+000110 PROCESS DYNAM NUMPROC(PFD) TRUNC(OPT)           NOSEQ     RENT
 000200* LAST UPDATE ON 9 Apr 2018 AT 15:37:17 BY  HOWARDT VERSION 01   *
 000300 ID DIVISION.
 000400 PROGRAM-ID. ACSTCHR.
@@ -28,6 +28,20 @@
 002800 DATE-COMPILED.
 002900 SECURITY. IBM SAMPLE CODE ONLY.
 003000*/**************************************************************/
+003020*/* Licensed under the Apache License, Version 2.0 (the        */
+003030*/* "License"); you may not use this file except in compliance */
+003040*/* with the License. You may obtain a copy of the License at  */
+003050*/*                                                            */
+003060*/* http://www.apache.org/licenses/LICENSE-2.0                 */
+003070*/*                                                            */
+003080*/* Unless required by applicable law or agreed to in writing, */
+003090*/* software distributed under the License is distributed on an*/
+003091*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+003092*/* KIND, either express or implied.  See the License for the  */
+003093*/* specific language governing permissions and limitations    */
+003094*/* under the License.                                         */
+003095*/*------------------------------------------------------------*/
+003096*/*                                                            */
 003100*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
 003200*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
 003300*/*                                                            */
@@ -59,8 +73,8 @@
 005900 77  PGMNAME                 PIC X(8) VALUE 'ACSTCHR'.
 006000 77  ABND-PGM                PIC X(8) VALUE 'CEE3DMP'.            !@01
 006100 77  ABEND-CODE              PIC 9(4) BINARY VALUE 12.
-006110 77  ABEND-OPTS              PIC X(255)                           !@01
-006120     VALUE 'ENC(CUR) THR(CUR) FILE VAR NOBLOCK NOSTOR SF(ALL)' .  !@01
+006101 77  ABEND-OPTS              PIC X(255)                           !@01
+006102     VALUE 'ENC(CUR) THR(CUR) FILE VAR NOBLOCK NOSTOR SF(ALL)' .  !@01
 006200 77  AFPWRITE                PIC X(8) VALUE 'AFPWRITE'.
 006300 77  ACSTCHR-LENGTH          PIC 9(8) BINARY VALUE ZERO.
 006400 01  GLOBAL-VARIABLES            GLOBAL.

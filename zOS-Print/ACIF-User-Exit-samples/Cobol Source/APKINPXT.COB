@@ -47,6 +47,20 @@
 004700 DATE-COMPILED.
 004800 SECURITY. IBM SAMPLE CODE ONLY.
 004900*/**************************************************************/
+004920*/* Licensed under the Apache License, Version 2.0 (the        */
+004930*/* "License"); you may not use this file except in compliance */
+004940*/* with the License. You may obtain a copy of the License at  */
+004950*/*                                                            */
+004960*/* http://www.apache.org/licenses/LICENSE-2.0                 */
+004970*/*                                                            */
+004980*/* Unless required by applicable law or agreed to in writing, */
+004990*/* software distributed under the License is distributed on an*/
+004991*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+004992*/* KIND, either express or implied.  See the License for the  */
+004993*/* specific language governing permissions and limitations    */
+004994*/* under the License.                                         */
+004995*/*------------------------------------------------------------*/
+004996*/*                                                            */
 005000*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
 005100*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
 005200*/*                                                            */
@@ -328,3 +342,4 @@
 032800 END PROGRAM AFPWRITE.
 032900 SKIP1
 033000 END PROGRAM APKINPXT.
+

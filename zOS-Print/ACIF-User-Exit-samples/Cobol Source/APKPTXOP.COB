@@ -39,7 +39,21 @@
 003900 DATE-WRITTEN. NOV 93.
 004000 DATE-COMPILED.
 004100 SECURITY. IBM SAMPLE CODE ONLY.
-004200*/**************************************************************/
+004210*/**************************************************************/
+004220*/* Licensed under the Apache License, Version 2.0 (the        */
+004230*/* "License"); you may not use this file except in compliance */
+004240*/* with the License. You may obtain a copy of the License at  */
+004250*/*                                                            */
+004260*/* http://www.apache.org/licenses/LICENSE-2.0                 */
+004270*/*                                                            */
+004280*/* Unless required by applicable law or agreed to in writing, */
+004290*/* software distributed under the License is distributed on an*/
+004291*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+004292*/* KIND, either express or implied.  See the License for the  */
+004293*/* specific language governing permissions and limitations    */
+004294*/* under the License.                                         */
+004295*/*------------------------------------------------------------*/
+004296*/*                                                            */
 004300*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
 004400*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
 004500*/*                                                            */
@@ -99,7 +113,7 @@
 009900                              PIC X.
 010000   EJECT
 010100 WORKING-STORAGE SECTION.
-010200 77  ABND-PGM                PIC X(8) VALUE 'CEE3DMP'.            !@01
+010220 77  ABND-PGM                PIC X(8) VALUE 'CEE3DMP'.            !@01
 010300 77  ABEND-CODE              PIC 9(4) BINARY VALUE 12.
 010310 77  ABEND-OPTS              PIC X(255)                           !@01
 010320     VALUE 'ENC(CUR) THR(CUR) FILE VAR NOBLOCK NOSTOR SF(ALL)' .  !@01

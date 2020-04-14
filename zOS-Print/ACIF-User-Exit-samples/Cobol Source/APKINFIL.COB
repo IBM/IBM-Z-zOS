@@ -1,4 +1,4 @@
-000100 PROCESS DYNAM NUMPROC(PFD) TRUNC(OPT) APOST     NOSEQ     RENT
+000110 PROCESS DYNAM NUMPROC(PFD) TRUNC(OPT) APOST     NOSEQ     RENT
 000200* LAST UPDATE ON 9 Apr 2018 AT 15:38:00 BY  HOWARDT VERSION 01   *
 000300 ID DIVISION.
 000400 PROGRAM-ID. APKINFIL.
@@ -29,6 +29,20 @@
 002900 DATE-COMPILED.
 003000 SECURITY. IBM SAMPLE CODE ONLY.
 003100*/**************************************************************/
+003120*/* Licensed under the Apache License, Version 2.0 (the        */
+003130*/* "License"); you may not use this file except in compliance */
+003140*/* with the License. You may obtain a copy of the License at  */
+003150*/*                                                            */
+003160*/* http://www.apache.org/licenses/LICENSE-2.0                 */
+003170*/*                                                            */
+003180*/* Unless required by applicable law or agreed to in writing, */
+003190*/* software distributed under the License is distributed on an*/
+003191*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+003192*/* KIND, either express or implied.  See the License for the  */
+003193*/* specific language governing permissions and limitations    */
+003194*/* under the License.                                         */
+003195*/*------------------------------------------------------------*/
+003196*/*                                                            */
 003200*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
 003300*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
 003400*/*                                                            */
@@ -94,10 +108,10 @@
 009400   SKIP3
 009500 WORKING-STORAGE SECTION.
 009600 77  PGMNAME                 PIC X(8) VALUE 'APKINFIL'.
-009700 77  ABND-PGM                PIC X(8) VALUE 'CEE3DMP'.            !@01
-009800 77  ABEND-CODE              PIC 9(4) BINARY VALUE 12.
-009810 77  ABEND-OPTS              PIC X(255)                           !@01
-009820     VALUE 'ENC(CUR) THR(CUR) FILE VAR NOBLOCK NOSTOR SF(ALL)' .  !@01
+009610 77  ABND-PGM                PIC X(8) VALUE 'CEE3DMP'.            !@01
+009620 77  ABEND-CODE              PIC 9(4) BINARY VALUE 12.
+009630 77  ABEND-OPTS              PIC X(255)                           !@01
+009640     VALUE 'ENC(CUR) THR(CUR) FILE VAR NOBLOCK NOSTOR SF(ALL)' .  !@01
 009900 77  AFPWRITE                PIC X(8) VALUE 'AFPWRITE'.
 010000 77  PAGE-COUNT              PIC 9(8) BINARY VALUE ZERO.
 010100 77  LINE-COUNT              PIC 9(8) BINARY VALUE ZERO.

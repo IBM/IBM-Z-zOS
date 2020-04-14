@@ -1,0 +1,370 @@
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211                 Date 04/09/2020  Time 16:29:54   Page     1
+0Invocation parameters:
+  APOST,MAP,NORENT,TRUNC(BIN),CP(1140),X,DYNAM,RMODE(24),S,NOOFF,DATA(24),TEST(SOURCE)
+0PROCESS(CBL) statements:
+  PROCESS NUMPROC(PFD) TRUNC(OPT) APOST NOSEQ NOLIST
+0Options in effect:
+  NOADATA
+    ADV
+    AFP(NOVOLATILE)
+    APOST
+    ARCH(7)
+    ARITH(COMPAT)
+  NOAWO
+  NOBLOCK0
+    BUFSIZE(4096)
+  NOCICS
+    CODEPAGE(1140)
+  NOCOMPILE(S)
+  NOCOPYLOC
+  NOCOPYRIGHT
+  NOCURRENCY
+    DATA(24)
+    DBCS
+  NODECK
+  NODEFINE
+  NODIAGTRUNC
+    DISPSIGN(COMPAT)
+  NODLL
+  NODUMP
+    DYNAM
+  NOEXIT
+  NOEXPORTALL
+  NOFASTSRT
+    FLAG(I,I)
+  NOFLAGSTD
+    HGPR(PRESERVE)
+  NOINITCHECK
+  NOINITIAL
+    INLINE
+    INTDATE(ANSI)
+    LANGUAGE(EN)
+    LINECOUNT(60)
+  NOLIST
+    MAP(HEX)
+    MAXPCF(100000)
+  NOMDECK
+  NONAME
+    NSYMBOL(NATIONAL)
+  NONUMBER
+  NONUMCHECK
+    NUMPROC(PFD)
+    OBJECT
+  NOOFFSET
+    OPTIMIZE(0)
+    OUTDD(SYSOUT)
+  NOPARMCHECK
+    PGMNAME(COMPAT)
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211                 Date 04/09/2020  Time 16:29:54   Page     2
+0   QUALIFY(COMPAT)
+  NORENT
+    RMODE(24)
+  NORULES
+  NOSERVICE
+  NOSEQUENCE
+    SOURCE
+    SPACE(1)
+  NOSQL
+    SQLCCSID
+  NOSQLIMS
+  NOSSRANGE
+  NOSTGOPT
+    SUPPRESS
+  NOTERM
+    TEST(NOEJPD,DWARF,SOURCE,NOSEPARATE)
+  NOTHREAD
+    TRUNC(OPT)
+  NOVBREF
+    VLR(STANDARD)
+    VSAMOPENFS(COMPAT)
+  NOWORD
+    XMLPARSE(XMLSS)
+    XREF(FULL)
+    ZONEDATA(PFD)
+    ZWB
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211       APKDUMIN  Date 04/09/2020  Time 16:29:54   Page     3
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0/* APKDUMIN
+   000001         000200* LAST UPDATE ON 5 Apr 2018 AT 15:52:20 BY  HOWARDT VERSION 01   *
+   000002         000300 ID DIVISION.
+   000003         000400 PROGRAM-ID. APKDUMIN.
+   000004         000500 AUTHOR. TURETZKY--HYDRA.
+   000005         000600 INSTALLATION. IBM BOULDER PROGRAMMING CENTER.
+   000006         000700               Test LE ACIF exits.          This program is a
+   000007         000800               sample exit for ACIF (APKACIF,5648-062)
+   000008         000900               demonstrating the use of the ACIF input exit.
+   000009         001000
+   000010         001100               In order to use this exit, include the control
+   000011         001200               INPEXIT=APKDUMIN to enable this exit, and include
+   000012         001300               the load module in a dataset referenced in STEPLIB
+   000013         001400               or elsewhere in the module search order.
+   000014         001500
+   000015         001600               The program is used to test the input exit. It will
+   000016         001700               simply return after each call from an ACIF exit.
+   000017         001800
+   000018         001900 DATE-WRITTEN. 04 DEC 2017.
+   000019         002000 DATE-COMPILED. 04/09/20.
+   000020         002100 SECURITY. IBM SAMPLE CODE ONLY.
+1ACIF Test Input Exit                                           APKDUMIN  Date 04/09/2020  Time 16:29:54   Page     4
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000022         002300*/**************************************************************/
+   000023         002400*/* LICENSED UNDER THE APACHE LICENSE, VERSION 2.0 (THE        */
+   000024         002500*/* "LICENSE"); YOU MAY NOT USE THIS FILE EXCEPT IN COMPLIANCE */
+   000025         002600*/* WITH THE LICENSE. YOU MAY OBTAIN A COPY OF THE LICENSE AT  */
+   000026         002700*/*                                                            */
+   000027         002800*/* HTTP://WWW.APACHE.ORG/LICENSES/LICENSE-2.0                 */
+   000028         002900*/*                                                            */
+   000029         003000*/* UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING, */
+   000030         003100*/* SOFTWARE DISTRIBUTED UNDER THE LICENSE IS DISTRIBUTED ON AN*/
+   000031         003200*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+   000032         003300*/* KIND, EITHER EXPRESS OR IMPLIED.  SEE THE LICENSE FOR THE  */
+   000033         003400*/* SPECIFIC LANGUAGE GOVERNING PERMISSIONS AND LIMITATIONS    */
+   000034         003500*/* UNDER THE LICENSE.                                         */
+   000035         003600*/*------------------------------------------------------------*/
+   000036         003700*/*                                                            */
+   000037         004410*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
+   000038         004420*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
+   000039         004430*/*                                                            */
+   000040         004440*/*   Permission to use, copy, modify, and distribute          */
+   000041         004450*/*   this software for any purpose with or without fee        */
+   000042         004460*/*   is hereby granted, provided that the above               */
+   000043         004470*/*   copyright notices appear in all copies.                  */
+   000044         004480*/*                                                            */
+   000045         004490*/*   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY       */
+   000046         004491*/*   OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT       */
+   000047         004492*/*   LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            */
+   000048         004493*/*   FITNESS FOR A PARTICULAR PURPOSE AND                     */
+   000049         004494*/*   NONINFRINGEMENT.  IN NO EVENT SHALL RICOH, RICOH         */
+   000050         004495*/*   SUBSIDIARIES, ANY OF ITS SUPPLIERS OR ANY OF THE         */
+   000051         004496*/*   OTHER COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,         */
+   000052         004497*/*   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF      */
+   000053         004498*/*   CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF        */
+   000054         004499*/*   OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR         */
+   000055         004500*/*   OTHER DEALINGS IN THE SOFTWARE.                          */
+   000056         004510*/**************************************************************/
+   000057         004400 ENVIRONMENT DIVISION.
+   000058         004500 CONFIGURATION SECTION.
+   000059         004600 SOURCE-COMPUTER. IBM-370.
+   000060         004700 OBJECT-COMPUTER. IBM-370.
+1ACIF Test Input Exit                                           APKDUMIN  Date 04/09/2020  Time 16:29:54   Page     5
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000062         004900 DATA DIVISION.
+   000063         005000 WORKING-STORAGE SECTION.
+   000064         005100 77  PGMNAME                 PIC X(8) VALUE 'APKINPTS'.                              000000000 8C
+   000065         005200 77  ABND-PGM                PIC X(8) VALUE 'CEE3DMP'.            !@01               000000000 8C
+   000066         005300 77  ABEND-CODE              PIC 9(4) BINARY VALUE 12.                               000000000 2C
+   000067         005400 77  ABEND-OPTS              PIC X(255)                           !@01               000000000 255C
+   000068         005500     VALUE 'ENC(CUR) THR(CUR) FILE VAR NOBLOCK NOSTOR SF(ALL)' .  !@01
+   000069         005600 77  AFPWRITE                PIC X(8) VALUE 'AFPWRITE'.                              000000000 8C
+   000070         005700 77  DIV-BY-ZERO             PIC 9(8) BINARY VALUE ZERO.                             000000000 4C
+                                                                                                   IMP
+   000071         005800 77  PAGE-COUNT              PIC 9(8) BINARY VALUE ZERO.                             000000000 4C
+                                                                                                   IMP
+   000072         005900 77  LINE-COUNT              PIC 9(8) BINARY VALUE ZERO.                             000000000 4C
+                                                                                                   IMP
+   000073         006000 77  EOF-LIT                 PIC X(9) VALUE 'AFTER EOF'.                             000000000 9C
+   000074         006100 77  FIRST-LINE-FLAG         PIC X VALUE LOW-VALUE.                                  000000000 1C
+                                                                                                   IMP
+   000075         006200     88  FIRST-LINE          VALUE HIGH-VALUE.                             IMP
+   000076         006300     88  NOTFIRST-LINE       VALUE LOW-VALUE.                              IMP
+0
+1ACIF Test Input Exit                                           APKDUMIN  Date 04/09/2020  Time 16:29:54   Page     6
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000078         006500/ PASSED PARAMETERS.
+   000079         006600 LINKAGE SECTION.
+   000080         006700 01  INP-PARMS.                                                            BLL=00001,000000000 0CL22
+   000081         006800     05  INP-USTOR           POINTER.                                      BLL=00001,000000000 4C
+   000082         006900     05  INP-PFATTR          POINTER.                                      BLL=00001,000000004 4C
+   000083         007000     05  INP-RECPTR          POINTER.                                      BLL=00001,000000008 4C
+   000084         007100     05  FILLER              POINTER.                                      BLL=00001,00000000C 4C
+   000085         007200     05  INP-RECLEN          PIC 9(4) BINARY.                              BLL=00001,000000010 2C
+   000086         007300     05  FILLER              PIC XX.                                       BLL=00001,000000012 2C
+   000087         007400     05  INP-REQUEST         PIC X.                                        BLL=00001,000000014 1C
+   000088         007500         88  INP-USE         VALUE X'00'.
+   000089         007600         88  INP-DELETE      VALUE X'01'.
+   000090         007700         88  INP-INSERT      VALUE X'02'.
+   000091         007800     05  INP-EOF-FLAG        PIC X.                                        BLL=00001,000000015 1C
+   000092         007900         88  INP-EOF         VALUE 'Y'.
+   000093         008000
+   000094         008100 01  INP-UAREA.                                                            BLL=00002,000000000 0CL17
+   000095         008200     05  UAREA-CNTR          PIC 9(4) BINARY.                              BLL=00002,000000000 2C
+   000096         008300     05  UAREA-INSCOUNT      PIC 9(4) BINARY.                              BLL=00002,000000002 2C
+   000097         008400     05  INSERT-FLAG         PIC X.                                        BLL=00002,000000004 1C
+   000098         008500         88 INSERT-LINE      VALUE HIGH-VALUE.                             IMP
+   000099         008600         88 INSERT-MULTIPLE  VALUE 'M'.
+   000100         008700         88 NOINSERT-LINE    VALUE LOW-VALUE.                              IMP
+   000101         008800     05  FILLER              PIC X(12).                                    BLL=00002,000000005 12C
+   000102         008900
+   000103         009000 01  INP-ATTR.                                                             BLL=00003,000000000 0CL51
+   000104         009100     05  INP-CC              PIC XXX.                                      BLL=00003,000000000 3C
+   000105         009200     05  INP-CCTYPE          PIC X.                                        BLL=00003,000000003 1C
+   000106         009300         88  INP-ANSI-CC     VALUE 'A'.
+   000107         009400         88  INP-MACH-CC     VALUE 'M'.
+   000108         009500     05  INP-CHARS           PIC X(20).                                    BLL=00003,000000004 20C
+   000109         009600     05  INP-FORMDEF         PIC X(8).                                     BLL=00003,000000018 8C
+   000110         009700     05  INP-PAGEDEF         PIC X(8).                                     BLL=00003,000000020 8C
+   000111         009800     05  INP-PRMODE          PIC X(8).                                     BLL=00003,000000028 8C
+   000112         009900     05  INP-TRC             PIC XXX.                                      BLL=00003,000000030 3C
+   000113         010000
+   000114         010100* This is a template for the input record, pointed to by
+   000115         010200* INP-RECPTR. The record's actual length is given by
+   000116         010300* INP-RECLEN.
+   000117         010400 01  INP-LINE.                                                             BLL=00004,000000000 0CL8211
+   000118         010500     05  INP-CCVAL           PIC X.                                        BLL=00004,000000000 1C
+   000119         010600     05  INP-TRCVAL          PIC X.                                        BLL=00004,000000001 1C
+   000120         010700     05  INP-PAGELIT         PIC X(4).                                     BLL=00004,000000002 4C
+   000121         010800     05  FILLER              PIC X.                                        BLL=00004,000000006 1C
+   000122         010900     05  INP-PAGENUM         PIC 9(4).                                     BLL=00004,000000007 4C
+   000123         011000     05  FILLER              PIC X.                                        BLL=00004,00000000B 1C
+   000124         011100     05  INP-LINELIT         PIC X(4).                                     BLL=00004,00000000C 4C
+   000125         011200     05  FILLER              PIC X.                                        BLL=00004,000000010 1C
+   000126         011300     05  INP-LINENUM         PIC 9(3).                                     BLL=00004,000000011 3C
+   000127         011400     05  FILLER              PIC X(8191).                                  BLL=00004,000000014 8191C
+
+1Initialization and Main Line                                   APKDUMIN  Date 04/09/2020  Time 16:29:54   Page     7
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000130         011700 PROCEDURE DIVISION USING INP-PARMS.                                       80
+   000131         011800* create an abend to see if we get control.
+   000132         011900*    DIVIDE ABEND-CODE BY DIV-BY-ZERO GIVING PAGE-COUNT.
+   000133         012000* make work area, attributes, and input line addressable.
+   000134         012100     display 'Entered before set address'.
+   000135         012200     SET ADDRESS OF INP-UAREA TO INP-USTOR.                                IMP 94 81
+   000136         012300     SET ADDRESS OF INP-ATTR TO INP-PFATTR.                                IMP 103 82
+   000137         012400     SET ADDRESS OF INP-LINE TO INP-RECPTR.                                IMP 117 83
+   000138         012500     display 'Before GOBACK'.
+   000139         012600     GOBACK.
+ */ APKDUMIN
+1Initialization and Main Line                                   APKDUMIN  Date 04/09/2020  Time 16:29:54   Page     8
+0An "M" preceding a data-name reference indicates that the data-name is modified by this reference.
+
+  Defined   Cross-reference of data names   References
+
+       66   ABEND-CODE
+       67   ABEND-OPTS
+       65   ABND-PGM
+       69   AFPWRITE
+       70   DIV-BY-ZERO
+       73   EOF-LIT
+       75   FIRST-LINE
+       74   FIRST-LINE-FLAG
+      106   INP-ANSI-CC
+      103   INP-ATTR . . . . . . . . . . .  136
+      104   INP-CC
+      105   INP-CCTYPE
+      118   INP-CCVAL
+      108   INP-CHARS
+       89   INP-DELETE
+       92   INP-EOF
+       91   INP-EOF-FLAG
+      109   INP-FORMDEF
+       90   INP-INSERT
+      117   INP-LINE . . . . . . . . . . .  137
+      124   INP-LINELIT
+      126   INP-LINENUM
+      107   INP-MACH-CC
+      110   INP-PAGEDEF
+      120   INP-PAGELIT
+      122   INP-PAGENUM
+       80   INP-PARMS. . . . . . . . . . .  130
+       82   INP-PFATTR . . . . . . . . . .  136
+      111   INP-PRMODE
+       85   INP-RECLEN
+       83   INP-RECPTR . . . . . . . . . .  137
+       87   INP-REQUEST
+      112   INP-TRC
+      119   INP-TRCVAL
+       94   INP-UAREA. . . . . . . . . . .  135
+       88   INP-USE
+       81   INP-USTOR. . . . . . . . . . .  135
+       97   INSERT-FLAG
+       98   INSERT-LINE
+       99   INSERT-MULTIPLE
+       72   LINE-COUNT
+      100   NOINSERT-LINE
+       76   NOTFIRST-LINE
+       71   PAGE-COUNT
+       64   PGMNAME
+       95   UAREA-CNTR
+       96   UAREA-INSCOUNT
+1Initialization and Main Line                                   APKDUMIN  Date 04/09/2020  Time 16:29:54   Page     9
+0 Defined   Cross-reference of programs     References
+
+        3   APKDUMIN
+1Initialization and Main Line                                   APKDUMIN  Date 04/09/2020  Time 16:29:54   Page    10
+0Data Division Map
+0Data Definition Attribute codes (rightmost column) have the following meanings:
+     D = Object of OCCURS DEPENDING    G = GLOBAL                             S = Spanned file
+     E = EXTERNAL                      O = Has OCCURS clause                  U = Undefined format file
+     F = Fixed-length file             OG= Group has own length definition    V = Variable-length file
+     FB= Fixed-length blocked file     R = REDEFINES                          VB= Variable-length blocked file
+     X = Unallocated
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+      3  PROGRAM-ID APKDUMIN----------------------------------------------------------------------------------------------------*
+     64   77 PGMNAME . . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+     65   77 ABND-PGM. . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+     66   77 ABEND-CODE. . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+     67   77 ABEND-OPTS. . . . . . . . . . . . . . . . . .             000000000   DS 255C           Display
+     69   77 AFPWRITE. . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+     70   77 DIV-BY-ZERO . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+     71   77 PAGE-COUNT. . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+     72   77 LINE-COUNT. . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+     73   77 EOF-LIT . . . . . . . . . . . . . . . . . . .             000000000   DS 9C             Display
+     74   77 FIRST-LINE-FLAG . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+     75   88 FIRST-LINE. . . . . . . . . . . . . . . . . .
+     76   88 NOTFIRST-LINE . . . . . . . . . . . . . . . .
+     80   1  INP-PARMS . . . . . . . . . . . . . . . . . . BLL=00001   000000000   DS 0CL22          Group
+     81     2  INP-USTOR . . . . . . . . . . . . . . . . . BLL=00001   000000000   DS 4C             Pointer
+     82     2  INP-PFATTR. . . . . . . . . . . . . . . . . BLL=00001   000000004   DS 4C             Pointer
+     83     2  INP-RECPTR. . . . . . . . . . . . . . . . . BLL=00001   000000008   DS 4C             Pointer
+     84     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00001   00000000C   DS 4C             Pointer
+     85     2  INP-RECLEN. . . . . . . . . . . . . . . . . BLL=00001   000000010   DS 2C             Binary
+     86     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00001   000000012   DS 2C             Display
+     87     2  INP-REQUEST . . . . . . . . . . . . . . . . BLL=00001   000000014   DS 1C             Display
+     88     88 INP-USE . . . . . . . . . . . . . . . . . . BLL=00001
+     89     88 INP-DELETE. . . . . . . . . . . . . . . . . BLL=00001
+     90     88 INP-INSERT. . . . . . . . . . . . . . . . . BLL=00001
+     91     2  INP-EOF-FLAG. . . . . . . . . . . . . . . . BLL=00001   000000015   DS 1C             Display
+     92     88 INP-EOF . . . . . . . . . . . . . . . . . . BLL=00001
+     94   1  INP-UAREA . . . . . . . . . . . . . . . . . . BLL=00002   000000000   DS 0CL17          Group
+     95     2  UAREA-CNTR. . . . . . . . . . . . . . . . . BLL=00002   000000000   DS 2C             Binary
+     96     2  UAREA-INSCOUNT. . . . . . . . . . . . . . . BLL=00002   000000002   DS 2C             Binary
+     97     2  INSERT-FLAG . . . . . . . . . . . . . . . . BLL=00002   000000004   DS 1C             Display
+     98     88 INSERT-LINE . . . . . . . . . . . . . . . . BLL=00002
+     99     88 INSERT-MULTIPLE . . . . . . . . . . . . . . BLL=00002
+    100     88 NOINSERT-LINE . . . . . . . . . . . . . . . BLL=00002
+    101     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00002   000000005   DS 12C            Display
+    103   1  INP-ATTR. . . . . . . . . . . . . . . . . . . BLL=00003   000000000   DS 0CL51          Group
+    104     2  INP-CC. . . . . . . . . . . . . . . . . . . BLL=00003   000000000   DS 3C             Display
+    105     2  INP-CCTYPE. . . . . . . . . . . . . . . . . BLL=00003   000000003   DS 1C             Display
+    106     88 INP-ANSI-CC . . . . . . . . . . . . . . . . BLL=00003
+    107     88 INP-MACH-CC . . . . . . . . . . . . . . . . BLL=00003
+    108     2  INP-CHARS . . . . . . . . . . . . . . . . . BLL=00003   000000004   DS 20C            Display
+    109     2  INP-FORMDEF . . . . . . . . . . . . . . . . BLL=00003   000000018   DS 8C             Display
+    110     2  INP-PAGEDEF . . . . . . . . . . . . . . . . BLL=00003   000000020   DS 8C             Display
+    111     2  INP-PRMODE. . . . . . . . . . . . . . . . . BLL=00003   000000028   DS 8C             Display
+    112     2  INP-TRC . . . . . . . . . . . . . . . . . . BLL=00003   000000030   DS 3C             Display
+    117   1  INP-LINE. . . . . . . . . . . . . . . . . . . BLL=00004   000000000   DS 0CL8211        Group
+    118     2  INP-CCVAL . . . . . . . . . . . . . . . . . BLL=00004   000000000   DS 1C             Display
+    119     2  INP-TRCVAL. . . . . . . . . . . . . . . . . BLL=00004   000000001   DS 1C             Display
+1Initialization and Main Line                                   APKDUMIN  Date 04/09/2020  Time 16:29:54   Page    11
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    120     2  INP-PAGELIT . . . . . . . . . . . . . . . . BLL=00004   000000002   DS 4C             Display
+    121     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00004   000000006   DS 1C             Display
+    122     2  INP-PAGENUM . . . . . . . . . . . . . . . . BLL=00004   000000007   DS 4C             Disp-Num
+    123     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00004   00000000B   DS 1C             Display
+    124     2  INP-LINELIT . . . . . . . . . . . . . . . . BLL=00004   00000000C   DS 4C             Display
+    125     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00004   000000010   DS 1C             Display
+    126     2  INP-LINENUM . . . . . . . . . . . . . . . . BLL=00004   000000011   DS 3C             Disp-Num
+    127     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00004   000000014   DS 8191C          Display
+ End of Data Division Map
+-* Statistics for COBOL program APKDUMIN:
+ *    Source records = 139
+ *    Data Division statements = 47
+ *    Procedure Division statements = 6
+ *    Generated COBOL statements = 0
+ *    Program complexity factor = 6
+0End of compilation 1,  program APKDUMIN,  no statements flagged.
+0Return code 0
+

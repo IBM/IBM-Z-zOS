@@ -1,0 +1,540 @@
+000100 PROCESS DYNAM NUMPROC(PFD) TRUNC(OPT) APOST     NOSEQ     RENT
+000200 ID DIVISION.
+000300* LAST UPDATE ON 9 Apr 2018 AT 15:53:19 BY  HOWARDT VERSION 01   *
+000400 PROGRAM-ID. APRPTXOP.
+000500 AUTHOR. H. L. TURETZKY, HYDRA
+000600     skip1
+000700     This program is a post processor for ACIF (APKACIF,
+000800     5648-062).
+000900
+001000     The program performs some optimization on text (PTX
+001100     structured field) data. It combines consecutive PTX records
+001200     into the smallest number of large PTX records. It optimizes
+001300     the generation of font (SCFL) and orientation (STO) changes
+001400     in order to improve print performance.
+001500
+001600     Method of operation: Structured fields are received from
+001700     the ACIF output exit. For a BPG, flags are reset so values
+001800     are not carried across pages, and the sequence number set
+001900     to zero. For a BPT, if a BPT without a corresponding EPT
+002000     has been generated, the BPT is ignored (thus combining
+002100     adjacent text blocks), otherwise a BPT is produced and the
+002200     current font and orientation are cleared.
+002300     EPT records are ignored.
+002400
+002500     For PTX records, the contents of the record are examined.
+002600     Font changes are remembered, and the associated SCFL is
+002700     skipped until a text control requiring a font is encountered.
+002800     Then the last font change is generated before the control
+002900     requiring the font. If the text orientation changes, an
+003000     STO is written, otherwise STO controls are skipped.
+003100     The PTX data is accumulated in a buffer and written when
+003200     the buffer is full or non-PTX structured field is encountered
+003300
+003400     All other structured fields are written unchanged.
+003500
+003600 INSTALLATION. IBM BOULDER PROGRAMMING CENTER.
+003700 DATE-WRITTEN. NOV 93.
+003800 DATE-COMPILED.
+003900 SECURITY. IBM SAMPLE CODE ONLY.
+004000*/**************************************************************/
+004020*/* Licensed under the Apache License, Version 2.0 (the        */
+004030*/* "License"); you may not use this file except in compliance */
+004040*/* with the License. You may obtain a copy of the License at  */
+004050*/*                                                            */
+004060*/* http://www.apache.org/licenses/LICENSE-2.0                 */
+004070*/*                                                            */
+004080*/* Unless required by applicable law or agreed to in writing, */
+004090*/* software distributed under the License is distributed on an*/
+004091*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+004092*/* KIND, either express or implied.  See the License for the  */
+004093*/* specific language governing permissions and limitations    */
+004094*/* under the License.                                         */
+004095*/*------------------------------------------------------------*/
+004096*/*                                                            */
+004100*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
+004200*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
+004300*/*                                                            */
+004400*/*   Permission to use, copy, modify, and distribute          */
+004500*/*   this software for any purpose with or without fee        */
+004600*/*   is hereby granted, provided that the above               */
+004700*/*   copyright notices appear in all copies.                  */
+004800*/*                                                            */
+004900*/*   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY       */
+005000*/*   OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT       */
+005100*/*   LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            */
+005200*/*   FITNESS FOR A PARTICULAR PURPOSE AND                     */
+005300*/*   NONINFRINGEMENT.  IN NO EVENT SHALL RICOH, RICOH         */
+005400*/*   SUBSIDIARIES, ANY OF ITS SUPPLIERS OR ANY OF THE         */
+005500*/*   OTHER COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,         */
+005600*/*   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF      */
+005700*/*   CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF        */
+005800*/*   OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR         */
+005900*/*   OTHER DEALINGS IN THE SOFTWARE.                          */
+006000*/**************************************************************/
+006100 TITLE 'AFPDS TEXT OPTIMIZER'.
+006200 ENVIRONMENT DIVISION.
+006300 CONFIGURATION SECTION.
+006400 SOURCE-COMPUTER. IBM-370.
+006500 OBJECT-COMPUTER. IBM-370.
+006600 INPUT-OUTPUT SECTION.
+006700 FILE-CONTROL.
+006800     SELECT PRINT-IN-FILE        ASSIGN TO DINFILE,
+006900                                 FILE STATUS PRINT-IN-STATUS.
+007000     SELECT PRINT-OUT-FILE       ASSIGN TO DOUTFILE,
+007100                                 FILE STATUS PRINT-OUT-STATUS.
+007200   SKIP2
+007300 DATA DIVISION.
+007400 FILE SECTION.
+007500 FD  PRINT-IN-FILE  GLOBAL,
+007600     BLOCK CONTAINS 0,
+007700     RECORD VARYING FROM 9 TO 32752 DEPENDING ON PRINT-IN-LENGTH,
+007800     LABEL RECORDS STANDARD,
+007900     RECORDING MODE V.
+008000 01  PRINT-IN-RECORD.
+008100     05  PRINT-IN-INTRODUCER.
+008200       10  PRINT-IN-CC       PIC X.
+008300           88  PRINT-IN-SF   VALUE X'5A'.
+008400       10  PRINT-IN-LEN-CHR  PIC XX.
+008500       10  PRINT-IN-RECLEN   REDEFINES PRINT-IN-LEN-CHR
+008600                             PIC 9(4) COMP.
+008700* NOTE:  9(4) COMP is used to get halfword integer, but COBOL
+008800* may restrict value to 9999. COBOL II compile-time parm
+008900* TRUNC(BIN) or TRUNC(OPT) will treat the value as a halfword
+009000* with no truncation (TRUNC(OPT) produces far better code).
+009100       10  PRINT-IN-TYPE     PIC XXX.
+009200       10  PRINT-IN-FLAG     PIC X.
+009300       10  PRINT-IN-SEQ-CHR  PIC XX.
+009400       10  PRINT-IN-SEQNUM   REDEFINES PRINT-IN-SEQ-CHR
+009500                             PIC 9(4) COMP.
+009600     05  PRINT-IN-DATA.
+009700       10  FILLER            OCCURS 0 TO 32743,
+009800                             DEPENDING ON PRINT-IN-RECLEN,
+009900                             PIC X.
+010000   SKIP2
+010100 FD  PRINT-OUT-FILE GLOBAL,
+010200     BLOCK CONTAINS 0,
+010300     LABEL RECORDS STANDARD,
+010400     RECORD VARYING FROM 9 TO 32752 DEPENDING ON PRINT-OUT-LENGTH,
+010500     RECORDING MODE V.
+010600 01  PRINT-OUT-RECORD.
+010700     05  PRINT-OUT-INTRODUCER.
+010800       10  PRINT-OUT-CC       PIC X.
+010900       10  PRINT-OUT-LEN-CHR  PIC XX.
+011000       10  PRINT-OUT-RECLEN   REDEFINES PRINT-OUT-LEN-CHR
+011100                             PIC 9(4) COMP.
+011200* NOTE:  9(4) COMP is used to get halfword integer, but COBOL
+011300* may restrict value to 9999. COBOL II compile-time parm
+011400* TRUNC(BIN) or TRUNC(OPT) will treat the value as a halfword
+011500* with no truncation (TRUNC(OPT) GLOBAL,  far better code).
+011600       10  PRINT-OUT-TYPE     PIC XXX.
+011700       10  PRINT-OUT-FLAG     PIC X.
+011800       10  PRINT-OUT-SEQ-CHR  PIC XX.
+011900       10  PRINT-OUT-SEQNUM   REDEFINES PRINT-OUT-SEQ-CHR
+012000                              PIC 9(4) COMP.
+012100     05  PRINT-OUT-DATA.
+012200         10  FILLER           OCCURS 0 TO 32743,
+012300                              DEPENDING ON PRINT-OUT-RECLEN,
+012400                              INDEXED BY PRINT-OUT-INDX,
+012500                              PIC X.
+012600   EJECT
+012700 WORKING-STORAGE SECTION.
+012820 77  ABND-PGM                PIC X(8) VALUE 'CEE3DMP'.            !@01
+012900 77  ABEND-CODE              PIC 9(4) BINARY VALUE 12.
+012910 77  ABEND-OPTS              PIC X(255)                           !@01
+012920     VALUE 'ENC(CUR) THR(CUR) FILE VAR NOBLOCK NOSTOR SF(ALL)' .  !@01
+013000 77  IN-REC-CNTR             PIC 9(8) BINARY VALUE ZERO.
+013100 77  PTX-PTR                 PIC 9(4) BINARY.
+013200 77  PTX-CHAIN-FLAG          PIC 9(4) BINARY.
+013300 77  NULL-NAME               PIC X(8) VALUE HIGH-VALUE.
+013400 77  LAST-FONT               PIC X    VALUE HIGH-VALUE.
+013500 77  LAST-FONT-USED          PIC X    VALUE HIGH-VALUE.
+013600 77  LAST-ORIENT             PIC X(4) VALUE HIGH-VALUE.
+013700 77  FLUSH-BUFFER            PIC XX   VALUE LOW-VALUE.
+013800 77  BLANKS                  PIC X(6) VALUE 'BLANKS'.
+013900 77  TRN-BLANK-FLAG          PIC X.
+014000     88  BLANK-TRNS          VALUE HIGH-VALUE.
+014100     88  NO-BLANK-TRNS       VALUE LOW-VALUE.
+014200 77  BPT-FLAG                PIC X.
+014300     88  IN-BPT              VALUE HIGH-VALUE.
+014400     88  NOT-IN-BPT          VALUE LOW-VALUE.
+014500 77  LAST-FONT-FLAG          PIC X.
+014600     88  LAST-FONT-GEND      VALUE HIGH-VALUE.
+014700     88  NOT-LAST-FONT-GEND  VALUE LOW-VALUE.
+014800     SKIP1
+014900 01  PRINT-IN-EOF-FLAG       PIC X    VALUE LOW-VALUE GLOBAL.
+015000     88  PRINT-IN-EOF        VALUE HIGH-VALUE.
+015100     SKIP1
+015200 01  SUBROUTINE-NAMES        GLOBAL.
+015300     05  PGMNAME             PIC X(8) VALUE 'APRPTXOP'.
+015400     05  WRITE-SF            PIC X(8) VALUE 'WRITESF'.
+015500     05  BUILD-SF            PIC X(8) VALUE 'BUILDSF'.
+015600     05  PUT-IN-BUF          PIC X(8) VALUE 'PUTINBUF'.
+015700     SKIP1
+015800 01  DATE-DATA.
+015900   05  RUN-DATE.
+016000     10 RUN-YY                 PIC 99.
+016100     10 RUN-MM                 PIC 99.
+016200     10 RUN-DD                 PIC 99.
+016300   05  COMPILE-DATE.
+016400     10  COMP-DATE             PIC X(8).
+016500     10  COMP-TIME             PIC X(12).
+016600   05  RUN-TIME.
+016700     10  RUN-HH                PIC 99.
+016800     10  RUN-MM                PIC 99.
+016900     10  RUN-SS                PIC 99.
+017000     10  RUN-MS                PIC 99.
+017100     SKIP2
+017200 01  PTX-BUFFER                PIC X(32743) GLOBAL.
+017300     SKIP2
+017400 01  PRINT-FILE-ATTRS          GLOBAL.
+017500     05 PRINT-IN-LENGTH        PIC 9(8) BINARY.
+017600     05 PRINT-OUT-LENGTH       PIC 9(8) BINARY.
+017700     05 PRINT-OUT-MAX          PIC 9(8) BINARY VALUE 32756.
+017800     05 PRINT-IN-STATUS        PIC 99.
+017900     05 PRINT-OUT-STATUS       PIC 99.
+018000     05 PRINT-OUT-SFCOUNT      PIC 9(4) BINARY.
+018100     05 OUT-REC-CNTR           PIC 9(8) BINARY VALUE ZERO.
+018200     SKIP2
+018300 01  PTX-CONTROL.
+018400     05  PTX-CTL-LEN           PIC X.
+018500     05  PTX-CTL-CTL           PIC X.
+018600     SKIP1
+018700 01  TEXT-CONTROL.
+018800     05  TXTCTL-CTL            PIC XX.
+018900     05  TXTCTL-CHAIN          REDEFINES TXTCTL-CTL
+019000                               PIC 9(4) BINARY.
+019100 01  BINARY-NUMBERS.
+019200     05  BIN-4                   PIC 9(8) BINARY VALUE ZERO.
+019300     05  BIN4-X                  REDEFINES BIN-4
+019400                                 PIC X(4).
+019500     05  BIN2                    PIC 9(4) BINARY VALUE ZERO.
+019600     05  BIN2-X                  REDEFINES BIN2.
+019700         10  FILLER              PIC X.
+019800         10  BIN2-2              PIC X.
+019900     SKIP2
+020000     COPY STRFLDS SUPPRESS.
+020100     EJECT
+020200 LINKAGE SECTION.
+020300 01  PARMS.
+020400     05  PARM-LEN                PIC 9(4) BINARY.
+020500     05  PARM-TEXT               PIC X(6).
+020600 TITLE 'INITIALIZATION AND MAIN LINE'.
+020700 PROCEDURE DIVISION USING PARMS.
+020800 000-MAINLINE.
+020900     IF PARM-LEN > ZERO
+021000      THEN
+021100       IF PARM-TEXT = BLANKS
+021200        THEN
+021300         SET BLANK-TRNS TO TRUE;
+021400        ELSE
+021500         SET NO-BLANK-TRNS TO TRUE;
+021600       END-IF;
+021700      ELSE
+021800       SET NO-BLANK-TRNS TO TRUE;
+021900     END-IF.
+022000     IF NO-BLANK-TRNS
+022100      THEN
+022200       DISPLAY PGMNAME, ' OPTIONS IN EFFECT: ',
+022300                 'removing long blank TRNs';
+022400      ELSE
+022500       DISPLAY PGMNAME, ' OPTIONS IN EFFECT: ',
+022600                 'including long blank TRNs';
+022700     END-IF.
+022800     OPEN INPUT PRINT-IN-FILE,
+022900          OUTPUT PRINT-OUT-FILE.
+023000     PERFORM 0100-GET-INPUT.
+023100     PERFORM UNTIL PRINT-IN-EOF;
+023200      EVALUATE PRINT-IN-TYPE
+023300
+023400       WHEN SF-BPG
+023500        SET NOT-IN-BPT TO TRUE;
+023600        MOVE ZERO TO PRINT-OUT-SFCOUNT;
+023700        CALL WRITE-SF USING PRINT-IN-RECORD;
+023800
+023900       WHEN SF-BPT
+024000        IF NOT-IN-BPT
+024100         THEN
+024200          CALL WRITE-SF USING PRINT-IN-RECORD;
+024300          MOVE HIGH-VALUE TO LAST-FONT,
+024400                             LAST-FONT-USED,
+024500                             LAST-ORIENT;
+024600          SET IN-BPT TO TRUE;
+024700          SET LAST-FONT-GEND TO TRUE;
+024800         ELSE
+024900          CONTINUE;
+025000        END-IF;
+025100
+025200       WHEN SF-EPT
+025300        CONTINUE;
+025400
+025500       WHEN SF-PTX
+025600        PERFORM 0400-FIX-PTX;
+025700       WHEN SF-IPS
+025800* We can't tell if an IPS contains text that might change the
+025900* text orientation or font, so we'll force them to be reset.
+026000        IF IN-BPT
+026100         THEN
+026200          CALL PUT-IN-BUF USING FLUSH-BUFFER;
+026300          CALL BUILD-SF USING SF-EPT,
+026400                              BY CONTENT LENGTH OF NULL-NAME,
+026500                              NULL-NAME;
+026600          SET NOT-IN-BPT TO TRUE;
+026700          MOVE HIGH-VALUE TO LAST-FONT,
+026800                             LAST-FONT-USED,
+026900                             LAST-ORIENT;
+027000         ELSE
+027100          CONTINUE;
+027200        END-IF;
+027300        CALL WRITE-SF USING PRINT-IN-RECORD;
+027400
+027500       WHEN OTHER
+027600        IF IN-BPT
+027700         THEN
+027800          CALL PUT-IN-BUF USING FLUSH-BUFFER;
+027900          CALL BUILD-SF USING SF-EPT,
+028000                              BY CONTENT LENGTH OF NULL-NAME,
+028100                              NULL-NAME;
+028200          SET NOT-IN-BPT TO TRUE;
+028300         ELSE
+028400          CONTINUE;
+028500        END-IF;
+028600        CALL WRITE-SF USING PRINT-IN-RECORD;
+028700
+028800       END-EVALUATE;
+028900      PERFORM 0100-GET-INPUT;
+029000
+029100     END-PERFORM.
+029200
+029300       DISPLAY PGMNAME, ' RECORDS READ: ', IN-REC-CNTR,
+029400                        ' RECORDS WRITTEN: ', OUT-REC-CNTR.
+029500
+029600       CLOSE PRINT-IN-FILE,
+029700             PRINT-OUT-FILE.
+029800       GOBACK.
+029900     SKIP1
+030000 0100-GET-INPUT.
+030100     READ PRINT-IN-FILE,
+030200      AT END SET PRINT-IN-EOF TO TRUE;
+030300      NOT AT END
+030400       IF PRINT-IN-STATUS NOT = ZERO
+030500        THEN
+030600         DISPLAY PGMNAME, ' I/O ERROR ON DINFILE: ',
+030700                 PRINT-IN-STATUS;
+030800         SET PRINT-IN-EOF TO TRUE;
+030900        ELSE
+031000         ADD 1 TO IN-REC-CNTR;
+031100       END-IF;
+031200     END-READ.
+031300     EJECT
+031400 0400-FIX-PTX.
+031500     MOVE 1 TO PTX-PTR.
+031600     PERFORM UNTIL PTX-PTR >= PRINT-IN-LENGTH -
+031700                              LENGTH OF PRINT-IN-INTRODUCER;
+031800      MOVE PRINT-IN-DATA (PTX-PTR : 2) TO PTX-CONTROL;
+031900      MOVE PTX-CTL-LEN TO BIN2-2;
+032000      IF PTX-CONTROL = TC-ESC
+032100       THEN
+032200        MOVE LENGTH OF TC-ESC TO BIN2;
+032300       ELSE
+032400        EVALUATE PTX-CTL-CTL
+032500         WHEN TC-SCFL (2 : 1) THRU TC-SCFL-C (2 : 1)
+032600          IF PRINT-IN-DATA (PTX-PTR + 2 : 1) NOT = LAST-FONT
+032700           THEN
+032800            MOVE PRINT-IN-DATA (PTX-PTR + 2 : 1) TO LAST-FONT;
+032900            SET NOT-LAST-FONT-GEND TO TRUE;
+033000           ELSE
+033100            CONTINUE;
+033200          END-IF;
+033300         WHEN TC-TRN (2 : 1) THRU TC-TRN-C (2 : 1)
+033400* We will check for all-blank lines by assuming that any PTX
+033500* with more than 100 bytes that is all blank was an empty record
+033600* that we don't need to print. This assumption is usually safe,
+033700* but if the user generated his own PTX using blanks to control
+033800* spacing then rerun with the NOBLANK parm option off.
+033900* The better approach is to look ahead in the PTX input record
+034000* to see if an AMI occurs before the next TRN, which means that
+034100* these blanks are not significant.
+034200          IF NO-BLANK-TRNS
+034300           THEN
+034400            IF BIN2 > 100 AND
+034500             PRINT-IN-DATA (PTX-PTR + 2 : BIN2 - 2) = SPACES
+034600             THEN
+034700              CONTINUE;
+034800             ELSE
+034900              PERFORM 0410-GEN-TEXT;
+035000            END-IF;
+035100           ELSE
+035200            PERFORM 0410-GEN-TEXT;
+035300          END-IF;
+035400         WHEN TC-STO (2 : 1) THRU TC-STO-C (2 : 1)
+035500          IF PRINT-IN-DATA (PTX-PTR + 2 : 4) NOT = LAST-ORIENT
+035600           THEN
+035700            MOVE PRINT-IN-DATA (PTX-PTR + 2 : 4) TO LAST-ORIENT;
+035800            CALL PUT-IN-BUF USING PTX-CONTROL, LAST-ORIENT;
+035900           ELSE
+036000            CONTINUE;
+036100          END-IF;
+036200         WHEN TC-RPS (2 :1 ) THRU TC-RPS-C (2 : 1)
+036300          PERFORM 0410-GEN-TEXT;
+036400         WHEN TC-OVS (2 : 1) THRU TC-OVS-C (2 : 1)
+036500          PERFORM 0410-GEN-TEXT;
+036600         WHEN TC-USC (2 : 1) THRU TC-USC-C (2 : 1)
+036700          PERFORM 0410-GEN-TEXT;
+036800         WHEN TC-NOP (2 : 1) THRU TC-NOP-C (2 : 1)
+036900          CONTINUE;
+037000         WHEN OTHER
+037100          CALL PUT-IN-BUF USING PTX-CONTROL,
+037200                                PRINT-IN-DATA (PTX-PTR + 2 :);
+037300       END-EVALUATE;
+037400      END-IF;
+037500      ADD BIN2 TO PTX-PTR;
+037600     END-PERFORM.
+037700      SKIP1
+037800 0410-GEN-TEXT.
+037900     IF LAST-FONT NOT = LAST-FONT-USED
+038000      THEN
+038100       CALL PUT-IN-BUF USING TC-SCFL, LAST-FONT;
+038200       MOVE LAST-FONT TO LAST-FONT-USED;
+038300       SET LAST-FONT-GEND TO TRUE;
+038400      ELSE
+038500       CONTINUE;
+038600     END-IF.
+038700     CALL PUT-IN-BUF USING PTX-CONTROL,
+038800                           PRINT-IN-DATA (PTX-PTR + 2 : ).
+038900 EJECT
+039000 ID DIVISION.
+039100 PROGRAM-ID. PUTINBUF COMMON.
+039200 DATA DIVISION.
+039300 WORKING-STORAGE SECTION.
+039400 77  BUF-PTR                 PIC 9(4) BINARY VALUE 1.
+039500 77  PTX-CHAIN-FLAG          PIC 9(4) BINARY.
+039600 77  FLUSH-BUFFER            PIC XX   VALUE LOW-VALUE.
+039700     SKIP1
+039800 01  HWORD                   PIC 9(4) BINARY.
+039900 01  HWORD-C                 REDEFINES HWORD.
+040000     05  FILLER              PIC X.
+040100     05  HWORD-LEN-C         PIC X.
+040200 01  TEXT-CONTROL.
+040300     05  TXTCTL-CTL            PIC XX.
+040400     05  TXTCTL-CHAIN          REDEFINES TXTCTL-CTL
+040500                               PIC 9(4) BINARY.
+040600 LINKAGE SECTION.
+040700 01  TXT-CTL.
+040800     05  TXT-CTL-LEN         PIC X.
+040900     05  TXT-CTL-CTL         PIC X.
+041000 01  TXT-DATA                PIC X(253).
+041100 PROCEDURE DIVISION USING TXT-CTL,
+041200                          TXT-DATA.
+041300* The text control and its operand are placed next in the output
+041400* file buffer. We ensure that all controls have their chain
+041500* bit flag set on.
+041600     MOVE TXT-CTL-LEN TO HWORD-LEN-C.
+041700     IF ((HWORD + BUF-PTR >= PRINT-OUT-MAX - LENGTH OF TC-NOP OR
+041800         TXT-CTL = FLUSH-BUFFER) AND
+041900        (BUF-PTR > LENGTH OF TC-ESC)) OR BUF-PTR = 1
+042000      THEN
+042100       IF BUF-PTR > 1
+042200        THEN
+042300         MOVE TC-NOP TO PTX-BUFFER (BUF-PTR : LENGTH OF TC-NOP);
+042400         MOVE LENGTH OF TC-NOP TO HWORD;
+042500         MOVE HWORD-LEN-C TO PTX-BUFFER (BUF-PTR : 1);
+042600         COMPUTE BUF-PTR = BUF-PTR + LENGTH OF TC-NOP - 1;
+042700         CALL BUILD-SF USING SF-PTX,
+042800                             BUF-PTR,
+042900                             PTX-BUFFER;
+043000        ELSE
+043100         CONTINUE;
+043200       END-IF;
+043300       MOVE TC-ESC TO PTX-BUFFER (1 : LENGTH OF TC-ESC);
+043400       ADD LENGTH OF TC-ESC, 1 GIVING BUF-PTR;
+043500       IF TXT-CTL = FLUSH-BUFFER
+043600        THEN
+043700         GOBACK;
+043800        ELSE
+043900         CONTINUE;
+044000       END-IF;
+044100      ELSE
+044200       IF TXT-CTL = FLUSH-BUFFER
+044300        THEN
+044400         GOBACK;
+044500        ELSE
+044600         CONTINUE;
+044700       END-IF;
+044800     END-IF.
+044900     MOVE TXT-CTL TO TEXT-CONTROL;
+045000     DIVIDE TXTCTL-CHAIN BY 2 GIVING TALLY
+045100          REMAINDER PTX-CHAIN-FLAG.
+045200     IF PTX-CHAIN-FLAG = ZERO
+045300      THEN
+045400       ADD 1 TO TXTCTL-CHAIN;
+045500       MOVE TEXT-CONTROL TO PTX-BUFFER (BUF-PTR : 2);
+045600      ELSE
+045700       MOVE TXT-CTL TO PTX-BUFFER (BUF-PTR : LENGTH OF TXT-CTL);
+045800     END-IF.
+045900     MOVE TXT-DATA (1 : HWORD - 2) TO
+046000          PTX-BUFFER (BUF-PTR + 2 : HWORD - 2);
+046100     ADD HWORD TO BUF-PTR.
+046200 END PROGRAM PUTINBUF.
+046300 EJECT
+046400 ID DIVISION.
+046500 PROGRAM-ID. BUILDSF COMMON.
+046600 DATA DIVISION.
+046700 WORKING-STORAGE SECTION.
+046800 77  SFCC                    PIC X VALUE X'5A'.
+046900 01  BSF-RECORD.
+047000     05  BSF-INTRO.
+047100         10 BSF-CC           PIC X.
+047200         10 BSF-LEN          PIC 9(4) BINARY.
+047300         10 BSF-TYPE         PIC XXX.
+047400         10 BSF-FLAG         PIC X.
+047500         10 BSF-SEQ          PIC 9(4) BINARY.
+047600     05  BSF-DATA            PIC X(32743).
+047700     SKIP1
+047800 LINKAGE SECTION.
+047900 01  BSF-ID                  PIC XXX.
+048000 01  BSF-DATA-LEN            PIC 9(4) BINARY.
+048100 01  BSF-DATA-DATA           PIC X(32743).
+048200 PROCEDURE DIVISION USING BSF-ID,
+048300                          BSF-DATA-LEN,
+048400                          BSF-DATA-DATA.
+048500     MOVE SFCC TO BSF-CC.
+048600     COMPUTE BSF-LEN = BSF-DATA-LEN + LENGTH OF BSF-INTRO - 1.
+048700     MOVE BSF-ID TO BSF-TYPE.
+048800     MOVE LOW-VALUE TO BSF-FLAG.
+048900     MOVE BSF-DATA-DATA (1 : BSF-DATA-LEN) TO
+049000          BSF-DATA (1 : BSF-DATA-LEN).
+049100     CALL WRITE-SF USING BSF-RECORD.
+049200 END PROGRAM BUILDSF.
+049300 EJECT
+049400 ID DIVISION.
+049500 PROGRAM-ID. WRITESF COMMON.
+049600 DATA DIVISION.
+049700     SKIP1
+049800 LINKAGE SECTION.
+049900 01  WSF-RECORD.
+050000     05  WSF-INTRO.
+050100         10 WSF-CC           PIC X.
+050200         10 WSF-LEN          PIC 9(4) BINARY.
+050300         10 WSF-TYPE         PIC XXX.
+050400         10 WSF-FLAG         PIC X.
+050500         10 WSF-SEQ          PIC 9(4) BINARY.
+050600     05  WSF-DATA            PIC X(32743).
+050700     SKIP1
+050800 PROCEDURE DIVISION USING WSF-RECORD.
+050900     MOVE PRINT-OUT-SFCOUNT TO WSF-SEQ.
+051000     ADD WSF-LEN, 1 GIVING PRINT-OUT-LENGTH.
+051100     WRITE PRINT-OUT-RECORD FROM WSF-RECORD (1 : PRINT-OUT-LENGTH)
+051200     IF PRINT-OUT-STATUS NOT = ZERO
+051300      THEN
+051400       DISPLAY PGMNAME, ' I/O ERROR ON DOUTFILE: ',
+051500               PRINT-OUT-STATUS;
+051600       SET PRINT-IN-EOF TO TRUE;
+051700      ELSE
+051800       ADD 1 TO OUT-REC-CNTR;
+051900     END-IF.
+052000     ADD 1 TO PRINT-OUT-SFCOUNT.
+052100 END PROGRAM WRITESF.
+052200 SKIP2
+052300 END PROGRAM APRPTXOP.
+

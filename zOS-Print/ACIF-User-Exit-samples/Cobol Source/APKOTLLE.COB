@@ -1,4 +1,4 @@
-000100 PROCESS NUMPROC(PFD) TRUNC(OPT) APOST NOSEQ LIST
+000100 PROCESS NUMPROC(PFD) TRUNC(OPT) APOST NOSEQ NOLIST
 000200* LAST UPDATE ON 9 Apr 2018 AT 15:41:28 BY  HOWARDT VERSION 01   *
 000300 ID DIVISION.
 000400 PROGRAM-ID. APKOTLLE.
@@ -40,6 +40,20 @@
 004000 DATE-COMPILED.
 004100 SECURITY. IBM SAMPLE CODE ONLY.
 004200*/**************************************************************/
+004220*/* Licensed under the Apache License, Version 2.0 (the        */
+004230*/* "License"); you may not use this file except in compliance */
+004240*/* with the License. You may obtain a copy of the License at  */
+004250*/*                                                            */
+004260*/* http://www.apache.org/licenses/LICENSE-2.0                 */
+004270*/*                                                            */
+004280*/* Unless required by applicable law or agreed to in writing, */
+004290*/* software distributed under the License is distributed on an*/
+004291*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+004292*/* KIND, either express or implied.  See the License for the  */
+004293*/* specific language governing permissions and limitations    */
+004294*/* under the License.                                         */
+004295*/*------------------------------------------------------------*/
+004296*/*                                                            */
 004300*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
 004400*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
 004500*/*                                                            */
@@ -69,7 +83,7 @@
 006900 DATA DIVISION.
 007000 WORKING-STORAGE SECTION.
 007100 77  PGMNAME                 PIC X(8) VALUE 'APKOTLLE'.
-007200 77  ABND-PGM                PIC X(8) VALUE 'CEE3DMP'.            !@01
+007211 77  ABND-PGM                PIC X(8) VALUE 'CEE3DMP'.            !@01
 007300 77  ABEND-CODE              PIC 9(4) BINARY VALUE 12.
 007310 77  ABEND-OPTS              PIC X(255)                           !@01
 007320     VALUE 'ENC(CUR) THR(CUR) FILE VAR NOBLOCK NOSTOR SF(ALL)' .  !@01

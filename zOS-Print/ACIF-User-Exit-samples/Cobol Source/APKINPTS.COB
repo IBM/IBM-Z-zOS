@@ -1,4 +1,4 @@
-000100 PROCESS NUMPROC(PFD) TRUNC(OPT) APOST NOSEQ LIST
+000100 PROCESS NUMPROC(PFD) TRUNC(OPT) APOST NOSEQ NOLIST
 000200* LAST UPDATE ON 9 Apr 2018 AT 15:39:32 BY  HOWARDT VERSION 01   *
 000300* LAST UPDATE ON 16 Nov 2017            BY  Howardt VERSION 02   *
 000400 ID DIVISION.
@@ -29,6 +29,20 @@
 002900 DATE-COMPILED.
 003000 SECURITY. IBM SAMPLE CODE ONLY.
 003100*/**************************************************************/
+003120*/* Licensed under the Apache License, Version 2.0 (the        */
+003130*/* "License"); you may not use this file except in compliance */
+003140*/* with the License. You may obtain a copy of the License at  */
+003150*/*                                                            */
+003160*/* http://www.apache.org/licenses/LICENSE-2.0                 */
+003170*/*                                                            */
+003180*/* Unless required by applicable law or agreed to in writing, */
+003190*/* software distributed under the License is distributed on an*/
+003191*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+003192*/* KIND, either express or implied.  See the License for the  */
+003193*/* specific language governing permissions and limitations    */
+003194*/* under the License.                                         */
+003195*/*------------------------------------------------------------*/
+003196*/*                                                            */
 003200*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
 003300*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
 003400*/*                                                            */
