@@ -14,9 +14,23 @@ Using a z/OSMF workflow, you can perform a z/OS V2R4 upgrade as an interactive, 
    <li>Provides the option for you to send feedback on your upgrade experience to IBM.</li>
    </ul>
  
-In order to use the z/OSMF Upgrade Workflow, you will need z/OSMF up and running, and Workflow access.  The "z/OS Migration" book is not
-available for z/OS V2.4.  Although z/OSMF is the strongly encouraged method to consume the z/OS V2.4 upgrade materials, we have provided
-an exported file of the contents of both the V2.3 and the V2.2 in HTML format.  
+In order to use the z/OSMF Upgrade Workflow, you will need z/OSMF up and running, and Workflow access.  The "z/OS Migration" book is not available for z/OS V2.4.  Although z/OSMF is the strongly encouraged method to consume the z/OS V2.4 upgrade materials, we have provided an exported file of the contents of both the V2.3 and the V2.2 in HTML format.  
+
+
+**What's new**
+
+The z/OS V2R4 Upgrade Workflow is updated with new information for the IBM z15 Model T02, the latest addition to the IBM Z 
+server family. With the addition of the Model T02, the IBM z15 family of mainframes includes the following hardware models: 
+
+* Model T01 (machine type 8561), with five feature codes to represent the processor capacity. The feature codes 
+are Max34, Max71, Max108, Max145, and Max190 with (respectively) 34, 71, 108, 145, and 190. This system is 
+configurable as a one-to-four 19-inch frame system. 
+
+* Model T02 (machine type 8562), with five CPC size features (one or two drawers). The system is configurable 
+as a 19-inch frame system.  
+
+In the workflow, references to "z15" pertain to all models of the IBM z15, including the z15 T02, unless otherwise noted.
+
 
 **Exported workflows link**
 
@@ -61,6 +75,9 @@ and store them in the same z/OS UNIX directory:
     * zOS Upgrade from V2.2 to V2.4-Level1.0.xml - download this file by clicking on "View Raw" not the DOWNLOAD button, or you will have create problems in the z/OSMF Workflow.
     * HC_rexx.txt
     * discovery.txt
+
+
+**Comments welcome**
 
 We welcome any contributions or feedback on anything you find. Keep in mind, there are no warranties for any of the files or contributions that you find here. This is a z/OS community that is sharing with others and it is expected that you review what you are using in your environment. This tool is not supported by the IBM Service organization, but rather by the tool owner on a best-can-do basis.
 
