@@ -1,0 +1,2061 @@
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211                 Date 04/02/2020  Time 12:07:57   Page     1
+0Invocation parameters:
+  APOST,MAP,NORENT,TRUNC(BIN),CP(1140),X,DYNAM,RMODE(24),S,NOOFF,DATA(24),TEST(SOURCE)
+0PROCESS(CBL) statements:
+  PROCESS DYNAM NUMPROC(PFD) TRUNC(OPT) APOST     NOSEQ            0001000
+0Options in effect:
+  NOADATA
+    ADV
+    AFP(NOVOLATILE)
+    APOST
+    ARCH(7)
+    ARITH(COMPAT)
+  NOAWO
+  NOBLOCK0
+    BUFSIZE(4096)
+  NOCICS
+    CODEPAGE(1140)
+  NOCOMPILE(S)
+  NOCOPYLOC
+  NOCOPYRIGHT
+  NOCURRENCY
+    DATA(24)
+    DBCS
+  NODECK
+  NODEFINE
+  NODIAGTRUNC
+    DISPSIGN(COMPAT)
+  NODLL
+  NODUMP
+    DYNAM
+  NOEXIT
+  NOEXPORTALL
+  NOFASTSRT
+    FLAG(I,I)
+  NOFLAGSTD
+    HGPR(PRESERVE)
+  NOINITCHECK
+  NOINITIAL
+    INLINE
+    INTDATE(ANSI)
+    LANGUAGE(EN)
+    LINECOUNT(60)
+  NOLIST
+    MAP(HEX)
+    MAXPCF(100000)
+  NOMDECK
+  NONAME
+    NSYMBOL(NATIONAL)
+  NONUMBER
+  NONUMCHECK
+    NUMPROC(PFD)
+    OBJECT
+  NOOFFSET
+    OPTIMIZE(0)
+    OUTDD(SYSOUT)
+  NOPARMCHECK
+    PGMNAME(COMPAT)
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211                 Date 04/02/2020  Time 12:07:57   Page     2
+0   QUALIFY(COMPAT)
+  NORENT
+    RMODE(24)
+  NORULES
+  NOSERVICE
+  NOSEQUENCE
+    SOURCE
+    SPACE(1)
+  NOSQL
+    SQLCCSID
+  NOSQLIMS
+  NOSSRANGE
+  NOSTGOPT
+    SUPPRESS
+  NOTERM
+    TEST(NOEJPD,DWARF,SOURCE,NOSEPARATE)
+  NOTHREAD
+    TRUNC(OPT)
+  NOVBREF
+    VLR(STANDARD)
+    VSAMOPENFS(COMPAT)
+  NOWORD
+    XMLPARSE(XMLSS)
+    XREF(FULL)
+    ZONEDATA(PFD)
+    ZWB
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211       ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page     3
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0/* ACIFIBDT
+   000001         000200* LAST UPDATE ON 9 Apr 2018 AT 16:12:16 BY  HOWARDT VERSION 01   *00020000
+   000002         000300 ID DIVISION.                                                     00030000
+   000003         000400 PROGRAM-ID. ACIFIBDT.                                            00040000
+   000004         000500 AUTHOR. TURETZKY--IBM PSD.                                       00050000
+   000005         000600 INSTALLATION. IBM BOULDER PROGRAMMING CENTER.                    00060000
+   000006         000700               This program is a sample exit for ACIF             00070000
+   000007         000800               (APKACIF,5648-062) demonstrating the use of the    00080000
+   000008         000900               ACIF input exit.                                   00090000
+   000009         001000                                                                  00100000
+   000010         001100               In order to use this exit, include the control     00110000
+   000011         001200               INPEXIT=ACIFIBDT to enable this exit, and include  00120000
+   000012         001300               the load module in a dataset referenced in STEPLIB 00130000
+   000013         001400               or elsewhere in the module search order.           00140000
+   000014         001500                                                                  00150000
+   000015         001600               This program will convert all BDT/EDT structured   00160000
+   000016         001700               fields to NOPs containing the original structured  00170000
+   000017         001800               field, which will be turned back into BDT/EDT by   00180000
+   000018         001900               ACIFOBDT.                                          00190000
+   000019         002000                                                                  00200000
+   000020         002100                                                                  00210000
+   000021         002200 DATE-WRITTEN. 10 Dec 2000.                                       00220000
+   000022         002300 DATE-COMPILED. 04/02/20.                                         00230000
+   000023         002400 SECURITY. IBM SAMPLE CODE ONLY.                                  00240000
+   000024         002500*/**************************************************************/ 00250000
+   000025         002600*/* Licensed under the Apache License, Version 2.0 (the        */ 00260003
+   000026         002610*/* "License"); you may not use this file except in compliance */ 00261003
+   000027         002700*/* with the License. You may obtain a copy of the License at  */ 00270003
+   000028         003000*/*                                                            */ 00300003
+   000029         003100*/* http://www.apache.org/licenses/LICENSE-2.0                    00310003
+   000030         003110*/*                                                            */ 00311003
+   000031         003300*/* Unless required by applicable law or agreed to in writing, */ 00330003
+   000032         003400*/* software distributed under the License is distributed on an*/ 00340003
+   000033         003500*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */ 00350003
+   000034         003510*/* KIND, either express or implied.  See the License for the  */ 00351003
+   000035         003600*/* specific language governing permissions and limitations    */ 00360003
+   000036         003700*/* under the License.                                         */ 00370003
+   000037         003800*/*------------------------------------------------------------*/ 00380004
+   000038         004402*/*                                                            */ 00440203
+   000039         004410*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */ 00441003
+   000040         004420*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */ 00442003
+   000041         004430*/*                                                            */ 00443003
+   000042         004440*/*   Permission to use, copy, modify, and distribute          */ 00444003
+   000043         004450*/*   this software for any purpose with or without fee        */ 00445003
+   000044         004460*/*   is hereby granted, provided that the above               */ 00446003
+   000045         004470*/*   copyright notices appear in all copies.                  */ 00447003
+   000046         004480*/*                                                            */ 00448003
+   000047         004490*/*   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY       */ 00449003
+   000048         004491*/*   OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT       */ 00449103
+   000049         004492*/*   LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            */ 00449203
+   000050         004493*/*   FITNESS FOR A PARTICULAR PURPOSE AND                     */ 00449303
+   000051         004494*/*   NONINFRINGEMENT.  IN NO EVENT SHALL RICOH, RICOH         */ 00449403
+   000052         004495*/*   SUBSIDIARIES, ANY OF ITS SUPPLIERS OR ANY OF THE         */ 00449503
+   000053         004496*/*   OTHER COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,         */ 00449603
+   000054         004497*/*   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF      */ 00449703
+   000055         004498*/*   CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF        */ 00449803
+   000056         004499*/*   OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR         */ 00449903
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211       ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page     4
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0  000057         004500*/*   OTHER DEALINGS IN THE SOFTWARE.                          */ 00450003
+   000058         004510*/**************************************************************/ 00451003
+1ACIF Sample Input Exit                                         ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page     5
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000060         004700 ENVIRONMENT DIVISION.                                            00470000
+   000061         004800 CONFIGURATION SECTION.                                           00480000
+   000062         004900 SOURCE-COMPUTER. IBM-370.                                        00490000
+   000063         005000 OBJECT-COMPUTER. IBM-370.                                        00500000
+1ACIF Sample Input Exit                                         ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page     6
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000065         005200 DATA DIVISION.                                                   00520000
+   000066         005300 WORKING-STORAGE SECTION.                                         00530000
+   000067         005400 77  PGMNAME                 PIC X(8) VALUE 'ACIFIBDT'.           00540000           000000000 8C
+   000068         005500 77  ABND-PGM                PIC X(8) VALUE 'CEE3ABD'.            00550000           000000000 8C
+   000069         005600 77  ABEND-CODE              PIC 9(4) BINARY VALUE 12.            00560000           000000000 2C
+   000070         005700 77  AFPWRITE                PIC X(8) VALUE 'AFPWRITE'.           00570000           000000000 8C
+   000071         005800* The following are values for positions and lengths of items     00580000
+   000072         005900* in the input lines.                                             00590000
+   000073         006000 77  REPT-LEN                PIC 9(4) BINARY VALUE 3.             00600000           000000000 2C
+   000074         006100 77  DATE-LEN                PIC 9(4) BINARY VALUE 8.             00610000           000000000 2C
+   000075         006200 77  PAGE-DISP               PIC ZZ,ZZ9.                          00620000           000000000 6C
+   000076         006300 77  SF-CC-VALUE             PIC X.                               00630000           000000000 1C
+   000077         006400     88  SF-CC               VALUE X'5A'.                         00640000
+
+   000079         006600 01  MISC-SAVED-DATA.                                             00660000           000000000 0CL10
+   000080         006700     05  FIRST-LINE-FLAG     PIC X VALUE LOW-VALUE.               00670000           000000000 1C
+                                                                                                   IMP
+   000081         006800         88 FIRST-LINE       VALUE HIGH-VALUE.                    00680000 IMP
+   000082         006900         88 NOTFIRST-LINE    VALUE LOW-VALUE.                     00690000 IMP
+   000083         007000     05  INSERT-FLAG         PIC X VALUE LOW-VALUE.               00700000           000000001 1C
+                                                                                                   IMP
+   000084         007100         88 INSERT-LINE      VALUE HIGH-VALUE.                    00710000 IMP
+   000085         007200         88 NOINSERT-LINE    VALUE LOW-VALUE.                     00720000 IMP
+   000086         007300     05  LINE-COUNT          PIC S9(8) BINARY VALUE ZERO.         00730000           000000002 4C
+                                                                                                   IMP
+   000087         007400     05  PAGE-COUNT          PIC S9(8) BINARY VALUE ZERO.         00740000           000000006 4C
+                                                                                                   IMP
+0
+   000089         007600 01  RECORD-BUFFERS.                                              00760000           000000000 0CL8194
+   000090         007700     05  SAVED-LINE-RECLEN   PIC 9(4) BINARY.                     00770000           000000000 2C
+   000091         007800     05  SAVED-LINE-BUFFER   PIC X(8192).                         00780000           000000002 8192C
+0
+1ACIF Sample Input Exit                                         ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page     7
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000093         008000/ AFP STRUCTURED FIELD DEFINITIONS.                               00800000
+   000094         008110     COPY STRFLDS SUPPRESS.                                       00811002
+1ACIF Sample Input Exit                                         ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page     8
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   001240         008200/ PASSED PARAMETERS.                                              00820000
+   001241         008300 LINKAGE SECTION.                                                 00830000
+   001242         008400 01  INP-PARMS.                                                   00840000 BLL=00001,000000000 0CL22
+   001243         008500     05  INP-USTOR           POINTER.                             00850000 BLL=00001,000000000 4C
+   001244         008600     05  INP-PFATTR          POINTER.                             00860000 BLL=00001,000000004 4C
+   001245         008700     05  INP-RECPTR          POINTER.                             00870000 BLL=00001,000000008 4C
+   001246         008800     05  FILLER              POINTER.                             00880000 BLL=00001,00000000C 4C
+   001247         008900     05  INP-RECLEN          PIC 9(4) BINARY.                     00890000 BLL=00001,000000010 2C
+   001248         009000     05  FILLER              PIC XX.                              00900000 BLL=00001,000000012 2C
+   001249         009100     05  INP-REQUEST         PIC X.                               00910000 BLL=00001,000000014 1C
+   001250         009200         88  INP-USE         VALUE X'00'.                         00920000
+   001251         009300         88  INP-DELETE      VALUE X'01'.                         00930000
+   001252         009400         88  INP-INSERT      VALUE X'02'.                         00940000
+   001253         009500     05  INP-EOF-FLAG        PIC X.                               00950000 BLL=00001,000000015 1C
+   001254         009600         88  INP-EOF         VALUE 'Y'.                           00960000
+   001255         009700                                                                  00970000
+   001256         009800 01  INP-UAREA               PIC X(16).                           00980000 BLL=00002,000000000 16C
+   001257         009900                                                                  00990000
+   001258         010000 01  INP-ATTR.                                                    01000000 BLL=00003,000000000 0CL51
+   001259         010100     05  INP-CC              PIC XXX.                             01010000 BLL=00003,000000000 3C
+   001260         010200     05  INP-CCTYPE          PIC X.                               01020000 BLL=00003,000000003 1C
+   001261         010300         88  INP-ANSI-CC     VALUE 'A'.                           01030000
+   001262         010400         88  INP-MACH-CC     VALUE 'M'.                           01040000
+   001263         010500     05  INP-CHARS           PIC X(20).                           01050000 BLL=00003,000000004 20C
+   001264         010600     05  INP-FORMDEF         PIC X(8).                            01060000 BLL=00003,000000018 8C
+   001265         010700     05  INP-PAGEDEF         PIC X(8).                            01070000 BLL=00003,000000020 8C
+   001266         010800     05  INP-PRMODE          PIC X(8).                            01080000 BLL=00003,000000028 8C
+   001267         010900     05  INP-TRC             PIC XXX.                             01090000 BLL=00003,000000030 3C
+
+   001269         011100* THIS IS THE BDT/EDT NOP RECORD. THE NOP DATA AREA MUST CONTAIN  01110000
+   001270         011200* A VALID BDT/EDT STRUCTURED FIELD.                               01120000
+   001271         011300 01  NOP-RECORD.                                                  01130000 BLL=00004,000000000 0CL26612
+   001272         011400     05  NOP-INTRODUCER.                                          01140000 BLL=00004,000000000 0CL9
+   001273         011500       10  NOP-CC            PIC X.                               01150000 BLL=00004,000000000 1C
+   001274         011600       10  NOP-LEN-CHR       PIC XX.                              01160000 BLL=00004,000000001 2C
+   001275         011700       10  NOP-RECLEN        REDEFINES NOP-LEN-CHR                01170000 BLL=00004,000000001 2C
+                                                                                                   1274
+   001276         011800                             PIC 9(4) BINARY.                     01180000
+   001277         011900       10  NOP-TYPE          PIC XXX.                             01190000 BLL=00004,000000003 3C
+   001278         012000           88  NOP-BDT       VALUE X'D3A8A8'.                     01200000
+   001279         012100           88  NOP-EDT       VALUE X'D3A9A8'.                     01210000
+   001280         012200       10  NOP-FLAG          PIC X.                               01220000 BLL=00004,000000006 1C
+   001281         012300       10  NOP-SEQ-CHR       PIC XX.                              01230000 BLL=00004,000000007 2C
+   001282         012400       10  NOP-SEQNUM        REDEFINES NOP-SEQ-CHR                01240000 BLL=00004,000000007 2C
+                                                                                                   1281
+   001283         012500                             PIC 9(4) BINARY.                     01250000
+   001284         012600     05  NOP-DATA.                                                01260000 BLL=00004,000000009 0CL26603
+   001285         012700       10  FILLER            PIC X.                               01270000 BLL=00004,000000009 1C
+   001286         012800       10  NOP-XDT-LEN-CHR   PIC XX.                              01280000 BLL=00004,00000000A 2C
+   001287         012900       10  NOP-XDT-RECLEN    REDEFINES NOP-XDT-LEN-CHR            01290000 BLL=00004,00000000A 2C
+                                                                                                   1286
+   001288         013000                             PIC 9(4) BINARY.                     01300000
+   001289         013100       10  NOP-XDT-TYPE      PIC XXX.                             01310000 BLL=00004,00000000C 3C
+   001290         013200       10  NOP-ARRAY         OCCURS 0 TO 26597,                   01320000 BLL=00004,00000000F 1C
+   001291         013300                             DEPENDING ON NOP-RECLEN,             01330000 1275
+   001292         013400                             PIC X.                               01340000
+
+1Initialization and Main Line                                   ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page     9
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   001295         013700 PROCEDURE DIVISION USING INP-PARMS.                              01370000 1242
+   001296         013800* make work area, attributes, and input line addressable.         01380000
+   001297         013900     SET ADDRESS OF INP-UAREA TO INP-USTOR.                       01390000 IMP 1256 1243
+   001298         014000     SET ADDRESS OF INP-ATTR TO INP-PFATTR.                       01400000 IMP 1258 1244
+   001299         014100     SET ADDRESS OF NOP-RECORD TO INP-RECPTR.                     01410000 IMP 1271 1245
+   001300         014200     MOVE ZERO TO RETURN-CODE.                                    01420000 IMP IMP IMP
+   001301         014300* no special action is necessary at EOF.                          01430000
+   001302         014400     IF INP-EOF                                                   01440000 1254
+   001303         014500      THEN                                                        01450000
+   001304      1  014600       DISPLAY PGMNAME, ' EOF REACHED.';                          01460000 67
+   001305      1  014700       MOVE PAGE-COUNT TO PAGE-DISP;                              01470000 87 75
+   001306      1  014800       GOBACK;                                                    01480000
+   001307         014900     END-IF.                                                      01490000
+   001308         015000     IF NOP-BDT OR NOP-EDT                                        01500000 1278 1279
+   001309         015100      THEN                                                        01510000
+   001310      1  015200       CALL AFPWRITE USING SF-NOP,                                01520000 70 480
+   001311      1  015300                           NOP-RECORD,                            01530000 1271
+   001312      1  015400                           INP-RECLEN,                            01540000 1247
+   001313      1  015500                           BY REFERENCE SAVED-LINE-RECLEN,        01550000 90
+   001314      1  015600                           SAVED-LINE-BUFFER;                     01560000 91
+   001315      1  015700       MOVE SAVED-LINE-RECLEN TO INP-RECLEN;                      01570000 90 1247
+   001316      1  015800       MOVE SAVED-LINE-BUFFER TO NOP-RECORD (1:SAVED-LINE-RECLEN);01580000 91 1271 90
+   001317      1  015900       SET INP-USE TO TRUE;                                       01590000 1250
+
+   001319      1  016100     GOBACK.                                                      01610000
+1Initialization and Main Line                                   ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    10
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    11
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   001322   1     016400 ID DIVISION.                                                     01640000
+   001323   1     016500* This routine takes the structured field type, data, and data    01650000
+   001324   1     016600* length and formats an AFP record and places it in the           01660000
+   001325   1     016700* exit's buffer.                                                  01670000
+   001326   1     016800 PROGRAM-ID. AFPWRITE COMMON.                                     01680000
+   001327   1     016900 DATA DIVISION.                                                   01690000
+   001328   1     017000 WORKING-STORAGE SECTION.                                         01700000
+   001329   1     017100 77  SF-CC                       PIC X VALUE X'5A'.               01710000           000000000 1C
+   001330   1     017200 LINKAGE SECTION.                                                 01720000
+   001331   1     017300 01  AFP-TYPE                    PIC X(3).                        01730000 BLL=00005,000000000 3C
+   001332   1     017400 01  AFP-DATA                    PIC X(8192).                     01740000 BLL=00006,000000000 8192C
+   001333   1     017500 01  AFP-DATA-LENGTH             PIC 9(4) BINARY.                 01750000 BLL=00007,000000000 2C
+   001334   1     017600 01  AFP-INSERT-LEN              PIC 9(4) BINARY.                 01760000 BLL=00008,000000000 2C
+
+   001336   1     017800 01  SF-RECORD.                                                   01780000 BLL=00009,000000000 0CL8201
+   001337   1     017900     05  SF-INTRODUCER.                                           01790000 BLL=00009,000000000 0CL9
+   001338   1     018000         10 SF-INTRO-CC      PIC X.                               01800000 BLL=00009,000000000 1C
+   001339   1     018100         10 SF-INTRO-LEN     PIC 9(4) BINARY.                     01810000 BLL=00009,000000001 2C
+   001340   1     018200         10 SF-INTRO-TYPE    PIC X(3).                            01820000 BLL=00009,000000003 3C
+   001341   1     018300         10 SF-INTRO-FLAG    PIC X.                               01830000 BLL=00009,000000006 1C
+   001342   1     018400         10 SF-INTRO-SEQNUM  PIC 9(4) BINARY.                     01840000 BLL=00009,000000007 2C
+   001343   1     018500     05  SF-DATA             PIC X(8192).                         01850000 BLL=00009,000000009 8192C
+-
+   001345   1     018700 PROCEDURE DIVISION USING AFP-TYPE,                               01870000 1331
+   001346   1     018800                          AFP-DATA,                               01880000 1332
+   001347   1     018900                          AFP-DATA-LENGTH,                        01890000 1333
+   001348   1     019000                          AFP-INSERT-LEN,                         01900000 1334
+   001349   1     019100                          SF-RECORD.                              01910000 1336
+   001350   1     019200* set the final record length (introducer plus data), which is    01920000
+   001351   1     019300* found in the introducer length field, move in the introducer    01930000
+   001352   1     019400* and the data, then write the record.                            01940000
+   001353   1     019500     ADD LENGTH OF SF-INTRODUCER, AFP-DATA-LENGTH GIVING          01950000 IMP 1337 1333
+   001354   1     019600         AFP-INSERT-LEN.                                          01960000 1334
+   001355   1     019700     SUBTRACT 1 FROM AFP-INSERT-LEN GIVING SF-INTRO-LEN.          01970000 1334 1339
+   001356   1     019800     MOVE SF-CC TO     SF-INTRO-CC.                               01980000 1329 1338
+   001357   1     019900     MOVE AFP-TYPE TO SF-INTRO-TYPE.                              01990000 1331 1340
+   001358   1     020000     MOVE LOW-VALUE TO SF-INTRO-FLAG.                             02000000 IMP 1341
+   001359   1     020100     MOVE ZERO TO      SF-INTRO-SEQNUM.                           02010000 IMP 1342
+   001360   1     020200     MOVE AFP-DATA (1 : AFP-DATA-LENGTH) TO SF-DATA               02020000 1332 1333 1343
+   001361   1     020300                                         (1 : AFP-DATA-LENGTH).   02030000 1333
+   001362   1     020400     EXIT PROGRAM.                                                02040000
+   001363   1     020500 END PROGRAM AFPWRITE.                                            02050000 1326
+
+   001365         020700 END PROGRAM ACIFIBDT.                                            02070000 3
+ */ ACIFIBDT
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    12
+0An "M" preceding a data-name reference indicates that the data-name is modified by this reference.
+
+  Defined   Cross-reference of data names   References
+
+       69   ABEND-CODE
+       68   ABND-PGM
+     1332   AFP-DATA . . . . . . . . . . .  1346 1360
+     1333   AFP-DATA-LENGTH. . . . . . . .  1347 1353 1360 1361
+     1334   AFP-INSERT-LEN . . . . . . . .  1348 M1354 1355
+     1331   AFP-TYPE . . . . . . . . . . .  1345 1357
+       70   AFPWRITE . . . . . . . . . . .  1310
+     1183   CAT-AEG
+     1149   CAT-AREA
+     1157   CAT-CFONT
+     1151   CAT-COLATT
+     1161   CAT-CONTAIN
+     1175   CAT-DATARSRC
+     1177   CAT-DOCENV
+     1167   CAT-DOCUMENT
+     1187   CAT-FORMAP
+     1173   CAT-GRAPHIC
+     1197   CAT-ID . . . . . . . . . . . .  1195
+     1153   CAT-IMIMAGE
+     1165   CAT-INDEX
+     1196   CAT-INDX
+     1155   CAT-MEDIUM
+     1185   CAT-MEDMAP
+     1146   CAT-NAMES. . . . . . . . . . .  1193
+     1181   CAT-OEG
+     1191   CAT-OVERLAY
+     1171   CAT-PAGE
+     1169   CAT-PAGEGRP
+     1159   CAT-PELEM
+     1189   CAT-POVLY
+     1163   CAT-PRESENT
+     1147   CAT-PSEG
+     1179   CAT-RESGRP
+     1193   CAT-TABLE
+       74   DATE-LEN
+       81   FIRST-LINE
+       80   FIRST-LINE-FLAG
+     1100   FQN-ATTR
+     1126   FQN-BDI
+     1112   FQN-BDT
+     1122   FQN-BMM
+     1128   FQN-BOR
+     1120   FQN-BPG
+     1098   FQN-BRG
+     1124   FQN-CFN
+     1116   FQN-CPG
+     1136   FQN-DOER
+     1108   FQN-DOFB
+     1110   FQN-DOFL
+     1130   FQN-DOIR
+     1118   FQN-FCS
+     1092   FQN-FFN
+     1094   FQN-FTN
+     1090   FQN-GID
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    13
+0 Defined   Cross-reference of data names   References
+
+0    1142   FQN-ID . . . . . . . . . . . .  1140
+     1132   FQN-IGID
+     1141   FQN-INDX
+     1106   FQN-MTM
+     1089   FQN-NAMES. . . . . . . . . . .  1138
+     1134   FQN-OOID
+     1104   FQN-PGRP
+     1087   FQN-PREFIX
+     1102   FQN-PREL
+     1096   FQN-RHR
+     1114   FQN-ROR
+     1138   FQN-TABLE
+      659   GBAR
+      665   GBCIMG
+      662   GBIMG
+      668   GBOX
+      671   GCBOX
+      677   GCCHST
+      704   GCFLARC
+      698   GCFLT
+      674   GCHST
+      713   GCLINE
+      719   GCMRK
+      680   GCOMT
+      728   GCPARC
+      734   GCRLINE
+      683   GEAR
+      686   GEIMG
+      689   GEPROL
+      701   GFARC
+      695   GFLT
+      707   GIMD
+      710   GLINE
+      716   GMRK
+      722   GNOP1
+      725   GPARC
+      816   GR-AREA-BOUNDARIES
+      817   GR-AREA-BOUNDARY
+      818   GR-AREA-NOBOUNDARY
+      824   GR-CDIR-B2T
+      820   GR-CDIR-DFLT
+      821   GR-CDIR-L2R
+      823   GR-CDIR-R2L
+      822   GR-CDIR-T2B
+      819   GR-CHAR-DIRECTION
+      825   GR-COLOR
+      827   GR-COLOR-BLUE
+      831   GR-COLOR-CYAN
+      826   GR-COLOR-DFLT
+      830   GR-COLOR-GREEN
+      829   GR-COLOR-MAGENTA
+      834   GR-COLOR-MEDIUM
+      833   GR-COLOR-PDFLT
+      828   GR-COLOR-RED
+      832   GR-COLOR-YELLOW
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    14
+0 Defined   Cross-reference of data names   References
+
+0     843   GR-ECOLOR-BLACK
+      837   GR-ECOLOR-BLUE
+      844   GR-ECOLOR-BROWN
+      841   GR-ECOLOR-CYAN
+      836   GR-ECOLOR-DFLT
+      840   GR-ECOLOR-GREEN
+      839   GR-ECOLOR-MAGENTA
+      846   GR-ECOLOR-MEDIUM
+      845   GR-ECOLOR-PDFLT
+      838   GR-ECOLOR-RED
+      842   GR-ECOLOR-YELLOW
+      835   GR-EXTENDED-COLOR
+      809   GR-ID. . . . . . . . . . . . .  805
+      806   GR-ID-INDX
+      893   GR-IMAGE-MAPPING
+      899   GR-IMAGE-ROTATION
+      808   GR-LENGTH
+      854   GR-LINE-DASHDDOT
+      851   GR-LINE-DASHDOT
+      852   GR-LINE-DBLDOT
+      848   GR-LINE-DFLT
+      849   GR-LINE-DOTTED
+      856   GR-LINE-INVISIBLE
+      853   GR-LINE-LDASH
+      850   GR-LINE-SDASH
+      855   GR-LINE-SOLID
+      857   GR-LINE-THICKNESS
+      847   GR-LINE-TYPE
+      896   GR-MAP-CENTER
+      898   GR-MAP-DOUBLE-DOT
+      897   GR-MAP-PEL
+      895   GR-MAP-SCALE
+      894   GR-MAP-TRIM
+      873   GR-MARK-BLANK
+      863   GR-MARK-CROSS
+      862   GR-MARK-DFLT
+      865   GR-MARK-DIAMOND
+      871   GR-MARK-DOT
+      869   GR-MARK-FDIAMOND
+      870   GR-MARK-FSQUARE
+      864   GR-MARK-PLUS
+      872   GR-MARK-SMCIRCLE
+      866   GR-MARK-SQUARE
+      867   GR-MARK-6PT-STAR
+      868   GR-MARK-9PT-STAR
+      861   GR-MARKER-SYMBOL
+      655   GR-NAMES . . . . . . . . . . .  803
+      892   GR-PATT-BLANK
+      875   GR-PATT-DFLT
+      876   GR-PATT-GREY-1
+      877   GR-PATT-GREY-2
+      878   GR-PATT-GREY-3
+      879   GR-PATT-GREY-4
+      880   GR-PATT-GREY-5
+      881   GR-PATT-GREY-6
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    15
+0 Defined   Cross-reference of data names   References
+
+0     882   GR-PATT-GREY-7
+      883   GR-PATT-GREY-8
+      885   GR-PATT-HLINES
+      886   GR-PATT-L2R-DIAG1
+      887   GR-PATT-L2R-DIAG2
+      890   GR-PATT-NONE
+      891   GR-PATT-SOLID
+      888   GR-PATT-T2B-DIAG1
+      889   GR-PATT-T2B-DIAG2
+      884   GR-PATT-VLINES
+      874   GR-PATTERN-SYMBOL
+      900   GR-ROT-00
+      902   GR-ROT-180
+      903   GR-ROT-270
+      901   GR-ROT-90
+      803   GR-TABLE
+      858   GR-THIK-DFLT
+      859   GR-THIK-NORMAL
+      860   GR-THIK-THICK
+      807   GR-VALUE
+      656   GRBSI
+      692   GRESI
+      731   GRLINE
+      660   GRN-GBAR
+      666   GRN-GBCIMG
+      663   GRN-GBIMG
+      669   GRN-GBOX
+      672   GRN-GCBOX
+      678   GRN-GCCHST
+      705   GRN-GCFARC
+      699   GRN-GCFLT
+      675   GRN-GCHST
+      714   GRN-GCLINE
+      720   GRN-GCMRK
+      681   GRN-GCOMT
+      729   GRN-GCPARC
+      735   GRN-GCRLINE
+      684   GRN-GEAR
+      687   GRN-GEIMG
+      690   GRN-GEPROL
+      702   GRN-GFARC
+      696   GRN-GFLT
+      708   GRN-GIMD
+      711   GRN-GLINE
+      717   GRN-GMRK
+      723   GRN-GNOP1
+      726   GRN-GPARC
+      657   GRN-GRBSI
+      693   GRN-GRESI
+      732   GRN-GRLINE
+      741   GRN-GSAP
+      744   GRN-GSBMX
+      747   GRN-GSCA
+      750   GRN-GSCC
+      753   GRN-GSCD
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    16
+0 Defined   Cross-reference of data names   References
+
+0     762   GRN-GSCH
+      765   GRN-GSCOL
+      768   GRN-GSCP
+      756   GRN-GSCR
+      759   GRN-GSCS
+      771   GRN-GSECOL
+      738   GRN-GSGCH
+      774   GRN-GSLT
+      777   GRN-GSLW
+      780   GRN-GSMC
+      783   GRN-GSMP
+      786   GRN-GSMS
+      789   GRN-GSMT
+      792   GRN-GSMX
+      801   GRN-GSPIK
+      795   GRN-GSPS
+      798   GRN-GSPT
+      740   GSAP
+      743   GSBMX
+      746   GSCA
+      749   GSCC
+      752   GSCD
+      761   GSCH
+      764   GSCOL
+      767   GSCP
+      755   GSCR
+      758   GSCS
+      770   GSECOL
+      737   GSGCH
+      773   GSLT
+      776   GSLW
+      779   GSMC
+      782   GSMP
+      785   GSMS
+      788   GSMT
+      791   GSMX
+      800   GSPIK
+      794   GSPS
+      797   GSPT
+     1261   INP-ANSI-CC
+     1258   INP-ATTR . . . . . . . . . . .  1298
+     1259   INP-CC
+     1260   INP-CCTYPE
+     1263   INP-CHARS
+     1251   INP-DELETE
+     1254   INP-EOF. . . . . . . . . . . .  1302
+     1253   INP-EOF-FLAG
+     1264   INP-FORMDEF
+     1252   INP-INSERT
+     1262   INP-MACH-CC
+     1265   INP-PAGEDEF
+     1242   INP-PARMS. . . . . . . . . . .  1295
+     1244   INP-PFATTR . . . . . . . . . .  1298
+     1266   INP-PRMODE
+     1247   INP-RECLEN . . . . . . . . . .  1312 M1315
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    17
+0 Defined   Cross-reference of data names   References
+
+0    1245   INP-RECPTR . . . . . . . . . .  1299
+     1249   INP-REQUEST
+     1267   INP-TRC
+     1256   INP-UAREA. . . . . . . . . . .  1297
+     1250   INP-USE. . . . . . . . . . . .  M1317
+     1243   INP-USTOR. . . . . . . . . . .  1297
+       83   INSERT-FLAG
+       84   INSERT-LINE
+       86   LINE-COUNT
+     1238   MCF2-RG-LEN-LEN
+       79   MISC-SAVED-DATA
+       85   NOINSERT-LINE
+     1290   NOP-ARRAY
+     1278   NOP-BDT. . . . . . . . . . . .  1308
+     1273   NOP-CC
+     1284   NOP-DATA
+     1279   NOP-EDT. . . . . . . . . . . .  1308
+     1280   NOP-FLAG
+     1272   NOP-INTRODUCER
+     1274   NOP-LEN-CHR. . . . . . . . . .  1275
+     1275   NOP-RECLEN . . . . . . . . . .  1291
+     1271   NOP-RECORD . . . . . . . . . .  1299 1311 M1316
+     1281   NOP-SEQ-CHR. . . . . . . . . .  1282
+     1282   NOP-SEQNUM
+     1277   NOP-TYPE
+     1286   NOP-XDT-LEN-CHR. . . . . . . .  1287
+     1287   NOP-XDT-RECLEN
+     1289   NOP-XDT-TYPE
+       82   NOTFIRST-LINE
+     1202   OBJTYP-ATTRIB
+     1210   OBJTYP-BEGIN
+     1208   OBJTYP-CONTROL
+     1204   OBJTYP-COPYCNT
+     1228   OBJTYP-DATA
+     1206   OBJTYP-DESCR
+     1212   OBJTYP-END
+     1234   OBJTYP-ID. . . . . . . . . . .  1232
+     1218   OBJTYP-INCLUDE
+     1233   OBJTYP-INDX
+     1226   OBJTYP-LINK
+     1214   OBJTYP-MAP
+     1222   OBJTYP-MIGR
+     1201   OBJTYP-NAMES . . . . . . . . .  1230
+     1216   OBJTYP-POSN
+     1220   OBJTYP-TABLE
+     1230   OBJTYP-TABLE
+     1224   OBJTYP-VARIABLE
+       87   PAGE-COUNT . . . . . . . . . .  1305
+       75   PAGE-DISP. . . . . . . . . . .  M1305
+       67   PGMNAME. . . . . . . . . . . .  1304
+       89   RECORD-BUFFERS
+       73   REPT-LEN
+        0   RETURN-CODE. . . . . . . . . .  1300 M1300
+       91   SAVED-LINE-BUFFER. . . . . . .  1314 1316
+       90   SAVED-LINE-RECLEN. . . . . . .  1313 1315 1316
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    18
+0 Defined   Cross-reference of data names   References
+
+0     135   SF-BAG
+      138   SF-BBC
+      141   SF-BCA
+      144   SF-BCF
+      147   SF-BCP
+      150   SF-BCT
+      153   SF-BDA
+      156   SF-BDD
+      159   SF-BDG
+      162   SF-BDI
+      165   SF-BDM
+      168   SF-BDT
+      171   SF-BDX
+      174   SF-BFG
+      177   SF-BFM
+      180   SF-BFN
+      183   SF-BGR
+      186   SF-BII
+      189   SF-BIM
+      192   SF-BMM
+      195   SF-BMO
+      198   SF-BNG
+      201   SF-BOC
+      204   SF-BOG
+      207   SF-BPG
+      210   SF-BPM
+      213   SF-BPS
+      216   SF-BPT
+      222   SF-BRG
+      219   SF-BRS
+      225   SF-CAT
+       77   SF-CC
+      132   SF-CC
+     1329   SF-CC. . . . . . . . . . . . .  1356
+       76   SF-CC-VALUE
+      228   SF-CCP
+      231   SF-CDD
+      234   SF-CFC
+      237   SF-CFI
+      240   SF-CPC
+      243   SF-CPD
+      246   SF-CPI
+      249   SF-CTC
+      252   SF-CTD
+      255   SF-CTX
+     1343   SF-DATA. . . . . . . . . . . .  M1360
+      261   SF-DCF
+      258   SF-DXD
+      264   SF-EAG
+      267   SF-EBC
+      270   SF-ECA
+      273   SF-ECF
+      276   SF-ECP
+      279   SF-ECT
+      282   SF-EDG
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    19
+0 Defined   Cross-reference of data names   References
+
+0     285   SF-EDI
+      288   SF-EDM
+      291   SF-EDT
+      294   SF-EDX
+      297   SF-EFG
+      300   SF-EFM
+      303   SF-EFN
+      306   SF-EGR
+      309   SF-EII
+      312   SF-EIM
+      315   SF-EMM
+      318   SF-EMO
+      321   SF-ENG
+      324   SF-EOC
+      327   SF-EOG
+      330   SF-EPG
+      333   SF-EPM
+      336   SF-EPS
+      339   SF-EPT
+      342   SF-ER
+      345   SF-ERG
+      348   SF-FDS
+      351   SF-FDX
+      354   SF-FGD
+      357   SF-FNC
+      360   SF-FND
+      363   SF-FNG
+      366   SF-FNI
+      369   SF-FNM
+      372   SF-FNO
+      375   SF-FNP
+      378   SF-GAD
+      381   SF-GDD
+      384   SF-ICP
+      527   SF-ID. . . . . . . . . . . . .  524
+      525   SF-ID-INDX
+      387   SF-IDD
+      390   SF-IDM
+      393   SF-IEL
+      396   SF-IID
+      399   SF-IMM
+     1338   SF-INTRO-CC. . . . . . . . . .  M1356
+     1341   SF-INTRO-FLAG. . . . . . . . .  M1358
+     1339   SF-INTRO-LEN . . . . . . . . .  M1355
+     1342   SF-INTRO-SEQNUM. . . . . . . .  M1359
+     1340   SF-INTRO-TYPE. . . . . . . . .  M1357
+     1337   SF-INTRODUCER. . . . . . . . .  1353
+      402   SF-IOB
+      405   SF-IOC
+      408   SF-IPD
+      411   SF-IPO
+      414   SF-IPS
+      417   SF-IRD
+      420   SF-LLE
+      423   SF-LNC
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    20
+0 Defined   Cross-reference of data names   References
+
+0     426   SF-LND
+      429   SF-MBC
+      432   SF-MCA
+      435   SF-MCC
+      438   SF-MCF
+      441   SF-MCF2
+      444   SF-MDD
+      447   SF-MDR
+      450   SF-MFC
+      453   SF-MGO
+      456   SF-MIO
+      459   SF-MMC
+      462   SF-MMO
+      465   SF-MMT
+      471   SF-MPG
+      468   SF-MPO
+      474   SF-MPS
+      477   SF-MSU
+      133   SF-NAMES . . . . . . . . . . .  522
+      480   SF-NOP . . . . . . . . . . . .  1310
+      483   SF-OBD
+      486   SF-OBP
+      489   SF-OCD
+      492   SF-PFC
+      495   SF-PGD
+      498   SF-PGP
+      501   SF-PGP2
+      504   SF-PMC
+      507   SF-PPO
+      510   SF-PTD
+      513   SF-PTD2
+      516   SF-PTX
+     1336   SF-RECORD. . . . . . . . . . .  1349
+      522   SF-TABLE
+      519   SF-TLE
+      526   SF-VALUE
+      136   SFN-BAG
+      139   SFN-BBC
+      142   SFN-BCA
+      145   SFN-BCF
+      148   SFN-BCP
+      151   SFN-BCT
+      154   SFN-BDA
+      157   SFN-BDD
+      160   SFN-BDG
+      163   SFN-BDI
+      166   SFN-BDM
+      169   SFN-BDT
+      172   SFN-BDX
+      175   SFN-BFG
+      178   SFN-BFM
+      181   SFN-BFN
+      184   SFN-BGR
+      187   SFN-BII
+      190   SFN-BIM
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    21
+0 Defined   Cross-reference of data names   References
+
+0     193   SFN-BMM
+      196   SFN-BMO
+      199   SFN-BNG
+      202   SFN-BOC
+      205   SFN-BOG
+      208   SFN-BPG
+      211   SFN-BPM
+      214   SFN-BPS
+      217   SFN-BPT
+      223   SFN-BRG
+      220   SFN-BRS
+      226   SFN-CCP
+      229   SFN-CCP
+      232   SFN-CDD
+      235   SFN-CFC
+      238   SFN-CFI
+      241   SFN-CPC
+      244   SFN-CPD
+      247   SFN-CPI
+      250   SFN-CTC
+      253   SFN-CTD
+      256   SFN-CTX
+      262   SFN-DCF
+      259   SFN-DXD
+      265   SFN-EAG
+      268   SFN-EBC
+      271   SFN-ECA
+      274   SFN-ECF
+      277   SFN-ECP
+      280   SFN-ECT
+      283   SFN-EDG
+      286   SFN-EDI
+      289   SFN-EDM
+      292   SFN-EDT
+      295   SFN-EDX
+      298   SFN-EFG
+      301   SFN-EFM
+      304   SFN-EFN
+      307   SFN-EGR
+      310   SFN-EII
+      313   SFN-EIM
+      316   SFN-EMM
+      319   SFN-EMO
+      322   SFN-ENG
+      325   SFN-EOC
+      328   SFN-EOG
+      331   SFN-EPG
+      334   SFN-EPM
+      337   SFN-EPS
+      340   SFN-EPT
+      343   SFN-ER
+      346   SFN-ERG
+      349   SFN-FDS
+      352   SFN-FDX
+      355   SFN-FGD
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    22
+0 Defined   Cross-reference of data names   References
+
+0     358   SFN-FNC
+      361   SFN-FND
+      364   SFN-FNG
+      367   SFN-FNI
+      370   SFN-FNM
+      373   SFN-FNO
+      376   SFN-FNP
+      379   SFN-GAD
+      382   SFN-GDD
+      385   SFN-ICP
+      388   SFN-IDD
+      391   SFN-IDM
+      394   SFN-IEL
+      397   SFN-IID
+      400   SFN-IMM
+      403   SFN-IOB
+      406   SFN-IOC
+      409   SFN-IPD
+      412   SFN-IPO
+      415   SFN-IPS
+      418   SFN-IRD
+      421   SFN-LLE
+      424   SFN-LNC
+      427   SFN-LND
+      430   SFN-MBC
+      433   SFN-MCA
+      436   SFN-MCC
+      439   SFN-MCF
+      442   SFN-MCF2
+      445   SFN-MDD
+      448   SFN-MDR
+      451   SFN-MFC
+      454   SFN-MGO
+      457   SFN-MIO
+      460   SFN-MMC
+      463   SFN-MMO
+      466   SFN-MMT
+      472   SFN-MPG
+      469   SFN-MPO
+      475   SFN-MPS
+      478   SFN-MSU
+      481   SFN-NOP
+      484   SFN-OBD
+      487   SFN-OBP
+      490   SFN-OCD
+      493   SFN-PFC
+      496   SFN-PGD
+      499   SFN-PGP
+      502   SFN-PGP2
+      505   SFN-PMC
+      508   SFN-PPO
+      511   SFN-PTD
+      514   SFN-PTD2
+      517   SFN-PTX
+      520   SFN-TLE
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    23
+0 Defined   Cross-reference of data names   References
+
+0     116   STRUCTURED-FIELDS
+      539   TC-AMB
+      540   TC-AMB-C
+      543   TC-AMI
+      544   TC-AMI-C
+      547   TC-BLN
+      548   TC-BLN-C
+      551   TC-BSU
+      552   TC-BSU-C
+      555   TC-CCTL
+      556   TC-CCTL-C
+      559   TC-DBR
+      560   TC-DBR-C
+      563   TC-DIR
+      564   TC-DIR-C
+      567   TC-ESC
+      568   TC-ESC-C
+      571   TC-ESU
+      572   TC-ESU-C
+      643   TC-ID. . . . . . . . . . . . .  637
+      638   TC-ID-INDX
+      639   TC-LENGTH
+      641   TC-LENGTH-C
+      538   TC-NAMES . . . . . . . . . . .  635
+      575   TC-NOP
+      576   TC-NOP-C
+      579   TC-OVS
+      580   TC-OVS-C
+      583   TC-RMB
+      584   TC-RMB-C
+      587   TC-RMI
+      588   TC-RMI-C
+      591   TC-RPS
+      592   TC-RPS-C
+      595   TC-SBI
+      596   TC-SBI-C
+      599   TC-SCFL
+      600   TC-SCFL-C
+      603   TC-SEC
+      604   TC-SEC-C
+      607   TC-SIA
+      608   TC-SIA-C
+      611   TC-SIM
+      612   TC-SIM-C
+      615   TC-STC
+      616   TC-STC-C
+      619   TC-STO
+      620   TC-STO-C
+      623   TC-SVI
+      624   TC-SVI-C
+      635   TC-TABLE
+      627   TC-TRN
+      628   TC-TRN-C
+      631   TC-USC
+      632   TC-USC-C
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    24
+0 Defined   Cross-reference of data names   References
+
+0     640   TC-VALUE
+      642   TC-VALUE-C
+      541   TCN-AMB
+      545   TCN-AMI
+      549   TCN-BLN
+      553   TCN-BSU
+      557   TCN-CCT
+      561   TCN-DBR
+      565   TCN-DIR
+      569   TCN-ESC
+      573   TCN-ESU
+      577   TCN-NOP
+      581   TCN-OVS
+      585   TCN-RMB
+      589   TCN-RMI
+      593   TCN-RPS
+      597   TCN-SBI
+      601   TCN-SCFL
+      605   TCN-SEC
+      609   TCN-SIA
+      613   TCN-SIM
+      617   TCN-STC
+      621   TCN-STO
+      625   TCN-SVI
+      629   TCN-TRN
+      633   TCN-USC
+      975   TR-AREADF
+     1041   TR-ATTQUAL
+      954   TR-ATVAL
+      951   TR-BYTEOF
+      987   TR-BYTEX
+      948   TR-CHAROT
+     1035   TR-COLFID
+      978   TR-COLSPF
+     1008   TR-CRC
+     1005   TR-DATETIME
+     1029   TR-DATIM
+      957   TR-DESPOS
+     1068   TR-DOFDSC
+      981   TR-ENCOD
+      939   TR-ERLID
+      933   TR-FCGCSID
+     1065   TR-FINFID
+     1056   TR-FINOP
+      927   TR-FNTDSC
+     1038   TR-FNTFID
+     1053   TR-FNTRES
+      915   TR-FQN
+      912   TR-GCSGID
+      999   TR-HSCALE
+     1080   TR-ID
+      924   TR-INTCHG
+     1078   TR-LENGTH
+      960   TR-MEDEJ
+     1062   TR-MEDFID
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    25
+0 Defined   Cross-reference of data names   References
+
+0    1017   TR-MEDORI
+     1026   TR-MIXRUL
+      918   TR-MPO
+      911   TR-NAMES . . . . . . . . . . .  1074
+      972   TR-OBJASZ
+     1002   TR-OBJCNT
+      996   TR-OBJOFF
+     1011   TR-OBJORIG
+      936   TR-OBJTYPE
+      921   TR-OCT
+      930   TR-OFS
+      984   TR-PGMAP
+     1044   TR-PGPOS
+      963   TR-POCP
+     1047   TR-PRMVAL
+     1050   TR-PRSCTL
+     1020   TR-RESINC
+     1023   TR-RESMIX
+      966   TR-RESUAT
+      942   TR-RLID
+      945   TR-SECNUM
+      993   TR-SFEX
+      990   TR-SFOF
+     1074   TR-TABLE
+     1032   TR-TONSAV
+     1059   TR-TXDFID
+     1014   TR-UCOMMENT
+      969   TR-UOM
+     1071   TR-UP3IOP
+     1079   TR-VALUE . . . . . . . . . . .  1076
+     1077   TR-VALUE-INDX
+      976   TRN-AREADF
+     1042   TRN-ATTQUAL
+      955   TRN-ATVAL
+      952   TRN-BYTEX
+      988   TRN-BYTEX
+      949   TRN-CHAROT
+     1036   TRN-COLFID
+      979   TRN-COLSPF
+     1009   TRN-CRC
+     1006   TRN-DATETIME
+     1030   TRN-DATIM
+      958   TRN-DESPOS
+     1069   TRN-DOFDSC
+      982   TRN-ENCOD
+      940   TRN-ERLIB
+      934   TRN-FCGCSID
+     1066   TRN-FINFID
+     1057   TRN-FINOP
+      928   TRN-FNTDSC
+     1039   TRN-FNTFID
+     1054   TRN-FNTRES
+      916   TRN-FQN
+      913   TRN-GCSGID
+     1000   TRN-HSCALE
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    26
+0 Defined   Cross-reference of data names   References
+
+0     925   TRN-INTCHG
+      961   TRN-MEDEJ
+     1063   TRN-MEDFID
+     1018   TRN-MEDORI
+     1027   TRN-MIXRUL
+      919   TRN-MPO
+      973   TRN-OBJASZ
+     1003   TRN-OBJCNT
+      997   TRN-OBJOFF
+     1012   TRN-OBJORIG
+      937   TRN-OBJTYPE
+      922   TRN-OCT
+      931   TRN-OFS
+      985   TRN-PGMAP
+     1045   TRN-PGPOS
+      964   TRN-POCP
+     1048   TRN-PRMVAL
+     1051   TRN-PRSCTL
+     1021   TRN-RESINC
+     1024   TRN-RESMIX
+      967   TRN-RESUAT
+      943   TRN-RLID
+      946   TRN-SECNUM
+      994   TRN-SFEX
+      991   TRN-SFOF
+     1033   TRN-TONSAV
+     1060   TRN-TXTFID
+     1015   TRN-UCOMMENT
+      970   TRN-UOM
+     1072   TRN-UP3IOP
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    27
+0 Defined   Cross-reference of programs     References
+
+        3   ACIFIBDT . . . . . . . . . . .  1365
+     1326   AFPWRITE . . . . . . . . . . .  1363
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    28
+0
+          COPY/BASIS cross-reference of text-names, library names and dataset information
+
+  Text-name Library   File name                                    Concat   ISPF statistics
+  (Member)  (DDNAME)  (Dataset name)                               Level    Created         Changed
+
+  STRFLDS   SYSLIB    RAYMORS.ACIFEXIT.COBOL                         0     1993/07/06   2020/02/26 16:43:57
+
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    29
+0Nested Program Map
+0Program Attribute codes (rightmost column) have the following meanings:
+     C = COMMON
+     I = INITIAL
+     U = PROCEDURE DIVISION USING...
+0Source Nesting                                                                                                     Program
+ LineID Level   Program Name from PROGRAM-ID paragraph                                                              Attributes
+      3     0   ACIFIBDT. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . U
+   1326     1     AFPWRITE. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . C,U
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    30
+0Data Division Map
+0Data Definition Attribute codes (rightmost column) have the following meanings:
+     D = Object of OCCURS DEPENDING    G = GLOBAL                             S = Spanned file
+     E = EXTERNAL                      O = Has OCCURS clause                  U = Undefined format file
+     F = Fixed-length file             OG= Group has own length definition    V = Variable-length file
+     FB= Fixed-length blocked file     R = REDEFINES                          VB= Variable-length blocked file
+     X = Unallocated
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+      3  PROGRAM-ID ACIFIBDT----------------------------------------------------------------------------------------------------*
+     67   77 PGMNAME . . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+     68   77 ABND-PGM. . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+     69   77 ABEND-CODE. . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+     70   77 AFPWRITE. . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+     73   77 REPT-LEN. . . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+     74   77 DATE-LEN. . . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+     75   77 PAGE-DISP . . . . . . . . . . . . . . . . . .             000000000   DS 6C             Disp-Num-Edit
+     76   77 SF-CC-VALUE . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+     77   88 SF-CC . . . . . . . . . . . . . . . . . . . .
+     79   1  MISC-SAVED-DATA . . . . . . . . . . . . . . .             000000000   DS 0CL10          Group
+     80     2  FIRST-LINE-FLAG . . . . . . . . . . . . . .             000000000   DS 1C             Display
+     81     88 FIRST-LINE. . . . . . . . . . . . . . . . .
+     82     88 NOTFIRST-LINE . . . . . . . . . . . . . . .
+     83     2  INSERT-FLAG . . . . . . . . . . . . . . . .             000000001   DS 1C             Display
+     84     88 INSERT-LINE . . . . . . . . . . . . . . . .
+     85     88 NOINSERT-LINE . . . . . . . . . . . . . . .
+     86     2  LINE-COUNT. . . . . . . . . . . . . . . . .             000000002   DS 4C             Binary
+     87     2  PAGE-COUNT. . . . . . . . . . . . . . . . .             000000006   DS 4C             Binary
+     89   1  RECORD-BUFFERS. . . . . . . . . . . . . . . .             000000000   DS 0CL8194        Group
+     90     2  SAVED-LINE-RECLEN . . . . . . . . . . . . .             000000000   DS 2C             Binary
+     91     2  SAVED-LINE-BUFFER . . . . . . . . . . . . .             000000002   DS 8192C          Display
+    116   1  STRUCTURED-FIELDS . . . . . . . . . . . . . .             000000000   DS 0CL1933        Group          G
+    132     2  SF-CC . . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display        G
+    133     2  SF-NAMES. . . . . . . . . . . . . . . . . .             000000001   DS 0CL774         Group          G
+    135       3  SF-BAG. . . . . . . . . . . . . . . . . .             000000001   DS 3C             Display        G
+    136       3  SFN-BAG . . . . . . . . . . . . . . . . .             000000004   DS 3C             Display        G
+    138       3  SF-BBC. . . . . . . . . . . . . . . . . .             000000007   DS 3C             Display        G
+    139       3  SFN-BBC . . . . . . . . . . . . . . . . .             00000000A   DS 3C             Display        G
+    141       3  SF-BCA. . . . . . . . . . . . . . . . . .             00000000D   DS 3C             Display        G
+    142       3  SFN-BCA . . . . . . . . . . . . . . . . .             000000010   DS 3C             Display        G
+    144       3  SF-BCF. . . . . . . . . . . . . . . . . .             000000013   DS 3C             Display        G
+    145       3  SFN-BCF . . . . . . . . . . . . . . . . .             000000016   DS 3C             Display        G
+    147       3  SF-BCP. . . . . . . . . . . . . . . . . .             000000019   DS 3C             Display        G
+    148       3  SFN-BCP . . . . . . . . . . . . . . . . .             00000001C   DS 3C             Display        G
+    150       3  SF-BCT. . . . . . . . . . . . . . . . . .             00000001F   DS 3C             Display        G
+    151       3  SFN-BCT . . . . . . . . . . . . . . . . .             000000022   DS 3C             Display        G
+    153       3  SF-BDA. . . . . . . . . . . . . . . . . .             000000025   DS 3C             Display        G
+    154       3  SFN-BDA . . . . . . . . . . . . . . . . .             000000028   DS 3C             Display        G
+    156       3  SF-BDD. . . . . . . . . . . . . . . . . .             00000002B   DS 3C             Display        G
+    157       3  SFN-BDD . . . . . . . . . . . . . . . . .             00000002E   DS 3C             Display        G
+    159       3  SF-BDG. . . . . . . . . . . . . . . . . .             000000031   DS 3C             Display        G
+    160       3  SFN-BDG . . . . . . . . . . . . . . . . .             000000034   DS 3C             Display        G
+    162       3  SF-BDI. . . . . . . . . . . . . . . . . .             000000037   DS 3C             Display        G
+    163       3  SFN-BDI . . . . . . . . . . . . . . . . .             00000003A   DS 3C             Display        G
+    165       3  SF-BDM. . . . . . . . . . . . . . . . . .             00000003D   DS 3C             Display        G
+    166       3  SFN-BDM . . . . . . . . . . . . . . . . .             000000040   DS 3C             Display        G
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    31
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    168       3  SF-BDT. . . . . . . . . . . . . . . . . .             000000043   DS 3C             Display        G
+    169       3  SFN-BDT . . . . . . . . . . . . . . . . .             000000046   DS 3C             Display        G
+    171       3  SF-BDX. . . . . . . . . . . . . . . . . .             000000049   DS 3C             Display        G
+    172       3  SFN-BDX . . . . . . . . . . . . . . . . .             00000004C   DS 3C             Display        G
+    174       3  SF-BFG. . . . . . . . . . . . . . . . . .             00000004F   DS 3C             Display        G
+    175       3  SFN-BFG . . . . . . . . . . . . . . . . .             000000052   DS 3C             Display        G
+    177       3  SF-BFM. . . . . . . . . . . . . . . . . .             000000055   DS 3C             Display        G
+    178       3  SFN-BFM . . . . . . . . . . . . . . . . .             000000058   DS 3C             Display        G
+    180       3  SF-BFN. . . . . . . . . . . . . . . . . .             00000005B   DS 3C             Display        G
+    181       3  SFN-BFN . . . . . . . . . . . . . . . . .             00000005E   DS 3C             Display        G
+    183       3  SF-BGR. . . . . . . . . . . . . . . . . .             000000061   DS 3C             Display        G
+    184       3  SFN-BGR . . . . . . . . . . . . . . . . .             000000064   DS 3C             Display        G
+    186       3  SF-BII. . . . . . . . . . . . . . . . . .             000000067   DS 3C             Display        G
+    187       3  SFN-BII . . . . . . . . . . . . . . . . .             00000006A   DS 3C             Display        G
+    189       3  SF-BIM. . . . . . . . . . . . . . . . . .             00000006D   DS 3C             Display        G
+    190       3  SFN-BIM . . . . . . . . . . . . . . . . .             000000070   DS 3C             Display        G
+    192       3  SF-BMM. . . . . . . . . . . . . . . . . .             000000073   DS 3C             Display        G
+    193       3  SFN-BMM . . . . . . . . . . . . . . . . .             000000076   DS 3C             Display        G
+    195       3  SF-BMO. . . . . . . . . . . . . . . . . .             000000079   DS 3C             Display        G
+    196       3  SFN-BMO . . . . . . . . . . . . . . . . .             00000007C   DS 3C             Display        G
+    198       3  SF-BNG. . . . . . . . . . . . . . . . . .             00000007F   DS 3C             Display        G
+    199       3  SFN-BNG . . . . . . . . . . . . . . . . .             000000082   DS 3C             Display        G
+    201       3  SF-BOC. . . . . . . . . . . . . . . . . .             000000085   DS 3C             Display        G
+    202       3  SFN-BOC . . . . . . . . . . . . . . . . .             000000088   DS 3C             Display        G
+    204       3  SF-BOG. . . . . . . . . . . . . . . . . .             00000008B   DS 3C             Display        G
+    205       3  SFN-BOG . . . . . . . . . . . . . . . . .             00000008E   DS 3C             Display        G
+    207       3  SF-BPG. . . . . . . . . . . . . . . . . .             000000091   DS 3C             Display        G
+    208       3  SFN-BPG . . . . . . . . . . . . . . . . .             000000094   DS 3C             Display        G
+    210       3  SF-BPM. . . . . . . . . . . . . . . . . .             000000097   DS 3C             Display        G
+    211       3  SFN-BPM . . . . . . . . . . . . . . . . .             00000009A   DS 3C             Display        G
+    213       3  SF-BPS. . . . . . . . . . . . . . . . . .             00000009D   DS 3C             Display        G
+    214       3  SFN-BPS . . . . . . . . . . . . . . . . .             0000000A0   DS 3C             Display        G
+    216       3  SF-BPT. . . . . . . . . . . . . . . . . .             0000000A3   DS 3C             Display        G
+    217       3  SFN-BPT . . . . . . . . . . . . . . . . .             0000000A6   DS 3C             Display        G
+    219       3  SF-BRS. . . . . . . . . . . . . . . . . .             0000000A9   DS 3C             Display        G
+    220       3  SFN-BRS . . . . . . . . . . . . . . . . .             0000000AC   DS 3C             Display        G
+    222       3  SF-BRG. . . . . . . . . . . . . . . . . .             0000000AF   DS 3C             Display        G
+    223       3  SFN-BRG . . . . . . . . . . . . . . . . .             0000000B2   DS 3C             Display        G
+    225       3  SF-CAT. . . . . . . . . . . . . . . . . .             0000000B5   DS 3C             Display        G
+    226       3  SFN-CCP . . . . . . . . . . . . . . . . .             0000000B8   DS 3C             Display        G
+    228       3  SF-CCP. . . . . . . . . . . . . . . . . .             0000000BB   DS 3C             Display        G
+    229       3  SFN-CCP . . . . . . . . . . . . . . . . .             0000000BE   DS 3C             Display        G
+    231       3  SF-CDD. . . . . . . . . . . . . . . . . .             0000000C1   DS 3C             Display        G
+    232       3  SFN-CDD . . . . . . . . . . . . . . . . .             0000000C4   DS 3C             Display        G
+    234       3  SF-CFC. . . . . . . . . . . . . . . . . .             0000000C7   DS 3C             Display        G
+    235       3  SFN-CFC . . . . . . . . . . . . . . . . .             0000000CA   DS 3C             Display        G
+    237       3  SF-CFI. . . . . . . . . . . . . . . . . .             0000000CD   DS 3C             Display        G
+    238       3  SFN-CFI . . . . . . . . . . . . . . . . .             0000000D0   DS 3C             Display        G
+    240       3  SF-CPC. . . . . . . . . . . . . . . . . .             0000000D3   DS 3C             Display        G
+    241       3  SFN-CPC . . . . . . . . . . . . . . . . .             0000000D6   DS 3C             Display        G
+    243       3  SF-CPD. . . . . . . . . . . . . . . . . .             0000000D9   DS 3C             Display        G
+    244       3  SFN-CPD . . . . . . . . . . . . . . . . .             0000000DC   DS 3C             Display        G
+    246       3  SF-CPI. . . . . . . . . . . . . . . . . .             0000000DF   DS 3C             Display        G
+    247       3  SFN-CPI . . . . . . . . . . . . . . . . .             0000000E2   DS 3C             Display        G
+    249       3  SF-CTC. . . . . . . . . . . . . . . . . .             0000000E5   DS 3C             Display        G
+    250       3  SFN-CTC . . . . . . . . . . . . . . . . .             0000000E8   DS 3C             Display        G
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    32
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    252       3  SF-CTD. . . . . . . . . . . . . . . . . .             0000000EB   DS 3C             Display        G
+    253       3  SFN-CTD . . . . . . . . . . . . . . . . .             0000000EE   DS 3C             Display        G
+    255       3  SF-CTX. . . . . . . . . . . . . . . . . .             0000000F1   DS 3C             Display        G
+    256       3  SFN-CTX . . . . . . . . . . . . . . . . .             0000000F4   DS 3C             Display        G
+    258       3  SF-DXD. . . . . . . . . . . . . . . . . .             0000000F7   DS 3C             Display        G
+    259       3  SFN-DXD . . . . . . . . . . . . . . . . .             0000000FA   DS 3C             Display        G
+    261       3  SF-DCF. . . . . . . . . . . . . . . . . .             0000000FD   DS 3C             Display        G
+    262       3  SFN-DCF . . . . . . . . . . . . . . . . .             000000100   DS 3C             Display        G
+    264       3  SF-EAG. . . . . . . . . . . . . . . . . .             000000103   DS 3C             Display        G
+    265       3  SFN-EAG . . . . . . . . . . . . . . . . .             000000106   DS 3C             Display        G
+    267       3  SF-EBC. . . . . . . . . . . . . . . . . .             000000109   DS 3C             Display        G
+    268       3  SFN-EBC . . . . . . . . . . . . . . . . .             00000010C   DS 3C             Display        G
+    270       3  SF-ECA. . . . . . . . . . . . . . . . . .             00000010F   DS 3C             Display        G
+    271       3  SFN-ECA . . . . . . . . . . . . . . . . .             000000112   DS 3C             Display        G
+    273       3  SF-ECF. . . . . . . . . . . . . . . . . .             000000115   DS 3C             Display        G
+    274       3  SFN-ECF . . . . . . . . . . . . . . . . .             000000118   DS 3C             Display        G
+    276       3  SF-ECP. . . . . . . . . . . . . . . . . .             00000011B   DS 3C             Display        G
+    277       3  SFN-ECP . . . . . . . . . . . . . . . . .             00000011E   DS 3C             Display        G
+    279       3  SF-ECT. . . . . . . . . . . . . . . . . .             000000121   DS 3C             Display        G
+    280       3  SFN-ECT . . . . . . . . . . . . . . . . .             000000124   DS 3C             Display        G
+    282       3  SF-EDG. . . . . . . . . . . . . . . . . .             000000127   DS 3C             Display        G
+    283       3  SFN-EDG . . . . . . . . . . . . . . . . .             00000012A   DS 3C             Display        G
+    285       3  SF-EDI. . . . . . . . . . . . . . . . . .             00000012D   DS 3C             Display        G
+    286       3  SFN-EDI . . . . . . . . . . . . . . . . .             000000130   DS 3C             Display        G
+    288       3  SF-EDM. . . . . . . . . . . . . . . . . .             000000133   DS 3C             Display        G
+    289       3  SFN-EDM . . . . . . . . . . . . . . . . .             000000136   DS 3C             Display        G
+    291       3  SF-EDT. . . . . . . . . . . . . . . . . .             000000139   DS 3C             Display        G
+    292       3  SFN-EDT . . . . . . . . . . . . . . . . .             00000013C   DS 3C             Display        G
+    294       3  SF-EDX. . . . . . . . . . . . . . . . . .             00000013F   DS 3C             Display        G
+    295       3  SFN-EDX . . . . . . . . . . . . . . . . .             000000142   DS 3C             Display        G
+    297       3  SF-EFG. . . . . . . . . . . . . . . . . .             000000145   DS 3C             Display        G
+    298       3  SFN-EFG . . . . . . . . . . . . . . . . .             000000148   DS 3C             Display        G
+    300       3  SF-EFM. . . . . . . . . . . . . . . . . .             00000014B   DS 3C             Display        G
+    301       3  SFN-EFM . . . . . . . . . . . . . . . . .             00000014E   DS 3C             Display        G
+    303       3  SF-EFN. . . . . . . . . . . . . . . . . .             000000151   DS 3C             Display        G
+    304       3  SFN-EFN . . . . . . . . . . . . . . . . .             000000154   DS 3C             Display        G
+    306       3  SF-EGR. . . . . . . . . . . . . . . . . .             000000157   DS 3C             Display        G
+    307       3  SFN-EGR . . . . . . . . . . . . . . . . .             00000015A   DS 3C             Display        G
+    309       3  SF-EII. . . . . . . . . . . . . . . . . .             00000015D   DS 3C             Display        G
+    310       3  SFN-EII . . . . . . . . . . . . . . . . .             000000160   DS 3C             Display        G
+    312       3  SF-EIM. . . . . . . . . . . . . . . . . .             000000163   DS 3C             Display        G
+    313       3  SFN-EIM . . . . . . . . . . . . . . . . .             000000166   DS 3C             Display        G
+    315       3  SF-EMM. . . . . . . . . . . . . . . . . .             000000169   DS 3C             Display        G
+    316       3  SFN-EMM . . . . . . . . . . . . . . . . .             00000016C   DS 3C             Display        G
+    318       3  SF-EMO. . . . . . . . . . . . . . . . . .             00000016F   DS 3C             Display        G
+    319       3  SFN-EMO . . . . . . . . . . . . . . . . .             000000172   DS 3C             Display        G
+    321       3  SF-ENG. . . . . . . . . . . . . . . . . .             000000175   DS 3C             Display        G
+    322       3  SFN-ENG . . . . . . . . . . . . . . . . .             000000178   DS 3C             Display        G
+    324       3  SF-EOC. . . . . . . . . . . . . . . . . .             00000017B   DS 3C             Display        G
+    325       3  SFN-EOC . . . . . . . . . . . . . . . . .             00000017E   DS 3C             Display        G
+    327       3  SF-EOG. . . . . . . . . . . . . . . . . .             000000181   DS 3C             Display        G
+    328       3  SFN-EOG . . . . . . . . . . . . . . . . .             000000184   DS 3C             Display        G
+    330       3  SF-EPG. . . . . . . . . . . . . . . . . .             000000187   DS 3C             Display        G
+    331       3  SFN-EPG . . . . . . . . . . . . . . . . .             00000018A   DS 3C             Display        G
+    333       3  SF-EPM. . . . . . . . . . . . . . . . . .             00000018D   DS 3C             Display        G
+    334       3  SFN-EPM . . . . . . . . . . . . . . . . .             000000190   DS 3C             Display        G
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    33
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    336       3  SF-EPS. . . . . . . . . . . . . . . . . .             000000193   DS 3C             Display        G
+    337       3  SFN-EPS . . . . . . . . . . . . . . . . .             000000196   DS 3C             Display        G
+    339       3  SF-EPT. . . . . . . . . . . . . . . . . .             000000199   DS 3C             Display        G
+    340       3  SFN-EPT . . . . . . . . . . . . . . . . .             00000019C   DS 3C             Display        G
+    342       3  SF-ER . . . . . . . . . . . . . . . . . .             00000019F   DS 3C             Display        G
+    343       3  SFN-ER. . . . . . . . . . . . . . . . . .             0000001A2   DS 3C             Display        G
+    345       3  SF-ERG. . . . . . . . . . . . . . . . . .             0000001A5   DS 3C             Display        G
+    346       3  SFN-ERG . . . . . . . . . . . . . . . . .             0000001A8   DS 3C             Display        G
+    348       3  SF-FDS. . . . . . . . . . . . . . . . . .             0000001AB   DS 3C             Display        G
+    349       3  SFN-FDS . . . . . . . . . . . . . . . . .             0000001AE   DS 3C             Display        G
+    351       3  SF-FDX. . . . . . . . . . . . . . . . . .             0000001B1   DS 3C             Display        G
+    352       3  SFN-FDX . . . . . . . . . . . . . . . . .             0000001B4   DS 3C             Display        G
+    354       3  SF-FGD. . . . . . . . . . . . . . . . . .             0000001B7   DS 3C             Display        G
+    355       3  SFN-FGD . . . . . . . . . . . . . . . . .             0000001BA   DS 3C             Display        G
+    357       3  SF-FNC. . . . . . . . . . . . . . . . . .             0000001BD   DS 3C             Display        G
+    358       3  SFN-FNC . . . . . . . . . . . . . . . . .             0000001C0   DS 3C             Display        G
+    360       3  SF-FND. . . . . . . . . . . . . . . . . .             0000001C3   DS 3C             Display        G
+    361       3  SFN-FND . . . . . . . . . . . . . . . . .             0000001C6   DS 3C             Display        G
+    363       3  SF-FNG. . . . . . . . . . . . . . . . . .             0000001C9   DS 3C             Display        G
+    364       3  SFN-FNG . . . . . . . . . . . . . . . . .             0000001CC   DS 3C             Display        G
+    366       3  SF-FNI. . . . . . . . . . . . . . . . . .             0000001CF   DS 3C             Display        G
+    367       3  SFN-FNI . . . . . . . . . . . . . . . . .             0000001D2   DS 3C             Display        G
+    369       3  SF-FNM. . . . . . . . . . . . . . . . . .             0000001D5   DS 3C             Display        G
+    370       3  SFN-FNM . . . . . . . . . . . . . . . . .             0000001D8   DS 3C             Display        G
+    372       3  SF-FNO. . . . . . . . . . . . . . . . . .             0000001DB   DS 3C             Display        G
+    373       3  SFN-FNO . . . . . . . . . . . . . . . . .             0000001DE   DS 3C             Display        G
+    375       3  SF-FNP. . . . . . . . . . . . . . . . . .             0000001E1   DS 3C             Display        G
+    376       3  SFN-FNP . . . . . . . . . . . . . . . . .             0000001E4   DS 3C             Display        G
+    378       3  SF-GAD. . . . . . . . . . . . . . . . . .             0000001E7   DS 3C             Display        G
+    379       3  SFN-GAD . . . . . . . . . . . . . . . . .             0000001EA   DS 3C             Display        G
+    381       3  SF-GDD. . . . . . . . . . . . . . . . . .             0000001ED   DS 3C             Display        G
+    382       3  SFN-GDD . . . . . . . . . . . . . . . . .             0000001F0   DS 3C             Display        G
+    384       3  SF-ICP. . . . . . . . . . . . . . . . . .             0000001F3   DS 3C             Display        G
+    385       3  SFN-ICP . . . . . . . . . . . . . . . . .             0000001F6   DS 3C             Display        G
+    387       3  SF-IDD. . . . . . . . . . . . . . . . . .             0000001F9   DS 3C             Display        G
+    388       3  SFN-IDD . . . . . . . . . . . . . . . . .             0000001FC   DS 3C             Display        G
+    390       3  SF-IDM. . . . . . . . . . . . . . . . . .             0000001FF   DS 3C             Display        G
+    391       3  SFN-IDM . . . . . . . . . . . . . . . . .             000000202   DS 3C             Display        G
+    393       3  SF-IEL. . . . . . . . . . . . . . . . . .             000000205   DS 3C             Display        G
+    394       3  SFN-IEL . . . . . . . . . . . . . . . . .             000000208   DS 3C             Display        G
+    396       3  SF-IID. . . . . . . . . . . . . . . . . .             00000020B   DS 3C             Display        G
+    397       3  SFN-IID . . . . . . . . . . . . . . . . .             00000020E   DS 3C             Display        G
+    399       3  SF-IMM. . . . . . . . . . . . . . . . . .             000000211   DS 3C             Display        G
+    400       3  SFN-IMM . . . . . . . . . . . . . . . . .             000000214   DS 3C             Display        G
+    402       3  SF-IOB. . . . . . . . . . . . . . . . . .             000000217   DS 3C             Display        G
+    403       3  SFN-IOB . . . . . . . . . . . . . . . . .             00000021A   DS 3C             Display        G
+    405       3  SF-IOC. . . . . . . . . . . . . . . . . .             00000021D   DS 3C             Display        G
+    406       3  SFN-IOC . . . . . . . . . . . . . . . . .             000000220   DS 3C             Display        G
+    408       3  SF-IPD. . . . . . . . . . . . . . . . . .             000000223   DS 3C             Display        G
+    409       3  SFN-IPD . . . . . . . . . . . . . . . . .             000000226   DS 3C             Display        G
+    411       3  SF-IPO. . . . . . . . . . . . . . . . . .             000000229   DS 3C             Display        G
+    412       3  SFN-IPO . . . . . . . . . . . . . . . . .             00000022C   DS 3C             Display        G
+    414       3  SF-IPS. . . . . . . . . . . . . . . . . .             00000022F   DS 3C             Display        G
+    415       3  SFN-IPS . . . . . . . . . . . . . . . . .             000000232   DS 3C             Display        G
+    417       3  SF-IRD. . . . . . . . . . . . . . . . . .             000000235   DS 3C             Display        G
+    418       3  SFN-IRD . . . . . . . . . . . . . . . . .             000000238   DS 3C             Display        G
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    34
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    420       3  SF-LLE. . . . . . . . . . . . . . . . . .             00000023B   DS 3C             Display        G
+    421       3  SFN-LLE . . . . . . . . . . . . . . . . .             00000023E   DS 3C             Display        G
+    423       3  SF-LNC. . . . . . . . . . . . . . . . . .             000000241   DS 3C             Display        G
+    424       3  SFN-LNC . . . . . . . . . . . . . . . . .             000000244   DS 3C             Display        G
+    426       3  SF-LND. . . . . . . . . . . . . . . . . .             000000247   DS 3C             Display        G
+    427       3  SFN-LND . . . . . . . . . . . . . . . . .             00000024A   DS 3C             Display        G
+    429       3  SF-MBC. . . . . . . . . . . . . . . . . .             00000024D   DS 3C             Display        G
+    430       3  SFN-MBC . . . . . . . . . . . . . . . . .             000000250   DS 3C             Display        G
+    432       3  SF-MCA. . . . . . . . . . . . . . . . . .             000000253   DS 3C             Display        G
+    433       3  SFN-MCA . . . . . . . . . . . . . . . . .             000000256   DS 3C             Display        G
+    435       3  SF-MCC. . . . . . . . . . . . . . . . . .             000000259   DS 3C             Display        G
+    436       3  SFN-MCC . . . . . . . . . . . . . . . . .             00000025C   DS 3C             Display        G
+    438       3  SF-MCF. . . . . . . . . . . . . . . . . .             00000025F   DS 3C             Display        G
+    439       3  SFN-MCF . . . . . . . . . . . . . . . . .             000000262   DS 3C             Display        G
+    441       3  SF-MCF2 . . . . . . . . . . . . . . . . .             000000265   DS 3C             Display        G
+    442       3  SFN-MCF2. . . . . . . . . . . . . . . . .             000000268   DS 3C             Display        G
+    444       3  SF-MDD. . . . . . . . . . . . . . . . . .             00000026B   DS 3C             Display        G
+    445       3  SFN-MDD . . . . . . . . . . . . . . . . .             00000026E   DS 3C             Display        G
+    447       3  SF-MDR. . . . . . . . . . . . . . . . . .             000000271   DS 3C             Display        G
+    448       3  SFN-MDR . . . . . . . . . . . . . . . . .             000000274   DS 3C             Display        G
+    450       3  SF-MFC. . . . . . . . . . . . . . . . . .             000000277   DS 3C             Display        G
+    451       3  SFN-MFC . . . . . . . . . . . . . . . . .             00000027A   DS 3C             Display        G
+    453       3  SF-MGO. . . . . . . . . . . . . . . . . .             00000027D   DS 3C             Display        G
+    454       3  SFN-MGO . . . . . . . . . . . . . . . . .             000000280   DS 3C             Display        G
+    456       3  SF-MIO. . . . . . . . . . . . . . . . . .             000000283   DS 3C             Display        G
+    457       3  SFN-MIO . . . . . . . . . . . . . . . . .             000000286   DS 3C             Display        G
+    459       3  SF-MMC. . . . . . . . . . . . . . . . . .             000000289   DS 3C             Display        G
+    460       3  SFN-MMC . . . . . . . . . . . . . . . . .             00000028C   DS 3C             Display        G
+    462       3  SF-MMO. . . . . . . . . . . . . . . . . .             00000028F   DS 3C             Display        G
+    463       3  SFN-MMO . . . . . . . . . . . . . . . . .             000000292   DS 3C             Display        G
+    465       3  SF-MMT. . . . . . . . . . . . . . . . . .             000000295   DS 3C             Display        G
+    466       3  SFN-MMT . . . . . . . . . . . . . . . . .             000000298   DS 3C             Display        G
+    468       3  SF-MPO. . . . . . . . . . . . . . . . . .             00000029B   DS 3C             Display        G
+    469       3  SFN-MPO . . . . . . . . . . . . . . . . .             00000029E   DS 3C             Display        G
+    471       3  SF-MPG. . . . . . . . . . . . . . . . . .             0000002A1   DS 3C             Display        G
+    472       3  SFN-MPG . . . . . . . . . . . . . . . . .             0000002A4   DS 3C             Display        G
+    474       3  SF-MPS. . . . . . . . . . . . . . . . . .             0000002A7   DS 3C             Display        G
+    475       3  SFN-MPS . . . . . . . . . . . . . . . . .             0000002AA   DS 3C             Display        G
+    477       3  SF-MSU. . . . . . . . . . . . . . . . . .             0000002AD   DS 3C             Display        G
+    478       3  SFN-MSU . . . . . . . . . . . . . . . . .             0000002B0   DS 3C             Display        G
+    480       3  SF-NOP. . . . . . . . . . . . . . . . . .             0000002B3   DS 3C             Display        G
+    481       3  SFN-NOP . . . . . . . . . . . . . . . . .             0000002B6   DS 3C             Display        G
+    483       3  SF-OBD. . . . . . . . . . . . . . . . . .             0000002B9   DS 3C             Display        G
+    484       3  SFN-OBD . . . . . . . . . . . . . . . . .             0000002BC   DS 3C             Display        G
+    486       3  SF-OBP. . . . . . . . . . . . . . . . . .             0000002BF   DS 3C             Display        G
+    487       3  SFN-OBP . . . . . . . . . . . . . . . . .             0000002C2   DS 3C             Display        G
+    489       3  SF-OCD. . . . . . . . . . . . . . . . . .             0000002C5   DS 3C             Display        G
+    490       3  SFN-OCD . . . . . . . . . . . . . . . . .             0000002C8   DS 3C             Display        G
+    492       3  SF-PFC. . . . . . . . . . . . . . . . . .             0000002CB   DS 3C             Display        G
+    493       3  SFN-PFC . . . . . . . . . . . . . . . . .             0000002CE   DS 3C             Display        G
+    495       3  SF-PGD. . . . . . . . . . . . . . . . . .             0000002D1   DS 3C             Display        G
+    496       3  SFN-PGD . . . . . . . . . . . . . . . . .             0000002D4   DS 3C             Display        G
+    498       3  SF-PGP. . . . . . . . . . . . . . . . . .             0000002D7   DS 3C             Display        G
+    499       3  SFN-PGP . . . . . . . . . . . . . . . . .             0000002DA   DS 3C             Display        G
+    501       3  SF-PGP2 . . . . . . . . . . . . . . . . .             0000002DD   DS 3C             Display        G
+    502       3  SFN-PGP2. . . . . . . . . . . . . . . . .             0000002E0   DS 3C             Display        G
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    35
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    504       3  SF-PMC. . . . . . . . . . . . . . . . . .             0000002E3   DS 3C             Display        G
+    505       3  SFN-PMC . . . . . . . . . . . . . . . . .             0000002E6   DS 3C             Display        G
+    507       3  SF-PPO. . . . . . . . . . . . . . . . . .             0000002E9   DS 3C             Display        G
+    508       3  SFN-PPO . . . . . . . . . . . . . . . . .             0000002EC   DS 3C             Display        G
+    510       3  SF-PTD. . . . . . . . . . . . . . . . . .             0000002EF   DS 3C             Display        G
+    511       3  SFN-PTD . . . . . . . . . . . . . . . . .             0000002F2   DS 3C             Display        G
+    513       3  SF-PTD2 . . . . . . . . . . . . . . . . .             0000002F5   DS 3C             Display        G
+    514       3  SFN-PTD2. . . . . . . . . . . . . . . . .             0000002F8   DS 3C             Display        G
+    516       3  SF-PTX. . . . . . . . . . . . . . . . . .             0000002FB   DS 3C             Display        G
+    517       3  SFN-PTX . . . . . . . . . . . . . . . . .             0000002FE   DS 3C             Display        G
+    519       3  SF-TLE. . . . . . . . . . . . . . . . . .             000000301   DS 3C             Display        G
+    520       3  SFN-TLE . . . . . . . . . . . . . . . . .             000000304   DS 3C             Display        G
+    522     2  SF-TABLE. . . . . . . . . . . . . . . . . .             000000001   DS 0CL6           Group          G,R,O
+    525        SF-ID-INDX. . . . . . . . . . . . . . . . .                                           Index-Name     G
+    526       3  SF-VALUE. . . . . . . . . . . . . . . . .             000000001   DS 3C             Display        G
+    527       3  SF-ID . . . . . . . . . . . . . . . . . .             000000004   DS 3C             Display        G
+    538     2  TC-NAMES. . . . . . . . . . . . . . . . . .             000000307   DS 0CL168         Group          G
+    539       3  TC-AMB. . . . . . . . . . . . . . . . . .             000000307   DS 2C             Display        G
+    540       3  TC-AMB-C. . . . . . . . . . . . . . . . .             000000309   DS 2C             Display        G
+    541       3  TCN-AMB . . . . . . . . . . . . . . . . .             00000030B   DS 3C             Display        G
+    543       3  TC-AMI. . . . . . . . . . . . . . . . . .             00000030E   DS 2C             Display        G
+    544       3  TC-AMI-C. . . . . . . . . . . . . . . . .             000000310   DS 2C             Display        G
+    545       3  TCN-AMI . . . . . . . . . . . . . . . . .             000000312   DS 3C             Display        G
+    547       3  TC-BLN. . . . . . . . . . . . . . . . . .             000000315   DS 2C             Display        G
+    548       3  TC-BLN-C. . . . . . . . . . . . . . . . .             000000317   DS 2C             Display        G
+    549       3  TCN-BLN . . . . . . . . . . . . . . . . .             000000319   DS 3C             Display        G
+    551       3  TC-BSU. . . . . . . . . . . . . . . . . .             00000031C   DS 2C             Display        G
+    552       3  TC-BSU-C. . . . . . . . . . . . . . . . .             00000031E   DS 2C             Display        G
+    553       3  TCN-BSU . . . . . . . . . . . . . . . . .             000000320   DS 3C             Display        G
+    555       3  TC-CCTL . . . . . . . . . . . . . . . . .             000000323   DS 2C             Display        G
+    556       3  TC-CCTL-C . . . . . . . . . . . . . . . .             000000325   DS 2C             Display        G
+    557       3  TCN-CCT . . . . . . . . . . . . . . . . .             000000327   DS 3C             Display        G
+    559       3  TC-DBR. . . . . . . . . . . . . . . . . .             00000032A   DS 2C             Display        G
+    560       3  TC-DBR-C. . . . . . . . . . . . . . . . .             00000032C   DS 2C             Display        G
+    561       3  TCN-DBR . . . . . . . . . . . . . . . . .             00000032E   DS 3C             Display        G
+    563       3  TC-DIR. . . . . . . . . . . . . . . . . .             000000331   DS 2C             Display        G
+    564       3  TC-DIR-C. . . . . . . . . . . . . . . . .             000000333   DS 2C             Display        G
+    565       3  TCN-DIR . . . . . . . . . . . . . . . . .             000000335   DS 3C             Display        G
+    567       3  TC-ESC. . . . . . . . . . . . . . . . . .             000000338   DS 2C             Display        G
+    568       3  TC-ESC-C. . . . . . . . . . . . . . . . .             00000033A   DS 2C             Display        G
+    569       3  TCN-ESC . . . . . . . . . . . . . . . . .             00000033C   DS 3C             Display        G
+    571       3  TC-ESU. . . . . . . . . . . . . . . . . .             00000033F   DS 2C             Display        G
+    572       3  TC-ESU-C. . . . . . . . . . . . . . . . .             000000341   DS 2C             Display        G
+    573       3  TCN-ESU . . . . . . . . . . . . . . . . .             000000343   DS 3C             Display        G
+    575       3  TC-NOP. . . . . . . . . . . . . . . . . .             000000346   DS 2C             Display        G
+    576       3  TC-NOP-C. . . . . . . . . . . . . . . . .             000000348   DS 2C             Display        G
+    577       3  TCN-NOP . . . . . . . . . . . . . . . . .             00000034A   DS 3C             Display        G
+    579       3  TC-OVS. . . . . . . . . . . . . . . . . .             00000034D   DS 2C             Display        G
+    580       3  TC-OVS-C. . . . . . . . . . . . . . . . .             00000034F   DS 2C             Display        G
+    581       3  TCN-OVS . . . . . . . . . . . . . . . . .             000000351   DS 3C             Display        G
+    583       3  TC-RMB. . . . . . . . . . . . . . . . . .             000000354   DS 2C             Display        G
+    584       3  TC-RMB-C. . . . . . . . . . . . . . . . .             000000356   DS 2C             Display        G
+    585       3  TCN-RMB . . . . . . . . . . . . . . . . .             000000358   DS 3C             Display        G
+    587       3  TC-RMI. . . . . . . . . . . . . . . . . .             00000035B   DS 2C             Display        G
+    588       3  TC-RMI-C. . . . . . . . . . . . . . . . .             00000035D   DS 2C             Display        G
+    589       3  TCN-RMI . . . . . . . . . . . . . . . . .             00000035F   DS 3C             Display        G
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    36
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    591       3  TC-RPS. . . . . . . . . . . . . . . . . .             000000362   DS 2C             Display        G
+    592       3  TC-RPS-C. . . . . . . . . . . . . . . . .             000000364   DS 2C             Display        G
+    593       3  TCN-RPS . . . . . . . . . . . . . . . . .             000000366   DS 3C             Display        G
+    595       3  TC-SBI. . . . . . . . . . . . . . . . . .             000000369   DS 2C             Display        G
+    596       3  TC-SBI-C. . . . . . . . . . . . . . . . .             00000036B   DS 2C             Display        G
+    597       3  TCN-SBI . . . . . . . . . . . . . . . . .             00000036D   DS 3C             Display        G
+    599       3  TC-SCFL . . . . . . . . . . . . . . . . .             000000370   DS 2C             Display        G
+    600       3  TC-SCFL-C . . . . . . . . . . . . . . . .             000000372   DS 2C             Display        G
+    601       3  TCN-SCFL. . . . . . . . . . . . . . . . .             000000374   DS 3C             Display        G
+    603       3  TC-SEC. . . . . . . . . . . . . . . . . .             000000377   DS 2C             Display        G
+    604       3  TC-SEC-C. . . . . . . . . . . . . . . . .             000000379   DS 2C             Display        G
+    605       3  TCN-SEC . . . . . . . . . . . . . . . . .             00000037B   DS 3C             Display        G
+    607       3  TC-SIA. . . . . . . . . . . . . . . . . .             00000037E   DS 2C             Display        G
+    608       3  TC-SIA-C. . . . . . . . . . . . . . . . .             000000380   DS 2C             Display        G
+    609       3  TCN-SIA . . . . . . . . . . . . . . . . .             000000382   DS 3C             Display        G
+    611       3  TC-SIM. . . . . . . . . . . . . . . . . .             000000385   DS 2C             Display        G
+    612       3  TC-SIM-C. . . . . . . . . . . . . . . . .             000000387   DS 2C             Display        G
+    613       3  TCN-SIM . . . . . . . . . . . . . . . . .             000000389   DS 3C             Display        G
+    615       3  TC-STC. . . . . . . . . . . . . . . . . .             00000038C   DS 2C             Display        G
+    616       3  TC-STC-C. . . . . . . . . . . . . . . . .             00000038E   DS 2C             Display        G
+    617       3  TCN-STC . . . . . . . . . . . . . . . . .             000000390   DS 3C             Display        G
+    619       3  TC-STO. . . . . . . . . . . . . . . . . .             000000393   DS 2C             Display        G
+    620       3  TC-STO-C. . . . . . . . . . . . . . . . .             000000395   DS 2C             Display        G
+    621       3  TCN-STO . . . . . . . . . . . . . . . . .             000000397   DS 3C             Display        G
+    623       3  TC-SVI. . . . . . . . . . . . . . . . . .             00000039A   DS 2C             Display        G
+    624       3  TC-SVI-C. . . . . . . . . . . . . . . . .             00000039C   DS 2C             Display        G
+    625       3  TCN-SVI . . . . . . . . . . . . . . . . .             00000039E   DS 3C             Display        G
+    627       3  TC-TRN. . . . . . . . . . . . . . . . . .             0000003A1   DS 2C             Display        G
+    628       3  TC-TRN-C. . . . . . . . . . . . . . . . .             0000003A3   DS 2C             Display        G
+    629       3  TCN-TRN . . . . . . . . . . . . . . . . .             0000003A5   DS 3C             Display        G
+    631       3  TC-USC. . . . . . . . . . . . . . . . . .             0000003A8   DS 2C             Display        G
+    632       3  TC-USC-C. . . . . . . . . . . . . . . . .             0000003AA   DS 2C             Display        G
+    633       3  TCN-USC . . . . . . . . . . . . . . . . .             0000003AC   DS 3C             Display        G
+    635     2  TC-TABLE. . . . . . . . . . . . . . . . . .             000000307   DS 0CL7           Group          G,R,O
+    638        TC-ID-INDX. . . . . . . . . . . . . . . . .                                           Index-Name     G
+    639       3  TC-LENGTH . . . . . . . . . . . . . . . .             000000307   DS 1C             Display        G
+    640       3  TC-VALUE. . . . . . . . . . . . . . . . .             000000308   DS 1C             Display        G
+    641       3  TC-LENGTH-C . . . . . . . . . . . . . . .             000000309   DS 1C             Display        G
+    642       3  TC-VALUE-C. . . . . . . . . . . . . . . .             00000030A   DS 1C             Display        G
+    643       3  TC-ID . . . . . . . . . . . . . . . . . .             00000030B   DS 3C             Display        G
+    655     2  GR-NAMES. . . . . . . . . . . . . . . . . .             0000003AF   DS 0CL392         Group          G
+    656       3  GRBSI . . . . . . . . . . . . . . . . . .             0000003AF   DS 2C             Display        G
+    657       3  GRN-GRBSI . . . . . . . . . . . . . . . .             0000003B1   DS 6C             Display        G
+    659       3  GBAR. . . . . . . . . . . . . . . . . . .             0000003B7   DS 2C             Display        G
+    660       3  GRN-GBAR. . . . . . . . . . . . . . . . .             0000003B9   DS 6C             Display        G
+    662       3  GBIMG . . . . . . . . . . . . . . . . . .             0000003BF   DS 2C             Display        G
+    663       3  GRN-GBIMG . . . . . . . . . . . . . . . .             0000003C1   DS 6C             Display        G
+    665       3  GBCIMG. . . . . . . . . . . . . . . . . .             0000003C7   DS 2C             Display        G
+    666       3  GRN-GBCIMG. . . . . . . . . . . . . . . .             0000003C9   DS 6C             Display        G
+    668       3  GBOX. . . . . . . . . . . . . . . . . . .             0000003CF   DS 2C             Display        G
+    669       3  GRN-GBOX. . . . . . . . . . . . . . . . .             0000003D1   DS 6C             Display        G
+    671       3  GCBOX . . . . . . . . . . . . . . . . . .             0000003D7   DS 2C             Display        G
+    672       3  GRN-GCBOX . . . . . . . . . . . . . . . .             0000003D9   DS 6C             Display        G
+    674       3  GCHST . . . . . . . . . . . . . . . . . .             0000003DF   DS 2C             Display        G
+    675       3  GRN-GCHST . . . . . . . . . . . . . . . .             0000003E1   DS 6C             Display        G
+    677       3  GCCHST. . . . . . . . . . . . . . . . . .             0000003E7   DS 2C             Display        G
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    37
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    678       3  GRN-GCCHST. . . . . . . . . . . . . . . .             0000003E9   DS 6C             Display        G
+    680       3  GCOMT . . . . . . . . . . . . . . . . . .             0000003EF   DS 2C             Display        G
+    681       3  GRN-GCOMT . . . . . . . . . . . . . . . .             0000003F1   DS 6C             Display        G
+    683       3  GEAR. . . . . . . . . . . . . . . . . . .             0000003F7   DS 2C             Display        G
+    684       3  GRN-GEAR. . . . . . . . . . . . . . . . .             0000003F9   DS 6C             Display        G
+    686       3  GEIMG . . . . . . . . . . . . . . . . . .             0000003FF   DS 2C             Display        G
+    687       3  GRN-GEIMG . . . . . . . . . . . . . . . .             000000401   DS 6C             Display        G
+    689       3  GEPROL. . . . . . . . . . . . . . . . . .             000000407   DS 2C             Display        G
+    690       3  GRN-GEPROL. . . . . . . . . . . . . . . .             000000409   DS 6C             Display        G
+    692       3  GRESI . . . . . . . . . . . . . . . . . .             00000040F   DS 2C             Display        G
+    693       3  GRN-GRESI . . . . . . . . . . . . . . . .             000000411   DS 6C             Display        G
+    695       3  GFLT. . . . . . . . . . . . . . . . . . .             000000417   DS 2C             Display        G
+    696       3  GRN-GFLT. . . . . . . . . . . . . . . . .             000000419   DS 6C             Display        G
+    698       3  GCFLT . . . . . . . . . . . . . . . . . .             00000041F   DS 2C             Display        G
+    699       3  GRN-GCFLT . . . . . . . . . . . . . . . .             000000421   DS 6C             Display        G
+    701       3  GFARC . . . . . . . . . . . . . . . . . .             000000427   DS 2C             Display        G
+    702       3  GRN-GFARC . . . . . . . . . . . . . . . .             000000429   DS 6C             Display        G
+    704       3  GCFLARC . . . . . . . . . . . . . . . . .             00000042F   DS 2C             Display        G
+    705       3  GRN-GCFARC. . . . . . . . . . . . . . . .             000000431   DS 6C             Display        G
+    707       3  GIMD. . . . . . . . . . . . . . . . . . .             000000437   DS 2C             Display        G
+    708       3  GRN-GIMD. . . . . . . . . . . . . . . . .             000000439   DS 6C             Display        G
+    710       3  GLINE . . . . . . . . . . . . . . . . . .             00000043F   DS 2C             Display        G
+    711       3  GRN-GLINE . . . . . . . . . . . . . . . .             000000441   DS 6C             Display        G
+    713       3  GCLINE. . . . . . . . . . . . . . . . . .             000000447   DS 2C             Display        G
+    714       3  GRN-GCLINE. . . . . . . . . . . . . . . .             000000449   DS 6C             Display        G
+    716       3  GMRK. . . . . . . . . . . . . . . . . . .             00000044F   DS 2C             Display        G
+    717       3  GRN-GMRK. . . . . . . . . . . . . . . . .             000000451   DS 6C             Display        G
+    719       3  GCMRK . . . . . . . . . . . . . . . . . .             000000457   DS 2C             Display        G
+    720       3  GRN-GCMRK . . . . . . . . . . . . . . . .             000000459   DS 6C             Display        G
+    722       3  GNOP1 . . . . . . . . . . . . . . . . . .             00000045F   DS 2C             Display        G
+    723       3  GRN-GNOP1 . . . . . . . . . . . . . . . .             000000461   DS 6C             Display        G
+    725       3  GPARC . . . . . . . . . . . . . . . . . .             000000467   DS 2C             Display        G
+    726       3  GRN-GPARC . . . . . . . . . . . . . . . .             000000469   DS 6C             Display        G
+    728       3  GCPARC. . . . . . . . . . . . . . . . . .             00000046F   DS 2C             Display        G
+    729       3  GRN-GCPARC. . . . . . . . . . . . . . . .             000000471   DS 6C             Display        G
+    731       3  GRLINE. . . . . . . . . . . . . . . . . .             000000477   DS 2C             Display        G
+    732       3  GRN-GRLINE. . . . . . . . . . . . . . . .             000000479   DS 6C             Display        G
+    734       3  GCRLINE . . . . . . . . . . . . . . . . .             00000047F   DS 2C             Display        G
+    735       3  GRN-GCRLINE . . . . . . . . . . . . . . .             000000481   DS 6C             Display        G
+    737       3  GSGCH . . . . . . . . . . . . . . . . . .             000000487   DS 2C             Display        G
+    738       3  GRN-GSGCH . . . . . . . . . . . . . . . .             000000489   DS 6C             Display        G
+    740       3  GSAP. . . . . . . . . . . . . . . . . . .             00000048F   DS 2C             Display        G
+    741       3  GRN-GSAP. . . . . . . . . . . . . . . . .             000000491   DS 6C             Display        G
+    743       3  GSBMX . . . . . . . . . . . . . . . . . .             000000497   DS 2C             Display        G
+    744       3  GRN-GSBMX . . . . . . . . . . . . . . . .             000000499   DS 6C             Display        G
+    746       3  GSCA. . . . . . . . . . . . . . . . . . .             00000049F   DS 2C             Display        G
+    747       3  GRN-GSCA. . . . . . . . . . . . . . . . .             0000004A1   DS 6C             Display        G
+    749       3  GSCC. . . . . . . . . . . . . . . . . . .             0000004A7   DS 2C             Display        G
+    750       3  GRN-GSCC. . . . . . . . . . . . . . . . .             0000004A9   DS 6C             Display        G
+    752       3  GSCD. . . . . . . . . . . . . . . . . . .             0000004AF   DS 2C             Display        G
+    753       3  GRN-GSCD. . . . . . . . . . . . . . . . .             0000004B1   DS 6C             Display        G
+    755       3  GSCR. . . . . . . . . . . . . . . . . . .             0000004B7   DS 2C             Display        G
+    756       3  GRN-GSCR. . . . . . . . . . . . . . . . .             0000004B9   DS 6C             Display        G
+    758       3  GSCS. . . . . . . . . . . . . . . . . . .             0000004BF   DS 2C             Display        G
+    759       3  GRN-GSCS. . . . . . . . . . . . . . . . .             0000004C1   DS 6C             Display        G
+    761       3  GSCH. . . . . . . . . . . . . . . . . . .             0000004C7   DS 2C             Display        G
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    38
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    762       3  GRN-GSCH. . . . . . . . . . . . . . . . .             0000004C9   DS 6C             Display        G
+    764       3  GSCOL . . . . . . . . . . . . . . . . . .             0000004CF   DS 2C             Display        G
+    765       3  GRN-GSCOL . . . . . . . . . . . . . . . .             0000004D1   DS 6C             Display        G
+    767       3  GSCP. . . . . . . . . . . . . . . . . . .             0000004D7   DS 2C             Display        G
+    768       3  GRN-GSCP. . . . . . . . . . . . . . . . .             0000004D9   DS 6C             Display        G
+    770       3  GSECOL. . . . . . . . . . . . . . . . . .             0000004DF   DS 2C             Display        G
+    771       3  GRN-GSECOL. . . . . . . . . . . . . . . .             0000004E1   DS 6C             Display        G
+    773       3  GSLT. . . . . . . . . . . . . . . . . . .             0000004E7   DS 2C             Display        G
+    774       3  GRN-GSLT. . . . . . . . . . . . . . . . .             0000004E9   DS 6C             Display        G
+    776       3  GSLW. . . . . . . . . . . . . . . . . . .             0000004EF   DS 2C             Display        G
+    777       3  GRN-GSLW. . . . . . . . . . . . . . . . .             0000004F1   DS 6C             Display        G
+    779       3  GSMC. . . . . . . . . . . . . . . . . . .             0000004F7   DS 2C             Display        G
+    780       3  GRN-GSMC. . . . . . . . . . . . . . . . .             0000004F9   DS 6C             Display        G
+    782       3  GSMP. . . . . . . . . . . . . . . . . . .             0000004FF   DS 2C             Display        G
+    783       3  GRN-GSMP. . . . . . . . . . . . . . . . .             000000501   DS 6C             Display        G
+    785       3  GSMS. . . . . . . . . . . . . . . . . . .             000000507   DS 2C             Display        G
+    786       3  GRN-GSMS. . . . . . . . . . . . . . . . .             000000509   DS 6C             Display        G
+    788       3  GSMT. . . . . . . . . . . . . . . . . . .             00000050F   DS 2C             Display        G
+    789       3  GRN-GSMT. . . . . . . . . . . . . . . . .             000000511   DS 6C             Display        G
+    791       3  GSMX. . . . . . . . . . . . . . . . . . .             000000517   DS 2C             Display        G
+    792       3  GRN-GSMX. . . . . . . . . . . . . . . . .             000000519   DS 6C             Display        G
+    794       3  GSPS. . . . . . . . . . . . . . . . . . .             00000051F   DS 2C             Display        G
+    795       3  GRN-GSPS. . . . . . . . . . . . . . . . .             000000521   DS 6C             Display        G
+    797       3  GSPT. . . . . . . . . . . . . . . . . . .             000000527   DS 2C             Display        G
+    798       3  GRN-GSPT. . . . . . . . . . . . . . . . .             000000529   DS 6C             Display        G
+    800       3  GSPIK . . . . . . . . . . . . . . . . . .             00000052F   DS 2C             Display        G
+    801       3  GRN-GSPIK . . . . . . . . . . . . . . . .             000000531   DS 6C             Display        G
+    803     2  GR-TABLE. . . . . . . . . . . . . . . . . .             0000003AF   DS 0CL8           Group          G,R,O
+    806        GR-ID-INDX. . . . . . . . . . . . . . . . .                                           Index-Name     G
+    807       3  GR-VALUE. . . . . . . . . . . . . . . . .             0000003AF   DS 1C             Display        G
+    808       3  GR-LENGTH . . . . . . . . . . . . . . . .             0000003B0   DS 1C             Display        G
+    809       3  GR-ID . . . . . . . . . . . . . . . . . .             0000003B1   DS 6C             Display        G
+    816     2  GR-AREA-BOUNDARIES. . . . . . . . . . . . .             000000537   DS 0CL2           Group          G
+    817       3  GR-AREA-BOUNDARY. . . . . . . . . . . . .             000000537   DS 1C             Display        G
+    818       3  GR-AREA-NOBOUNDARY. . . . . . . . . . . .             000000538   DS 1C             Display        G
+    819     2  GR-CHAR-DIRECTION . . . . . . . . . . . . .             000000539   DS 0CL5           Group          G
+    820       3  GR-CDIR-DFLT. . . . . . . . . . . . . . .             000000539   DS 1C             Display        G
+    821       3  GR-CDIR-L2R . . . . . . . . . . . . . . .             00000053A   DS 1C             Display        G
+    822       3  GR-CDIR-T2B . . . . . . . . . . . . . . .             00000053B   DS 1C             Display        G
+    823       3  GR-CDIR-R2L . . . . . . . . . . . . . . .             00000053C   DS 1C             Display        G
+    824       3  GR-CDIR-B2T . . . . . . . . . . . . . . .             00000053D   DS 1C             Display        G
+    825     2  GR-COLOR. . . . . . . . . . . . . . . . . .             00000053E   DS 0CL9           Group          G
+    826       3  GR-COLOR-DFLT . . . . . . . . . . . . . .             00000053E   DS 1C             Display        G
+    827       3  GR-COLOR-BLUE . . . . . . . . . . . . . .             00000053F   DS 1C             Display        G
+    828       3  GR-COLOR-RED. . . . . . . . . . . . . . .             000000540   DS 1C             Display        G
+    829       3  GR-COLOR-MAGENTA. . . . . . . . . . . . .             000000541   DS 1C             Display        G
+    830       3  GR-COLOR-GREEN. . . . . . . . . . . . . .             000000542   DS 1C             Display        G
+    831       3  GR-COLOR-CYAN . . . . . . . . . . . . . .             000000543   DS 1C             Display        G
+    832       3  GR-COLOR-YELLOW . . . . . . . . . . . . .             000000544   DS 1C             Display        G
+    833       3  GR-COLOR-PDFLT. . . . . . . . . . . . . .             000000545   DS 1C             Display        G
+    834       3  GR-COLOR-MEDIUM . . . . . . . . . . . . .             000000546   DS 1C             Display        G
+    835     2  GR-EXTENDED-COLOR . . . . . . . . . . . . .             000000547   DS 0CL22          Group          G
+    836       3  GR-ECOLOR-DFLT. . . . . . . . . . . . . .             000000547   DS 2C             Display        G
+    837       3  GR-ECOLOR-BLUE. . . . . . . . . . . . . .             000000549   DS 2C             Display        G
+    838       3  GR-ECOLOR-RED . . . . . . . . . . . . . .             00000054B   DS 2C             Display        G
+    839       3  GR-ECOLOR-MAGENTA . . . . . . . . . . . .             00000054D   DS 2C             Display        G
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    39
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    840       3  GR-ECOLOR-GREEN . . . . . . . . . . . . .             00000054F   DS 2C             Display        G
+    841       3  GR-ECOLOR-CYAN. . . . . . . . . . . . . .             000000551   DS 2C             Display        G
+    842       3  GR-ECOLOR-YELLOW. . . . . . . . . . . . .             000000553   DS 2C             Display        G
+    843       3  GR-ECOLOR-BLACK . . . . . . . . . . . . .             000000555   DS 2C             Display        G
+    844       3  GR-ECOLOR-BROWN . . . . . . . . . . . . .             000000557   DS 2C             Display        G
+    845       3  GR-ECOLOR-PDFLT . . . . . . . . . . . . .             000000559   DS 2C             Display        G
+    846       3  GR-ECOLOR-MEDIUM. . . . . . . . . . . . .             00000055B   DS 2C             Display        G
+    847     2  GR-LINE-TYPE. . . . . . . . . . . . . . . .             00000055D   DS 0CL9           Group          G
+    848       3  GR-LINE-DFLT. . . . . . . . . . . . . . .             00000055D   DS 1C             Display        G
+    849       3  GR-LINE-DOTTED. . . . . . . . . . . . . .             00000055E   DS 1C             Display        G
+    850       3  GR-LINE-SDASH . . . . . . . . . . . . . .             00000055F   DS 1C             Display        G
+    851       3  GR-LINE-DASHDOT . . . . . . . . . . . . .             000000560   DS 1C             Display        G
+    852       3  GR-LINE-DBLDOT. . . . . . . . . . . . . .             000000561   DS 1C             Display        G
+    853       3  GR-LINE-LDASH . . . . . . . . . . . . . .             000000562   DS 1C             Display        G
+    854       3  GR-LINE-DASHDDOT. . . . . . . . . . . . .             000000563   DS 1C             Display        G
+    855       3  GR-LINE-SOLID . . . . . . . . . . . . . .             000000564   DS 1C             Display        G
+    856       3  GR-LINE-INVISIBLE . . . . . . . . . . . .             000000565   DS 1C             Display        G
+    857     2  GR-LINE-THICKNESS . . . . . . . . . . . . .             000000566   DS 0CL3           Group          G
+    858       3  GR-THIK-DFLT. . . . . . . . . . . . . . .             000000566   DS 1C             Display        G
+    859       3  GR-THIK-NORMAL. . . . . . . . . . . . . .             000000567   DS 1C             Display        G
+    860       3  GR-THIK-THICK . . . . . . . . . . . . . .             000000568   DS 1C             Display        G
+    861     2  GR-MARKER-SYMBOL. . . . . . . . . . . . . .             000000569   DS 0CL12          Group          G
+    862       3  GR-MARK-DFLT. . . . . . . . . . . . . . .             000000569   DS 1C             Display        G
+    863       3  GR-MARK-CROSS . . . . . . . . . . . . . .             00000056A   DS 1C             Display        G
+    864       3  GR-MARK-PLUS. . . . . . . . . . . . . . .             00000056B   DS 1C             Display        G
+    865       3  GR-MARK-DIAMOND . . . . . . . . . . . . .             00000056C   DS 1C             Display        G
+    866       3  GR-MARK-SQUARE. . . . . . . . . . . . . .             00000056D   DS 1C             Display        G
+    867       3  GR-MARK-6PT-STAR. . . . . . . . . . . . .             00000056E   DS 1C             Display        G
+    868       3  GR-MARK-9PT-STAR. . . . . . . . . . . . .             00000056F   DS 1C             Display        G
+    869       3  GR-MARK-FDIAMOND. . . . . . . . . . . . .             000000570   DS 1C             Display        G
+    870       3  GR-MARK-FSQUARE . . . . . . . . . . . . .             000000571   DS 1C             Display        G
+    871       3  GR-MARK-DOT . . . . . . . . . . . . . . .             000000572   DS 1C             Display        G
+    872       3  GR-MARK-SMCIRCLE. . . . . . . . . . . . .             000000573   DS 1C             Display        G
+    873       3  GR-MARK-BLANK . . . . . . . . . . . . . .             000000574   DS 1C             Display        G
+    874     2  GR-PATTERN-SYMBOL . . . . . . . . . . . . .             000000575   DS 0CL18          Group          G
+    875       3  GR-PATT-DFLT. . . . . . . . . . . . . . .             000000575   DS 1C             Display        G
+    876       3  GR-PATT-GREY-1. . . . . . . . . . . . . .             000000576   DS 1C             Display        G
+    877       3  GR-PATT-GREY-2. . . . . . . . . . . . . .             000000577   DS 1C             Display        G
+    878       3  GR-PATT-GREY-3. . . . . . . . . . . . . .             000000578   DS 1C             Display        G
+    879       3  GR-PATT-GREY-4. . . . . . . . . . . . . .             000000579   DS 1C             Display        G
+    880       3  GR-PATT-GREY-5. . . . . . . . . . . . . .             00000057A   DS 1C             Display        G
+    881       3  GR-PATT-GREY-6. . . . . . . . . . . . . .             00000057B   DS 1C             Display        G
+    882       3  GR-PATT-GREY-7. . . . . . . . . . . . . .             00000057C   DS 1C             Display        G
+    883       3  GR-PATT-GREY-8. . . . . . . . . . . . . .             00000057D   DS 1C             Display        G
+    884       3  GR-PATT-VLINES. . . . . . . . . . . . . .             00000057E   DS 1C             Display        G
+    885       3  GR-PATT-HLINES. . . . . . . . . . . . . .             00000057F   DS 1C             Display        G
+    886       3  GR-PATT-L2R-DIAG1 . . . . . . . . . . . .             000000580   DS 1C             Display        G
+    887       3  GR-PATT-L2R-DIAG2 . . . . . . . . . . . .             000000581   DS 1C             Display        G
+    888       3  GR-PATT-T2B-DIAG1 . . . . . . . . . . . .             000000582   DS 1C             Display        G
+    889       3  GR-PATT-T2B-DIAG2 . . . . . . . . . . . .             000000583   DS 1C             Display        G
+    890       3  GR-PATT-NONE. . . . . . . . . . . . . . .             000000584   DS 1C             Display        G
+    891       3  GR-PATT-SOLID . . . . . . . . . . . . . .             000000585   DS 1C             Display        G
+    892       3  GR-PATT-BLANK . . . . . . . . . . . . . .             000000586   DS 1C             Display        G
+    893     2  GR-IMAGE-MAPPING. . . . . . . . . . . . . .             000000587   DS 0CL5           Group          G
+    894       3  GR-MAP-TRIM . . . . . . . . . . . . . . .             000000587   DS 1C             Display        G
+    895       3  GR-MAP-SCALE. . . . . . . . . . . . . . .             000000588   DS 1C             Display        G
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    40
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    896       3  GR-MAP-CENTER . . . . . . . . . . . . . .             000000589   DS 1C             Display        G
+    897       3  GR-MAP-PEL. . . . . . . . . . . . . . . .             00000058A   DS 1C             Display        G
+    898       3  GR-MAP-DOUBLE-DOT . . . . . . . . . . . .             00000058B   DS 1C             Display        G
+    899     2  GR-IMAGE-ROTATION . . . . . . . . . . . . .             00000058C   DS 0CL16          Group          G
+    900       3  GR-ROT-00 . . . . . . . . . . . . . . . .             00000058C   DS 4C             Display        G
+    901       3  GR-ROT-90 . . . . . . . . . . . . . . . .             000000590   DS 4C             Display        G
+    902       3  GR-ROT-180. . . . . . . . . . . . . . . .             000000594   DS 4C             Display        G
+    903       3  GR-ROT-270. . . . . . . . . . . . . . . .             000000598   DS 4C             Display        G
+    911     2  TR-NAMES. . . . . . . . . . . . . . . . . .             00000059C   DS 0CL432         Group          G
+    912       3  TR-GCSGID . . . . . . . . . . . . . . . .             00000059C   DS 2C             Display        G
+    913       3  TRN-GCSGID. . . . . . . . . . . . . . . .             00000059E   DS 6C             Display        G
+    915       3  TR-FQN. . . . . . . . . . . . . . . . . .             0000005A4   DS 2C             Display        G
+    916       3  TRN-FQN . . . . . . . . . . . . . . . . .             0000005A6   DS 6C             Display        G
+    918       3  TR-MPO. . . . . . . . . . . . . . . . . .             0000005AC   DS 2C             Display        G
+    919       3  TRN-MPO . . . . . . . . . . . . . . . . .             0000005AE   DS 6C             Display        G
+    921       3  TR-OCT. . . . . . . . . . . . . . . . . .             0000005B4   DS 2C             Display        G
+    922       3  TRN-OCT . . . . . . . . . . . . . . . . .             0000005B6   DS 6C             Display        G
+    924       3  TR-INTCHG . . . . . . . . . . . . . . . .             0000005BC   DS 2C             Display        G
+    925       3  TRN-INTCHG. . . . . . . . . . . . . . . .             0000005BE   DS 6C             Display        G
+    927       3  TR-FNTDSC . . . . . . . . . . . . . . . .             0000005C4   DS 2C             Display        G
+    928       3  TRN-FNTDSC. . . . . . . . . . . . . . . .             0000005C6   DS 6C             Display        G
+    930       3  TR-OFS. . . . . . . . . . . . . . . . . .             0000005CC   DS 2C             Display        G
+    931       3  TRN-OFS . . . . . . . . . . . . . . . . .             0000005CE   DS 6C             Display        G
+    933       3  TR-FCGCSID. . . . . . . . . . . . . . . .             0000005D4   DS 2C             Display        G
+    934       3  TRN-FCGCSID . . . . . . . . . . . . . . .             0000005D6   DS 6C             Display        G
+    936       3  TR-OBJTYPE. . . . . . . . . . . . . . . .             0000005DC   DS 2C             Display        G
+    937       3  TRN-OBJTYPE . . . . . . . . . . . . . . .             0000005DE   DS 6C             Display        G
+    939       3  TR-ERLID. . . . . . . . . . . . . . . . .             0000005E4   DS 2C             Display        G
+    940       3  TRN-ERLIB . . . . . . . . . . . . . . . .             0000005E6   DS 6C             Display        G
+    942       3  TR-RLID . . . . . . . . . . . . . . . . .             0000005EC   DS 2C             Display        G
+    943       3  TRN-RLID. . . . . . . . . . . . . . . . .             0000005EE   DS 6C             Display        G
+    945       3  TR-SECNUM . . . . . . . . . . . . . . . .             0000005F4   DS 2C             Display        G
+    946       3  TRN-SECNUM. . . . . . . . . . . . . . . .             0000005F6   DS 6C             Display        G
+    948       3  TR-CHAROT . . . . . . . . . . . . . . . .             0000005FC   DS 2C             Display        G
+    949       3  TRN-CHAROT. . . . . . . . . . . . . . . .             0000005FE   DS 6C             Display        G
+    951       3  TR-BYTEOF . . . . . . . . . . . . . . . .             000000604   DS 2C             Display        G
+    952       3  TRN-BYTEX . . . . . . . . . . . . . . . .             000000606   DS 6C             Display        G
+    954       3  TR-ATVAL. . . . . . . . . . . . . . . . .             00000060C   DS 2C             Display        G
+    955       3  TRN-ATVAL . . . . . . . . . . . . . . . .             00000060E   DS 6C             Display        G
+    957       3  TR-DESPOS . . . . . . . . . . . . . . . .             000000614   DS 2C             Display        G
+    958       3  TRN-DESPOS. . . . . . . . . . . . . . . .             000000616   DS 6C             Display        G
+    960       3  TR-MEDEJ. . . . . . . . . . . . . . . . .             00000061C   DS 2C             Display        G
+    961       3  TRN-MEDEJ . . . . . . . . . . . . . . . .             00000061E   DS 6C             Display        G
+    963       3  TR-POCP . . . . . . . . . . . . . . . . .             000000624   DS 2C             Display        G
+    964       3  TRN-POCP. . . . . . . . . . . . . . . . .             000000626   DS 6C             Display        G
+    966       3  TR-RESUAT . . . . . . . . . . . . . . . .             00000062C   DS 2C             Display        G
+    967       3  TRN-RESUAT. . . . . . . . . . . . . . . .             00000062E   DS 6C             Display        G
+    969       3  TR-UOM. . . . . . . . . . . . . . . . . .             000000634   DS 2C             Display        G
+    970       3  TRN-UOM . . . . . . . . . . . . . . . . .             000000636   DS 6C             Display        G
+    972       3  TR-OBJASZ . . . . . . . . . . . . . . . .             00000063C   DS 2C             Display        G
+    973       3  TRN-OBJASZ. . . . . . . . . . . . . . . .             00000063E   DS 6C             Display        G
+    975       3  TR-AREADF . . . . . . . . . . . . . . . .             000000644   DS 2C             Display        G
+    976       3  TRN-AREADF. . . . . . . . . . . . . . . .             000000646   DS 6C             Display        G
+    978       3  TR-COLSPF . . . . . . . . . . . . . . . .             00000064C   DS 2C             Display        G
+    979       3  TRN-COLSPF. . . . . . . . . . . . . . . .             00000064E   DS 6C             Display        G
+    981       3  TR-ENCOD. . . . . . . . . . . . . . . . .             000000654   DS 2C             Display        G
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    41
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    982       3  TRN-ENCOD . . . . . . . . . . . . . . . .             000000656   DS 6C             Display        G
+    984       3  TR-PGMAP. . . . . . . . . . . . . . . . .             00000065C   DS 2C             Display        G
+    985       3  TRN-PGMAP . . . . . . . . . . . . . . . .             00000065E   DS 6C             Display        G
+    987       3  TR-BYTEX. . . . . . . . . . . . . . . . .             000000664   DS 2C             Display        G
+    988       3  TRN-BYTEX . . . . . . . . . . . . . . . .             000000666   DS 6C             Display        G
+    990       3  TR-SFOF . . . . . . . . . . . . . . . . .             00000066C   DS 2C             Display        G
+    991       3  TRN-SFOF. . . . . . . . . . . . . . . . .             00000066E   DS 6C             Display        G
+    993       3  TR-SFEX . . . . . . . . . . . . . . . . .             000000674   DS 2C             Display        G
+    994       3  TRN-SFEX. . . . . . . . . . . . . . . . .             000000676   DS 6C             Display        G
+    996       3  TR-OBJOFF . . . . . . . . . . . . . . . .             00000067C   DS 2C             Display        G
+    997       3  TRN-OBJOFF. . . . . . . . . . . . . . . .             00000067E   DS 6C             Display        G
+    999       3  TR-HSCALE . . . . . . . . . . . . . . . .             000000684   DS 2C             Display        G
+   1000       3  TRN-HSCALE. . . . . . . . . . . . . . . .             000000686   DS 6C             Display        G
+   1002       3  TR-OBJCNT . . . . . . . . . . . . . . . .             00000068C   DS 2C             Display        G
+   1003       3  TRN-OBJCNT. . . . . . . . . . . . . . . .             00000068E   DS 6C             Display        G
+   1005       3  TR-DATETIME . . . . . . . . . . . . . . .             000000694   DS 2C             Display        G
+   1006       3  TRN-DATETIME. . . . . . . . . . . . . . .             000000696   DS 6C             Display        G
+   1008       3  TR-CRC. . . . . . . . . . . . . . . . . .             00000069C   DS 2C             Display        G
+   1009       3  TRN-CRC . . . . . . . . . . . . . . . . .             00000069E   DS 6C             Display        G
+   1011       3  TR-OBJORIG. . . . . . . . . . . . . . . .             0000006A4   DS 2C             Display        G
+   1012       3  TRN-OBJORIG . . . . . . . . . . . . . . .             0000006A6   DS 6C             Display        G
+   1014       3  TR-UCOMMENT . . . . . . . . . . . . . . .             0000006AC   DS 2C             Display        G
+   1015       3  TRN-UCOMMENT. . . . . . . . . . . . . . .             0000006AE   DS 6C             Display        G
+   1017       3  TR-MEDORI . . . . . . . . . . . . . . . .             0000006B4   DS 2C             Display        G
+   1018       3  TRN-MEDORI. . . . . . . . . . . . . . . .             0000006B6   DS 6C             Display        G
+   1020       3  TR-RESINC . . . . . . . . . . . . . . . .             0000006BC   DS 2C             Display        G
+   1021       3  TRN-RESINC. . . . . . . . . . . . . . . .             0000006BE   DS 6C             Display        G
+   1023       3  TR-RESMIX . . . . . . . . . . . . . . . .             0000006C4   DS 2C             Display        G
+   1024       3  TRN-RESMIX. . . . . . . . . . . . . . . .             0000006C6   DS 6C             Display        G
+   1026       3  TR-MIXRUL . . . . . . . . . . . . . . . .             0000006CC   DS 2C             Display        G
+   1027       3  TRN-MIXRUL. . . . . . . . . . . . . . . .             0000006CE   DS 6C             Display        G
+   1029       3  TR-DATIM. . . . . . . . . . . . . . . . .             0000006D4   DS 2C             Display        G
+   1030       3  TRN-DATIM . . . . . . . . . . . . . . . .             0000006D6   DS 6C             Display        G
+   1032       3  TR-TONSAV . . . . . . . . . . . . . . . .             0000006DC   DS 2C             Display        G
+   1033       3  TRN-TONSAV. . . . . . . . . . . . . . . .             0000006DE   DS 6C             Display        G
+   1035       3  TR-COLFID . . . . . . . . . . . . . . . .             0000006E4   DS 2C             Display        G
+   1036       3  TRN-COLFID. . . . . . . . . . . . . . . .             0000006E6   DS 6C             Display        G
+   1038       3  TR-FNTFID . . . . . . . . . . . . . . . .             0000006EC   DS 2C             Display        G
+   1039       3  TRN-FNTFID. . . . . . . . . . . . . . . .             0000006EE   DS 6C             Display        G
+   1041       3  TR-ATTQUAL. . . . . . . . . . . . . . . .             0000006F4   DS 2C             Display        G
+   1042       3  TRN-ATTQUAL . . . . . . . . . . . . . . .             0000006F6   DS 6C             Display        G
+   1044       3  TR-PGPOS. . . . . . . . . . . . . . . . .             0000006FC   DS 2C             Display        G
+   1045       3  TRN-PGPOS . . . . . . . . . . . . . . . .             0000006FE   DS 6C             Display        G
+   1047       3  TR-PRMVAL . . . . . . . . . . . . . . . .             000000704   DS 2C             Display        G
+   1048       3  TRN-PRMVAL. . . . . . . . . . . . . . . .             000000706   DS 6C             Display        G
+   1050       3  TR-PRSCTL . . . . . . . . . . . . . . . .             00000070C   DS 2C             Display        G
+   1051       3  TRN-PRSCTL. . . . . . . . . . . . . . . .             00000070E   DS 6C             Display        G
+   1053       3  TR-FNTRES . . . . . . . . . . . . . . . .             000000714   DS 2C             Display        G
+   1054       3  TRN-FNTRES. . . . . . . . . . . . . . . .             000000716   DS 6C             Display        G
+   1056       3  TR-FINOP. . . . . . . . . . . . . . . . .             00000071C   DS 2C             Display        G
+   1057       3  TRN-FINOP . . . . . . . . . . . . . . . .             00000071E   DS 6C             Display        G
+   1059       3  TR-TXDFID . . . . . . . . . . . . . . . .             000000724   DS 2C             Display        G
+   1060       3  TRN-TXTFID. . . . . . . . . . . . . . . .             000000726   DS 6C             Display        G
+   1062       3  TR-MEDFID . . . . . . . . . . . . . . . .             00000072C   DS 2C             Display        G
+   1063       3  TRN-MEDFID. . . . . . . . . . . . . . . .             00000072E   DS 6C             Display        G
+   1065       3  TR-FINFID . . . . . . . . . . . . . . . .             000000734   DS 2C             Display        G
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    42
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+   1066       3  TRN-FINFID. . . . . . . . . . . . . . . .             000000736   DS 6C             Display        G
+   1068       3  TR-DOFDSC . . . . . . . . . . . . . . . .             00000073C   DS 2C             Display        G
+   1069       3  TRN-DOFDSC. . . . . . . . . . . . . . . .             00000073E   DS 6C             Display        G
+   1071       3  TR-UP3IOP . . . . . . . . . . . . . . . .             000000744   DS 2C             Display        G
+   1072       3  TRN-UP3IOP. . . . . . . . . . . . . . . .             000000746   DS 6C             Display        G
+   1074     2  TR-TABLE. . . . . . . . . . . . . . . . . .             00000059C   DS 0CL8           Group          G,R,O
+   1077        TR-VALUE-INDX . . . . . . . . . . . . . . .                                           Index-Name     G
+   1078       3  TR-LENGTH . . . . . . . . . . . . . . . .             00000059C   DS 1C             Display        G
+   1079       3  TR-VALUE. . . . . . . . . . . . . . . . .             00000059D   DS 1C             Display        G
+   1080       3  TR-ID . . . . . . . . . . . . . . . . . .             00000059E   DS 6C             Display        G
+   1087     2  FQN-PREFIX. . . . . . . . . . . . . . . . .             00000074C   DS 2C             Binary         G
+   1089     2  FQN-NAMES . . . . . . . . . . . . . . . . .             00000074E   DS 0CL24          Group          G
+   1090       3  FQN-GID . . . . . . . . . . . . . . . . .             00000074E   DS 1C             Display        G
+   1092       3  FQN-FFN . . . . . . . . . . . . . . . . .             00000074F   DS 1C             Display        G
+   1094       3  FQN-FTN . . . . . . . . . . . . . . . . .             000000750   DS 1C             Display        G
+   1096       3  FQN-RHR . . . . . . . . . . . . . . . . .             000000751   DS 1C             Display        G
+   1098       3  FQN-BRG . . . . . . . . . . . . . . . . .             000000752   DS 1C             Display        G
+   1100       3  FQN-ATTR. . . . . . . . . . . . . . . . .             000000753   DS 1C             Display        G
+   1102       3  FQN-PREL. . . . . . . . . . . . . . . . .             000000754   DS 1C             Display        G
+   1104       3  FQN-PGRP. . . . . . . . . . . . . . . . .             000000755   DS 1C             Display        G
+   1106       3  FQN-MTM . . . . . . . . . . . . . . . . .             000000756   DS 1C             Display        G
+   1108       3  FQN-DOFB. . . . . . . . . . . . . . . . .             000000757   DS 1C             Display        G
+   1110       3  FQN-DOFL. . . . . . . . . . . . . . . . .             000000758   DS 1C             Display        G
+   1112       3  FQN-BDT . . . . . . . . . . . . . . . . .             000000759   DS 1C             Display        G
+   1114       3  FQN-ROR . . . . . . . . . . . . . . . . .             00000075A   DS 1C             Display        G
+   1116       3  FQN-CPG . . . . . . . . . . . . . . . . .             00000075B   DS 1C             Display        G
+   1118       3  FQN-FCS . . . . . . . . . . . . . . . . .             00000075C   DS 1C             Display        G
+   1120       3  FQN-BPG . . . . . . . . . . . . . . . . .             00000075D   DS 1C             Display        G
+   1122       3  FQN-BMM . . . . . . . . . . . . . . . . .             00000075E   DS 1C             Display        G
+   1124       3  FQN-CFN . . . . . . . . . . . . . . . . .             00000075F   DS 1C             Display        G
+   1126       3  FQN-BDI . . . . . . . . . . . . . . . . .             000000760   DS 1C             Display        G
+   1128       3  FQN-BOR . . . . . . . . . . . . . . . . .             000000761   DS 1C             Display        G
+   1130       3  FQN-DOIR. . . . . . . . . . . . . . . . .             000000762   DS 1C             Display        G
+   1132       3  FQN-IGID. . . . . . . . . . . . . . . . .             000000763   DS 1C             Display        G
+   1134       3  FQN-OOID. . . . . . . . . . . . . . . . .             000000764   DS 1C             Display        G
+   1136       3  FQN-DOER. . . . . . . . . . . . . . . . .             000000765   DS 1C             Display        G
+   1138     2  FQN-TABLE . . . . . . . . . . . . . . . . .             00000074E   DS 0CL1           Group          G,R,O
+   1141        FQN-INDX. . . . . . . . . . . . . . . . . .                                           Index-Name     G
+   1142       3  FQN-ID. . . . . . . . . . . . . . . . . .             00000074E   DS 1C             Display        G
+   1146     2  CAT-NAMES . . . . . . . . . . . . . . . . .             000000766   DS 0CL23          Group          G
+   1147       3  CAT-PSEG. . . . . . . . . . . . . . . . .             000000766   DS 1C             Display        G
+   1149       3  CAT-AREA. . . . . . . . . . . . . . . . .             000000767   DS 1C             Display        G
+   1151       3  CAT-COLATT. . . . . . . . . . . . . . . .             000000768   DS 1C             Display        G
+   1153       3  CAT-IMIMAGE . . . . . . . . . . . . . . .             000000769   DS 1C             Display        G
+   1155       3  CAT-MEDIUM. . . . . . . . . . . . . . . .             00000076A   DS 1C             Display        G
+   1157       3  CAT-CFONT . . . . . . . . . . . . . . . .             00000076B   DS 1C             Display        G
+   1159       3  CAT-PELEM . . . . . . . . . . . . . . . .             00000076C   DS 1C             Display        G
+   1161       3  CAT-CONTAIN . . . . . . . . . . . . . . .             00000076D   DS 1C             Display        G
+   1163       3  CAT-PRESENT . . . . . . . . . . . . . . .             00000076E   DS 1C             Display        G
+   1165       3  CAT-INDEX . . . . . . . . . . . . . . . .             00000076F   DS 1C             Display        G
+   1167       3  CAT-DOCUMENT. . . . . . . . . . . . . . .             000000770   DS 1C             Display        G
+   1169       3  CAT-PAGEGRP . . . . . . . . . . . . . . .             000000771   DS 1C             Display        G
+   1171       3  CAT-PAGE. . . . . . . . . . . . . . . . .             000000772   DS 1C             Display        G
+   1173       3  CAT-GRAPHIC . . . . . . . . . . . . . . .             000000773   DS 1C             Display        G
+   1175       3  CAT-DATARSRC. . . . . . . . . . . . . . .             000000774   DS 1C             Display        G
+   1177       3  CAT-DOCENV. . . . . . . . . . . . . . . .             000000775   DS 1C             Display        G
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    43
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+   1179       3  CAT-RESGRP. . . . . . . . . . . . . . . .             000000776   DS 1C             Display        G
+   1181       3  CAT-OEG . . . . . . . . . . . . . . . . .             000000777   DS 1C             Display        G
+   1183       3  CAT-AEG . . . . . . . . . . . . . . . . .             000000778   DS 1C             Display        G
+   1185       3  CAT-MEDMAP. . . . . . . . . . . . . . . .             000000779   DS 1C             Display        G
+   1187       3  CAT-FORMAP. . . . . . . . . . . . . . . .             00000077A   DS 1C             Display        G
+   1189       3  CAT-POVLY . . . . . . . . . . . . . . . .             00000077B   DS 1C             Display        G
+   1191       3  CAT-OVERLAY . . . . . . . . . . . . . . .             00000077C   DS 1C             Display        G
+   1193     2  CAT-TABLE . . . . . . . . . . . . . . . . .             000000766   DS 0CL1           Group          G,R,O
+   1196        CAT-INDX. . . . . . . . . . . . . . . . . .                                           Index-Name     G
+   1197       3  CAT-ID. . . . . . . . . . . . . . . . . .             000000766   DS 1C             Display        G
+   1201     2  OBJTYP-NAMES. . . . . . . . . . . . . . . .             00000077D   DS 0CL14          Group          G
+   1202       3  OBJTYP-ATTRIB . . . . . . . . . . . . . .             00000077D   DS 1C             Display        G
+   1204       3  OBJTYP-COPYCNT. . . . . . . . . . . . . .             00000077E   DS 1C             Display        G
+   1206       3  OBJTYP-DESCR. . . . . . . . . . . . . . .             00000077F   DS 1C             Display        G
+   1208       3  OBJTYP-CONTROL. . . . . . . . . . . . . .             000000780   DS 1C             Display        G
+   1210       3  OBJTYP-BEGIN. . . . . . . . . . . . . . .             000000781   DS 1C             Display        G
+   1212       3  OBJTYP-END. . . . . . . . . . . . . . . .             000000782   DS 1C             Display        G
+   1214       3  OBJTYP-MAP. . . . . . . . . . . . . . . .             000000783   DS 1C             Display        G
+   1216       3  OBJTYP-POSN . . . . . . . . . . . . . . .             000000784   DS 1C             Display        G
+   1218       3  OBJTYP-INCLUDE. . . . . . . . . . . . . .             000000785   DS 1C             Display        G
+   1220       3  OBJTYP-TABLE. . . . . . . . . . . . . . .             000000786   DS 1C             Display        G
+   1222       3  OBJTYP-MIGR . . . . . . . . . . . . . . .             000000787   DS 1C             Display        G
+   1224       3  OBJTYP-VARIABLE . . . . . . . . . . . . .             000000788   DS 1C             Display        G
+   1226       3  OBJTYP-LINK . . . . . . . . . . . . . . .             000000789   DS 1C             Display        G
+   1228       3  OBJTYP-DATA . . . . . . . . . . . . . . .             00000078A   DS 1C             Display        G
+   1230     2  OBJTYP-TABLE. . . . . . . . . . . . . . . .             00000077D   DS 0CL1           Group          G,R,O
+   1233        OBJTYP-INDX . . . . . . . . . . . . . . . .                                           Index-Name     G
+   1234       3  OBJTYP-ID . . . . . . . . . . . . . . . .             00000077D   DS 1C             Display        G
+   1238     2  MCF2-RG-LEN-LEN . . . . . . . . . . . . . .             00000078B   DS 2C             Binary         G
+   1242   1  INP-PARMS . . . . . . . . . . . . . . . . . . BLL=00001   000000000   DS 0CL22          Group
+   1243     2  INP-USTOR . . . . . . . . . . . . . . . . . BLL=00001   000000000   DS 4C             Pointer
+   1244     2  INP-PFATTR. . . . . . . . . . . . . . . . . BLL=00001   000000004   DS 4C             Pointer
+   1245     2  INP-RECPTR. . . . . . . . . . . . . . . . . BLL=00001   000000008   DS 4C             Pointer
+   1246     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00001   00000000C   DS 4C             Pointer
+   1247     2  INP-RECLEN. . . . . . . . . . . . . . . . . BLL=00001   000000010   DS 2C             Binary
+   1248     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00001   000000012   DS 2C             Display
+   1249     2  INP-REQUEST . . . . . . . . . . . . . . . . BLL=00001   000000014   DS 1C             Display
+   1250     88 INP-USE . . . . . . . . . . . . . . . . . . BLL=00001
+   1251     88 INP-DELETE. . . . . . . . . . . . . . . . . BLL=00001
+   1252     88 INP-INSERT. . . . . . . . . . . . . . . . . BLL=00001
+   1253     2  INP-EOF-FLAG. . . . . . . . . . . . . . . . BLL=00001   000000015   DS 1C             Display
+   1254     88 INP-EOF . . . . . . . . . . . . . . . . . . BLL=00001
+   1256   1  INP-UAREA . . . . . . . . . . . . . . . . . . BLL=00002   000000000   DS 16C            Display
+   1258   1  INP-ATTR. . . . . . . . . . . . . . . . . . . BLL=00003   000000000   DS 0CL51          Group
+   1259     2  INP-CC. . . . . . . . . . . . . . . . . . . BLL=00003   000000000   DS 3C             Display
+   1260     2  INP-CCTYPE. . . . . . . . . . . . . . . . . BLL=00003   000000003   DS 1C             Display
+   1261     88 INP-ANSI-CC . . . . . . . . . . . . . . . . BLL=00003
+   1262     88 INP-MACH-CC . . . . . . . . . . . . . . . . BLL=00003
+   1263     2  INP-CHARS . . . . . . . . . . . . . . . . . BLL=00003   000000004   DS 20C            Display
+   1264     2  INP-FORMDEF . . . . . . . . . . . . . . . . BLL=00003   000000018   DS 8C             Display
+   1265     2  INP-PAGEDEF . . . . . . . . . . . . . . . . BLL=00003   000000020   DS 8C             Display
+   1266     2  INP-PRMODE. . . . . . . . . . . . . . . . . BLL=00003   000000028   DS 8C             Display
+   1267     2  INP-TRC . . . . . . . . . . . . . . . . . . BLL=00003   000000030   DS 3C             Display
+   1271   1  NOP-RECORD. . . . . . . . . . . . . . . . . . BLL=00004   000000000   DS 0CL26612       Grp-VarLen     OG
+   1272     2  NOP-INTRODUCER. . . . . . . . . . . . . . . BLL=00004   000000000   DS 0CL9           Group          OG
+   1273       3  NOP-CC. . . . . . . . . . . . . . . . . . BLL=00004   000000000   DS 1C             Display
+1FORMAT AFPDS RECORD                                            ACIFIBDT  Date 04/02/2020  Time 12:07:57   Page    44
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+   1274       3  NOP-LEN-CHR . . . . . . . . . . . . . . . BLL=00004   000000001   DS 2C             Display
+   1275       3  NOP-RECLEN. . . . . . . . . . . . . . . . BLL=00004   000000001   DS 2C             Binary         R,D
+   1277       3  NOP-TYPE. . . . . . . . . . . . . . . . . BLL=00004   000000003   DS 3C             Display
+   1278       88 NOP-BDT . . . . . . . . . . . . . . . . . BLL=00004
+   1279       88 NOP-EDT . . . . . . . . . . . . . . . . . BLL=00004
+   1280       3  NOP-FLAG. . . . . . . . . . . . . . . . . BLL=00004   000000006   DS 1C             Display
+   1281       3  NOP-SEQ-CHR . . . . . . . . . . . . . . . BLL=00004   000000007   DS 2C             Display
+   1282       3  NOP-SEQNUM. . . . . . . . . . . . . . . . BLL=00004   000000007   DS 2C             Binary         R
+   1284     2  NOP-DATA. . . . . . . . . . . . . . . . . . BLL=00004   000000009   DS 0CL26603       Grp-VarLen
+   1285       3  FILLER. . . . . . . . . . . . . . . . . . BLL=00004   000000009   DS 1C             Display
+   1286       3  NOP-XDT-LEN-CHR . . . . . . . . . . . . . BLL=00004   00000000A   DS 2C             Display
+   1287       3  NOP-XDT-RECLEN. . . . . . . . . . . . . . BLL=00004   00000000A   DS 2C             Binary         R
+   1289       3  NOP-XDT-TYPE. . . . . . . . . . . . . . . BLL=00004   00000000C   DS 3C             Display
+   1290       3  NOP-ARRAY . . . . . . . . . . . . . . . . BLL=00004   00000000F   DS 1C             Display        O
+   1326  PROGRAM-ID AFPWRITE----------------------------------------------------------------------------------------------------*
+   1329   77 SF-CC . . . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+   1331   1  AFP-TYPE. . . . . . . . . . . . . . . . . . . BLL=00005   000000000   DS 3C             Display
+   1332   1  AFP-DATA. . . . . . . . . . . . . . . . . . . BLL=00006   000000000   DS 8192C          Display
+   1333   1  AFP-DATA-LENGTH . . . . . . . . . . . . . . . BLL=00007   000000000   DS 2C             Binary
+   1334   1  AFP-INSERT-LEN. . . . . . . . . . . . . . . . BLL=00008   000000000   DS 2C             Binary
+   1336   1  SF-RECORD . . . . . . . . . . . . . . . . . . BLL=00009   000000000   DS 0CL8201        Group
+   1337     2  SF-INTRODUCER . . . . . . . . . . . . . . . BLL=00009   000000000   DS 0CL9           Group
+   1338       3  SF-INTRO-CC . . . . . . . . . . . . . . . BLL=00009   000000000   DS 1C             Display
+   1339       3  SF-INTRO-LEN. . . . . . . . . . . . . . . BLL=00009   000000001   DS 2C             Binary
+   1340       3  SF-INTRO-TYPE . . . . . . . . . . . . . . BLL=00009   000000003   DS 3C             Display
+   1341       3  SF-INTRO-FLAG . . . . . . . . . . . . . . BLL=00009   000000006   DS 1C             Display
+   1342       3  SF-INTRO-SEQNUM . . . . . . . . . . . . . BLL=00009   000000007   DS 2C             Binary
+   1343     2  SF-DATA . . . . . . . . . . . . . . . . . . BLL=00009   000000009   DS 8192C          Display
+ End of Data Division Map
+-* Statistics for COBOL program ACIFIBDT:
+ *    Source records = 1365
+ *    Data Division statements = 791
+ *    Procedure Division statements = 22
+ *    Generated COBOL statements = 0
+ *    Program complexity factor = 24
+0End of compilation 1,  program ACIFIBDT,  no statements flagged.
+0Return code 0
+

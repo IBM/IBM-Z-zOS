@@ -1,0 +1,494 @@
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211                 Date 04/09/2020  Time 15:16:12   Page     1
+0Invocation parameters:
+  APOST,MAP,NORENT,TRUNC(BIN),CP(1140),X,DYNAM,RMODE(24),S,NOOFF,DATA(24),TEST(SOURCE)
+0PROCESS(CBL) statements:
+  PROCESS NUMPROC(PFD) TRUNC(OPT) APOST NOSEQ NOLIST
+0Options in effect:
+  NOADATA
+    ADV
+    AFP(NOVOLATILE)
+    APOST
+    ARCH(7)
+    ARITH(COMPAT)
+  NOAWO
+  NOBLOCK0
+    BUFSIZE(4096)
+  NOCICS
+    CODEPAGE(1140)
+  NOCOMPILE(S)
+  NOCOPYLOC
+  NOCOPYRIGHT
+  NOCURRENCY
+    DATA(24)
+    DBCS
+  NODECK
+  NODEFINE
+  NODIAGTRUNC
+    DISPSIGN(COMPAT)
+  NODLL
+  NODUMP
+    DYNAM
+  NOEXIT
+  NOEXPORTALL
+  NOFASTSRT
+    FLAG(I,I)
+  NOFLAGSTD
+    HGPR(PRESERVE)
+  NOINITCHECK
+  NOINITIAL
+    INLINE
+    INTDATE(ANSI)
+    LANGUAGE(EN)
+    LINECOUNT(60)
+  NOLIST
+    MAP(HEX)
+    MAXPCF(100000)
+  NOMDECK
+  NONAME
+    NSYMBOL(NATIONAL)
+  NONUMBER
+  NONUMCHECK
+    NUMPROC(PFD)
+    OBJECT
+  NOOFFSET
+    OPTIMIZE(0)
+    OUTDD(SYSOUT)
+  NOPARMCHECK
+    PGMNAME(COMPAT)
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211                 Date 04/09/2020  Time 15:16:12   Page     2
+0   QUALIFY(COMPAT)
+  NORENT
+    RMODE(24)
+  NORULES
+  NOSERVICE
+  NOSEQUENCE
+    SOURCE
+    SPACE(1)
+  NOSQL
+    SQLCCSID
+  NOSQLIMS
+  NOSSRANGE
+  NOSTGOPT
+    SUPPRESS
+  NOTERM
+    TEST(NOEJPD,DWARF,SOURCE,NOSEPARATE)
+  NOTHREAD
+    TRUNC(OPT)
+  NOVBREF
+    VLR(STANDARD)
+    VSAMOPENFS(COMPAT)
+  NOWORD
+    XMLPARSE(XMLSS)
+    XREF(FULL)
+    ZONEDATA(PFD)
+    ZWB
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211       APKINPTS  Date 04/09/2020  Time 15:16:12   Page     3
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0/* APKINPTS
+   000001         000200* LAST UPDATE ON 9 Apr 2018 AT 15:39:32 BY  HOWARDT VERSION 01   *
+   000002         000300* LAST UPDATE ON 16 Nov 2017            BY  Howardt VERSION 02   *
+   000003         000400 ID DIVISION.
+   000004         000500 PROGRAM-ID. APKINPTS.
+   000005         000600 AUTHOR. TURETZKY--HYDRA.
+   000006         000700 INSTALLATION. IBM BOULDER PROGRAMMING CENTER.
+   000007         000800               This program is a sample exit for ACIF
+   000008         000900               (APKACIF,5648-062) demonstrating the use of the
+   000009         001000               ACIF input exit.
+   000010         001100
+   000011         001200               In order to use this exit, include the control
+   000012         001300               INPEXIT=APKINPTS to enable this exit, and include
+   000013         001400               the load module in a dataset referenced in STEPLIB
+   000014         001500               or elsewhere in the module search order.
+   000015         001600
+   000016         001700               The program is used to test the input exit. It will
+   000017         001800               pass back each input record unchanged, then insert
+   000018         001900               a record after each input record. It will also
+   000019         002000               insert a record after EOF.
+   000020         002100
+   000021         002200               Method of operation: for each input record, the
+   000022         002300               request flag is set to INSERT (x'02'), the existing
+   000023         002400               record is sent back unchanged, then when control is
+   000024         002500               returned a new record created and the flag set to
+   000025         002600               process (x'00').
+   000026         002700
+   000027         002800 DATE-WRITTEN. 23 SEP 93.
+   000028         002900 DATE-COMPILED. 04/09/20.
+   000029         003000 SECURITY. IBM SAMPLE CODE ONLY.
+   000030         003100*/**************************************************************/
+   000031         003120*/* Licensed under the Apache License, Version 2.0 (the        */
+   000032         003130*/* "License"); you may not use this file except in compliance */
+   000033         003140*/* with the License. You may obtain a copy of the License at  */
+   000034         003150*/*                                                            */
+   000035         003160*/* http://www.apache.org/licenses/LICENSE-2.0                 */
+   000036         003170*/*                                                            */
+   000037         003180*/* Unless required by applicable law or agreed to in writing, */
+   000038         003190*/* software distributed under the License is distributed on an*/
+   000039         003191*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+   000040         003192*/* KIND, either express or implied.  See the License for the  */
+   000041         003193*/* specific language governing permissions and limitations    */
+   000042         003194*/* under the License.                                         */
+   000043         003195*/*------------------------------------------------------------*/
+   000044         003196*/*                                                            */
+   000045         003200*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
+   000046         003300*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
+   000047         003400*/*                                                            */
+   000048         003500*/*   Permission to use, copy, modify, and distribute          */
+   000049         003600*/*   this software for any purpose with or without fee        */
+   000050         003700*/*   is hereby granted, provided that the above               */
+   000051         003800*/*   copyright notices appear in all copies.                  */
+   000052         003900*/*                                                            */
+   000053         004000*/*   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY       */
+   000054         004100*/*   OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT       */
+   000055         004200*/*   LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            */
+   000056         004300*/*   FITNESS FOR A PARTICULAR PURPOSE AND                     */
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211       APKINPTS  Date 04/09/2020  Time 15:16:12   Page     4
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0  000057         004400*/*   NONINFRINGEMENT.  IN NO EVENT SHALL RICOH, RICOH         */
+   000058         004500*/*   SUBSIDIARIES, ANY OF ITS SUPPLIERS OR ANY OF THE         */
+   000059         004600*/*   OTHER COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,         */
+   000060         004700*/*   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF      */
+   000061         004800*/*   CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF        */
+   000062         004900*/*   OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR         */
+   000063         005000*/*   OTHER DEALINGS IN THE SOFTWARE.                          */
+   000064         005100*/**************************************************************/
+1ACIF Test Input Exit                                           APKINPTS  Date 04/09/2020  Time 15:16:12   Page     5
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000066         005300 ENVIRONMENT DIVISION.
+   000067         005400 CONFIGURATION SECTION.
+   000068         005500 SOURCE-COMPUTER. IBM-370.
+   000069         005600 OBJECT-COMPUTER. IBM-370.
+1ACIF Test Input Exit                                           APKINPTS  Date 04/09/2020  Time 15:16:12   Page     6
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000071         005800 DATA DIVISION.
+   000072         005900 WORKING-STORAGE SECTION.
+   000073         006000 77  PGMNAME                 PIC X(8) VALUE 'APKINPTS'.                              000000000 8C
+   000074         006100 77  ABND-PGM                PIC X(8) VALUE 'CEE3DMP'.            !@01               000000000 8C
+   000075         006200 77  ABEND-CODE              PIC 9(4) BINARY VALUE 12.                               000000000 2C
+   000076         006300 77  ABEND-OPTS              PIC X(255)                           !@01               000000000 255C
+   000077         006400     VALUE 'ENC(CUR) THR(CUR) FILE VAR NOBLOCK NOSTOR SF(ALL)' .  !@01
+   000078         006500 77  AFPWRITE                PIC X(8) VALUE 'AFPWRITE'.                              000000000 8C
+   000079         006600 77  PAGE-COUNT              PIC 9(8) BINARY VALUE ZERO.                             000000000 4C
+                                                                                                   IMP
+   000080         006700 77  LINE-COUNT              PIC 9(8) BINARY VALUE ZERO.                             000000000 4C
+                                                                                                   IMP
+   000081         006800 77  EOF-LIT                 PIC X(9) VALUE 'AFTER EOF'.                             000000000 9C
+   000082         006900 77  CC-TOF                  PIC X.                                                  000000000 1C
+   000083         007000     88  ANSI-TOF            VALUE '1'.
+   000084         007100     88  MACH-TOF            VALUE X'8B'.
+   000085         007200 77  FIRST-LINE-FLAG         PIC X VALUE LOW-VALUE.                                  000000000 1C
+                                                                                                   IMP
+   000086         007300     88  FIRST-LINE          VALUE HIGH-VALUE.                             IMP
+   000087         007400     88  NOTFIRST-LINE       VALUE LOW-VALUE.                              IMP
+0
+   000089         007600 01  NEW-LINE.                                                                       000000000 0CL37
+   000090         007700     05  NEW-CC              PIC X.                                                  000000000 1C
+   000091         007800     05  FILLER              PIC X(17) VALUE '>>>INSERTED LINE '.                    000000001 17C
+   000092         007900     05  NEW-COUNT           PIC ZZZ,ZZ9.                                            000000012 7C
+   000093         008000     05  FILLER              PIC X(03) VALUE '<<<'.                                  000000019 3C
+   000094         008100     05  NEW-EOF             PIC X(9) VALUE SPACES.                                  00000001C 9C
+                                                                                                   IMP
+1ACIF Test Input Exit                                           APKINPTS  Date 04/09/2020  Time 15:16:12   Page     7
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000095         008200/ PASSED PARAMETERS.
+   000096         008300 LINKAGE SECTION.
+   000097         008400 01  INP-PARMS.                                                            BLL=00001,000000000 0CL22
+   000098         008500     05  INP-USTOR           POINTER.                                      BLL=00001,000000000 4C
+   000099         008600     05  INP-PFATTR          POINTER.                                      BLL=00001,000000004 4C
+   000100         008700     05  INP-RECPTR          POINTER.                                      BLL=00001,000000008 4C
+   000101         008800     05  FILLER              POINTER.                                      BLL=00001,00000000C 4C
+   000102         008900     05  INP-RECLEN          PIC 9(4) BINARY.                              BLL=00001,000000010 2C
+   000103         009000     05  FILLER              PIC XX.                                       BLL=00001,000000012 2C
+   000104         009100     05  INP-REQUEST         PIC X.                                        BLL=00001,000000014 1C
+   000105         009200         88  INP-USE         VALUE X'00'.
+   000106         009300         88  INP-DELETE      VALUE X'01'.
+   000107         009400         88  INP-INSERT      VALUE X'02'.
+   000108         009500     05  INP-EOF-FLAG        PIC X.                                        BLL=00001,000000015 1C
+   000109         009600         88  INP-EOF         VALUE 'Y'.
+   000110         009700
+   000111         009800 01  INP-UAREA.                                                            BLL=00002,000000000 0CL17
+   000112         009900     05  UAREA-CNTR          PIC 9(4) BINARY.                              BLL=00002,000000000 2C
+   000113         010000     05  UAREA-INSCOUNT      PIC 9(4) BINARY.                              BLL=00002,000000002 2C
+   000114         010100     05  INSERT-FLAG         PIC X.                                        BLL=00002,000000004 1C
+   000115         010200         88 INSERT-LINE      VALUE HIGH-VALUE.                             IMP
+   000116         010300         88 INSERT-MULTIPLE  VALUE 'M'.
+   000117         010400         88 NOINSERT-LINE    VALUE LOW-VALUE.                              IMP
+   000118         010500     05  FILLER              PIC X(12).                                    BLL=00002,000000005 12C
+   000119         010600
+   000120         010700 01  INP-ATTR.                                                             BLL=00003,000000000 0CL51
+   000121         010800     05  INP-CC              PIC XXX.                                      BLL=00003,000000000 3C
+   000122         010900     05  INP-CCTYPE          PIC X.                                        BLL=00003,000000003 1C
+   000123         011000         88  INP-ANSI-CC     VALUE 'A'.
+   000124         011100         88  INP-MACH-CC     VALUE 'M'.
+   000125         011200     05  INP-CHARS           PIC X(20).                                    BLL=00003,000000004 20C
+   000126         011300     05  INP-FORMDEF         PIC X(8).                                     BLL=00003,000000018 8C
+   000127         011400     05  INP-PAGEDEF         PIC X(8).                                     BLL=00003,000000020 8C
+   000128         011500     05  INP-PRMODE          PIC X(8).                                     BLL=00003,000000028 8C
+   000129         011600     05  INP-TRC             PIC XXX.                                      BLL=00003,000000030 3C
+   000130         011700
+   000131         011800* This is a template for the input record, pointed to by
+   000132         011900* INP-RECPTR. The record's actual length is given by
+   000133         012000* INP-RECLEN.
+   000134         012100 01  INP-LINE.                                                             BLL=00004,000000000 0CL8211
+   000135         012200     05  INP-CCVAL           PIC X.                                        BLL=00004,000000000 1C
+   000136         012300     05  INP-TRCVAL          PIC X.                                        BLL=00004,000000001 1C
+   000137         012400     05  INP-PAGELIT         PIC X(4).                                     BLL=00004,000000002 4C
+   000138         012500     05  FILLER              PIC X.                                        BLL=00004,000000006 1C
+   000139         012600     05  INP-PAGENUM         PIC 9(4).                                     BLL=00004,000000007 4C
+   000140         012700     05  FILLER              PIC X.                                        BLL=00004,00000000B 1C
+   000141         012800     05  INP-LINELIT         PIC X(4).                                     BLL=00004,00000000C 4C
+   000142         012900     05  FILLER              PIC X.                                        BLL=00004,000000010 1C
+   000143         013000     05  INP-LINENUM         PIC 9(3).                                     BLL=00004,000000011 3C
+   000144         013100     05  FILLER              PIC X(8191).                                  BLL=00004,000000014 8191C
+
+1Initialization and Main Line                                   APKINPTS  Date 04/09/2020  Time 15:16:12   Page     8
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000147         013400 PROCEDURE DIVISION USING INP-PARMS.                                       97
+   000148         013500* make work area, attributes, and input line addressable.
+   000149         013600     SET ADDRESS OF INP-UAREA TO INP-USTOR.                                IMP 111 98
+   000150         013700     SET ADDRESS OF INP-ATTR TO INP-PFATTR.                                IMP 120 99
+   000151         013800     SET ADDRESS OF INP-LINE TO INP-RECPTR.                                IMP 134 100
+   000152         013900* no special action is necessary at EOF.
+   000153         014000     IF INP-EOF                                                            109
+   000154         014100      THEN
+   000155      1  014200       DISPLAY PGMNAME, ' EOF REACHED.';                                   73
+   000156      1  014300       MOVE EOF-LIT TO NEW-EOF;                                            81 94
+   000157      1  014400       PERFORM 0100-INSERT-RECORD;                                         225
+   000158      1  014500       GOBACK;
+   000159         014600     END-IF.
+   000160         014700* The print file attributes are used to determine the type
+   000161         014800* of carriage control to test for for top-of-form.
+   000162         014900* For purposes of this example, we assume the file will
+   000163         015000* always have carriage control, and if machine control the
+   000164         015100* skip to channel 1 immediate is used for new pages.
+   000165         015200     IF INP-ANSI-CC                                                        123
+   000166         015300      THEN
+   000167      1  015400       SET ANSI-TOF TO TRUE                                                83
+   000168         015500      ELSE
+   000169      1  015600       SET MACH-TOF TO TRUE.                                               84
+   000170         015700* The carriage control character is tested for top-of-form.
+   000171         015800* This identifies the first line of a page. The line is
+   000172         015900* scanned for a space large enough for our text insert.
+   000173         016000* The report number and run date are saved for use in the
+   000174         016100* indexer key. The page counter is incremented and the
+   000175         016200* line counter is reset, then the modified line is passed
+   000176         016300* back to ACIF.
+   000177         016400* If machine carriage control is used, then the first
+   000178         016500* print line is the line after the top-of-form. A flag
+   000179         016600* is set to cause this line to be treated as the top.
+   000180         016700     IF FIRST-LINE OR (INP-CCVAL = CC-TOF)                                 86 135 82
+   000181         016800      THEN
+   000182      1  016900       IF ANSI-TOF OR FIRST-LINE                                           83 86
+   000183      1  017000        THEN
+   000184      2  017100         ADD 1 TO PAGE-COUNT;                                              79
+   000185      2  017200         MOVE 1 TO LINE-COUNT;                                             80
+   000186      2  017300         SET NOTFIRST-LINE TO TRUE;                                        87
+   000187      1  017400        ELSE
+   000188      2  017500         SET FIRST-LINE TO TRUE;                                           86
+   000189      1  017600       END-IF;
+   000190         017700      ELSE
+   000191      1  017800       ADD 1 TO LINE-COUNT;                                                80
+   000192         017900     END-IF.
+
+   000194         018100* If this record is received from ACIF, send it back and set
+   000195         018200* the insert flag and also set our flag to note that a record
+   000196         018300* will be inserted on the next call.
+   000197         018400     INSPECT INP-PAGENUM REPLACING ALL SPACES BY ZEROES.                   139 IMP IMP
+   000198         018500     INSPECT INP-LINENUM REPLACING ALL SPACES BY ZEROES.                   143 IMP IMP
+   000199         018600     IF INSERT-LINE                                                        115
+   000200         018700      THEN
+   000201      1  018800       SET NOINSERT-LINE TO TRUE;                                          117
+   000202      1  018900       PERFORM 0100-INSERT-RECORD;                                         225
+   000203      1  019000       SET INP-USE TO TRUE;                                                105
+   000204         019100      ELSE
+1Initialization and Main Line                                   APKINPTS  Date 04/09/2020  Time 15:16:12   Page     9
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0  000205         019200* last line is on page 5, line 5
+   000206      1  019300       IF (INP-PAGENUM = 5 AND INP-LINENUM = 5) OR INSERT-MULTIPLE         139 143 116
+   000207      1  019400        THEN
+   000208      2  019500         SET INSERT-MULTIPLE TO TRUE;                                      116
+   000209      2  019600         ADD 1 TO UAREA-INSCOUNT;                                          113
+   000210      2  019700         IF UAREA-INSCOUNT < 6                                             113
+   000211      2  019800          THEN
+   000212      3  019900           SET INP-INSERT TO TRUE;                                         107
+   000213      3  020000           PERFORM 0100-INSERT-RECORD;                                     225
+   000214      2  020100          ELSE
+   000215      3  020200           SET INP-DELETE TO TRUE;                                         106
+   000216      2  020300         END-IF;
+   000217      1  020400        ELSE
+   000218      2  020500         SET INSERT-LINE TO TRUE;                                          115
+   000219      2  020600         SET INP-INSERT TO TRUE;                                           107
+   000220      1  020700      END-IF;
+   000221         020800     END-IF.
+
+   000223         021000     GOBACK.
+-
+   000225         021200 0100-INSERT-RECORD.
+   000226         021300* create the record, move it to the provided buffer, and
+   000227         021400* set the flag to use the record and then provide a new one.
+   000228         021500     MOVE SPACE TO NEW-CC.                                                 IMP 90
+   000229         021600     ADD 1 TO UAREA-CNTR.                                                  112
+   000230         021700     MOVE UAREA-CNTR TO NEW-COUNT.                                         112 92
+   000231         021800     MOVE NEW-LINE TO INP-LINE.                                            89 134
+   000232         021900     MOVE LENGTH OF NEW-LINE TO INP-RECLEN.                                IMP 89 102
+ */ APKINPTS
+1Initialization and Main Line                                   APKINPTS  Date 04/09/2020  Time 15:16:12   Page    10
+0An "M" preceding a data-name reference indicates that the data-name is modified by this reference.
+
+  Defined   Cross-reference of data names   References
+
+       75   ABEND-CODE
+       76   ABEND-OPTS
+       74   ABND-PGM
+       78   AFPWRITE
+       83   ANSI-TOF . . . . . . . . . . .  M167 182
+       82   CC-TOF . . . . . . . . . . . .  180
+       81   EOF-LIT. . . . . . . . . . . .  156
+       86   FIRST-LINE . . . . . . . . . .  180 182 M188
+       85   FIRST-LINE-FLAG
+      123   INP-ANSI-CC. . . . . . . . . .  165
+      120   INP-ATTR . . . . . . . . . . .  150
+      121   INP-CC
+      122   INP-CCTYPE
+      135   INP-CCVAL. . . . . . . . . . .  180
+      125   INP-CHARS
+      106   INP-DELETE . . . . . . . . . .  M215
+      109   INP-EOF. . . . . . . . . . . .  153
+      108   INP-EOF-FLAG
+      126   INP-FORMDEF
+      107   INP-INSERT . . . . . . . . . .  M212 M219
+      134   INP-LINE . . . . . . . . . . .  151 M231
+      141   INP-LINELIT
+      143   INP-LINENUM. . . . . . . . . .  M198 206
+      124   INP-MACH-CC
+      127   INP-PAGEDEF
+      137   INP-PAGELIT
+      139   INP-PAGENUM. . . . . . . . . .  M197 206
+       97   INP-PARMS. . . . . . . . . . .  147
+       99   INP-PFATTR . . . . . . . . . .  150
+      128   INP-PRMODE
+      102   INP-RECLEN . . . . . . . . . .  M232
+      100   INP-RECPTR . . . . . . . . . .  151
+      104   INP-REQUEST
+      129   INP-TRC
+      136   INP-TRCVAL
+      111   INP-UAREA. . . . . . . . . . .  149
+      105   INP-USE. . . . . . . . . . . .  M203
+       98   INP-USTOR. . . . . . . . . . .  149
+      114   INSERT-FLAG
+      115   INSERT-LINE. . . . . . . . . .  199 M218
+      116   INSERT-MULTIPLE. . . . . . . .  206 M208
+       80   LINE-COUNT . . . . . . . . . .  M185 M191
+       84   MACH-TOF . . . . . . . . . . .  M169
+       90   NEW-CC . . . . . . . . . . . .  M228
+       92   NEW-COUNT. . . . . . . . . . .  M230
+       94   NEW-EOF. . . . . . . . . . . .  M156
+       89   NEW-LINE . . . . . . . . . . .  231 232
+      117   NOINSERT-LINE. . . . . . . . .  M201
+       87   NOTFIRST-LINE. . . . . . . . .  M186
+       79   PAGE-COUNT . . . . . . . . . .  M184
+       73   PGMNAME. . . . . . . . . . . .  155
+      112   UAREA-CNTR . . . . . . . . . .  M229 230
+      113   UAREA-INSCOUNT . . . . . . . .  M209 210
+1Initialization and Main Line                                   APKINPTS  Date 04/09/2020  Time 15:16:12   Page    11
+0Context usage is indicated by the letter preceding a procedure-name reference.
+ These letters and their meanings are:
+     A = ALTER (procedure-name)
+     D = GO TO (procedure-name) DEPENDING ON
+     E = End of range of (PERFORM) through (procedure-name)
+     G = GO TO (procedure-name)
+     P = PERFORM (procedure-name)
+     T = (ALTER) TO PROCEED TO (procedure-name)
+     U = USE FOR DEBUGGING (procedure-name)
+
+  Defined   Cross-reference of procedures   References
+
+      225   0100-INSERT-RECORD . . . . . .  P157 P202 P213
+1Initialization and Main Line                                   APKINPTS  Date 04/09/2020  Time 15:16:12   Page    12
+0 Defined   Cross-reference of programs     References
+
+        4   APKINPTS
+1Initialization and Main Line                                   APKINPTS  Date 04/09/2020  Time 15:16:12   Page    13
+0Data Division Map
+0Data Definition Attribute codes (rightmost column) have the following meanings:
+     D = Object of OCCURS DEPENDING    G = GLOBAL                             S = Spanned file
+     E = EXTERNAL                      O = Has OCCURS clause                  U = Undefined format file
+     F = Fixed-length file             OG= Group has own length definition    V = Variable-length file
+     FB= Fixed-length blocked file     R = REDEFINES                          VB= Variable-length blocked file
+     X = Unallocated
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+      4  PROGRAM-ID APKINPTS----------------------------------------------------------------------------------------------------*
+     73   77 PGMNAME . . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+     74   77 ABND-PGM. . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+     75   77 ABEND-CODE. . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+     76   77 ABEND-OPTS. . . . . . . . . . . . . . . . . .             000000000   DS 255C           Display
+     78   77 AFPWRITE. . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+     79   77 PAGE-COUNT. . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+     80   77 LINE-COUNT. . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+     81   77 EOF-LIT . . . . . . . . . . . . . . . . . . .             000000000   DS 9C             Display
+     82   77 CC-TOF. . . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+     83   88 ANSI-TOF. . . . . . . . . . . . . . . . . . .
+     84   88 MACH-TOF. . . . . . . . . . . . . . . . . . .
+     85   77 FIRST-LINE-FLAG . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+     86   88 FIRST-LINE. . . . . . . . . . . . . . . . . .
+     87   88 NOTFIRST-LINE . . . . . . . . . . . . . . . .
+     89   1  NEW-LINE. . . . . . . . . . . . . . . . . . .             000000000   DS 0CL37          Group
+     90     2  NEW-CC. . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+     91     2  FILLER. . . . . . . . . . . . . . . . . . .             000000001   DS 17C            Display
+     92     2  NEW-COUNT . . . . . . . . . . . . . . . . .             000000012   DS 7C             Disp-Num-Edit
+     93     2  FILLER. . . . . . . . . . . . . . . . . . .             000000019   DS 3C             Display
+     94     2  NEW-EOF . . . . . . . . . . . . . . . . . .             00000001C   DS 9C             Display
+     97   1  INP-PARMS . . . . . . . . . . . . . . . . . . BLL=00001   000000000   DS 0CL22          Group
+     98     2  INP-USTOR . . . . . . . . . . . . . . . . . BLL=00001   000000000   DS 4C             Pointer
+     99     2  INP-PFATTR. . . . . . . . . . . . . . . . . BLL=00001   000000004   DS 4C             Pointer
+    100     2  INP-RECPTR. . . . . . . . . . . . . . . . . BLL=00001   000000008   DS 4C             Pointer
+    101     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00001   00000000C   DS 4C             Pointer
+    102     2  INP-RECLEN. . . . . . . . . . . . . . . . . BLL=00001   000000010   DS 2C             Binary
+    103     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00001   000000012   DS 2C             Display
+    104     2  INP-REQUEST . . . . . . . . . . . . . . . . BLL=00001   000000014   DS 1C             Display
+    105     88 INP-USE . . . . . . . . . . . . . . . . . . BLL=00001
+    106     88 INP-DELETE. . . . . . . . . . . . . . . . . BLL=00001
+    107     88 INP-INSERT. . . . . . . . . . . . . . . . . BLL=00001
+    108     2  INP-EOF-FLAG. . . . . . . . . . . . . . . . BLL=00001   000000015   DS 1C             Display
+    109     88 INP-EOF . . . . . . . . . . . . . . . . . . BLL=00001
+    111   1  INP-UAREA . . . . . . . . . . . . . . . . . . BLL=00002   000000000   DS 0CL17          Group
+    112     2  UAREA-CNTR. . . . . . . . . . . . . . . . . BLL=00002   000000000   DS 2C             Binary
+    113     2  UAREA-INSCOUNT. . . . . . . . . . . . . . . BLL=00002   000000002   DS 2C             Binary
+    114     2  INSERT-FLAG . . . . . . . . . . . . . . . . BLL=00002   000000004   DS 1C             Display
+    115     88 INSERT-LINE . . . . . . . . . . . . . . . . BLL=00002
+    116     88 INSERT-MULTIPLE . . . . . . . . . . . . . . BLL=00002
+    117     88 NOINSERT-LINE . . . . . . . . . . . . . . . BLL=00002
+    118     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00002   000000005   DS 12C            Display
+    120   1  INP-ATTR. . . . . . . . . . . . . . . . . . . BLL=00003   000000000   DS 0CL51          Group
+    121     2  INP-CC. . . . . . . . . . . . . . . . . . . BLL=00003   000000000   DS 3C             Display
+    122     2  INP-CCTYPE. . . . . . . . . . . . . . . . . BLL=00003   000000003   DS 1C             Display
+    123     88 INP-ANSI-CC . . . . . . . . . . . . . . . . BLL=00003
+    124     88 INP-MACH-CC . . . . . . . . . . . . . . . . BLL=00003
+1Initialization and Main Line                                   APKINPTS  Date 04/09/2020  Time 15:16:12   Page    14
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    125     2  INP-CHARS . . . . . . . . . . . . . . . . . BLL=00003   000000004   DS 20C            Display
+    126     2  INP-FORMDEF . . . . . . . . . . . . . . . . BLL=00003   000000018   DS 8C             Display
+    127     2  INP-PAGEDEF . . . . . . . . . . . . . . . . BLL=00003   000000020   DS 8C             Display
+    128     2  INP-PRMODE. . . . . . . . . . . . . . . . . BLL=00003   000000028   DS 8C             Display
+    129     2  INP-TRC . . . . . . . . . . . . . . . . . . BLL=00003   000000030   DS 3C             Display
+    134   1  INP-LINE. . . . . . . . . . . . . . . . . . . BLL=00004   000000000   DS 0CL8211        Group
+    135     2  INP-CCVAL . . . . . . . . . . . . . . . . . BLL=00004   000000000   DS 1C             Display
+    136     2  INP-TRCVAL. . . . . . . . . . . . . . . . . BLL=00004   000000001   DS 1C             Display
+    137     2  INP-PAGELIT . . . . . . . . . . . . . . . . BLL=00004   000000002   DS 4C             Display
+    138     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00004   000000006   DS 1C             Display
+    139     2  INP-PAGENUM . . . . . . . . . . . . . . . . BLL=00004   000000007   DS 4C             Disp-Num
+    140     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00004   00000000B   DS 1C             Display
+    141     2  INP-LINELIT . . . . . . . . . . . . . . . . BLL=00004   00000000C   DS 4C             Display
+    142     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00004   000000010   DS 1C             Display
+    143     2  INP-LINENUM . . . . . . . . . . . . . . . . BLL=00004   000000011   DS 3C             Disp-Num
+    144     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00004   000000014   DS 8191C          Display
+ End of Data Division Map
+-* Statistics for COBOL program APKINPTS:
+ *    Source records = 232
+ *    Data Division statements = 53
+ *    Procedure Division statements = 39
+ *    Generated COBOL statements = 0
+ *    Program complexity factor = 41
+0End of compilation 1,  program APKINPTS,  no statements flagged.
+0Return code 0

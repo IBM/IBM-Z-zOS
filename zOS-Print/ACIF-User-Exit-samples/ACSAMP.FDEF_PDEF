@@ -1,0 +1,119 @@
+ /* use BCOCA instead of barcode subroutine */                          00020000
+ /**************************************************************/  
+ /* Licensed under the Apache License, Version 2.0 (the        */  
+ /* "License"); you may not use this file except in compliance */  
+ /* with the License. You may obtain a copy of the License at  */  
+ /*                                                            */  
+ /* http://www.apache.org/licenses/LICENSE-2.0                 */  
+ /*                                                            */  
+ /* Unless required by applicable law or agreed to in writing, */  
+ /* software distributed under the License is distributed on an*/  
+ /* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */  
+ /* KIND, either express or implied.  See the License for the  */  
+ /* specific language governing permissions and limitations    */  
+ /* under the License.                                         */  
+ /*------------------------------------------------------------*/  
+ /*                                                            */  
+ /*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */  
+ /*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */  
+ /**************************************************************/
+FORMDEF ACSAMP                                                          00080000
+  PRESENT landscape                                                     00090000
+  OFFSET 0.1 IN 0.1 IN                                                  00100000
+  DIRECTION down                                                        00110000
+  REPLACE YES;                                                          00120000
+PAGEDEF ACSAMP                                                          00130000
+  REPLACE YES;                                                          00140000
+  FONT TITLE GB10;               /* gothic bold 10 pitch */             00150000
+  FONT NAD ST10;                 /* serif text 10 pitch  */             00160000
+  FONT DETAIL GT10;              /* gothic text 10 pitch */             00170000
+  FONT LEGEND N2109C;            /* 9pt Times Roman Medium */           00200000
+  FONT message n510fc;           /* 16pt Times Roman Italic Bold */     00201000
+    PAGEFORMAT PAGE1                                                    00230000
+        WIDTH 11.0 in                                                   00240000
+        HEIGHT 8.5 in                                                   00250000
+        LINEONE 0.1 0.2                                                 00260000
+        DIRECTION down;                                                 00270000
+      PRINTLINE                      /* THE TITLE */                    00310000
+        POSITION MARGIN TOP                                             00320000
+        CHANNEL 1;                                                      00330000
+        FIELD TEXT C'Date:'                                             00331000
+          FONT TITLE                                                    00332000
+          POSITION 8.0 IN 0.5 in;                                       00333000
+        FIELD START 1 LENGTH 12                                         00340000
+          FONT DETAIL                                                   00350000
+          POSITION 8.6 IN 0.5 in;                                       00360000
+        FIELD TEXT C'Account:'                                          00370000
+          FONT TITLE                                                    00380000
+          POSITION 7.7 IN 0.7 in;                                       00390000
+        FIELD START 14 LENGTH 9                                         00391000
+          FONT DETAIL                                                   00392000
+          POSITION 8.6 IN 0.7 in;                                       00393000
+      PRINTLINE                     /* NAME AND ADDRESS */              00400000
+        REPEAT 3                                                        00410000
+        FONT NAD                                                        00420000
+        POSITION 0.25 in 1.5 IN;                                        00430000
+      PRINTLINE                     /* DETAIL LINES */                  00440000
+        channel 2                                                       00441000
+        REPEAT 18                                                       00450000
+        FONT DETAIL                                                     00460000
+        POSITION 1.0 in 3.0 IN;                                         00470000
+      PRINTLINE                     /* message     */                   00531000
+        CHANNEL 3                                                       00532100
+        FONT message                                                    00533000
+        POSITION 1.0 in 8.00 IN;                                        00534000
+      PRINTLINE                     /* continued   */                   00535000
+        CHANNEL 4                                                       00536000
+        FONT LEGEND                                                     00537000
+        POSITION 1.0 in 8.25 IN;                                        00538000
+      PRINTLINE                     /* Barcode line */                  00540000
+        CHANNEL 12                                                      00550000
+        POSITION 10.0 IN 3.0 IN   ;                                     00551000
+ /*     FONT barcode    */                                              00560000
+        FIELD START 1 LENGTH 09                                         00560100
+        BARCODE       TYPE 2DMATRIX                                     00560400
+             SUPPBLANKS BCXPARMS E2A;                                   00560500
+    PAGEFORMAT CONT                                                     00580000
+        WIDTH 11.0                                                      00590000
+        HEIGHT 8.5                                                      00600000
+        LINEONE 0.1 0.2                                                 00610000
+        DIRECTION down;                                                 00620000
+      PRINTLINE                      /* THE TITLE */                    00621000
+        POSITION MARGIN TOP                                             00622000
+        CHANNEL 1;                                                      00623000
+        FIELD TEXT C'Date:'                                             00624000
+          FONT TITLE                                                    00625000
+          POSITION 8.0 IN 0.5 in;                                       00626000
+        FIELD START 1 LENGTH 12                                         00627000
+          FONT DETAIL                                                   00628000
+          POSITION 8.6 IN 0.5 in;                                       00629000
+        FIELD TEXT C'Account:'                                          00629100
+          FONT TITLE                                                    00629200
+          POSITION 7.7 IN 0.7 in;                                       00629300
+        FIELD START 14 LENGTH 9                                         00629400
+          FONT DETAIL                                                   00629500
+          POSITION 8.6 IN 0.7 in;                                       00629600
+      PRINTLINE                     /* NAME AND ADDRESS */              00780000
+        REPEAT 3                                                        00790000
+        FONT NAD                                                        00800000
+        POSITION 0.25 in 1.5 IN;                                        00810000
+      PRINTLINE                     /* DETAIL LINES */                  00820000
+        channel 2                                                       00830000
+        REPEAT 18                                                       00840000
+        FONT DETAIL                                                     00850000
+        POSITION 1.0 in 3.0 IN;                                         00860000
+      PRINTLINE                     /* message     */                   00910000
+        CHANNEL 3                                                       00920000
+        FONT message                                                    00930000
+        POSITION 1.0 in 8.00 IN;                                        00940000
+      PRINTLINE                     /* continued   */                   00941000
+        CHANNEL 4                                                       00942000
+        FONT LEGEND                                                     00943000
+        POSITION 1.0 in 8.25 IN;                                        00944000
+      PRINTLINE                     /* Barcode line */                  00950000
+        CHANNEL 12                                                      00960000
+        POSITION 10.0 IN 3.0 IN DIRECTION DOWN   ;                      00961000
+ /*     FONT barcode      */                                            00970000
+        FIELD START 1 LENGTH 09                                         00981000
+        BARCODE       TYPE 2DMATRIX                                     00982000
+             SUPPBLANKS BCXPARMS E2A;                                   00983000

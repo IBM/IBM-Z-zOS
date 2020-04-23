@@ -1,0 +1,393 @@
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211                 Date 04/09/2020  Time 15:59:31   Page     1
+0Invocation parameters:
+  APOST,MAP,NORENT,TRUNC(BIN),CP(1140),X,DYNAM,RMODE(24),S,NOOFF,DATA(24),TEST(SOURCE)
+0PROCESS(CBL) statements:
+  PROCESS DYNAM NUMPROC(PFD) TRUNC(OPT)           NOSEQ     RENT
+0Options in effect:
+  NOADATA
+    ADV
+    AFP(NOVOLATILE)
+    APOST
+    ARCH(7)
+    ARITH(COMPAT)
+  NOAWO
+  NOBLOCK0
+    BUFSIZE(4096)
+  NOCICS
+    CODEPAGE(1140)
+  NOCOMPILE(S)
+  NOCOPYLOC
+  NOCOPYRIGHT
+  NOCURRENCY
+    DATA(24)
+    DBCS
+  NODECK
+  NODEFINE
+  NODIAGTRUNC
+    DISPSIGN(COMPAT)
+  NODLL
+  NODUMP
+    DYNAM
+  NOEXIT
+  NOEXPORTALL
+  NOFASTSRT
+    FLAG(I,I)
+  NOFLAGSTD
+    HGPR(PRESERVE)
+  NOINITCHECK
+  NOINITIAL
+    INLINE
+    INTDATE(ANSI)
+    LANGUAGE(EN)
+    LINECOUNT(60)
+  NOLIST
+    MAP(HEX)
+    MAXPCF(100000)
+  NOMDECK
+  NONAME
+    NSYMBOL(NATIONAL)
+  NONUMBER
+  NONUMCHECK
+    NUMPROC(PFD)
+    OBJECT
+  NOOFFSET
+    OPTIMIZE(0)
+    OUTDD(SYSOUT)
+  NOPARMCHECK
+    PGMNAME(COMPAT)
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211                 Date 04/09/2020  Time 15:59:31   Page     2
+0   QUALIFY(COMPAT)
+    RENT
+    RMODE(24)
+  NORULES
+  NOSERVICE
+  NOSEQUENCE
+    SOURCE
+    SPACE(1)
+  NOSQL
+    SQLCCSID
+  NOSQLIMS
+  NOSSRANGE
+  NOSTGOPT
+    SUPPRESS
+  NOTERM
+    TEST(NOEJPD,DWARF,SOURCE,NOSEPARATE)
+  NOTHREAD
+    TRUNC(OPT)
+  NOVBREF
+    VLR(STANDARD)
+    VSAMOPENFS(COMPAT)
+  NOWORD
+    XMLPARSE(XMLSS)
+    XREF(FULL)
+    ZONEDATA(PFD)
+    ZWB
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211       ACSTCHR   Date 04/09/2020  Time 15:59:31   Page     3
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0/* ACSTCHR
+   000001         000200* LAST UPDATE ON 9 Apr 2018 AT 15:37:17 BY  HOWARDT VERSION 01   *
+   000002         000300 ID DIVISION.
+   000003         000400 PROGRAM-ID. ACSTCHR.
+   000004         000500 AUTHOR. TURETZKY--HYDRA.
+   000005         000600 INSTALLATION. IBM BOULDER PROGRAMMING CENTER.
+   000006         000700               This program is a sample exit for ACIF
+   000007         000800               (APKACIF,5648-062) demonstrating the use of the
+   000008         000900               ACIF input exit.
+   000009         001000
+   000010         001100               In order to use this exit, include the control
+   000011         001200               INPEXIT=ACSTCHR to enable this exit, and include
+   000012         001300               the load module in a dataset referenced in STEPLIB
+   000013         001400               or elsewhere in the module search order.
+   000014         001500
+   000015         001600               This program strips the first character of each
+   000016         001700               record in the input file, provided it is the
+   000017         001800               character zero. Records are passed into the exit,
+   000018         001900               the first byte is tested for zero, and the record
+   000019         002000               returned with the length adjusted.
+   000020         002100
+   000021         002200               This program must either be compiled with the
+   000022         002300               NORENT option or linked with IGZOPT with the
+   000023         002400               RTEREUS option.  (See VS COBOL II Application
+   000024         002500               Programming Guide, SC26-4045).
+   000025         002600
+   000026         002700 DATE-WRITTEN. 11 May 98.
+   000027         002800 DATE-COMPILED. 04/09/20.
+   000028         002900 SECURITY. IBM SAMPLE CODE ONLY.
+   000029         003000*/**************************************************************/
+   000030         003020*/* Licensed under the Apache License, Version 2.0 (the        */
+   000031         003030*/* "License"); you may not use this file except in compliance */
+   000032         003040*/* with the License. You may obtain a copy of the License at  */
+   000033         003050*/*                                                            */
+   000034         003060*/* http://www.apache.org/licenses/LICENSE-2.0                 */
+   000035         003070*/*                                                            */
+   000036         003080*/* Unless required by applicable law or agreed to in writing, */
+   000037         003090*/* software distributed under the License is distributed on an*/
+   000038         003091*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+   000039         003092*/* KIND, either express or implied.  See the License for the  */
+   000040         003093*/* specific language governing permissions and limitations    */
+   000041         003094*/* under the License.                                         */
+   000042         003095*/*------------------------------------------------------------*/
+   000043         003096*/*                                                            */
+   000044         003100*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
+   000045         003200*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
+   000046         003300*/*                                                            */
+   000047         003400*/*   Permission to use, copy, modify, and distribute          */
+   000048         003500*/*   this software for any purpose with or without fee        */
+   000049         003600*/*   is hereby granted, provided that the above               */
+   000050         003700*/*   copyright notices appear in all copies.                  */
+   000051         003800*/*                                                            */
+   000052         003900*/*   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY       */
+   000053         004000*/*   OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT       */
+   000054         004100*/*   LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            */
+   000055         004200*/*   FITNESS FOR A PARTICULAR PURPOSE AND                     */
+   000056         004300*/*   NONINFRINGEMENT.  IN NO EVENT SHALL RICOH, RICOH         */
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211       ACSTCHR   Date 04/09/2020  Time 15:59:31   Page     4
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0  000057         004400*/*   SUBSIDIARIES, ANY OF ITS SUPPLIERS OR ANY OF THE         */
+   000058         004500*/*   OTHER COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,         */
+   000059         004600*/*   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF      */
+   000060         004700*/*   CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF        */
+   000061         004800*/*   OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR         */
+   000062         004900*/*   OTHER DEALINGS IN THE SOFTWARE.                          */
+   000063         005000*/**************************************************************/
+1ACIF Strip Character Input Exit                                ACSTCHR   Date 04/09/2020  Time 15:59:31   Page     5
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000065         005200 ENVIRONMENT DIVISION.
+   000066         005300 CONFIGURATION SECTION.
+   000067         005400 SOURCE-COMPUTER. IBM-370.
+   000068         005500 OBJECT-COMPUTER. IBM-370.
+1ACIF Strip Character Input Exit                                ACSTCHR   Date 04/09/2020  Time 15:59:31   Page     6
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000070         005700 DATA DIVISION.
+   000071         005800 WORKING-STORAGE SECTION.
+   000072         005900 77  PGMNAME                 PIC X(8) VALUE 'ACSTCHR'.                               000000000 8C
+   000073         006000 77  ABND-PGM                PIC X(8) VALUE 'CEE3DMP'.            !@01               000000000 8C
+   000074         006100 77  ABEND-CODE              PIC 9(4) BINARY VALUE 12.                               000000000 2C
+   000075         006101 77  ABEND-OPTS              PIC X(255)                           !@01               000000000 255C
+   000076         006102     VALUE 'ENC(CUR) THR(CUR) FILE VAR NOBLOCK NOSTOR SF(ALL)' .  !@01
+   000077         006200 77  AFPWRITE                PIC X(8) VALUE 'AFPWRITE'.                              000000000 8C
+   000078         006300 77  ACSTCHR-LENGTH          PIC 9(8) BINARY VALUE ZERO.                             000000000 4C
+                                                                                                   IMP
+   000079         006400 01  GLOBAL-VARIABLES            GLOBAL.                                             000000000 0CL2
+   000080         006500     05  ACSTCHR-IN-STATUS       PIC 99   VALUE ZERO.                                000000000 2C
+                                                                                                   IMP
+   000081         006600         88  ACSTCHR-IN-OK       VALUE 00.
+   000082         006700         88  ACSTCHR-IN-EOF      VALUE 10.
+1ACIF Strip Character Input Exit                                ACSTCHR   Date 04/09/2020  Time 15:59:31   Page     7
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000083         006800/ PASSED PARAMETERS.
+   000084         006900 LINKAGE SECTION.
+   000085         007000 01  INP-PARMS.                                                            BLL=00001,000000000 0CL22
+   000086         007100     05  INP-USTOR           POINTER.                                      BLL=00001,000000000 4C
+   000087         007200     05  INP-PFATTR          POINTER.                                      BLL=00001,000000004 4C
+   000088         007300     05  INP-RECPTR          POINTER.                                      BLL=00001,000000008 4C
+   000089         007400     05  FILLER              POINTER.                                      BLL=00001,00000000C 4C
+   000090         007500     05  INP-RECLEN          PIC 9(4) BINARY.                              BLL=00001,000000010 2C
+   000091         007600     05  FILLER              PIC XX.                                       BLL=00001,000000012 2C
+   000092         007700     05  INP-REQUEST         PIC X.                                        BLL=00001,000000014 1C
+   000093         007800         88  INP-USE         VALUE X'00'.
+   000094         007900         88  INP-DELETE      VALUE X'01'.
+   000095         008000         88  INP-INSERT      VALUE X'02'.
+   000096         008100     05  INP-EOF-FLAG        PIC X.                                        BLL=00001,000000015 1C
+   000097         008200         88  INP-EOF         VALUE 'Y'.
+   000098         008300
+   000099         008400 01  INP-UAREA.                                                            BLL=00002,000000000 0CL16
+   000100         008500     05  UAREA-CHGCNT        PIC 9(8) BINARY.                              BLL=00002,000000000 4C
+   000101         008600     05  UAREA-RECCNT        PIC 9(8) BINARY.                              BLL=00002,000000004 4C
+   000102         008700     05  INIT-FLAG           PIC X.                                        BLL=00002,000000008 1C
+   000103         008800         88 INITTED          VALUE HIGH-VALUE.                             IMP
+   000104         008900         88 NOT-INITTED      VALUE LOW-VALUE.                              IMP
+   000105         009000     05  FILLER              PIC X(07).                                    BLL=00002,000000009 7C
+   000106         009100
+   000107         009200 01  INP-ATTR.                                                             BLL=00003,000000000 0CL51
+   000108         009300     05  INP-CC              PIC XXX.                                      BLL=00003,000000000 3C
+   000109         009400     05  INP-CCTYPE          PIC X.                                        BLL=00003,000000003 1C
+   000110         009500         88  INP-ANSI-CC     VALUE 'A'.
+   000111         009600         88  INP-MACH-CC     VALUE 'M'.
+   000112         009700     05  INP-CHARS           PIC X(20).                                    BLL=00003,000000004 20C
+   000113         009800     05  INP-FORMDEF         PIC X(8).                                     BLL=00003,000000018 8C
+   000114         009900     05  INP-PAGEDEF         PIC X(8).                                     BLL=00003,000000020 8C
+   000115         010000     05  INP-PRMODE          PIC X(8).                                     BLL=00003,000000028 8C
+   000116         010100     05  INP-TRC             PIC XXX.                                      BLL=00003,000000030 3C
+   000117         010200
+   000118         010300* This is a template for the input record, pointed to by
+   000119         010400* INP-RECPTR. The record's actual length is given by
+   000120         010500* INP-RECLEN.
+   000121         010600 01  INP-LINE.                                                             BLL=00004,000000000 0CL32753
+   000122         010700     05  INP-BYTE1           PIC X.                                        BLL=00004,000000000 1C
+   000123         010800     05  INP-CCVAL           PIC X.                                        BLL=00004,000000001 1C
+   000124         010900     05  INP-TRCVAL          PIC X.                                        BLL=00004,000000002 1C
+   000125         011000     05  INP-DATA            PIC X(32750).                                 BLL=00004,000000003 32750C
+   000126         011100* This is the returned record. It is pointed to by INP-RECPTR.
+   000127         011200*The length is given by the adusted value of INP-RECLEN.
+   000128         011300 01  INP-NEWLINE.                                                          BLL=00005,000000000 0CL32752
+   000129         011400     05  INP-CCVAL           PIC X.                                        BLL=00005,000000000 1C
+   000130         011500     05  INP-TRCVAL          PIC X.                                        BLL=00005,000000001 1C
+   000131         011600     05  INP-DATA            PIC X(32750).                                 BLL=00005,000000002 32750C
+
+1Initialization and Main Line                                   ACSTCHR   Date 04/09/2020  Time 15:59:31   Page     8
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000134         011900 PROCEDURE DIVISION USING INP-PARMS.                                       85
+   000135         012000* make work area, attributes, and input line addressable.
+   000136         012100     SET ADDRESS OF INP-UAREA TO INP-USTOR.                                IMP 99 86
+   000137         012200     SET ADDRESS OF INP-ATTR TO INP-PFATTR.                                IMP 107 87
+   000138         012300     SET ADDRESS OF INP-LINE TO INP-RECPTR.                                IMP 121 88
+   000139         012400     SET ADDRESS OF INP-NEWLINE TO INP-RECPTR.                             IMP 128 88
+   000140         012500* First time through, reset counters and first-time flag in the
+   000141         012600*ACIF user area.
+   000142         012700     IF NOT-INITTED                                                        104
+   000143         012800      THEN
+   000144      1  012900       SET INITTED TO TRUE;                                                103
+   000145      1  013000       MOVE ZERO TO UAREA-CHGCNT, UAREA-RECCNT;                            IMP 100 101
+   000146         013100     END-IF.
+   000147         013200* no special action is necessary at EOF.
+   000148         013300     IF INP-EOF                                                            97
+   000149         013400      THEN
+   000150      1  013500       DISPLAY PGMNAME, ' EOF REACHED.';                                   72
+   000151      1  013600       DISPLAY PGMNAME, UAREA-CHGCNT, ' RECORDS CHANGED OF ',              72 100
+   000152      1  013700               UAREA-RECCNT;                                               101
+   000153      1  013800       GOBACK;
+   000154         013900     END-IF.
+   000155         014000     ADD 1 TO UAREA-RECCNT.                                                101
+
+   000157         014200* If the first byte is a zero, shift the record left one byte
+   000158         014300*by moving it over itself in the buffer.
+   000159         014400*Adjust the returned record length.
+   000160         014500     IF INP-BYTE1 = ZERO                                                   122 IMP
+   000161         014600      THEN
+   000162      1  014700       SUBTRACT 1 FROM INP-RECLEN;                                         90
+   000163      1  014800       MOVE INP-LINE (2 : INP-RECLEN) TO INP-NEWLINE;                      121 90 128
+   000164      1  014900       ADD 1 TO UAREA-CHGCNT;                                              100
+   000165         015000     END-IF.
+   000166         015100* Indicate that record passed to exit will be returned.
+   000167         015200     SET INP-USE TO TRUE.                                                  93
+
+   000169         015400     GOBACK.
+ */ ACSTCHR
+1Initialization and Main Line                                   ACSTCHR   Date 04/09/2020  Time 15:59:31   Page     9
+0An "M" preceding a data-name reference indicates that the data-name is modified by this reference.
+
+  Defined   Cross-reference of data names   References
+
+       74   ABEND-CODE
+       75   ABEND-OPTS
+       73   ABND-PGM
+       82   ACSTCHR-IN-EOF
+       81   ACSTCHR-IN-OK
+       80   ACSTCHR-IN-STATUS
+       78   ACSTCHR-LENGTH
+       77   AFPWRITE
+       79   GLOBAL-VARIABLES
+      102   INIT-FLAG
+      103   INITTED. . . . . . . . . . . .  M144
+      110   INP-ANSI-CC
+      107   INP-ATTR . . . . . . . . . . .  137
+      122   INP-BYTE1. . . . . . . . . . .  160
+      108   INP-CC
+      109   INP-CCTYPE
+      123   INP-CCVAL
+      129   INP-CCVAL
+      112   INP-CHARS
+      125   INP-DATA
+      131   INP-DATA
+       94   INP-DELETE
+       97   INP-EOF. . . . . . . . . . . .  148
+       96   INP-EOF-FLAG
+      113   INP-FORMDEF
+       95   INP-INSERT
+      121   INP-LINE . . . . . . . . . . .  138 163
+      111   INP-MACH-CC
+      128   INP-NEWLINE. . . . . . . . . .  139 M163
+      114   INP-PAGEDEF
+       85   INP-PARMS. . . . . . . . . . .  134
+       87   INP-PFATTR . . . . . . . . . .  137
+      115   INP-PRMODE
+       90   INP-RECLEN . . . . . . . . . .  M162 163
+       88   INP-RECPTR . . . . . . . . . .  138 139
+       92   INP-REQUEST
+      116   INP-TRC
+      124   INP-TRCVAL
+      130   INP-TRCVAL
+       99   INP-UAREA. . . . . . . . . . .  136
+       93   INP-USE. . . . . . . . . . . .  M167
+       86   INP-USTOR. . . . . . . . . . .  136
+      104   NOT-INITTED. . . . . . . . . .  142
+       72   PGMNAME. . . . . . . . . . . .  150 151
+      100   UAREA-CHGCNT . . . . . . . . .  M145 151 M164
+      101   UAREA-RECCNT . . . . . . . . .  M145 152 M155
+1Initialization and Main Line                                   ACSTCHR   Date 04/09/2020  Time 15:59:31   Page    10
+0 Defined   Cross-reference of programs     References
+
+        3   ACSTCHR
+1Initialization and Main Line                                   ACSTCHR   Date 04/09/2020  Time 15:59:31   Page    11
+0Data Division Map
+0Data Definition Attribute codes (rightmost column) have the following meanings:
+     D = Object of OCCURS DEPENDING    G = GLOBAL                             S = Spanned file
+     E = EXTERNAL                      O = Has OCCURS clause                  U = Undefined format file
+     F = Fixed-length file             OG= Group has own length definition    V = Variable-length file
+     FB= Fixed-length blocked file     R = REDEFINES                          VB= Variable-length blocked file
+     X = Unallocated
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+      3  PROGRAM-ID ACSTCHR-----------------------------------------------------------------------------------------------------*
+     72   77 PGMNAME . . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+     73   77 ABND-PGM. . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+     74   77 ABEND-CODE. . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+     75   77 ABEND-OPTS. . . . . . . . . . . . . . . . . .             000000000   DS 255C           Display
+     77   77 AFPWRITE. . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+     78   77 ACSTCHR-LENGTH. . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+     79   1  GLOBAL-VARIABLES. . . . . . . . . . . . . . .             000000000   DS 0CL2           Group          G
+     80     2  ACSTCHR-IN-STATUS . . . . . . . . . . . . .             000000000   DS 2C             Disp-Num       G
+     81     88 ACSTCHR-IN-OK . . . . . . . . . . . . . . .                                                          G
+     82     88 ACSTCHR-IN-EOF. . . . . . . . . . . . . . .                                                          G
+     85   1  INP-PARMS . . . . . . . . . . . . . . . . . . BLL=00001   000000000   DS 0CL22          Group
+     86     2  INP-USTOR . . . . . . . . . . . . . . . . . BLL=00001   000000000   DS 4C             Pointer
+     87     2  INP-PFATTR. . . . . . . . . . . . . . . . . BLL=00001   000000004   DS 4C             Pointer
+     88     2  INP-RECPTR. . . . . . . . . . . . . . . . . BLL=00001   000000008   DS 4C             Pointer
+     89     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00001   00000000C   DS 4C             Pointer
+     90     2  INP-RECLEN. . . . . . . . . . . . . . . . . BLL=00001   000000010   DS 2C             Binary
+     91     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00001   000000012   DS 2C             Display
+     92     2  INP-REQUEST . . . . . . . . . . . . . . . . BLL=00001   000000014   DS 1C             Display
+     93     88 INP-USE . . . . . . . . . . . . . . . . . . BLL=00001
+     94     88 INP-DELETE. . . . . . . . . . . . . . . . . BLL=00001
+     95     88 INP-INSERT. . . . . . . . . . . . . . . . . BLL=00001
+     96     2  INP-EOF-FLAG. . . . . . . . . . . . . . . . BLL=00001   000000015   DS 1C             Display
+     97     88 INP-EOF . . . . . . . . . . . . . . . . . . BLL=00001
+     99   1  INP-UAREA . . . . . . . . . . . . . . . . . . BLL=00002   000000000   DS 0CL16          Group
+    100     2  UAREA-CHGCNT. . . . . . . . . . . . . . . . BLL=00002   000000000   DS 4C             Binary
+    101     2  UAREA-RECCNT. . . . . . . . . . . . . . . . BLL=00002   000000004   DS 4C             Binary
+    102     2  INIT-FLAG . . . . . . . . . . . . . . . . . BLL=00002   000000008   DS 1C             Display
+    103     88 INITTED . . . . . . . . . . . . . . . . . . BLL=00002
+    104     88 NOT-INITTED . . . . . . . . . . . . . . . . BLL=00002
+    105     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00002   000000009   DS 7C             Display
+    107   1  INP-ATTR. . . . . . . . . . . . . . . . . . . BLL=00003   000000000   DS 0CL51          Group
+    108     2  INP-CC. . . . . . . . . . . . . . . . . . . BLL=00003   000000000   DS 3C             Display
+    109     2  INP-CCTYPE. . . . . . . . . . . . . . . . . BLL=00003   000000003   DS 1C             Display
+    110     88 INP-ANSI-CC . . . . . . . . . . . . . . . . BLL=00003
+    111     88 INP-MACH-CC . . . . . . . . . . . . . . . . BLL=00003
+    112     2  INP-CHARS . . . . . . . . . . . . . . . . . BLL=00003   000000004   DS 20C            Display
+    113     2  INP-FORMDEF . . . . . . . . . . . . . . . . BLL=00003   000000018   DS 8C             Display
+    114     2  INP-PAGEDEF . . . . . . . . . . . . . . . . BLL=00003   000000020   DS 8C             Display
+    115     2  INP-PRMODE. . . . . . . . . . . . . . . . . BLL=00003   000000028   DS 8C             Display
+    116     2  INP-TRC . . . . . . . . . . . . . . . . . . BLL=00003   000000030   DS 3C             Display
+    121   1  INP-LINE. . . . . . . . . . . . . . . . . . . BLL=00004   000000000   DS 0CL32753       Group
+    122     2  INP-BYTE1 . . . . . . . . . . . . . . . . . BLL=00004   000000000   DS 1C             Display
+    123     2  INP-CCVAL . . . . . . . . . . . . . . . . . BLL=00004   000000001   DS 1C             Display
+    124     2  INP-TRCVAL. . . . . . . . . . . . . . . . . BLL=00004   000000002   DS 1C             Display
+    125     2  INP-DATA. . . . . . . . . . . . . . . . . . BLL=00004   000000003   DS 32750C         Display
+    128   1  INP-NEWLINE . . . . . . . . . . . . . . . . . BLL=00005   000000000   DS 0CL32752       Group
+1Initialization and Main Line                                   ACSTCHR   Date 04/09/2020  Time 15:59:31   Page    12
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    129     2  INP-CCVAL . . . . . . . . . . . . . . . . . BLL=00005   000000000   DS 1C             Display
+    130     2  INP-TRCVAL. . . . . . . . . . . . . . . . . BLL=00005   000000001   DS 1C             Display
+    131     2  INP-DATA. . . . . . . . . . . . . . . . . . BLL=00005   000000002   DS 32750C         Display
+ End of Data Division Map
+-* Statistics for COBOL program ACSTCHR:
+ *    Source records = 169
+ *    Data Division statements = 46
+ *    Procedure Division statements = 18
+ *    Generated COBOL statements = 0
+ *    Program complexity factor = 18
+0End of compilation 1,  program ACSTCHR,  no statements flagged.
+0Return code 0

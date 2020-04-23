@@ -1,0 +1,923 @@
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211                 Date 04/08/2020  Time 15:58:12   Page     1
+0Invocation parameters:
+  APOST,MAP,NORENT,TRUNC(BIN),CP(1140),X,DYNAM,RMODE(24),S,NOOFF,DATA(24),TEST(SOURCE)
+0PROCESS(CBL) statements:
+  PROCESS DYNAM NUMPROC(PFD) TRUNC(OPT) APOST     NOSEQ     RENT   APKRSLS
+0Options in effect:
+  NOADATA
+    ADV
+    AFP(NOVOLATILE)
+    APOST
+    ARCH(7)
+    ARITH(COMPAT)
+  NOAWO
+  NOBLOCK0
+    BUFSIZE(4096)
+  NOCICS
+    CODEPAGE(1140)
+  NOCOMPILE(S)
+  NOCOPYLOC
+  NOCOPYRIGHT
+  NOCURRENCY
+    DATA(24)
+    DBCS
+  NODECK
+  NODEFINE
+  NODIAGTRUNC
+    DISPSIGN(COMPAT)
+  NODLL
+  NODUMP
+    DYNAM
+  NOEXIT
+  NOEXPORTALL
+  NOFASTSRT
+    FLAG(I,I)
+  NOFLAGSTD
+    HGPR(PRESERVE)
+  NOINITCHECK
+  NOINITIAL
+    INLINE
+    INTDATE(ANSI)
+    LANGUAGE(EN)
+    LINECOUNT(60)
+  NOLIST
+    MAP(HEX)
+    MAXPCF(100000)
+  NOMDECK
+  NONAME
+    NSYMBOL(NATIONAL)
+  NONUMBER
+  NONUMCHECK
+    NUMPROC(PFD)
+    OBJECT
+  NOOFFSET
+    OPTIMIZE(0)
+    OUTDD(SYSOUT)
+  NOPARMCHECK
+    PGMNAME(COMPAT)
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211                 Date 04/08/2020  Time 15:58:12   Page     2
+0   QUALIFY(COMPAT)
+    RENT
+    RMODE(24)
+  NORULES
+  NOSERVICE
+  NOSEQUENCE
+    SOURCE
+    SPACE(1)
+  NOSQL
+    SQLCCSID
+  NOSQLIMS
+  NOSSRANGE
+  NOSTGOPT
+    SUPPRESS
+  NOTERM
+    TEST(NOEJPD,DWARF,SOURCE,NOSEPARATE)
+  NOTHREAD
+    TRUNC(OPT)
+  NOVBREF
+    VLR(STANDARD)
+    VSAMOPENFS(COMPAT)
+  NOWORD
+    XMLPARSE(XMLSS)
+    XREF(FULL)
+    ZONEDATA(PFD)
+    ZWB
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211       APKRSLST  Date 04/08/2020  Time 15:58:12   Page     3
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0/* APKRSLST
+   000001         000200* LAST UPDATE ON 9 Apr 2018 AT 15:46:17 BY  HOWARDT VERSION 01   *
+   000002         000300* LAST UPDATE ON 4 Mar 1993 AT 11:54:13 BY  VEND789 VERSION 01   *APKRSLST
+   000003         000400 ID DIVISION.                                                     APKRSLST
+   000004         000500 PROGRAM-ID. APKRSLST.                                            APKRSLST
+   000005         000600 AUTHOR. TURETZKY--HYDRA.                                         APKRSLST
+   000006         000700 INSTALLATION. IBM BOULDER PROGRAMMING CENTER.                    APKRSLST
+   000007         000800                                                                  APKRSLST
+   000008         000900               Modified 1Feb2018: extended parameter list         !@01A
+   000009         001000                                  additional resource types.      !@01A
+   000010         001100                                                                  APKRSLST
+   000011         001200               NOTE: REQUIRES VS COBOL II OR LE COBOL.
+   000012         001300               !@02 This program is an apkrslst exit for ACIF
+   000013         001400               (APKACIF,5648-062) that will print a list of
+   000014         001500               resources referenced in a print job, and
+   000015         001600               (optionally) cause them to be excluded from  the
+   000016         001700               output resource library.
+   000017         001900                                                                  APKRSLST
+   000018         002000               In order to use this exit, you must use the ACIF   APKRSLST
+   000019         002100               control statement RESTYPE=ALL for the list to be   APKRSLST
+   000020         002200               complete. RESTYPE=NONE will produce no list at     APKRSLST
+   000021         002300               all.  If you only wish to see certain type of      APKRSLST
+   000022         002400               resource, use RESTYPE to select it. Include the    APKRSLST
+   000023         002500               control RESEXIT=APKRSLST to enable this exit, and  APKRSLST
+   000024         002600               include the load module in a dataset referenced    APKRSLST
+   000025         002700               in STEPLIB or elsewhere in the module search       APKRSLST
+   000026         002800               order.                                             APKRSLST
+   000027         002900                                                                  APKRSLST
+   000028         003000               To control resource inclusion in the output        APKRSLST
+   000029         003100               resource library, set the value of RES-ACTION      APKRSLST
+   000030         003200               appropriately.  Note that if resources are         APKRSLST
+   000031         003300               excluded, resources contained in overlays will     APKRSLST
+   000032         003400               not appear in the report because overlay contents  APKRSLST
+   000033         003500               will not be processed by ACIF.                     APKRSLST
+   000034         003600                                                                  APKRSLST
+   000035         003700               Method of operation: each resource name is saved   APKRSLST
+   000036         003800               in a table for that type of resource. The table    APKRSLST
+   000037         003900               may be searched to eliminate duplicates. When the  APKRSLST
+   000038         004000               last call flag is set, the contents of the tables  APKRSLST
+   000039         004100               are printed.                                       APKRSLST
+   000040         004200                                                                  APKRSLST
+   000041         004300               You must allocate a DD named PAPKRSLS for the      APKRSLST
+   000042         004400               print file, with an LRECL of 84, BLKSIZE of        APKRSLST
+   000043         004500               n*84+4, VBA.                                       APKRSLST
+   000044         004600                                                                  APKRSLST
+   000045         004700 DATE-WRITTEN. 23 FEB 93.                                         APKRSLST
+   000046         004800 DATE-COMPILED. 04/08/20.                                         APKRSLST
+   000047         004900 SECURITY. IBM SAMPLE CODE ONLY.                                  APKRSLST
+   000048         005000*/**************************************************************/
+   000049         005010*/* Licensed under the Apache License, Version 2.0 (the        */
+   000050         005020*/* "License"); you may not use this file except in compliance */
+   000051         005030*/* with the License. You may obtain a copy of the License at  */
+   000052         005040*/*                                                            */
+   000053         005050*/* http://www.apache.org/licenses/LICENSE-2.0                 */
+   000054         005060*/*                                                            */
+   000055         005070*/* Unless required by applicable law or agreed to in writing, */
+   000056         005080*/* software distributed under the License is distributed on an*/
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211       APKRSLST  Date 04/08/2020  Time 15:58:12   Page     4
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0  000057         005090*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+   000058         005091*/* KIND, either express or implied.  See the License for the  */
+   000059         005092*/* specific language governing permissions and limitations    */
+   000060         005093*/* under the License.                                         */
+   000061         005094*/*------------------------------------------------------------*/
+   000062         005095*/*                                                            */
+   000063         005100*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
+   000064         005200*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
+   000065         005300*/*                                                            */
+   000066         005400*/*   Permission to use, copy, modify, and distribute          */
+   000067         005500*/*   this software for any purpose with or without fee        */
+   000068         005600*/*   is hereby granted, provided that the above               */
+   000069         005700*/*   copyright notices appear in all copies.                  */
+   000070         005800*/*                                                            */
+   000071         005900*/*   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY       */
+   000072         006000*/*   OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT       */
+   000073         006100*/*   LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            */
+   000074         006200*/*   FITNESS FOR A PARTICULAR PURPOSE AND                     */
+   000075         006300*/*   NONINFRINGEMENT.  IN NO EVENT SHALL RICOH, RICOH         */
+   000076         006400*/*   SUBSIDIARIES, ANY OF ITS SUPPLIERS OR ANY OF THE         */
+   000077         006500*/*   OTHER COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,         */
+   000078         006600*/*   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF      */
+   000079         006700*/*   CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF        */
+   000080         006800*/*   OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR         */
+   000081         006900*/*   OTHER DEALINGS IN THE SOFTWARE.                          */
+   000082         007000*/**************************************************************/
+1ACIF RESOURCE REPORT EXIT                                      APKRSLST  Date 04/08/2020  Time 15:58:12   Page     5
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000084         007200 ENVIRONMENT DIVISION.                                            APKRSLST
+   000085         007300 CONFIGURATION SECTION.                                           APKRSLST
+   000086         007400 SOURCE-COMPUTER. IBM-370.                                        APKRSLST
+   000087         007500 OBJECT-COMPUTER. IBM-370.                                        APKRSLST
+   000088         007600 INPUT-OUTPUT SECTION.                                            APKRSLST
+   000089         007700 FILE-CONTROL.                                                    APKRSLST
+   000090         007800     SELECT PRINT-FILE ASSIGN TO PAPKRSLS.                        APKRSLST 94
+0
+   000092         008000 DATA DIVISION.                                                   APKRSLST
+   000093         008100 FILE SECTION.                                                    APKRSLST
+   000094         008200 FD  PRINT-FILE                                                   APKRSLST
+   000095         008300     BLOCK CONTAINS 0                                             APKRSLST
+   000096         008400     LABEL RECORDS STANDARD                                       APKRSLST
+   000097         008500     RECORD VARYING DEPENDING ON PRINT-REC-LEN                    APKRSLST 108
+   000098         008600     RECORDING MODE V.                                            APKRSLST
+   000099         008700 01  PRINT-RECORD.                                                APKRSLST BLF=00001,000000000 0CL255
+   000100         008800     05  PRINT-DATA          OCCURS 1 TO 255,                     APKRSLST BLF=00001,000000000 1C
+   000101         008900                             DEPENDING ON PRINT-REC-LEN,          APKRSLST 108
+   000102         009000                             PIC X.                               APKRSLST
+1ACIF RESOURCE REPORT EXIT                                      APKRSLST  Date 04/08/2020  Time 15:58:12   Page     6
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000104         009200 WORKING-STORAGE SECTION.                                         APKRSLST
+   000105         009300 77  PGMNAME                 PIC X(8) VALUE 'APKRSLST'.           APKRSLST           000000000 8C
+   000106         009400 77  ABND-PGM                PIC X(8) VALUE 'CEE3ABD' .           APKRSLST           000000000 8C
+   000107         009500 77  ABEND-CODE              PIC 9(4) BINARY VALUE 12.            APKRSLST           000000000 2C
+   000108         009600 77  PRINT-REC-LEN           PIC 9(8) BINARY VALUE ZERO.          APKRSLST           000000000 4C
+                                                                                                   IMP
+   000109         009700 77  MIN-REC-LEN             PIC 9(4) BINARY VALUE 9.             APKRSLST           000000000 2C
+   000110         009800 77  MAX-REC-LEN             PIC 9(4) BINARY VALUE 255.           APKRSLST           000000000 2C
+   000111         009900 77  LINE-COUNT              PIC S9(8) BINARY VALUE ZERO.         APKRSLST           000000000 4C
+                                                                                                   IMP
+   000112         010000 77  PAGE-COUNT              PIC S9(8) BINARY VALUE ZERO.         APKRSLST           000000000 4C
+                                                                                                   IMP
+   000113         010100 77  PAGE-LEN                PIC S9(8) BINARY VALUE 50.           APKRSLST           000000000 4C
+   000114         010200 77  UNKNOWN-CNTR            PIC 9(4) BINARY VALUE ZERO.          APKRSLST           000000000 2C
+                                                                                                   IMP
+   000115         010300 77  INCLUDE-RESOURCE        PIC X VALUE X'00'.                   APKRSLST           000000000 1C
+   000116         010400 77  IGNORE-RESOURCE         PIC X VALUE X'01'.                   APKRSLST           000000000 1C
+   000117         010500 77  FIRST-TIME-FLAG         PIC X VALUE LOW-VALUE.               APKRSLST           000000000 1C
+                                                                                                   IMP
+   000118         010600     88  FIRST-TIME          VALUE HIGH-VALUE.                    APKRSLST IMP
+   000119         010700* RESOURCE TYPES
+   000120         010800 77  CPAGE                   PIC X VALUE X'41'.                   APKRSLST           000000000 1C
+   000121         010900 77  CSET                    PIC X VALUE X'40'.                   APKRSLST           000000000 1C
+   000122         011000 77  CODED-FONT              PIC X VALUE X'42'.                   APKRSLST           000000000 1C
+   000123         011100 77  PSEG                    PIC X VALUE X'FB'.                   APKRSLST           000000000 1C
+   000124         011200 77  OVLY                    PIC X VALUE X'FC'.                   APKRSLST           000000000 1C
+   000125         011300 77  GOCA                    PIC X VALUE X'03'.                   !@01A              000000000 1C
+   000126         011400 77  BCOCA                   PIC X VALUE X'05'.                   !@01A              000000000 1C
+   000127         011500 77  IOCA                    PIC X VALUE X'06'.                   !@01A              000000000 1C
+   000128         011600 77  PTOCA-OBJECT            PIC X VALUE X'9B'.                   !@01A              000000000 1C
+   000129         011700 77  OBJECT-CONT             PIC X VALUE X'92'.                   !@01A              000000000 1C
+   000130         011800 77  CPAGE-NAME              PIC X(14) VALUE 'CODE PAGE'.         APKRSLST           000000000 14C
+   000131         011900 77  CSET-NAME               PIC X(14) VALUE 'CHARACTER SET'.     APKRSLST           000000000 14C
+   000132         012000 77  CODED-FONT              PIC X(14) VALUE 'CODED FONT'.        APKRSLST           000000000 14C
+   000133         012100 77  PSEG-NAME               PIC X(14) VALUE 'PAGE SEGMENT'.      APKRSLST           000000000 14C
+   000134         012200 77  OVLY-NAME               PIC X(14) VALUE 'OVERLAY'.           APKRSLST           000000000 14C
+   000135         012300 77  OBJ-CONT-NAME           PIC X(14) VALUE 'OBJECT'.            !@01A              000000000 14C
+   000136         012400 77  GOCA-NAME               PIC X(14) VALUE 'GOCA'.              !@01A              000000000 14C
+   000137         012500 77  IOCA-NAME               PIC X(14) VALUE 'IOCA'.              !@01A              000000000 14C
+   000138         012600 77  BCOCA-NAME              PIC X(14) VALUE 'BCOCA'.             !@01A              000000000 14C
+   000139         012700 77  PTOCA-NAME              PIC X(14) VALUE 'PTOCA'.             !@01A              000000000 14C
+0
+   000141         012900* code page name table                                            APKRSLST
+   000142         013000 01  CPGS-USED.                                                   APKRSLST           000000000 0CL2050
+   000143         013100     05  CPGS-CNTR           PIC 9(4) BINARY VALUE ZERO.          APKRSLST           000000000 2C
+                                                                                                   IMP
+   000144         013200     05  CPGS-TABLE          OCCURS 256                           APKRSLST           000000002 8C
+   000145         013300                             DEPENDING ON CPGS-CNTR               APKRSLST 143
+   000146         013400                             INDEXED BY CPGS-INDEX                APKRSLST
+   000147         013500                             PIC X(8).                            APKRSLST
+   000148         013600* character sets used table                                       APKRSLST
+   000149         013700 01  CSETS-USED.                                                  APKRSLST           000000000 0CL2050
+   000150         013800     05  CSETS-CNTR          PIC 9(4) BINARY VALUE ZERO.          APKRSLST           000000000 2C
+                                                                                                   IMP
+   000151         013900     05  CSETS-TABLE         OCCURS 256                           APKRSLST           000000002 8C
+   000152         014000                             DEPENDING ON CSETS-CNTR              APKRSLST 150
+   000153         014100                             INDEXED BY CSETS-INDEX               APKRSLST
+1ACIF RESOURCE REPORT EXIT                                      APKRSLST  Date 04/08/2020  Time 15:58:12   Page     7
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0  000154         014200                             PIC X(8).                            APKRSLST
+   000155         014300* page segments used table                                        APKRSLST
+   000156         014400 01  PSEGS-USED.                                                  APKRSLST           000000000 0CL2050
+   000157         014500     05  PSEGS-CNTR          PIC 9(4) BINARY VALUE ZERO.          APKRSLST           000000000 2C
+                                                                                                   IMP
+   000158         014600     05  PSEGS-TABLE         OCCURS 256                           APKRSLST           000000002 8C
+   000159         014700                             DEPENDING ON PSEGS-CNTR              APKRSLST 157
+   000160         014800                             INDEXED BY PSEGS-INDEX               APKRSLST
+   000161         014900                             PIC X(8).                            APKRSLST
+   000162         015000* overlays used table                                             APKRSLST
+   000163         015100 01  OVLYS-USED.                                                  APKRSLST           000000000 0CL2050
+   000164         015200     05  OVLYS-CNTR          PIC 9(4) BINARY VALUE ZERO.          APKRSLST           000000000 2C
+                                                                                                   IMP
+   000165         015300     05  OVLYS-TABLE         OCCURS 256                           APKRSLST           000000002 8C
+   000166         015400                             DEPENDING ON OVLYS-CNTR              APKRSLST 164
+   000167         015500                             INDEXED BY OVLYS-INDEX               APKRSLST
+   000168         015600                             PIC X(8).                            APKRSLST
+   000169         015700* GOCA     used table                                             APKRSLST
+   000170         015800 01  GOCA-USED.                                                   APKRSLST           000000000 0CL2050
+   000171         015900     05  GOCA-CNTR           PIC 9(4) BINARY VALUE ZERO.          APKRSLST           000000000 2C
+                                                                                                   IMP
+   000172         016000     05  GOCA-TABLE          OCCURS 256                           APKRSLST           000000002 8C
+   000173         016100                             DEPENDING ON GOCA-CNTR               APKRSLST 171
+   000174         016200                             INDEXED BY GOCA-INDEX                APKRSLST
+   000175         016300                             PIC X(8).                            APKRSLST
+   000176         016400* IOCA     used table                                             APKRSLST
+   000177         016500 01  IOCA-USED.                                                   APKRSLST           000000000 0CL2050
+   000178         016600     05  IOCA-CNTR           PIC 9(4) BINARY VALUE ZERO.          APKRSLST           000000000 2C
+                                                                                                   IMP
+   000179         016700     05  IOCA-TABLE          OCCURS 256                           APKRSLST           000000002 8C
+   000180         016800                             DEPENDING ON IOCA-CNTR               APKRSLST 178
+   000181         016900                             INDEXED BY IOCA-INDEX                APKRSLST
+   000182         017000                             PIC X(8).                            APKRSLST
+   000183         017100* BCOCA    used table                                             APKRSLST
+   000184         017200 01  BCOCA-USED.                                                  APKRSLST           000000000 0CL2050
+   000185         017300     05  BCOCA-CNTR          PIC 9(4) BINARY VALUE ZERO.          APKRSLST           000000000 2C
+                                                                                                   IMP
+   000186         017400     05  BCOCA-TABLE         OCCURS 256                           APKRSLST           000000002 8C
+   000187         017500                             DEPENDING ON BCOCA-CNTR              APKRSLST 185
+   000188         017600                             INDEXED BY BCOCA-INDEX               APKRSLST
+   000189         017700                             PIC X(8).                            APKRSLST
+   000190         017800* PTOCA    used table                                             APKRSLST
+   000191         017900 01  PTOCA-USED.                                                  APKRSLST           000000000 0CL2050
+   000192         018000     05  PTOCA-CNTR          PIC 9(4) BINARY VALUE ZERO.          APKRSLST           000000000 2C
+                                                                                                   IMP
+   000193         018100     05  PTOCA-TABLE         OCCURS 256                           APKRSLST           000000002 8C
+   000194         018200                             DEPENDING ON PTOCA-CNTR              APKRSLST 192
+   000195         018300                             INDEXED BY PTOCA-INDEX               APKRSLST
+   000196         018400                             PIC X(8).                            APKRSLST
+   000197         018500* objects  used table                                             !@01A
+   000198         018600 01  OBJECTS-USED.                                                !@01A              000000000 0CL64004
+   000199         018700     05  OBJECTS-CNTR        PIC 9(4) BINARY VALUE ZERO.          !@01A              000000000 2C
+                                                                                                   IMP
+   000200         018800     05  OBJECTS-NM-LEN      PIC 9(4) BINARY VALUE ZERO.          !@01A              000000002 2C
+                                                                                                   IMP
+   000201         018900     05  OBJECTS-TABLE       OCCURS 256                           !@01A              000000004 250C
+   000202         019000                             DEPENDING ON OBJECTS-CNTR            !@01A    199
+1ACIF RESOURCE REPORT EXIT                                      APKRSLST  Date 04/08/2020  Time 15:58:12   Page     8
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0  000203         019100                             INDEXED BY OBJECTS-INDEX             !@01A
+   000204         019200                             PIC N(125).                          !@01A
+0
+   000206         019400 01  PAGE-TITLE.                                                  APKRSLST           000000000 0CL51
+   000207         019500     05  FILLER              PIC X VALUE '1'.                     APKRSLST           000000000 1C
+   000208         019600     05  FILLER              PIC X(26)                            APKRSLST           000000001 26C
+   000209         019700                             VALUE 'ACIF Resources Used Report'.  APKRSLST
+   000210         019800     05  FILLER              PIC X(4)  VALUE SPACES.              APKRSLST           00000001B 4C
+                                                                                                   IMP
+   000211         019900     05  PAGE-TIMESTAMP      PIC X(10).                           APKRSLST           00000001F 10C
+   000212         020000     05  FILLER              PIC X     VALUE SPACE.               APKRSLST           000000029 1C
+                                                                                                   IMP
+   000213         020100     05  FILLER              PIC X(05) VALUE 'Page'.              APKRSLST           00000002A 5C
+   000214         020200     05  LINE-PAGE-NUM       PIC Z(4).                            APKRSLST           00000002F 4C
+
+   000216         020400 01  PAGE-SUBTITLE-1.                                             APKRSLST           000000000 0CL64
+   000217         020500     05  FILLER              PIC X VALUE SPACE.                   APKRSLST           000000000 1C
+                                                                                                   IMP
+   000218         020600     05  FILLER              PIC XXX VALUE 'CC'.                  APKRSLST           000000001 3C
+   000219         020700     05  FILLER              PIC X VALUE SPACE.                   APKRSLST           000000004 1C
+                                                                                                   IMP
+   000220         020800     05  FILLER              PIC X(7) VALUE 'CC Type'.            APKRSLST           000000005 7C
+   000221         020900     05  FILLER              PIC X VALUE SPACE.                   APKRSLST           00000000C 1C
+                                                                                                   IMP
+   000222         021000     05  FILLER              PIC X(20) VALUE 'CHARS'.             APKRSLST           00000000D 20C
+   000223         021100     05  FILLER              PIC X VALUE SPACE.                   APKRSLST           000000021 1C
+                                                                                                   IMP
+   000224         021200     05  FILLER              PIC X(8) VALUE 'FORMDEF'.            APKRSLST           000000022 8C
+   000225         021300     05  FILLER              PIC X VALUE SPACE.                   APKRSLST           00000002A 1C
+                                                                                                   IMP
+   000226         021400     05  FILLER              PIC X(8) VALUE 'PAGEDEF'.            APKRSLST           00000002B 8C
+   000227         021500     05  FILLER              PIC X VALUE SPACE.                   APKRSLST           000000033 1C
+                                                                                                   IMP
+   000228         021600     05  FILLER              PIC X(8) VALUE 'PRMODE'.             APKRSLST           000000034 8C
+   000229         021700     05  FILLER              PIC X VALUE SPACE.                   APKRSLST           00000003C 1C
+                                                                                                   IMP
+   000230         021800     05  FILLER              PIC XXX VALUE 'TRC'.                 APKRSLST           00000003D 3C
+
+   000232         022000 01  PAGE-SUBTITLE-2.                                             APKRSLST           000000000 0CL64
+   000233         022100     05  FILLER              PIC X VALUE SPACE.                   APKRSLST           000000000 1C
+                                                                                                   IMP
+   000234         022200     05  PS1-CC              PIC XXX.                             APKRSLST           000000001 3C
+   000235         022300     05  FILLER              PIC X VALUE SPACE.                   APKRSLST           000000004 1C
+                                                                                                   IMP
+   000236         022400     05  PS1-CCTYPE          PIC X.                               APKRSLST           000000005 1C
+   000237         022500     05  FILLER              PIC X(7) VALUE SPACE.                APKRSLST           000000006 7C
+                                                                                                   IMP
+   000238         022600     05  PS1-CHARS           PIC X(20).                           APKRSLST           00000000D 20C
+   000239         022700     05  FILLER              PIC X VALUE SPACE.                   APKRSLST           000000021 1C
+                                                                                                   IMP
+   000240         022800     05  PS1-FORMDEF         PIC X(8).                            APKRSLST           000000022 8C
+   000241         022900     05  FILLER              PIC X VALUE SPACE.                   APKRSLST           00000002A 1C
+                                                                                                   IMP
+   000242         023000     05  PS1-PAGEDEF         PIC X(8).                            APKRSLST           00000002B 8C
+   000243         023100     05  FILLER              PIC X VALUE SPACE.                   APKRSLST           000000033 1C
+                                                                                                   IMP
+1ACIF RESOURCE REPORT EXIT                                      APKRSLST  Date 04/08/2020  Time 15:58:12   Page     9
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0  000244         023200     05  PS1-PRMODE          PIC X(8).                            APKRSLST           000000034 8C
+   000245         023300     05  FILLER              PIC X VALUE SPACE.                   APKRSLST           00000003C 1C
+                                                                                                   IMP
+   000246         023400     05  PS1-TRC             PIC XXX.                             APKRSLST           00000003D 3C
+
+   000248         023600 01  PAGE-SUBTITLE-3.                                             APKRSLST           000000000 0CL29
+   000249         023700     05  FILLER              PIC X VALUE '0'.                     APKRSLST           000000000 1C
+   000250         023800     05  FILLER              PIC X(14)                            APKRSLST           000000001 14C
+   000251         023900                             VALUE 'Resource Type '.              APKRSLST
+   000252         024000     05  PS-RESTYPE          PIC X(14).                           APKRSLST           00000000F 14C
+
+   000254         024200 01  LINE-DETAIL.                                                 APKRSLST           000000000 0CL131
+   000255         024300     05  LINE-CC             PIC X   VALUE SPACE.                 APKRSLST           000000000 1C
+                                                                                                   IMP
+   000256         024400     05  FILLER              PIC X(02) VALUE SPACES.              APKRSLST           000000001 2C
+                                                                                                   IMP
+   000257         024500     05  LINE-RESNAME        PIC X(128).                          !@01A              000000003 128C
+
+   000259         024700 01  TIME-STAMP.                                                  APKRSLST           000000000 0CL12
+   000260         024800     05  T-S-DAY             PIC 9(5).                            APKRSLST           000000000 5C
+   000261         024900     05  FILLER              PIC X VALUE '/'.                     APKRSLST           000000005 1C
+   000262         025000     05  T-S-TIME            PIC X(6).                            APKRSLST           000000006 6C
+
+1ACIF RESOURCE REPORT EXIT                                      APKRSLST  Date 04/08/2020  Time 15:58:12   Page    10
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000264         025200/ PASSED PARAMETERS.                                              APKRSLST
+   000265         025300 LINKAGE SECTION.                                                 APKRSLST
+   000266         025400 01  RES-PARMS.                                                   APKRSLST BLL=00001,000000000 0CL275
+   000267         025500     05  RES-USTOR           POINTER.                             APKRSLST BLL=00001,000000000 4C
+   000268         025600     05  RES-PFATTR          POINTER.                             APKRSLST BLL=00001,000000004 4C
+   000269         025700     05  RES-RSNAME          PIC X(8).                            APKRSLST BLL=00001,000000008 8C
+   000270         025800     05  RES-RSTYPE          PIC X.                               APKRSLST BLL=00001,000000010 1C
+   000271         025900     05  RES-ACTION          PIC X.                               APKRSLST BLL=00001,000000011 1C
+   000272         026000     05  RES-EOF-FLAG        PIC X.                               APKRSLST BLL=00001,000000012 1C
+   000273         026100         88  RES-EOF         VALUE 'Y'.                           APKRSLST
+   000274         026200     05  FILLER              PIC X.                                        BLL=00001,000000013 1C
+   000275         026300     05  RES-RESNAMEL        PIC 9(4) BINARY.                     !@01A    BLL=00001,000000014 2C
+   000276         026400     05  FILLER              PIC X(3).                            !@01A    BLL=00001,000000016 3C
+   000277         026500     05  RES-RESNAMF         PIC N(125).                          !@01A    BLL=00001,000000019 250C
+   000278         026600                                                                  APKRSLST
+   000279         026700 01  RES-UAREA               PIC X(16).                           APKRSLST BLL=00002,000000000 16C
+   000280         026800                                                                  APKRSLST
+   000281         026900 01  RES-ATTR.                                                    APKRSLST BLL=00003,000000000 0CL51
+   000282         027000     05  RES-CC              PIC XXX.                             APKRSLST BLL=00003,000000000 3C
+   000283         027100     05  RES-CCTYPE          PIC X.                               APKRSLST BLL=00003,000000003 1C
+   000284         027200     05  RES-CHARS           PIC X(20).                           APKRSLST BLL=00003,000000004 20C
+   000285         027300     05  RES-FORMDEF         PIC X(8).                            APKRSLST BLL=00003,000000018 8C
+   000286         027400     05  RES-PAGEDEF         PIC X(8).                            APKRSLST BLL=00003,000000020 8C
+   000287         027500     05  RES-PRMODE          PIC X(8).                            APKRSLST BLL=00003,000000028 8C
+   000288         027600     05  RES-TRC             PIC XXX.                             APKRSLST BLL=00003,000000030 3C
+1INITIALIZATION AND MAIN LINE                                   APKRSLST  Date 04/08/2020  Time 15:58:12   Page    11
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000290         027800 PROCEDURE DIVISION USING RES-PARMS.                              APKRSLST 266
+   000291         027900 0010-UPDATE-TABLE.                                               APKRSLST
+   000292         028000     SET ADDRESS OF RES-UAREA TO RES-USTOR.                       APKRSLST IMP 279 267
+   000293         028100     IF RES-EOF                                                   APKRSLST 273
+   000294         028200      THEN                                                        APKRSLST
+   000295      1  028300       PERFORM 0100-PRINT-REPORT;                                 APKRSLST 353
+   000296      1  028400       GOBACK;                                                    APKRSLST
+   000297         028500     END-IF.                                                      APKRSLST
+   000298         028600     EVALUATE RES-RSTYPE                                          APKRSLST 270
+   000299         028700* ACIF presents code pages each time they appear in a font, so    APKRSLST
+   000300         028800* there may be many occurences of the same codepage. Make sure    APKRSLST
+   000301         028900* we save only 1 of each.                                         APKRSLST
+   000302         029000      WHEN CPAGE                                                  APKRSLST 120
+   000303      1  029100       SET CPGS-INDEX TO 1;                                       APKRSLST 146
+   000304      1  029200       SEARCH CPGS-TABLE                                          APKRSLST 144
+   000305      1  029300        AT END                                                    APKRSLST
+   000306      2  029400         ADD 1 TO CPGS-CNTR;                                      APKRSLST 143
+   000307      2  029500         MOVE RES-RSNAME TO CPGS-TABLE (CPGS-INDEX);              APKRSLST 269 144 146
+   000308      1  029600        WHEN RES-RSNAME = CPGS-TABLE (CPGS-INDEX)                 APKRSLST 269 144 146
+   000309      2  029700         CONTINUE;                                                APKRSLST
+   000310      1  029800       END-SEARCH;                                                APKRSLST
+   000311         029900      WHEN CSET                                                   APKRSLST 121
+   000312      1  030000       ADD 1 TO CSETS-CNTR;                                       APKRSLST 150
+   000313      1  030100       SET CSETS-INDEX TO CSETS-CNTR;                             APKRSLST 153 150
+   000314      1  030200       MOVE RES-RSNAME TO CSETS-TABLE (CSETS-INDEX);              APKRSLST 269 151 153
+   000315         030300      WHEN PSEG                                                   APKRSLST 123
+   000316      1  030400       ADD 1 TO PSEGS-CNTR;                                       APKRSLST 157
+   000317      1  030500       SET PSEGS-INDEX TO PSEGS-CNTR;                             APKRSLST 160 157
+   000318      1  030600       MOVE RES-RSNAME TO PSEGS-TABLE (PSEGS-INDEX);              APKRSLST 269 158 160
+   000319         030700      WHEN OVLY                                                   APKRSLST 124
+   000320      1  030800       ADD 1 TO OVLYS-CNTR;                                       APKRSLST 164
+   000321      1  030900       SET OVLYS-INDEX TO OVLYS-CNTR;                             APKRSLST 167 164
+   000322      1  031000       MOVE RES-RSNAME TO OVLYS-TABLE (OVLYS-INDEX);              APKRSLST 269 165 167
+   000323         031100      WHEN GOCA                                                   APKRSLST 125
+   000324      1  031200       ADD 1 TO GOCA-CNTR;                                        APKRSLST 171
+   000325      1  031300       SET GOCA-INDEX TO GOCA-CNTR;                               APKRSLST 174 171
+   000326      1  031400       MOVE RES-RSNAME TO GOCA-TABLE (GOCA-INDEX);                APKRSLST 269 172 174
+   000327         031500      WHEN IOCA                                                   APKRSLST 127
+   000328      1  031600       ADD 1 TO IOCA-CNTR;                                        APKRSLST 178
+   000329      1  031700       SET IOCA-INDEX TO IOCA-CNTR;                               APKRSLST 181 178
+   000330      1  031800       MOVE RES-RSNAME TO IOCA-TABLE (IOCA-INDEX);                APKRSLST 269 179 181
+   000331         031900      WHEN BCOCA                                                  APKRSLST 126
+   000332      1  032000       ADD 1 TO BCOCA-CNTR;                                       APKRSLST 185
+   000333      1  032100       SET BCOCA-INDEX TO BCOCA-CNTR;                             APKRSLST 188 185
+   000334      1  032200       MOVE RES-RSNAME TO BCOCA-TABLE (BCOCA-INDEX);              APKRSLST 269 186 188
+   000335         032300      WHEN PTOCA-OBJECT                                           APKRSLST 128
+   000336      1  032400       ADD 1 TO PTOCA-CNTR;                                       APKRSLST 192
+   000337      1  032500       SET PTOCA-INDEX TO PTOCA-CNTR;                             APKRSLST 195 192
+   000338      1  032600       MOVE RES-RSNAME TO PTOCA-TABLE (PTOCA-INDEX);              APKRSLST 269 193 195
+   000339         032700      WHEN OBJECT-CONT                                            !@01A    129
+   000340      1  032800       ADD 1 TO OBJECTS-CNTR;                                     !@01A    199
+   000341      1  032900       SET OBJECTS-INDEX TO OBJECTS-CNTR;                         !@01A    203 199
+   000342      1  033000       MOVE SPACES TO OBJECTS-TABLE (OBJECTS-INDEX);              !@01A    IMP 201 203
+   000343      1  033100       MOVE RES-RESNAMF (1:RES-RESNAMEL) TO                       !@01A    277 275
+   000344      1  033200            OBJECTS-TABLE (OBJECTS-INDEX);                        !@01A    201 203
+   000345         033300      WHEN OTHER                                                  APKRSLST
+   000346      1  033400       ADD 1 TO UNKNOWN-CNTR;                                     APKRSLST 114
+   000347         033500     END-EVALUATE.                                                APKRSLST
+1INITIALIZATION AND MAIN LINE                                   APKRSLST  Date 04/08/2020  Time 15:58:12   Page    12
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0  000348         033600* The following omits or includes all resources.                  APKRSLST
+   000349         033700*    MOVE IGNORE-RESOURCE TO RES-ACTION.                          APKRSLST
+   000350         033800     MOVE INCLUDE-RESOURCE TO RES-ACTION.                         APKRSLST 115 271
+   000351         033900     GOBACK.                                                      APKRSLST
+1Produce Resource Used Report                                   APKRSLST  Date 04/08/2020  Time 15:58:12   Page    13
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000353         034100 0100-PRINT-REPORT.                                               APKRSLST
+   000354         034200     ACCEPT T-S-DAY FROM DAY.                                     APKRSLST 260
+   000355         034300     ACCEPT T-S-TIME FROM TIME.                                   APKRSLST 262
+   000356         034400     MOVE TIME-STAMP TO PAGE-TIMESTAMP.                           APKRSLST 259 211
+   000357         034500     SET ADDRESS OF RES-ATTR TO RES-PFATTR.                       APKRSLST IMP 281 268
+   000358         034600     MOVE RES-CC TO PS1-CC.                                       APKRSLST 282 234
+   000359         034700     MOVE RES-CCTYPE TO PS1-CCTYPE.                               APKRSLST 283 236
+   000360         034800     MOVE RES-CHARS TO PS1-CHARS.                                 APKRSLST 284 238
+   000361         034900     MOVE RES-FORMDEF TO PS1-FORMDEF.                             APKRSLST 285 240
+   000362         035000     MOVE RES-PAGEDEF TO PS1-PAGEDEF.                             APKRSLST 286 242
+   000363         035100     MOVE RES-PRMODE TO PS1-PRMODE.                               APKRSLST 287 244
+   000364         035200     MOVE RES-TRC TO PS1-TRC.                                     APKRSLST 288 246
+   000365         035300     MOVE CPAGE-NAME TO PS-RESTYPE.                               APKRSLST 130 252
+
+   000367         035500     OPEN OUTPUT PRINT-FILE.                                      APKRSLST 94
+
+   000369         035700     MOVE PAGE-LEN TO LINE-COUNT.                                 APKRSLST 113 111
+   000370         035800     PERFORM WITH TEST BEFORE                                     APKRSLST
+   000371         035900         VARYING CPGS-INDEX FROM 1 BY 1                           APKRSLST 146
+   000372         036000         UNTIL CPGS-INDEX > CPGS-CNTR;                            APKRSLST 146 143
+   000373      1  036100       MOVE CPGS-TABLE (CPGS-INDEX) TO LINE-RESNAME;              APKRSLST 144 146 257
+   000374      1  036200       PERFORM 0120-PRINT-DETAIL;                                 APKRSLST 459
+   000375         036300     END-PERFORM.                                                 APKRSLST
+   000376         036400     MOVE CSET-NAME TO PS-RESTYPE.                                APKRSLST 131 252
+   000377         036500     MOVE PAGE-LEN TO LINE-COUNT.                                 APKRSLST 113 111
+   000378         036600     PERFORM WITH TEST BEFORE                                     APKRSLST
+   000379         036700         VARYING CSETS-INDEX FROM 1 BY 1                          APKRSLST 153
+   000380         036800         UNTIL CSETS-INDEX > CSETS-CNTR;                          APKRSLST 153 150
+   000381      1  036900       MOVE CSETS-TABLE (CSETS-INDEX) TO LINE-RESNAME;            APKRSLST 151 153 257
+   000382      1  037000       PERFORM 0120-PRINT-DETAIL;                                 APKRSLST 459
+   000383         037100     END-PERFORM.                                                 APKRSLST
+   000384         037200     MOVE PSEG-NAME TO PS-RESTYPE.                                APKRSLST 133 252
+   000385         037300     MOVE PAGE-LEN TO LINE-COUNT.                                 APKRSLST 113 111
+   000386         037400     PERFORM WITH TEST BEFORE                                     APKRSLST
+   000387         037500       VARYING PSEGS-INDEX FROM 1 BY 1                            APKRSLST 160
+   000388         037600       UNTIL PSEGS-INDEX > PSEGS-CNTR;                            APKRSLST 160 157
+   000389      1  037700       MOVE PSEGS-TABLE (PSEGS-INDEX) TO LINE-RESNAME;            APKRSLST 158 160 257
+   000390      1  037800       PERFORM 0120-PRINT-DETAIL;                                 APKRSLST 459
+   000391         037900     END-PERFORM.                                                 APKRSLST
+   000392         038000     MOVE OVLY-NAME TO PS-RESTYPE.                                APKRSLST 134 252
+   000393         038100     MOVE PAGE-LEN TO LINE-COUNT.                                 APKRSLST 113 111
+   000394         038200     PERFORM WITH TEST BEFORE                                     APKRSLST
+   000395         038300         VARYING OVLYS-INDEX FROM 1 BY 1                          APKRSLST 167
+   000396         038400         UNTIL OVLYS-INDEX > OVLYS-CNTR;                          APKRSLST 167 164
+   000397      1  038500       MOVE OVLYS-TABLE (OVLYS-INDEX) TO LINE-RESNAME;            APKRSLST 165 167 257
+   000398      1  038600       PERFORM 0120-PRINT-DETAIL;                                 APKRSLST 459
+   000399         038700     END-PERFORM.                                                 APKRSLST
+   000400         038800     MOVE GOCA-NAME TO PS-RESTYPE.                                !@01A    136 252
+   000401         038900     MOVE PAGE-LEN TO LINE-COUNT.                                 !@01A    113 111
+   000402         039000     PERFORM WITH TEST BEFORE                                     !@01A
+   000403         039100         VARYING GOCA-INDEX FROM 1 BY 1                           !@01A    174
+   000404         039200         UNTIL GOCA-INDEX > GOCA-CNTR;                            !@01A    174 171
+   000405      1  039300       MOVE GOCA-TABLE (GOCA-INDEX) TO LINE-RESNAME;              !@01A    172 174 257
+   000406      1  039400       PERFORM 0120-PRINT-DETAIL;                                 !@01A    459
+   000407         039500     END-PERFORM.                                                 !@01A
+   000408         039600     MOVE BCOCA-NAME TO PS-RESTYPE.                               !@01A    138 252
+   000409         039700     MOVE PAGE-LEN TO LINE-COUNT.                                 !@01A    113 111
+   000410         039800     PERFORM WITH TEST BEFORE                                     !@01A
+1Produce Resource Used Report                                   APKRSLST  Date 04/08/2020  Time 15:58:12   Page    14
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0  000411         039900         VARYING BCOCA-INDEX FROM 1 BY 1                          !@01A    188
+   000412         040000         UNTIL BCOCA-INDEX > BCOCA-CNTR;                          !@01A    188 185
+   000413      1  040100       MOVE BCOCA-TABLE (BCOCA-INDEX) TO LINE-RESNAME;            !@01A    186 188 257
+   000414      1  040200       PERFORM 0120-PRINT-DETAIL;                                 !@01A    459
+   000415         040300     END-PERFORM.                                                 !@01A
+   000416         040400     MOVE IOCA-NAME TO PS-RESTYPE.                                !@01A    137 252
+   000417         040500     MOVE PAGE-LEN TO LINE-COUNT.                                 !@01A    113 111
+   000418         040600     PERFORM WITH TEST BEFORE                                     !@01A
+   000419         040700         VARYING IOCA-INDEX FROM 1 BY 1                           !@01A    181
+   000420         040800         UNTIL IOCA-INDEX > IOCA-CNTR;                            !@01A    181 178
+   000421      1  040900       MOVE IOCA-TABLE (IOCA-INDEX) TO LINE-RESNAME;              !@01A    179 181 257
+   000422      1  041000       PERFORM 0120-PRINT-DETAIL;                                 !@01A    459
+   000423         041100     END-PERFORM.                                                 !@01A
+   000424         041200     MOVE PTOCA-NAME TO PS-RESTYPE.                               !@01A    139 252
+   000425         041300     MOVE PAGE-LEN TO LINE-COUNT.                                 !@01A    113 111
+   000426         041400     PERFORM WITH TEST BEFORE                                     !@01A
+   000427         041500         VARYING PTOCA-INDEX FROM 1 BY 1                          !@01A    195
+   000428         041600         UNTIL PTOCA-INDEX > PTOCA-CNTR;                          !@01A    195 192
+   000429      1  041700       MOVE PTOCA-TABLE (PTOCA-INDEX) TO LINE-RESNAME;            !@01A    193 195 257
+   000430      1  041800       PERFORM 0120-PRINT-DETAIL;                                 !@01A    459
+   000431         041900     END-PERFORM.                                                 !@01A
+   000432         042000     MOVE OBJ-CONT-NAME TO PS-RESTYPE.                            !@01A    135 252
+   000433         042100     MOVE PAGE-LEN TO LINE-COUNT.                                 !@01A    113 111
+   000434         042200     PERFORM WITH TEST BEFORE                                     !@01A
+   000435         042300         VARYING OBJECTS-INDEX FROM 1 BY 1                        !@01A    203
+   000436         042400         UNTIL OBJECTS-INDEX > OBJECTS-CNTR;                      !@01A    203 199
+   000437      1  042500       MOVE SPACES TO LINE-RESNAME;                               !@01A    IMP 257
+   000438      1  042600       MOVE FUNCTION DISPLAY-OF (OBJECTS-TABLE (OBJECTS-INDEX))   !@01A    IFN 201 203
+   000439      1  042700            TO  LINE-RESNAME;                                     !@01A    257
+   000440      1  042800       PERFORM 0120-PRINT-DETAIL;                                 APKRSLST 459
+   000441         042900     END-PERFORM.                                                 APKRSLST
+   000442         043000     MOVE PAGE-LEN TO LINE-COUNT.                                 APKRSLST 113 111
+
+   000444         043200     CLOSE PRINT-FILE.                                            APKRSLST 94
+
+   000446         043400 0110-PRINT-HEADER.                                               APKRSLST
+   000447         043500     ADD 1 TO PAGE-COUNT.                                         APKRSLST 112
+   000448         043600     MOVE PAGE-COUNT TO LINE-PAGE-NUM.                            APKRSLST 112 214
+   000449         043700     MOVE LENGTH OF PAGE-TITLE TO PRINT-REC-LEN.                  APKRSLST IMP 206 108
+   000450         043800     WRITE PRINT-RECORD FROM PAGE-TITLE.                          APKRSLST 99 206
+   000451         043900     MOVE LENGTH OF PAGE-SUBTITLE-1 TO PRINT-REC-LEN.             APKRSLST IMP 216 108
+   000452         044000     WRITE PRINT-RECORD FROM PAGE-SUBTITLE-1.                     APKRSLST 99 216
+   000453         044100     MOVE LENGTH OF PAGE-SUBTITLE-2 TO PRINT-REC-LEN.             APKRSLST IMP 232 108
+   000454         044200     WRITE PRINT-RECORD FROM PAGE-SUBTITLE-2.                     APKRSLST 99 232
+   000455         044300     MOVE LENGTH OF PAGE-SUBTITLE-3 TO PRINT-REC-LEN.             APKRSLST IMP 248 108
+   000456         044400     WRITE PRINT-RECORD FROM PAGE-SUBTITLE-3.                     APKRSLST 99 248
+   000457         044500     MOVE ZERO TO LINE-COUNT.                                     APKRSLST IMP 111
+0
+   000459         044700 0120-PRINT-DETAIL.                                               APKRSLST
+   000460         044800     IF LINE-COUNT >= PAGE-LEN                                    APKRSLST 111 113
+   000461         044900      THEN                                                        APKRSLST
+   000462      1  045000       PERFORM 0110-PRINT-HEADER;                                 APKRSLST 446
+   000463         045100     END-IF.                                                      APKRSLST
+   000464         045200     ADD 1 TO LINE-COUNT.                                         APKRSLST 111
+   000465         045300     MOVE LENGTH OF LINE-DETAIL TO PRINT-REC-LEN.                 APKRSLST IMP 254 108
+   000466         045400     WRITE PRINT-RECORD FROM LINE-DETAIL.                         APKRSLST 99 254
+1Produce Resource Used Report                                   APKRSLST  Date 04/08/2020  Time 15:58:12   Page    15
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0*/ APKRSLST
+1Produce Resource Used Report                                   APKRSLST  Date 04/08/2020  Time 15:58:12   Page    16
+0An "M" preceding a data-name reference indicates that the data-name is modified by this reference.
+
+  Defined   Cross-reference of data names   References
+
+      107   ABEND-CODE
+      106   ABND-PGM
+      126   BCOCA. . . . . . . . . . . . .  331
+      185   BCOCA-CNTR . . . . . . . . . .  187 M332 333 412
+      188   BCOCA-INDEX. . . . . . . . . .  M333 334 M411 412 413
+      138   BCOCA-NAME . . . . . . . . . .  408
+      186   BCOCA-TABLE. . . . . . . . . .  M334 413
+      184   BCOCA-USED
+      122   CODED-FONT
+      132   CODED-FONT
+      120   CPAGE. . . . . . . . . . . . .  302
+      130   CPAGE-NAME . . . . . . . . . .  365
+      143   CPGS-CNTR. . . . . . . . . . .  145 M306 372
+      146   CPGS-INDEX . . . . . . . . . .  M303 307 308 M371 372 373
+      144   CPGS-TABLE . . . . . . . . . .  304 M307 308 373
+      142   CPGS-USED
+      121   CSET . . . . . . . . . . . . .  311
+      131   CSET-NAME. . . . . . . . . . .  376
+      150   CSETS-CNTR . . . . . . . . . .  152 M312 313 380
+      153   CSETS-INDEX. . . . . . . . . .  M313 314 M379 380 381
+      151   CSETS-TABLE. . . . . . . . . .  M314 381
+      149   CSETS-USED
+      118   FIRST-TIME
+      117   FIRST-TIME-FLAG
+      125   GOCA . . . . . . . . . . . . .  323
+      171   GOCA-CNTR. . . . . . . . . . .  173 M324 325 404
+      174   GOCA-INDEX . . . . . . . . . .  M325 326 M403 404 405
+      136   GOCA-NAME. . . . . . . . . . .  400
+      172   GOCA-TABLE . . . . . . . . . .  M326 405
+      170   GOCA-USED
+      116   IGNORE-RESOURCE
+      115   INCLUDE-RESOURCE . . . . . . .  350
+      127   IOCA . . . . . . . . . . . . .  327
+      178   IOCA-CNTR. . . . . . . . . . .  180 M328 329 420
+      181   IOCA-INDEX . . . . . . . . . .  M329 330 M419 420 421
+      137   IOCA-NAME. . . . . . . . . . .  416
+      179   IOCA-TABLE . . . . . . . . . .  M330 421
+      177   IOCA-USED
+      255   LINE-CC
+      111   LINE-COUNT . . . . . . . . . .  M369 M377 M385 M393 M401 M409 M417 M425 M433 M442 M457 460 M464
+      254   LINE-DETAIL. . . . . . . . . .  465 466
+      214   LINE-PAGE-NUM. . . . . . . . .  M448
+      257   LINE-RESNAME . . . . . . . . .  M373 M381 M389 M397 M405 M413 M421 M429 M437 M439
+      110   MAX-REC-LEN
+      109   MIN-REC-LEN
+      135   OBJ-CONT-NAME. . . . . . . . .  432
+      129   OBJECT-CONT. . . . . . . . . .  339
+      199   OBJECTS-CNTR . . . . . . . . .  202 M340 341 436
+      203   OBJECTS-INDEX. . . . . . . . .  M341 342 344 M435 436 438
+      200   OBJECTS-NM-LEN
+      201   OBJECTS-TABLE. . . . . . . . .  M342 M344 438
+      198   OBJECTS-USED
+      124   OVLY . . . . . . . . . . . . .  319
+      134   OVLY-NAME. . . . . . . . . . .  392
+1Produce Resource Used Report                                   APKRSLST  Date 04/08/2020  Time 15:58:12   Page    17
+0 Defined   Cross-reference of data names   References
+
+0     164   OVLYS-CNTR . . . . . . . . . .  166 M320 321 396
+      167   OVLYS-INDEX. . . . . . . . . .  M321 322 M395 396 397
+      165   OVLYS-TABLE. . . . . . . . . .  M322 397
+      163   OVLYS-USED
+      112   PAGE-COUNT . . . . . . . . . .  M447 448
+      113   PAGE-LEN . . . . . . . . . . .  369 377 385 393 401 409 417 425 433 442 460
+      216   PAGE-SUBTITLE-1. . . . . . . .  451 452
+      232   PAGE-SUBTITLE-2. . . . . . . .  453 454
+      248   PAGE-SUBTITLE-3. . . . . . . .  455 456
+      211   PAGE-TIMESTAMP . . . . . . . .  M356
+      206   PAGE-TITLE . . . . . . . . . .  449 450
+      105   PGMNAME
+      100   PRINT-DATA
+       94   PRINT-FILE . . . . . . . . . .  90 367 444
+      108   PRINT-REC-LEN. . . . . . . . .  97 101 M449 M451 M453 M455 M465
+       99   PRINT-RECORD . . . . . . . . .  M450 M452 M454 M456 M466
+      252   PS-RESTYPE . . . . . . . . . .  M365 M376 M384 M392 M400 M408 M416 M424 M432
+      123   PSEG . . . . . . . . . . . . .  315
+      133   PSEG-NAME. . . . . . . . . . .  384
+      157   PSEGS-CNTR . . . . . . . . . .  159 M316 317 388
+      160   PSEGS-INDEX. . . . . . . . . .  M317 318 M387 388 389
+      158   PSEGS-TABLE. . . . . . . . . .  M318 389
+      156   PSEGS-USED
+      234   PS1-CC . . . . . . . . . . . .  M358
+      236   PS1-CCTYPE . . . . . . . . . .  M359
+      238   PS1-CHARS. . . . . . . . . . .  M360
+      240   PS1-FORMDEF. . . . . . . . . .  M361
+      242   PS1-PAGEDEF. . . . . . . . . .  M362
+      244   PS1-PRMODE . . . . . . . . . .  M363
+      246   PS1-TRC. . . . . . . . . . . .  M364
+      192   PTOCA-CNTR . . . . . . . . . .  194 M336 337 428
+      195   PTOCA-INDEX. . . . . . . . . .  M337 338 M427 428 429
+      139   PTOCA-NAME . . . . . . . . . .  424
+      128   PTOCA-OBJECT . . . . . . . . .  335
+      193   PTOCA-TABLE. . . . . . . . . .  M338 429
+      191   PTOCA-USED
+      271   RES-ACTION . . . . . . . . . .  M350
+      281   RES-ATTR . . . . . . . . . . .  357
+      282   RES-CC . . . . . . . . . . . .  358
+      283   RES-CCTYPE . . . . . . . . . .  359
+      284   RES-CHARS. . . . . . . . . . .  360
+      273   RES-EOF. . . . . . . . . . . .  293
+      272   RES-EOF-FLAG
+      285   RES-FORMDEF. . . . . . . . . .  361
+      286   RES-PAGEDEF. . . . . . . . . .  362
+      266   RES-PARMS. . . . . . . . . . .  290
+      268   RES-PFATTR . . . . . . . . . .  357
+      287   RES-PRMODE . . . . . . . . . .  363
+      275   RES-RESNAMEL . . . . . . . . .  343
+      277   RES-RESNAMF. . . . . . . . . .  343
+      269   RES-RSNAME . . . . . . . . . .  307 308 314 318 322 326 330 334 338
+      270   RES-RSTYPE . . . . . . . . . .  298
+      288   RES-TRC. . . . . . . . . . . .  364
+      279   RES-UAREA. . . . . . . . . . .  292
+      267   RES-USTOR. . . . . . . . . . .  292
+1Produce Resource Used Report                                   APKRSLST  Date 04/08/2020  Time 15:58:12   Page    18
+0 Defined   Cross-reference of data names   References
+
+0     260   T-S-DAY. . . . . . . . . . . .  M354
+      262   T-S-TIME . . . . . . . . . . .  M355
+      259   TIME-STAMP . . . . . . . . . .  356
+      114   UNKNOWN-CNTR . . . . . . . . .  M346
+1Produce Resource Used Report                                   APKRSLST  Date 04/08/2020  Time 15:58:12   Page    19
+0Context usage is indicated by the letter preceding a procedure-name reference.
+ These letters and their meanings are:
+     A = ALTER (procedure-name)
+     D = GO TO (procedure-name) DEPENDING ON
+     E = End of range of (PERFORM) through (procedure-name)
+     G = GO TO (procedure-name)
+     P = PERFORM (procedure-name)
+     T = (ALTER) TO PROCEED TO (procedure-name)
+     U = USE FOR DEBUGGING (procedure-name)
+
+  Defined   Cross-reference of procedures   References
+
+      291   0010-UPDATE-TABLE
+      353   0100-PRINT-REPORT. . . . . . .  P295
+      446   0110-PRINT-HEADER. . . . . . .  P462
+      459   0120-PRINT-DETAIL. . . . . . .  P374 P382 P390 P398 P406 P414 P422 P430 P440
+1Produce Resource Used Report                                   APKRSLST  Date 04/08/2020  Time 15:58:12   Page    20
+0 Defined   Cross-reference of programs     References
+
+        4   APKRSLST
+1Produce Resource Used Report                                   APKRSLST  Date 04/08/2020  Time 15:58:12   Page    21
+0Data Division Map
+0Data Definition Attribute codes (rightmost column) have the following meanings:
+     D = Object of OCCURS DEPENDING    G = GLOBAL                             S = Spanned file
+     E = EXTERNAL                      O = Has OCCURS clause                  U = Undefined format file
+     F = Fixed-length file             OG= Group has own length definition    V = Variable-length file
+     FB= Fixed-length blocked file     R = REDEFINES                          VB= Variable-length blocked file
+     X = Unallocated
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+      4  PROGRAM-ID APKRSLST----------------------------------------------------------------------------------------------------*
+     94   FD PRINT-FILE. . . . . . . . . . . . . . . . . . BLF=00001                                 QSAM           VB
+     99   1  PRINT-RECORD. . . . . . . . . . . . . . . . . BLF=00001   000000000   DS 0CL255         Grp-VarLen
+    100     2  PRINT-DATA. . . . . . . . . . . . . . . . . BLF=00001   000000000   DS 1C             Display        O
+    105   77 PGMNAME . . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+    106   77 ABND-PGM. . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+    107   77 ABEND-CODE. . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+    108   77 PRINT-REC-LEN . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary         D
+    109   77 MIN-REC-LEN . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+    110   77 MAX-REC-LEN . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+    111   77 LINE-COUNT. . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+    112   77 PAGE-COUNT. . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+    113   77 PAGE-LEN. . . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+    114   77 UNKNOWN-CNTR. . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+    115   77 INCLUDE-RESOURCE. . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    116   77 IGNORE-RESOURCE . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    117   77 FIRST-TIME-FLAG . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    118   88 FIRST-TIME. . . . . . . . . . . . . . . . . .
+    120   77 CPAGE . . . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    121   77 CSET. . . . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    122   77 CODED-FONT. . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    123   77 PSEG. . . . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    124   77 OVLY. . . . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    125   77 GOCA. . . . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    126   77 BCOCA . . . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    127   77 IOCA. . . . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    128   77 PTOCA-OBJECT. . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    129   77 OBJECT-CONT . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    130   77 CPAGE-NAME. . . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    131   77 CSET-NAME . . . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    132   77 CODED-FONT. . . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    133   77 PSEG-NAME . . . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    134   77 OVLY-NAME . . . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    135   77 OBJ-CONT-NAME . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    136   77 GOCA-NAME . . . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    137   77 IOCA-NAME . . . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    138   77 BCOCA-NAME. . . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    139   77 PTOCA-NAME. . . . . . . . . . . . . . . . . .             000000000   DS 14C            Display
+    142   1  CPGS-USED . . . . . . . . . . . . . . . . . .             000000000   DS 0CL2050        Grp-VarLen     OG
+    143     2  CPGS-CNTR . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary         D
+    144     2  CPGS-TABLE. . . . . . . . . . . . . . . . .             000000002   DS 8C             Display        O
+    146        CPGS-INDEX. . . . . . . . . . . . . . . . .                                           Index-Name
+    149   1  CSETS-USED. . . . . . . . . . . . . . . . . .             000000000   DS 0CL2050        Grp-VarLen     OG
+    150     2  CSETS-CNTR. . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary         D
+    151     2  CSETS-TABLE . . . . . . . . . . . . . . . .             000000002   DS 8C             Display        O
+    153        CSETS-INDEX . . . . . . . . . . . . . . . .                                           Index-Name
+    156   1  PSEGS-USED. . . . . . . . . . . . . . . . . .             000000000   DS 0CL2050        Grp-VarLen     OG
+1Produce Resource Used Report                                   APKRSLST  Date 04/08/2020  Time 15:58:12   Page    22
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    157     2  PSEGS-CNTR. . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary         D
+    158     2  PSEGS-TABLE . . . . . . . . . . . . . . . .             000000002   DS 8C             Display        O
+    160        PSEGS-INDEX . . . . . . . . . . . . . . . .                                           Index-Name
+    163   1  OVLYS-USED. . . . . . . . . . . . . . . . . .             000000000   DS 0CL2050        Grp-VarLen     OG
+    164     2  OVLYS-CNTR. . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary         D
+    165     2  OVLYS-TABLE . . . . . . . . . . . . . . . .             000000002   DS 8C             Display        O
+    167        OVLYS-INDEX . . . . . . . . . . . . . . . .                                           Index-Name
+    170   1  GOCA-USED . . . . . . . . . . . . . . . . . .             000000000   DS 0CL2050        Grp-VarLen     OG
+    171     2  GOCA-CNTR . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary         D
+    172     2  GOCA-TABLE. . . . . . . . . . . . . . . . .             000000002   DS 8C             Display        O
+    174        GOCA-INDEX. . . . . . . . . . . . . . . . .                                           Index-Name
+    177   1  IOCA-USED . . . . . . . . . . . . . . . . . .             000000000   DS 0CL2050        Grp-VarLen     OG
+    178     2  IOCA-CNTR . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary         D
+    179     2  IOCA-TABLE. . . . . . . . . . . . . . . . .             000000002   DS 8C             Display        O
+    181        IOCA-INDEX. . . . . . . . . . . . . . . . .                                           Index-Name
+    184   1  BCOCA-USED. . . . . . . . . . . . . . . . . .             000000000   DS 0CL2050        Grp-VarLen     OG
+    185     2  BCOCA-CNTR. . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary         D
+    186     2  BCOCA-TABLE . . . . . . . . . . . . . . . .             000000002   DS 8C             Display        O
+    188        BCOCA-INDEX . . . . . . . . . . . . . . . .                                           Index-Name
+    191   1  PTOCA-USED. . . . . . . . . . . . . . . . . .             000000000   DS 0CL2050        Grp-VarLen     OG
+    192     2  PTOCA-CNTR. . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary         D
+    193     2  PTOCA-TABLE . . . . . . . . . . . . . . . .             000000002   DS 8C             Display        O
+    195        PTOCA-INDEX . . . . . . . . . . . . . . . .                                           Index-Name
+    198   1  OBJECTS-USED. . . . . . . . . . . . . . . . .             000000000   DS 0CL64004       Grp-VarLen     OG
+    199     2  OBJECTS-CNTR. . . . . . . . . . . . . . . .             000000000   DS 2C             Binary         D
+    200     2  OBJECTS-NM-LEN. . . . . . . . . . . . . . .             000000002   DS 2C             Binary
+    201     2  OBJECTS-TABLE . . . . . . . . . . . . . . .             000000004   DS 250C           National       O
+    203        OBJECTS-INDEX . . . . . . . . . . . . . . .                                           Index-Name
+    206   1  PAGE-TITLE. . . . . . . . . . . . . . . . . .             000000000   DS 0CL51          Group
+    207     2  FILLER. . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    208     2  FILLER. . . . . . . . . . . . . . . . . . .             000000001   DS 26C            Display
+    210     2  FILLER. . . . . . . . . . . . . . . . . . .             00000001B   DS 4C             Display
+    211     2  PAGE-TIMESTAMP. . . . . . . . . . . . . . .             00000001F   DS 10C            Display
+    212     2  FILLER. . . . . . . . . . . . . . . . . . .             000000029   DS 1C             Display
+    213     2  FILLER. . . . . . . . . . . . . . . . . . .             00000002A   DS 5C             Display
+    214     2  LINE-PAGE-NUM . . . . . . . . . . . . . . .             00000002F   DS 4C             Disp-Num-Edit
+    216   1  PAGE-SUBTITLE-1 . . . . . . . . . . . . . . .             000000000   DS 0CL64          Group
+    217     2  FILLER. . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    218     2  FILLER. . . . . . . . . . . . . . . . . . .             000000001   DS 3C             Display
+    219     2  FILLER. . . . . . . . . . . . . . . . . . .             000000004   DS 1C             Display
+    220     2  FILLER. . . . . . . . . . . . . . . . . . .             000000005   DS 7C             Display
+    221     2  FILLER. . . . . . . . . . . . . . . . . . .             00000000C   DS 1C             Display
+    222     2  FILLER. . . . . . . . . . . . . . . . . . .             00000000D   DS 20C            Display
+    223     2  FILLER. . . . . . . . . . . . . . . . . . .             000000021   DS 1C             Display
+    224     2  FILLER. . . . . . . . . . . . . . . . . . .             000000022   DS 8C             Display
+    225     2  FILLER. . . . . . . . . . . . . . . . . . .             00000002A   DS 1C             Display
+    226     2  FILLER. . . . . . . . . . . . . . . . . . .             00000002B   DS 8C             Display
+    227     2  FILLER. . . . . . . . . . . . . . . . . . .             000000033   DS 1C             Display
+    228     2  FILLER. . . . . . . . . . . . . . . . . . .             000000034   DS 8C             Display
+    229     2  FILLER. . . . . . . . . . . . . . . . . . .             00000003C   DS 1C             Display
+    230     2  FILLER. . . . . . . . . . . . . . . . . . .             00000003D   DS 3C             Display
+    232   1  PAGE-SUBTITLE-2 . . . . . . . . . . . . . . .             000000000   DS 0CL64          Group
+    233     2  FILLER. . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    234     2  PS1-CC. . . . . . . . . . . . . . . . . . .             000000001   DS 3C             Display
+    235     2  FILLER. . . . . . . . . . . . . . . . . . .             000000004   DS 1C             Display
+    236     2  PS1-CCTYPE. . . . . . . . . . . . . . . . .             000000005   DS 1C             Display
+1Produce Resource Used Report                                   APKRSLST  Date 04/08/2020  Time 15:58:12   Page    23
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    237     2  FILLER. . . . . . . . . . . . . . . . . . .             000000006   DS 7C             Display
+    238     2  PS1-CHARS . . . . . . . . . . . . . . . . .             00000000D   DS 20C            Display
+    239     2  FILLER. . . . . . . . . . . . . . . . . . .             000000021   DS 1C             Display
+    240     2  PS1-FORMDEF . . . . . . . . . . . . . . . .             000000022   DS 8C             Display
+    241     2  FILLER. . . . . . . . . . . . . . . . . . .             00000002A   DS 1C             Display
+    242     2  PS1-PAGEDEF . . . . . . . . . . . . . . . .             00000002B   DS 8C             Display
+    243     2  FILLER. . . . . . . . . . . . . . . . . . .             000000033   DS 1C             Display
+    244     2  PS1-PRMODE. . . . . . . . . . . . . . . . .             000000034   DS 8C             Display
+    245     2  FILLER. . . . . . . . . . . . . . . . . . .             00000003C   DS 1C             Display
+    246     2  PS1-TRC . . . . . . . . . . . . . . . . . .             00000003D   DS 3C             Display
+    248   1  PAGE-SUBTITLE-3 . . . . . . . . . . . . . . .             000000000   DS 0CL29          Group
+    249     2  FILLER. . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    250     2  FILLER. . . . . . . . . . . . . . . . . . .             000000001   DS 14C            Display
+    252     2  PS-RESTYPE. . . . . . . . . . . . . . . . .             00000000F   DS 14C            Display
+    254   1  LINE-DETAIL . . . . . . . . . . . . . . . . .             000000000   DS 0CL131         Group
+    255     2  LINE-CC . . . . . . . . . . . . . . . . . .             000000000   DS 1C             Display
+    256     2  FILLER. . . . . . . . . . . . . . . . . . .             000000001   DS 2C             Display
+    257     2  LINE-RESNAME. . . . . . . . . . . . . . . .             000000003   DS 128C           Display
+    259   1  TIME-STAMP. . . . . . . . . . . . . . . . . .             000000000   DS 0CL12          Group
+    260     2  T-S-DAY . . . . . . . . . . . . . . . . . .             000000000   DS 5C             Disp-Num
+    261     2  FILLER. . . . . . . . . . . . . . . . . . .             000000005   DS 1C             Display
+    262     2  T-S-TIME. . . . . . . . . . . . . . . . . .             000000006   DS 6C             Display
+    266   1  RES-PARMS . . . . . . . . . . . . . . . . . . BLL=00001   000000000   DS 0CL275         Group
+    267     2  RES-USTOR . . . . . . . . . . . . . . . . . BLL=00001   000000000   DS 4C             Pointer
+    268     2  RES-PFATTR. . . . . . . . . . . . . . . . . BLL=00001   000000004   DS 4C             Pointer
+    269     2  RES-RSNAME. . . . . . . . . . . . . . . . . BLL=00001   000000008   DS 8C             Display
+    270     2  RES-RSTYPE. . . . . . . . . . . . . . . . . BLL=00001   000000010   DS 1C             Display
+    271     2  RES-ACTION. . . . . . . . . . . . . . . . . BLL=00001   000000011   DS 1C             Display
+    272     2  RES-EOF-FLAG. . . . . . . . . . . . . . . . BLL=00001   000000012   DS 1C             Display
+    273     88 RES-EOF . . . . . . . . . . . . . . . . . . BLL=00001
+    274     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00001   000000013   DS 1C             Display
+    275     2  RES-RESNAMEL. . . . . . . . . . . . . . . . BLL=00001   000000014   DS 2C             Binary
+    276     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00001   000000016   DS 3C             Display
+    277     2  RES-RESNAMF . . . . . . . . . . . . . . . . BLL=00001   000000019   DS 250C           National
+    279   1  RES-UAREA . . . . . . . . . . . . . . . . . . BLL=00002   000000000   DS 16C            Display
+    281   1  RES-ATTR. . . . . . . . . . . . . . . . . . . BLL=00003   000000000   DS 0CL51          Group
+    282     2  RES-CC. . . . . . . . . . . . . . . . . . . BLL=00003   000000000   DS 3C             Display
+    283     2  RES-CCTYPE. . . . . . . . . . . . . . . . . BLL=00003   000000003   DS 1C             Display
+    284     2  RES-CHARS . . . . . . . . . . . . . . . . . BLL=00003   000000004   DS 20C            Display
+    285     2  RES-FORMDEF . . . . . . . . . . . . . . . . BLL=00003   000000018   DS 8C             Display
+    286     2  RES-PAGEDEF . . . . . . . . . . . . . . . . BLL=00003   000000020   DS 8C             Display
+    287     2  RES-PRMODE. . . . . . . . . . . . . . . . . BLL=00003   000000028   DS 8C             Display
+    288     2  RES-TRC . . . . . . . . . . . . . . . . . . BLL=00003   000000030   DS 3C             Display
+ End of Data Division Map
+-* Statistics for COBOL program APKRSLST:
+ *    Source records = 466
+ *    Data Division statements = 103
+ *    Procedure Division statements = 114
+ *    Generated COBOL statements = 0
+ *    Program complexity factor = 135
+0End of compilation 1,  program APKRSLST,  no statements flagged.
+0Return code 0

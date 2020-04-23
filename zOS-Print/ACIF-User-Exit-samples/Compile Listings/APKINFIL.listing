@@ -1,0 +1,500 @@
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211                 Date 04/09/2020  Time 15:34:32   Page     1
+0Invocation parameters:
+  APOST,MAP,NORENT,TRUNC(BIN),CP(1140),X,DYNAM,RMODE(24),S,NOOFF,DATA(24),TEST(SOURCE)
+0PROCESS(CBL) statements:
+  PROCESS DYNAM NUMPROC(PFD) TRUNC(OPT) APOST     NOSEQ     RENT
+0Options in effect:
+  NOADATA
+    ADV
+    AFP(NOVOLATILE)
+    APOST
+    ARCH(7)
+    ARITH(COMPAT)
+  NOAWO
+  NOBLOCK0
+    BUFSIZE(4096)
+  NOCICS
+    CODEPAGE(1140)
+  NOCOMPILE(S)
+  NOCOPYLOC
+  NOCOPYRIGHT
+  NOCURRENCY
+    DATA(24)
+    DBCS
+  NODECK
+  NODEFINE
+  NODIAGTRUNC
+    DISPSIGN(COMPAT)
+  NODLL
+  NODUMP
+    DYNAM
+  NOEXIT
+  NOEXPORTALL
+  NOFASTSRT
+    FLAG(I,I)
+  NOFLAGSTD
+    HGPR(PRESERVE)
+  NOINITCHECK
+  NOINITIAL
+    INLINE
+    INTDATE(ANSI)
+    LANGUAGE(EN)
+    LINECOUNT(60)
+  NOLIST
+    MAP(HEX)
+    MAXPCF(100000)
+  NOMDECK
+  NONAME
+    NSYMBOL(NATIONAL)
+  NONUMBER
+  NONUMCHECK
+    NUMPROC(PFD)
+    OBJECT
+  NOOFFSET
+    OPTIMIZE(0)
+    OUTDD(SYSOUT)
+  NOPARMCHECK
+    PGMNAME(COMPAT)
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211                 Date 04/09/2020  Time 15:34:32   Page     2
+0   QUALIFY(COMPAT)
+    RENT
+    RMODE(24)
+  NORULES
+  NOSERVICE
+  NOSEQUENCE
+    SOURCE
+    SPACE(1)
+  NOSQL
+    SQLCCSID
+  NOSQLIMS
+  NOSSRANGE
+  NOSTGOPT
+    SUPPRESS
+  NOTERM
+    TEST(NOEJPD,DWARF,SOURCE,NOSEPARATE)
+  NOTHREAD
+    TRUNC(OPT)
+  NOVBREF
+    VLR(STANDARD)
+    VSAMOPENFS(COMPAT)
+  NOWORD
+    XMLPARSE(XMLSS)
+    XREF(FULL)
+    ZONEDATA(PFD)
+    ZWB
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211       APKINFIL  Date 04/09/2020  Time 15:34:32   Page     3
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0/* APKINFIL
+   000001         000200* LAST UPDATE ON 9 Apr 2018 AT 15:38:00 BY  HOWARDT VERSION 01   *
+   000002         000300 ID DIVISION.
+   000003         000400 PROGRAM-ID. APKINFIL.
+   000004         000500 AUTHOR. TURETZKY--HYDRA.
+   000005         000600 INSTALLATION. IBM BOULDER PROGRAMMING CENTER.
+   000006         000700               This program is a sample exit for ACIF
+   000007         000800               (APKACIF,5648-062) demonstrating the use of the
+   000008         000900               ACIF input exit.
+   000009         001000
+   000010         001100               In order to use this exit, include the control
+   000011         001200               INPEXIT=APKINFIL to enable this exit, and include
+   000012         001300               the load module in a dataset referenced in STEPLIB
+   000013         001400               or elsewhere in the module search order.
+   000014         001500
+   000015         001600               This program tests inserting an entire file at the
+   000016         001700               input exit. The first record from ACIF is a single
+   000017         001800               dummy record from the input file. The exit opens
+   000018         001900               the "real" input file, sets the insert flag, and
+   000019         002000               returns each record from the actual file. When all
+   000020         002100               records are processed, the delete flag is set.
+   000021         002200
+   000022         002300               This program must either be compiled with the
+   000023         002400               NORENT option or linked with IGZOPT with the
+   000024         002500               RTEREUS option.  (See VS COBOL II Application
+   000025         002600               Programming Guide, SC26-4045).
+   000026         002700
+   000027         002800 DATE-WRITTEN. 16 AUG 94.
+   000028         002900 DATE-COMPILED. 04/09/20.
+   000029         003000 SECURITY. IBM SAMPLE CODE ONLY.
+   000030         003100*/**************************************************************/
+   000031         003120*/* Licensed under the Apache License, Version 2.0 (the        */
+   000032         003130*/* "License"); you may not use this file except in compliance */
+   000033         003140*/* with the License. You may obtain a copy of the License at  */
+   000034         003150*/*                                                            */
+   000035         003160*/* http://www.apache.org/licenses/LICENSE-2.0                 */
+   000036         003170*/*                                                            */
+   000037         003180*/* Unless required by applicable law or agreed to in writing, */
+   000038         003190*/* software distributed under the License is distributed on an*/
+   000039         003191*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY     */
+   000040         003192*/* KIND, either express or implied.  See the License for the  */
+   000041         003193*/* specific language governing permissions and limitations    */
+   000042         003194*/* under the License.                                         */
+   000043         003195*/*------------------------------------------------------------*/
+   000044         003196*/*                                                            */
+   000045         003200*/*   COPYRIGHT (C) 1993,2007 IBM CORPORATION                  */
+   000046         003300*/*   COPYRIGHT (C) 2007,2018 RICOH COMPANY, LTD               */
+   000047         003400*/*                                                            */
+   000048         003500*/*   Permission to use, copy, modify, and distribute          */
+   000049         003600*/*   this software for any purpose with or without fee        */
+   000050         003700*/*   is hereby granted, provided that the above               */
+   000051         003800*/*   copyright notices appear in all copies.                  */
+   000052         003900*/*                                                            */
+   000053         004000*/*   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY       */
+   000054         004100*/*   OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT       */
+   000055         004200*/*   LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            */
+   000056         004300*/*   FITNESS FOR A PARTICULAR PURPOSE AND                     */
+1PP 5655-EC6 IBM Enterprise COBOL for z/OS  6.2.0 P191211       APKINFIL  Date 04/09/2020  Time 15:34:32   Page     4
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0  000057         004400*/*   NONINFRINGEMENT.  IN NO EVENT SHALL RICOH, RICOH         */
+   000058         004500*/*   SUBSIDIARIES, ANY OF ITS SUPPLIERS OR ANY OF THE         */
+   000059         004600*/*   OTHER COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,         */
+   000060         004700*/*   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF      */
+   000061         004800*/*   CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF        */
+   000062         004900*/*   OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR         */
+   000063         005000*/*   OTHER DEALINGS IN THE SOFTWARE.                          */
+   000064         005100*/**************************************************************/
+1ACIF Test Input Exit                                           APKINFIL  Date 04/09/2020  Time 15:34:32   Page     5
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000066         005300 ENVIRONMENT DIVISION.
+   000067         005400 CONFIGURATION SECTION.
+   000068         005500 SOURCE-COMPUTER. IBM-370.
+   000069         005600 OBJECT-COMPUTER. IBM-370.
+   000070         005700 INPUT-OUTPUT SECTION.
+   000071         005800 FILE-CONTROL.
+   000072         005900     SELECT APKINFIL-IN          ASSIGN TO SYS001-S-APKINFIL               78
+   000073         006000                                 FILE STATUS
+   000074         006100                                 APKINFIL-IN-STATUS.                       119
+1ACIF Test Input Exit                                           APKINFIL  Date 04/09/2020  Time 15:34:32   Page     6
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000076         006300 DATA DIVISION.
+   000077         006400 FILE SECTION.
+   000078         006500 FD  APKINFIL-IN                 GLOBAL,
+   000079         006600     BLOCK CONTAINS 0 RECORDS,
+   000080         006700     RECORDING MODE IS V
+   000081         006800     RECORD VARYING FROM 08 TO 32752 DEPENDING ON APKINFIL-LENGTH.         117
+   000082         006900
+   000083         007000 01  APKINFIL-IN-RECORD.                                                   BLF=00001,000000000 0CL32752
+   000084         007100     05  APKINFIL-IN-INTRODUCER.                                           BLF=00001,000000000 0CL9
+   000085         007200       10  APKINFIL-IN-CC PIC X.                                           BLF=00001,000000000 1C
+   000086         007300       10  APKINFIL-IN-LEN-CHR PIC XX.                                     BLF=00001,000000001 2C
+   000087         007400       10  APKINFIL-IN-RECLEN REDEFINES                                    BLF=00001,000000001 2C
+   000088         007500                                  APKINFIL-IN-LEN-CHR                      86
+   000089         007600                             PIC 9(4) COMP.
+   000090         007700* NOTE:  9(4) COMP IS USED TO GET HALFWORD INTEGER, BUT COBOL
+   000091         007800* MAY RESTRICT VALUE TO 9999. COBOL II COMPILE-TIME PARM
+   000092         007900* TRUNC(BIN) OR TRUNC(OPT) WILL TREAT THE VALUE AS A HALFWORD
+   000093         008000* WITH NO TRUNCATION (TRUNC(OPT) PRODUCES FAR BETTER CODE).
+   000094         008100       10  APKINFIL-IN-TYPE PIC XXX.                                       BLF=00001,000000003 3C
+   000095         008200       10  APKINFIL-IN-FLAG PIC X.                                         BLF=00001,000000006 1C
+   000096         008300       10  APKINFIL-IN-SEQ-CHR PIC XX.                                     BLF=00001,000000007 2C
+   000097         008400       10  APKINFIL-IN-SEQNUM REDEFINES                                    BLF=00001,000000007 2C
+   000098         008500                                  APKINFIL-IN-SEQ-CHR                      96
+   000099         008600                             PIC 9(4) COMP.
+   000100         008700     05  APKINFIL-IN-DATA.                                                 BLF=00001,000000009 0CL32743
+   000101         008800         10  APKINFIL-IN-ARRAY                                             BLF=00001,000000009 1C
+   000102         008900                             OCCURS 32743,
+   000103         009000                             DEPENDING ON
+   000104         009100                             APKINFIL-IN-RECLEN,                           87
+   000105         009200                             INDEXED BY APKINFIL-IN-INDX,
+   000106         009300                             PIC X.
+-
+   000108         009500 WORKING-STORAGE SECTION.
+   000109         009600 77  PGMNAME                 PIC X(8) VALUE 'APKINFIL'.                              000000000 8C
+   000110         009610 77  ABND-PGM                PIC X(8) VALUE 'CEE3DMP'.            !@01               000000000 8C
+   000111         009620 77  ABEND-CODE              PIC 9(4) BINARY VALUE 12.                               000000000 2C
+   000112         009630 77  ABEND-OPTS              PIC X(255)                           !@01               000000000 255C
+   000113         009640     VALUE 'ENC(CUR) THR(CUR) FILE VAR NOBLOCK NOSTOR SF(ALL)' .  !@01
+   000114         009900 77  AFPWRITE                PIC X(8) VALUE 'AFPWRITE'.                              000000000 8C
+   000115         010000 77  PAGE-COUNT              PIC 9(8) BINARY VALUE ZERO.                             000000000 4C
+                                                                                                   IMP
+   000116         010100 77  LINE-COUNT              PIC 9(8) BINARY VALUE ZERO.                             000000000 4C
+                                                                                                   IMP
+   000117         010200 77  APKINFIL-LENGTH         PIC 9(8) BINARY VALUE ZERO.                             000000000 4C
+                                                                                                   IMP
+   000118         010300 01  GLOBAL-VARIABLES            GLOBAL.                                             000000000 0CL2
+   000119         010400     05  APKINFIL-IN-STATUS      PIC 99   VALUE ZERO.                                000000000 2C
+                                                                                                   IMP
+   000120         010500         88  APKINFIL-IN-OK      VALUE 00.
+   000121         010600         88  APKINFIL-IN-EOF     VALUE 10.
+1ACIF Test Input Exit                                           APKINFIL  Date 04/09/2020  Time 15:34:32   Page     7
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000122         010700/ PASSED PARAMETERS.
+   000123         010800 LINKAGE SECTION.
+   000124         010900 01  INP-PARMS.                                                            BLL=00001,000000000 0CL22
+   000125         011000     05  INP-USTOR           POINTER.                                      BLL=00001,000000000 4C
+   000126         011100     05  INP-PFATTR          POINTER.                                      BLL=00001,000000004 4C
+   000127         011200     05  INP-RECPTR          POINTER.                                      BLL=00001,000000008 4C
+   000128         011300     05  FILLER              POINTER.                                      BLL=00001,00000000C 4C
+   000129         011400     05  INP-RECLEN          PIC 9(4) BINARY.                              BLL=00001,000000010 2C
+   000130         011500     05  FILLER              PIC XX.                                       BLL=00001,000000012 2C
+   000131         011600     05  INP-REQUEST         PIC X.                                        BLL=00001,000000014 1C
+   000132         011700         88  INP-USE         VALUE X'00'.
+   000133         011800         88  INP-DELETE      VALUE X'01'.
+   000134         011900         88  INP-INSERT      VALUE X'02'.
+   000135         012000     05  INP-EOF-FLAG        PIC X.                                        BLL=00001,000000015 1C
+   000136         012100         88  INP-EOF         VALUE 'Y'.
+   000137         012200
+   000138         012300 01  INP-UAREA.                                                            BLL=00002,000000000 0CL16
+   000139         012400     05  UAREA-INCNTR        PIC 9(8) BINARY.                              BLL=00002,000000000 4C
+   000140         012500     05  INIT-FLAG           PIC X.                                        BLL=00002,000000004 1C
+   000141         012600         88 INITTED          VALUE HIGH-VALUE.                             IMP
+   000142         012700         88 NOT-INITTED      VALUE LOW-VALUE.                              IMP
+   000143         012800     05  FILLER              PIC X(11).                                    BLL=00002,000000005 11C
+   000144         012900
+   000145         013000 01  INP-ATTR.                                                             BLL=00003,000000000 0CL51
+   000146         013100     05  INP-CC              PIC XXX.                                      BLL=00003,000000000 3C
+   000147         013200     05  INP-CCTYPE          PIC X.                                        BLL=00003,000000003 1C
+   000148         013300         88  INP-ANSI-CC     VALUE 'A'.
+   000149         013400         88  INP-MACH-CC     VALUE 'M'.
+   000150         013500     05  INP-CHARS           PIC X(20).                                    BLL=00003,000000004 20C
+   000151         013600     05  INP-FORMDEF         PIC X(8).                                     BLL=00003,000000018 8C
+   000152         013700     05  INP-PAGEDEF         PIC X(8).                                     BLL=00003,000000020 8C
+   000153         013800     05  INP-PRMODE          PIC X(8).                                     BLL=00003,000000028 8C
+   000154         013900     05  INP-TRC             PIC XXX.                                      BLL=00003,000000030 3C
+   000155         014000
+   000156         014100* This is a template for the input record, pointed to by
+   000157         014200* INP-RECPTR. The record's actual length is given by
+   000158         014300* INP-RECLEN.
+   000159         014400 01  INP-LINE.                                                             BLL=00004,000000000 0CL32752
+   000160         014500     05  INP-CCVAL           PIC X.                                        BLL=00004,000000000 1C
+   000161         014600     05  INP-TRCVAL          PIC X.                                        BLL=00004,000000001 1C
+   000162         014700     05  INP-DATA            PIC X(32750).                                 BLL=00004,000000002 32750C
+
+1Initialization and Main Line                                   APKINFIL  Date 04/09/2020  Time 15:34:32   Page     8
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+   000165         015000 PROCEDURE DIVISION USING INP-PARMS.                                       124
+   000166         015100* make work area, attributes, and input line addressable.
+   000167         015200     SET ADDRESS OF INP-UAREA TO INP-USTOR.                                IMP 138 125
+   000168         015300     SET ADDRESS OF INP-ATTR TO INP-PFATTR.                                IMP 145 126
+   000169         015400     SET ADDRESS OF INP-LINE TO INP-RECPTR.                                IMP 159 127
+   000170         015500* no special action is necessary at EOF.
+   000171         015600     IF INP-EOF                                                            136
+   000172         015700      THEN
+   000173      1  015800       DISPLAY PGMNAME, ' EOF REACHED.';                                   109
+   000174      1  015900       DISPLAY PGMNAME, ' RECORDS INSERTED ', UAREA-INCNTR;                109 139
+   000175      1  016000       CLOSE APKINFIL-IN;                                                  78
+   000176      1  016100       GOBACK;
+   000177         016200     END-IF.
+   000178         016300     IF NOT-INITTED                                                        142
+   000179         016400      THEN
+   000180      1  016500       OPEN INPUT APKINFIL-IN;                                             78
+   000181      1  016600       IF NOT APKINFIL-IN-OK                                               120
+   000182      1  016700        THEN
+   000183      2  016800         DISPLAY PGMNAME, ' ERROR OPENING APKINFIL INPUT FILE';            109
+   000184      2  016900         DISPLAY PGMNAME, ' STATUS CODE ', APKINFIL-IN-STATUS;             109 119
+   000185      2  017000         MOVE APKINFIL-IN-STATUS TO RETURN-CODE;                           119 IMP IMP
+   000186      2  017100         GOBACK;
+   000187      1  017200        ELSE
+   000188      2  017300         SET INITTED TO TRUE;                                              141
+   000189      1  017400       END-IF;
+   000190         017500     END-IF.
+
+   000192         017700* Set the insert flag, and point the ACIF input record pointer
+   000193         017800* to the input record just read.
+   000194         017900     PERFORM 0100-READ-RECORD.                                             212
+   000195         018000     IF APKINFIL-IN-OK                                                     120
+   000196         018100      THEN
+   000197      1  018200       SET INP-INSERT TO TRUE;                                             134
+   000198      1  018300       MOVE APKINFIL-IN-RECORD TO INP-LINE (1 : APKINFIL-LENGTH);          83 159 117
+   000199      1  018400       MOVE APKINFIL-LENGTH TO INP-RECLEN;                                 117 129
+   000200         018500      ELSE
+   000201      1  018600       IF NOT APKINFIL-IN-EOF                                              121
+   000202      1  018700        THEN
+   000203      2  018800         DISPLAY PGMNAME, ' ERROR READING APKINFIL INPUT FILE';            109
+   000204      2  018900         DISPLAY PGMNAME, ' STATUS CODE ', APKINFIL-IN-STATUS;             109 119
+   000205      2  019000         MOVE APKINFIL-IN-STATUS TO RETURN-CODE;                           119 IMP IMP
+   000206      1  019100        END-IF;
+   000207      1  019200       SET INP-DELETE TO TRUE;                                             133
+   000208         019300      END-IF.
+
+   000210         019500     GOBACK.
+-
+   000212         019700 0100-READ-RECORD.
+   000213         019800* Read a record from the input file.
+   000214         019900     READ APKINFIL-IN,                                                     78
+
+ ==000214==> IGYPG3178-I A "READ" statement was found for a file whose "FD" had a shortest record
+                         length that was not equal to the lower "RECORD IS VARYING" integer or a
+                         longest record length that was not equal to the higher "RECORD IS
+                         VARYING" integer.  A record length conflict could occur at execution.
+                         For a more reliable program, change the "FD" so that the shortest and
+1Initialization and Main Line                                   APKINFIL  Date 04/09/2020  Time 15:34:32   Page     9
+   LineID  PL SL  ----+-*A-1-B--+----2----+----3----+----4----+----5----+----6----+----7-|--+----8 Map and Cross Reference
+0                        longest record lengths match the "RECORD IS VARYING" integers.
+
+   000215         020000      AT END
+   000216      1  020100       CONTINUE;
+   000217         020200      NOT AT END
+   000218      1  020300       ADD 1 TO UAREA-INCNTR;                                              139
+   000219         020400     END-READ.
+ */ APKINFIL
+1Initialization and Main Line                                   APKINFIL  Date 04/09/2020  Time 15:34:32   Page    10
+0An "M" preceding a data-name reference indicates that the data-name is modified by this reference.
+
+  Defined   Cross-reference of data names   References
+
+      111   ABEND-CODE
+      112   ABEND-OPTS
+      110   ABND-PGM
+      114   AFPWRITE
+       78   APKINFIL-IN. . . . . . . . . .  72 175 180 214
+      101   APKINFIL-IN-ARRAY
+       85   APKINFIL-IN-CC
+      100   APKINFIL-IN-DATA
+      121   APKINFIL-IN-EOF. . . . . . . .  201
+       95   APKINFIL-IN-FLAG
+      105   APKINFIL-IN-INDX
+       84   APKINFIL-IN-INTRODUCER
+       86   APKINFIL-IN-LEN-CHR. . . . . .  88
+      120   APKINFIL-IN-OK . . . . . . . .  181 195
+       87   APKINFIL-IN-RECLEN . . . . . .  104
+       83   APKINFIL-IN-RECORD . . . . . .  198
+       96   APKINFIL-IN-SEQ-CHR. . . . . .  98
+       97   APKINFIL-IN-SEQNUM
+      119   APKINFIL-IN-STATUS . . . . . .  74 184 185 204 205
+       94   APKINFIL-IN-TYPE
+      117   APKINFIL-LENGTH. . . . . . . .  81 198 199
+      118   GLOBAL-VARIABLES
+      140   INIT-FLAG
+      141   INITTED. . . . . . . . . . . .  M188
+      148   INP-ANSI-CC
+      145   INP-ATTR . . . . . . . . . . .  168
+      146   INP-CC
+      147   INP-CCTYPE
+      160   INP-CCVAL
+      150   INP-CHARS
+      162   INP-DATA
+      133   INP-DELETE . . . . . . . . . .  M207
+      136   INP-EOF. . . . . . . . . . . .  171
+      135   INP-EOF-FLAG
+      151   INP-FORMDEF
+      134   INP-INSERT . . . . . . . . . .  M197
+      159   INP-LINE . . . . . . . . . . .  169 M198
+      149   INP-MACH-CC
+      152   INP-PAGEDEF
+      124   INP-PARMS. . . . . . . . . . .  165
+      126   INP-PFATTR . . . . . . . . . .  168
+      153   INP-PRMODE
+      129   INP-RECLEN . . . . . . . . . .  M199
+      127   INP-RECPTR . . . . . . . . . .  169
+      131   INP-REQUEST
+      154   INP-TRC
+      161   INP-TRCVAL
+      138   INP-UAREA. . . . . . . . . . .  167
+      132   INP-USE
+      125   INP-USTOR. . . . . . . . . . .  167
+      116   LINE-COUNT
+      142   NOT-INITTED. . . . . . . . . .  178
+      115   PAGE-COUNT
+      109   PGMNAME. . . . . . . . . . . .  173 174 183 184 203 204
+1Initialization and Main Line                                   APKINFIL  Date 04/09/2020  Time 15:34:32   Page    11
+0 Defined   Cross-reference of data names   References
+
+0       0   RETURN-CODE. . . . . . . . . .  185 M185 205 M205
+      139   UAREA-INCNTR . . . . . . . . .  174 M218
+1Initialization and Main Line                                   APKINFIL  Date 04/09/2020  Time 15:34:32   Page    12
+0Context usage is indicated by the letter preceding a procedure-name reference.
+ These letters and their meanings are:
+     A = ALTER (procedure-name)
+     D = GO TO (procedure-name) DEPENDING ON
+     E = End of range of (PERFORM) through (procedure-name)
+     G = GO TO (procedure-name)
+     P = PERFORM (procedure-name)
+     T = (ALTER) TO PROCEED TO (procedure-name)
+     U = USE FOR DEBUGGING (procedure-name)
+
+  Defined   Cross-reference of procedures   References
+
+      212   0100-READ-RECORD . . . . . . .  P194
+1Initialization and Main Line                                   APKINFIL  Date 04/09/2020  Time 15:34:32   Page    13
+0 Defined   Cross-reference of programs     References
+
+        3   APKINFIL
+1Initialization and Main Line                                   APKINFIL  Date 04/09/2020  Time 15:34:32   Page    14
+0Data Division Map
+0Data Definition Attribute codes (rightmost column) have the following meanings:
+     D = Object of OCCURS DEPENDING    G = GLOBAL                             S = Spanned file
+     E = EXTERNAL                      O = Has OCCURS clause                  U = Undefined format file
+     F = Fixed-length file             OG= Group has own length definition    V = Variable-length file
+     FB= Fixed-length blocked file     R = REDEFINES                          VB= Variable-length blocked file
+     X = Unallocated
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+      3  PROGRAM-ID APKINFIL----------------------------------------------------------------------------------------------------*
+     78   FD APKINFIL-IN . . . . . . . . . . . . . . . . . BLF=00001                                 QSAM           G,VB
+     83   1  APKINFIL-IN-RECORD. . . . . . . . . . . . . . BLF=00001   000000000   DS 0CL32752       Grp-VarLen     G,OG
+     84     2  APKINFIL-IN-INTRODUCER. . . . . . . . . . . BLF=00001   000000000   DS 0CL9           Group          G,OG
+     85       3  APKINFIL-IN-CC. . . . . . . . . . . . . . BLF=00001   000000000   DS 1C             Display        G
+     86       3  APKINFIL-IN-LEN-CHR . . . . . . . . . . . BLF=00001   000000001   DS 2C             Display        G
+     87       3  APKINFIL-IN-RECLEN. . . . . . . . . . . . BLF=00001   000000001   DS 2C             Binary         G,R,D
+     94       3  APKINFIL-IN-TYPE. . . . . . . . . . . . . BLF=00001   000000003   DS 3C             Display        G
+     95       3  APKINFIL-IN-FLAG. . . . . . . . . . . . . BLF=00001   000000006   DS 1C             Display        G
+     96       3  APKINFIL-IN-SEQ-CHR . . . . . . . . . . . BLF=00001   000000007   DS 2C             Display        G
+     97       3  APKINFIL-IN-SEQNUM. . . . . . . . . . . . BLF=00001   000000007   DS 2C             Binary         G,R
+    100     2  APKINFIL-IN-DATA. . . . . . . . . . . . . . BLF=00001   000000009   DS 0CL32743       Grp-VarLen     G
+    101       3  APKINFIL-IN-ARRAY . . . . . . . . . . . . BLF=00001   000000009   DS 1C             Display        G,O
+    105          APKINFIL-IN-INDX. . . . . . . . . . . . .                                           Index-Name     G
+    109   77 PGMNAME . . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+    110   77 ABND-PGM. . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+    111   77 ABEND-CODE. . . . . . . . . . . . . . . . . .             000000000   DS 2C             Binary
+    112   77 ABEND-OPTS. . . . . . . . . . . . . . . . . .             000000000   DS 255C           Display
+    114   77 AFPWRITE. . . . . . . . . . . . . . . . . . .             000000000   DS 8C             Display
+    115   77 PAGE-COUNT. . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+    116   77 LINE-COUNT. . . . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+    117   77 APKINFIL-LENGTH . . . . . . . . . . . . . . .             000000000   DS 4C             Binary
+    118   1  GLOBAL-VARIABLES. . . . . . . . . . . . . . .             000000000   DS 0CL2           Group          G
+    119     2  APKINFIL-IN-STATUS. . . . . . . . . . . . .             000000000   DS 2C             Disp-Num       G
+    120     88 APKINFIL-IN-OK. . . . . . . . . . . . . . .                                                          G
+    121     88 APKINFIL-IN-EOF . . . . . . . . . . . . . .                                                          G
+    124   1  INP-PARMS . . . . . . . . . . . . . . . . . . BLL=00001   000000000   DS 0CL22          Group
+    125     2  INP-USTOR . . . . . . . . . . . . . . . . . BLL=00001   000000000   DS 4C             Pointer
+    126     2  INP-PFATTR. . . . . . . . . . . . . . . . . BLL=00001   000000004   DS 4C             Pointer
+    127     2  INP-RECPTR. . . . . . . . . . . . . . . . . BLL=00001   000000008   DS 4C             Pointer
+    128     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00001   00000000C   DS 4C             Pointer
+    129     2  INP-RECLEN. . . . . . . . . . . . . . . . . BLL=00001   000000010   DS 2C             Binary
+    130     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00001   000000012   DS 2C             Display
+    131     2  INP-REQUEST . . . . . . . . . . . . . . . . BLL=00001   000000014   DS 1C             Display
+    132     88 INP-USE . . . . . . . . . . . . . . . . . . BLL=00001
+    133     88 INP-DELETE. . . . . . . . . . . . . . . . . BLL=00001
+    134     88 INP-INSERT. . . . . . . . . . . . . . . . . BLL=00001
+    135     2  INP-EOF-FLAG. . . . . . . . . . . . . . . . BLL=00001   000000015   DS 1C             Display
+    136     88 INP-EOF . . . . . . . . . . . . . . . . . . BLL=00001
+    138   1  INP-UAREA . . . . . . . . . . . . . . . . . . BLL=00002   000000000   DS 0CL16          Group
+    139     2  UAREA-INCNTR. . . . . . . . . . . . . . . . BLL=00002   000000000   DS 4C             Binary
+    140     2  INIT-FLAG . . . . . . . . . . . . . . . . . BLL=00002   000000004   DS 1C             Display
+    141     88 INITTED . . . . . . . . . . . . . . . . . . BLL=00002
+    142     88 NOT-INITTED . . . . . . . . . . . . . . . . BLL=00002
+    143     2  FILLER. . . . . . . . . . . . . . . . . . . BLL=00002   000000005   DS 11C            Display
+    145   1  INP-ATTR. . . . . . . . . . . . . . . . . . . BLL=00003   000000000   DS 0CL51          Group
+    146     2  INP-CC. . . . . . . . . . . . . . . . . . . BLL=00003   000000000   DS 3C             Display
+1Initialization and Main Line                                   APKINFIL  Date 04/09/2020  Time 15:34:32   Page    15
+0Source   Hierarchy and                                    Base      Displacement  Asmblr Data                      Data Def
+ LineID   Data Name                                        Locator     Structure   Definition        Data Type      Attributes
+    147     2  INP-CCTYPE. . . . . . . . . . . . . . . . . BLL=00003   000000003   DS 1C             Display
+    148     88 INP-ANSI-CC . . . . . . . . . . . . . . . . BLL=00003
+    149     88 INP-MACH-CC . . . . . . . . . . . . . . . . BLL=00003
+    150     2  INP-CHARS . . . . . . . . . . . . . . . . . BLL=00003   000000004   DS 20C            Display
+    151     2  INP-FORMDEF . . . . . . . . . . . . . . . . BLL=00003   000000018   DS 8C             Display
+    152     2  INP-PAGEDEF . . . . . . . . . . . . . . . . BLL=00003   000000020   DS 8C             Display
+    153     2  INP-PRMODE. . . . . . . . . . . . . . . . . BLL=00003   000000028   DS 8C             Display
+    154     2  INP-TRC . . . . . . . . . . . . . . . . . . BLL=00003   000000030   DS 3C             Display
+    159   1  INP-LINE. . . . . . . . . . . . . . . . . . . BLL=00004   000000000   DS 0CL32752       Group
+    160     2  INP-CCVAL . . . . . . . . . . . . . . . . . BLL=00004   000000000   DS 1C             Display
+    161     2  INP-TRCVAL. . . . . . . . . . . . . . . . . BLL=00004   000000001   DS 1C             Display
+    162     2  INP-DATA. . . . . . . . . . . . . . . . . . BLL=00004   000000002   DS 32750C         Display
+ End of Data Division Map
+1Initialization and Main Line                                   APKINFIL  Date 04/09/2020  Time 15:34:32   Page    16
+0LineID  Message code  Message text
+
+    214  IGYPG3178-I   A "READ" statement was found for a file whose "FD" had a shortest record length that was not equal to the
+                       lower "RECORD IS VARYING" integer or a longest record length that was not equal to the higher "RECORD IS
+                       VARYING" integer.  A record length conflict could occur at execution.  For a more reliable program, change the
+                       "FD" so that the shortest and longest record lengths match the "RECORD IS VARYING" integers.
+-Messages    Total    Informational    Warning    Error    Severe    Terminating
+0Printed:       1           1
+-* Statistics for COBOL program APKINFIL:
+ *    Source records = 219
+ *    Data Division statements = 53
+ *    Procedure Division statements = 30
+ *    Generated COBOL statements = 0
+ *    Program complexity factor = 32
+0End of compilation 1,  program APKINFIL,  highest severity 0.
+0Return code 0
