@@ -8,10 +8,20 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script type="text/javascript">
+    dojoConfig = {
+      async: true,
+      parseOnLoad: true,
+      baseUrl: '/IzuDojo/1_5/CustomBuild/dojo/',
+      packages: [{
+        name: "nav",
+        location: "/zosmf/js/zosmf"
+      }]
+    };
+  </script>
   <script type="text/javascript" src="/IzuDojo/1_5/CustomBuild/dojo/IzugDojo.js.uncompressed.js"></script>
   <script type="text/javascript">
-    require(["dojo/_base/window", "/zosmf/js/zosmf/util/zosmfExternalTools"],
-    function(win, zosmfExternalTools){
+    require(["dojo/_base/window", "nav/util/zosmfExternalTools"], function(win, zosmfExternalTools){
       win.global.zosmfExternalTools = new zosmfExternalTools();
     });
   </script>
