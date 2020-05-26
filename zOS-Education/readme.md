@@ -23,4 +23,4 @@ Modules are provided for the following:
 
 Your feedback is welcome. 
 
-Though the materials provided herein are not supported by the IBM Service organization, your comments are welcomed by the developers, who reserve the right to revise or remove the materials at any time. To report a problem, or provide suggestions or comments, contact zosmig@us.ibm.com.  
+Though the materials provided herein are not supported by the IBM Service organization, your comments are welcomed by the developers, who reserve the right to revise or remove the materials at any time. To report a problem, or provide suggestions or comments, contact zosmig@us.ibm.com, or open a GitHub issue.
