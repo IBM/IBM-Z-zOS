@@ -1,3 +1,11 @@
+WLM/SRM enhancements in z/OS V2.4 and for IBM z15
+=================================================
+* Workload Manager support for Tailored Fit Pricing colocated workloads delivers simplicity, transparency, and predictability of pricing. For a colocated solution, the system programmer creates tenant resource groups and tenant report classes in the WLM service definition, using either the ISPF WLM administrative application or the z/OSMF WLM task, to identify the WLM-classified workloads that constitute the approved solution workload.
+* z/OS Workload Management supports now System Recovery Boost. Built into IBM z15, System Recovery Boost is an innovative solution that diminishes the impact of downtime, planned or unplanned, so you can restore service and recover workloads substantially faster than on previous IBM Z generations with zero increase in IBM software MSU consumption or cost. With System Recovery Boost, you can use your already-entitled Central Processors and zIIPs to unleash additional processing capacity on an LPAR-by-LPAR basis, providing a fixed-duration performance boost to reduce the length and mitigate the impact of downtime.
+* With More Granular Ressource Controls Workload Manager allows now to deactivate Discretionary Goal Management in the service definition and exempt service classes from default IFAHONORPRIORITY or IIPHONORPRIORITY processing.
+* With z/OS 2.4 the Performance of XML Format Service Definition reads and writes in the ISPF Administrative Application is improved.
+* z/OS V2R4 will be the last release of the operating system that supports specifying service coefficients in the WLM service definition
+
 WLM/SRM enhancements in z/OS V2.3
 =================================
 * Workload Manager in z/OS V2.3 incorporates the latest support for the IBM z14. Hiperdispatch has been enhanced memory-intensive applications to preferentially use the same common cache across workload balancing intervals. Also, z/OS WLM enhances compute- intensive applications to preferentially be subdivided across processors sharing common caches.
