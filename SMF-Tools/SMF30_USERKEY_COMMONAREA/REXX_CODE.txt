@@ -1,0 +1,218 @@
+/* REXX */
+/*********************************************************************/
+/*                                                                   */
+/* USER KEY COMMON AREA ANALYZER                                     */
+/*                                                                   */
+/* AUTHOR : SHIVANG SHARMA AND UTKARSH GOSWAMI                       */
+/* LICENSE: APACHE-2.0 (APACHE LICENSE 2.0)                          */
+/*                                                                   */
+/* URL: HTTPS://WWW.APACHE.ORG/LICENSES/LICENSE-2.0                  */
+/*                                                                   */
+/*********************************************************************/
+/*********************************************************************/
+/*                                                                   */
+/* COPYRIGHT 2020 IBM CORP.                                          */
+/*                                                                   */
+/* LICENSED UNDER THE APACHE LICENSE, VERSION 2.0 (THE "LICENSE");   */
+/* YOU MAY NOT USE THIS FILE EXCEPT IN COMPLIANCE WITH THE LICENSE.  */
+/* YOU MAY OBTAIN A COPY OF THE LICENSE AT                           */
+/*                                                                   */
+/* HTTP://WWW.APACHE.ORG/LICENSES/LICENSE-2.0                        */
+/*                                                                   */
+/* UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING,        */
+/* SOFTWARE DISTRIBUTED UNDER THE LICENSE IS DISTRIBUTED ON AN       */
+/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      */
+/* EITHER EXPRESS OR IMPLIED. SEE THE LICENSE FOR THE SPECIFIC       */
+/* LANGUAGE GOVERNING PERMISSIONS AND LIMITATIONS UNDER THE LICENSE. */
+/*********************************************************************/
+
+"EXECIO * DISKR SMFIN (STEM RECORDS. OPEN FINIS"
+"FREE F(SMFIN)"
+
+COUNT=0
+FINAL_OUT.=''
+FINAL_OUT2.=''
+OUT_COUNT=1;
+OUT_COUNT2=0;
+SAY " "
+SAY "**************************************************************"||,
+"**************************"
+SAY "USER KEY COMMON AREAS ANALYZER"
+SAY "**************************************************************"||,
+"*************************"
+/**********************MAPPING SECTION*******************************/
+DO I=1 TO RECORDS.0
+   RECTYPE = C2D(SUBSTR(RECORDS.I,2,1)) /*RECORD TYPE VERIFICATION */
+    IF RECTYPE=30 THEN DO
+      SUBTYPE = C2D(SUBSTR(RECORDS.I,19,2))
+    IF SUBTYPE=2 | SUBTYPE=3 | SUBTYPE=6 THEN DO
+      SID = SUBSTR(RECORDS.I,11,4)
+      IDENTOFF = SUBSTR(RECORDS.I,29,4)
+      IDENTOFF = C2D(IDENTOFF) - 3
+      SMF30JNM = SUBSTR(RECORDS.I,IDENTOFF+32,8)
+      SMF30ROF = SUBSTR(RECORDS.I,69,4)
+      SMF30ROF = C2D(SMF30ROF) - 3
+      SMF30RLN = C2D(SUBSTR(RECORDS.I,73,2))
+      SMF30RON=C2D(SUBSTR(RECORDS.I,75,2))
+      ETIME=SUBSTR(RECORDS.I,3,4)
+      ETIME=C2D(ETIME)
+      HUNDRETHS = ETIME % 100
+      HH        = HUNDRETHS % 3600
+      HH        = RIGHT("0"||HH,2)
+      MM        = (HUNDRETHS % 60) - (HH * 60)
+      MM        = RIGHT("0"||MM,2)
+      SS        = HUNDRETHS - (HH * 3600) - (MM * 60)
+      SS        = RIGHT("0"||SS,2)
+      EDATE    = SUBSTR(RECORDS.I,7,4)
+      EDATE    = C2X(EDATE)
+      EDATE    = LEFT(EDATE,7)
+      EDATE    = RIGHT(EDATE,5)
+      EDATE1=SUBSTR(EDATE,1,2)
+      EDATE2=SUBSTR(EDATE,3,3)
+      FINAL_DATE=EDATE1"."EDATE2
+      FINAL_DATE=DATE_CONVERT(FINAL_DATE)
+      JOBNAME  = SUBSTR(RECORDS.I,IDENTOFF,8)
+      PROGNAME = SUBSTR(RECORDS.I,IDENTOFF+8,8)
+      STEPNAME = SUBSTR(RECORDS.I,IDENTOFF+16,8)
+      JES_IDENT= SUBSTR(RECORDS.I,IDENTOFF+32,8)
+      SMF30RAX_FLAG =SUBSTR(RECORDS.I,SMF30ROF+178,1)
+      SMF30RAX_FLAG =X2B(C2X(SMF30RAX_FLAG))
+      REAL_FLAG = SUBSTR(SMF30RAX_FLAG,2,3)
+      FLAG = SUBSTR(SMF30RAX_FLAG,1,1)
+      STC_OR_JOB = SUBSTR(JES_IDENT,1,3)
+      FINAL_TIME=HH||':'||MM||':'||SS
+    IF STC_OR_JOB='JOB' THEN
+       STC_OR_JOB='JOB'
+    ELSE IF STC_OR_JOB='STC' THEN
+       STC_OR_JOB='STC'
+    ELSE IF STC_OR_JOB='TSU' THEN
+       STC_OR_JOB='TSO'
+    ELSE STC_OR_JOB='OTHER'
+    IF FLAG=1 THEN DO
+      IF REAL_FLAG=111 THEN
+         TYPE='USERKEYCSAUSAGE+USERKEYCADSUSAGE+USERKEYCHANGKEYUSAGE'
+      ELSE IF REAL_FLAG=001 THEN
+         TYPE='USERKEYCHANGKEYUSAGE'
+      ELSE IF REAL_FLAG=010  THEN
+         TYPE='USERKEYCADSUSAGE'
+      ELSE IF REAL_FLAG=011 THEN
+         TYPE='USERKEYCADSUSAGE+USERKEYCHANGKEYUSAGE'
+      ELSE IF REAL_FLAG=100 THEN
+         TYPE='USERKEYCSAUSAGE'
+      ELSE IF REAL_FLAG=110 THEN
+         TYPE='USERKEYCSAUSAGE+USERKEYCADSUSAGE'
+      ELSE IF REAL_FLAG=101 THEN
+         TYPE='USERKEYCSAUSAGE+USERKEYCHANGKEYUSAGE'
+      ELSE IF REAL_FLAG=000 THEN
+         TYPE='NO_OFFENDER'
+      END
+    ELSE TYPE =  'NOT_AUDITABLE'
+    IF STEPNAME='' THEN STEPNAME='NOT APPL'
+    IF PROGNAME='' THEN PROGNAME='NOT APPL'
+    IF JES_IDENT='' THEN JES_IDENT='NOT APPL'
+    IF SMF30RON <> 0 THEN DO
+    IF TYPE <> 'NOT_AUDITABLE' THEN DO
+    IF TYPE <> 'NO_OFFENDER' THEN DO
+       OUT_COUNT=OUT_COUNT+1;
+       OUT_COUNT2=OUT_COUNT2+1;
+       FINAL_OUT.OUT_COUNT=,
+       SID"|",
+       FINAL_DATE"|",
+       FINAL_TIME"|",
+       JOBNAME"|",
+       STEPNAME"|",
+       PROGNAME"|",
+       JES_IDENT"|",
+       STC_OR_JOB"|",
+       " "TYPE
+/**************************SUMMARY STEM*******************************/
+    FINAL_OUT2.OUT_COUNT2=,
+    SID"|",
+    FINAL_DATE"|",
+    JOBNAME"|",
+    STEPNAME"|",
+    PROGNAME"|",
+    JES_IDENT"|",
+    STC_OR_JOB"|",
+    " "TYPE
+           END
+          END
+         END
+        END
+       END
+      END
+FINAL_OUT.1=,
+"SID  ",
+"DATE ",
+"   TIME ",
+"    JOBNAME ",
+" STEPNAME ",
+"PROGNAME ",
+"JOBID",
+"    TYPE ",
+"FLAG"
+IF OUT_COUNT2>0 THEN DO
+SAY "SUMMARY REPORT:"
+SAY"---------------------------------------------------------------"||,
+"---------------------------"
+SAY "SID   DATE     JOBNAME   STEPNAME  PROGRAM   JOBID     TYPE  FLAG"
+SAY"---------------------------------------------------------------"||,
+"---------------------------"
+LOOKUP. = NO
+J=0
+DO I = 1 TO OUT_COUNT2
+   V = FINAL_OUT2.I
+    IF LOOKUP.V <> YES THEN DO
+       J = J + 1
+       OUT.J = V
+       LOOKUP.V = YES
+    END
+   END
+OUT.0 = J
+DO I=1 TO OUT.0
+SAY OUT.I
+SAY "-------------------------------------------------------------"||,
+"-----------------------------"
+END
+END
+SAY "                                                               "
+IF OUT_COUNT > 1 THEN DO
+SAY "DETAILED REPORT:"
+SAY"---------------------------------------------------------------"||,
+"---------------------------"
+DO I=1 TO OUT_COUNT
+SAY FINAL_OUT.I;
+SAY "-------------------------------------------------------------"||,
+"-----------------------------"
+END
+END
+ELSE SAY "NO TASKS FOUND";
+EXIT
+DATE_CONVERT: PROCEDURE
+    PARSE ARG CENTURY_YEAR '.' DAY
+    LEAPCAL = ,
+    '000031060091121152182213244274305335366'
+    NLEAPCAL = ,
+    '000031059090120151181212243273304334365'
+    CAL = NLEAPCAL
+    LEAP_CHECK = CENTURY_YEAR//4
+    IF LEAP_CHECK = 0 THEN DO
+       CAL = LEAPCAL
+       LEAP_CHECK = CENTURY_YEAR//100
+          IF LEAP_CHECK = 0 THEN DO
+             LEAP_CHECK = CENTURY_YEAR//400
+             IF LEAP_CHECK = 0 THEN NOP
+             ELSE CAL = NLEAPCAL
+          END
+         END
+       MONTH = 0
+       DO     CALC_DAY = 1 TO LENGTH(CAL) BY 3
+           MONTH_END     = SUBSTR(CAL,CALC_DAY,3)
+           IF DAY        > MONTH_END  THEN NOP
+             ELSE DO
+               DAY       = DAY - SUBSTR(CAL,CALC_DAY-3,3)
+               LEAVE
+             END
+            MONTH       = MONTH+1
+        END
+        RETURN DAY||'/'||MONTH||'/'CENTURY_YEAR
