@@ -1,4 +1,4 @@
-IBM z/OS V2.4 Migration Workflow
+IBM z/OS V2.4 Upgrade Workflow
 ===============================
 
 Introducing another advancement in z/OS upgrade  assistance!  (Be aware "upgrade" is the new term for "migration", as of z/OS V2.4.)
