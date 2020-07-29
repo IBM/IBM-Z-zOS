@@ -65,14 +65,14 @@ Upgrade Workflow Tips
 If you are upgrading from z/OS V2R3 to V2R4, transfer the appropriate three files as binary using File Transfer Protocol (FTP),
 and store them in the same z/OS UNIX directory:
 
-    * zOS Upgrade from V2.3 to V2.4-Level1.0.xml - download this file by clicking on "View Raw", not the DOWNLOAD button, or you will have create problems in the z/OSMF Workflow.
+    * zOS Upgrade from V2.3 to V2.4-Level2.1.xml - download this file by clicking on "View Raw", not the DOWNLOAD button, or you will have create problems in the z/OSMF Workflow.
     * HC_rexx.txt
     * discovery.txt    
 
 If you are migrating from z/OS V2R2 to V2R4, transfer the appropriate three files as binary using File Transfer Protocol (FTP),
 and store them in the same z/OS UNIX directory:
 
-    * zOS Upgrade from V2.2 to V2.4-Level1.0.xml - download this file by clicking on "View Raw" not the DOWNLOAD button, or you will have create problems in the z/OSMF Workflow.
+    * zOS Upgrade from V2.2 to V2.4-Level2.1.xml - download this file by clicking on "View Raw" not the DOWNLOAD button, or you will have create problems in the z/OSMF Workflow.
     * HC_rexx.txt
     * discovery.txt
 
