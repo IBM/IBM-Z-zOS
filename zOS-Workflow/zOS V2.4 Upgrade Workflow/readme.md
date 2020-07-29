@@ -16,8 +16,24 @@ Using a z/OSMF workflow, you can perform a z/OS V2R4 upgrade as an interactive, 
  
 In order to use the z/OSMF Upgrade Workflow, you will need z/OSMF up and running, and Workflow access.  The "z/OS Migration" book is not available for z/OS V2.4.  Although z/OSMF is the strongly encouraged method to consume the z/OS V2.4 upgrade materials, we have provided an exported file of the contents of both the V2.3 and the V2.2 in HTML format.  
 
+---
+## What's new
 
-**What's new**
+**New version:** z/OS V2R4 Upgrade Workflow, Version 2.1 (July 31 2020)
+
+This workflow replaces the previous version, Version 2.0, from September 2019. 
+
+The following upgrade actions are new:
+- "BCP: Plan for removal of support for the IEWTPORTS transport utility"
+- "Security Server: Plan for removal of support for RACF database sharing with z/VM"
+
+Other changes:
+- Throughout this workflow, links were corrected or removed to ensure consistent linking.
+- Terminology, maintenance, and editorial corrections.
+
+
+
+### Changes in previous versions of this workflow</h2>
 
 The z/OS V2R4 Upgrade Workflow is updated with new information for the IBM z15 Model T02, the latest addition to the IBM Z 
 server family. With the addition of the Model T02, the IBM z15 family of mainframes includes the following hardware models: 
@@ -32,15 +48,15 @@ as a 19-inch frame system.
 In the workflow, references to "z15" pertain to all models of the IBM z15, including the z15 T02, unless otherwise noted.
 
 
-**Exported workflows link**
+### Exported workflows link
 
-You can find links to those exported formats on z/OS V2.4 Knowledge Center [AT THE BOTTOM OF THIS WEB PAGE](https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zos.v2r4.e0zm100/abstract.htm).  The exported format is suitable for browsing, printing, and searching.
+You can find links to sample exported workflows in the z/OS V2.4 Knowledge Center [AT THE BOTTOM OF THIS WEB PAGE](https://www.ibm.com/support/knowledgecenter/SSLTBW_2.4.0/com.ibm.zos.v2r4.e0zm100/abstract.htm).  The exported format is suitable for browsing, printing, and searching.
 
-**Want to see a demo?**
+### Want to see a demo?
 
 If you would like to see a short demo on using the z/OS V2R1 migration workflow, visit the site IBM z/OSMF V2.1 Migration Workflow Demo on [YouTube](https://www.youtube.com/watch?v=ejQRSYaxz9M).
 
-**Feedback is welcome**
+### Feedback is welcome
 
 The z/OS V2R4 Upgrade Workflow takes advantage of the newer z/OSMF Workflow enhancement for Feedback. Before using this workflow,  minimally install these PTFs:
 
@@ -52,7 +68,7 @@ Otherwise, validation errors will occur (message IZUWF0133E) during the workflow
 Upgrade Workflow Tips
 -----------------------
 
-* You can skip the "empty" tasks, within the first Discovery step!  To be consistent with the former z/OS Migration book, the z/OS V2.4 upgrade workflows include some empty upgrade actions shown as "None" for components that do not have any migration action. "None" still counts as a workflow sub-task to “complete,” even though there is no upgrade action to perform. If you do not choose to skip the empty tasks during the Disovery step, to complete the sub-task, mark the upgrade action sub-tasks with an "Override-complete" to have them marked as complete. 
+* You can skip the "empty" tasks, within the first Discovery step. To be consistent with the former z/OS Migration book, the z/OS V2.4 upgrade workflows include some empty upgrade actions shown as "None" for components that do not have any migration action. "None" still counts as a workflow sub-task to “complete,” even though there is no upgrade action to perform. If you do not choose to skip the empty tasks during the Disovery step, to complete the sub-task, mark the upgrade action sub-tasks with an "Override-complete" to have them marked as complete. 
 
 * The URL links to the documentation in the workflow cannot go to an anchor in the web page. The URLs take you to the web page, not specifically to the content, which might be further down in the page. You might have to scroll down the web page to find the information that you need. 
 
