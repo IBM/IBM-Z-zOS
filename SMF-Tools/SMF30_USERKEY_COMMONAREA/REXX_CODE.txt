@@ -25,10 +25,7 @@
 /* EITHER EXPRESS OR IMPLIED. SEE THE LICENSE FOR THE SPECIFIC       */
 /* LANGUAGE GOVERNING PERMISSIONS AND LIMITATIONS UNDER THE LICENSE. */
 /*********************************************************************/
-
-"EXECIO * DISKR SMFIN (STEM RECORDS. OPEN FINIS"
-"FREE F(SMFIN)"
-
+I=1
 COUNT=0
 FINAL_OUT.=''
 FINAL_OUT2.=''
@@ -41,7 +38,13 @@ SAY "USER KEY COMMON AREAS ANALYZER"
 SAY "**************************************************************"||,
 "*************************"
 /**********************MAPPING SECTION*******************************/
-DO I=1 TO RECORDS.0
+ "EXECIO 0 DISKR SMFIN (OPEN "
+ EOF = 'NO'
+  DO UNTIL EOF = 'YES'
+  "EXECIO 1 DISKR SMFIN (STEM RECORDS."
+  IF RC <> 0 THEN EOF = 'YES'
+  IF RC=0 THEN
+  DO
    RECTYPE = C2D(SUBSTR(RECORDS.I,2,1)) /*RECORD TYPE VERIFICATION */
     IF RECTYPE=30 THEN DO
       SUBTYPE = C2D(SUBSTR(RECORDS.I,19,2))
@@ -141,6 +144,8 @@ DO I=1 TO RECORDS.0
         END
        END
       END
+     END /* DO UNTIL EOF = 'YES' */
+"EXECIO 0 DISKR SMFIN (FINIS"
 FINAL_OUT.1=,
 "SID  ",
 "DATE ",
