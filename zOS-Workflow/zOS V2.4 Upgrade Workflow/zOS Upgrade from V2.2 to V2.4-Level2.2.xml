@@ -265,9 +265,9 @@
 		<description><![CDATA[ This level of the z/OS Upgrade Workflow
 			corresponds to z/OS V2R4.
 			<h2>Introducing the z/OS V2R4 Upgrade Workflow</h2>
-			<p>Using a z/OSMF workflow, you can perform a z/OS V2R5 upgrade as an interactive, step-by-step process. The z/OS V2R5 Upgrade Workflow uses the latest functions in z/OSMF to provide a smooth upgrade experience.</p>
+			<p>Using a z/OSMF workflow, you can perform a z/OS V2R4 upgrade as an interactive, step-by-step process. The z/OS V2R4 Upgrade Workflow uses the latest functions in z/OSMF to provide a smooth upgrade experience.</p>
 			<p>
-				The z/OS V2R4 Upgrade Workflow is available as two z/OS Management Facility (z/OSMF) workflows. Depending on whether you are migrating from z/OS V2R3 or z/OS V2R4, you select the files that apply to your migration path and download them to your system to create the workflow.
+				The z/OS V2R4 Upgrade Workflow is available as two z/OS Management Facility (z/OSMF) workflows. Depending on whether you are migrating from z/OS V2R2 or z/OS V2R3, you select the files that apply to your migration path and download them to your system to create the workflow.
 			</p>
 			<p>
 				IBM no longer provides the <cite>z/OS Migration</cite> publication. Since z/OS V2R2, the preferred method for learning about migration actions has been the z/OS Workflow. Discovering, performing, and verifying many migration actions through the workflow instead of a traditional book allows for a tailored and specific migration path that is associated with a particular system.
@@ -44638,10 +44638,10 @@
 
 		<step name="OpenSSH_Actions_Before_Install">
 				<!--<step level="step_4_25_3">-->
-				<title>z/OS OpenSSH actions to perform before installing z/OS V2R5</title>
+				<title>z/OS OpenSSH actions to perform before installing z/OS V2R4</title>
 				<description><![CDATA[
 					<p>
-						This topic describes z/OS OpenSSH migration actions that you can perform on your current (old) system. You do not need the z/OS V2R5 level of code to make these changes, and the changes do not require the z/OS V2R5 level of code to run after they are made.</p>
+						This topic describes z/OS OpenSSH migration actions that you can perform on your current (old) system. You do not need the z/OS V2R4 level of code to make these changes, and the changes do not require the z/OS V2R4 level of code to run after they are made.</p>
 					<p>None.</p>
 				]]></description>
 				<condition>
@@ -44657,10 +44657,10 @@
 			</step>
 <step name="OpenSSH_Actions_Before_IPL">
 				<!--<step level="step_4_25_3">-->
-				<title>z/OS OpenSSH actions to perform before the first IPL of z/OS V2R5</title>
+				<title>z/OS OpenSSH actions to perform before the first IPL of z/OS V2R4</title>
 				<description><![CDATA[
 					<p>
-						This topic describes z/OS OpenSSH migration actions that you can perform after you have installed z/OS V2R5, but before the first time you IPL. These actions might require the z/OS V2R5 level of code to be installed, but do not require it to be active.</p>
+						This topic describes z/OS OpenSSH migration actions that you can perform after you have installed z/OS V2R4, but before the first time you IPL. These actions might require the z/OS V2R4 level of code to be installed, but do not require it to be active.</p>
 					<p>None.</p>
 				]]></description>
 				<condition>
@@ -44676,10 +44676,10 @@
 			</step>
 <step name="OpenSSH_Actions_After_IPL">
 				<!--<step level="step_4_9_3">-->
-				<title>z/OS OpenSSH actions to perform after the first IPL of z/OS V2R5</title>
+				<title>z/OS OpenSSH actions to perform after the first IPL of z/OS V2R4</title>
 				<description><![CDATA[
 					<p>
-						This topic describes z/OS OpenSSH migration actions that you can perform only after you have IPLed z/OS V2R5. You need a running z/OS V2R5 system to perform these actions.</p>
+						This topic describes z/OS OpenSSH migration actions that you can perform only after you have IPLed z/OS V2R4. You need a running z/OS V2R4 system to perform these actions.</p>
 				]]></description>
 
 			<step name="OpenSSH_V2R4_Version76P1_AfterIPL">
