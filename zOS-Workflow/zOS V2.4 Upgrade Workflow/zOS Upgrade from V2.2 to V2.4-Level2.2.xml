@@ -647,34 +647,6 @@
 			<!--<step level="step_2_3">-->  
 			<title>Elements and features that do not have upgrade actions</title>  
 			<description><![CDATA[  
-				<p>The following z/OS elements and features do not have upgrade actions on the z/OS V2R3 to z/OS V2R4 path:</p>  
-				<ul> 
-					<li>Alternate Library for REXX</li>  
-					<li>BDT</li>  
-					<li>BDT File-to-File</li>  
-					<li>BDT SNA NJE</li>  
-					<li>Communications Server Security Level 3</li>  
-					<li>DFSORT</li>  
-					<li>EREP</li>  
-					<li>FFST</li>  
-					<li>GDDM</li>  
-					<li>GDDM-PGF</li>  
-					<li>GDDM-REXX</li>  
-					<li>IBM HTTP Server</li>  
-					<li>IBM Knowledge Center for z/OS</li>  
-					<li>IBM Tivoli Directory Server</li>  
-					<li>ICKDSF (Device Support Facility)</li>  
-					<li>Integrated Security Services</li>  
-					<li>Metal C Runtime Library</li>  
-					<li>MICR/OCR</li>  
-					<li>NFS</li>  
-					<li>Runtime Library Extensions</li>  
-					<li>TIOC</li>  
-					<li>z/OS Font Collection</li>  
-					<li>z/OS OpenSSH</li>  
-					<li>z/OS Security Level 3</li>  
-					<li>3270 PC File Transfer Program</li> 
-				</ul>  
 				<p>The following z/OS elements and features do not have upgrade actions on the z/OS V2R2 to z/OS V2R4 path:</p>  
 				<ul> 
 					<li>Alternate Library for REXX</li>  
