@@ -34496,6 +34496,1335 @@
 				<weight>10</weight> 
 			</step>
 </step>
+<step name="OpenSSH_Upgrade_Actions">
+			<!--<step level="step_4_10">-->
+			<title>z/OS OpenSSH upgrade actions</title>
+			<description><![CDATA[
+				<p>This topic describes upgrade actions for the base element z/OS OpenSSH.</p>
+			]]></description>
+
+
+
+		<step name="OpenSSH_Actions_Before_Install">
+				<!--<step level="step_4_25_3">-->
+				<title>z/OS OpenSSH actions to perform before installing z/OS V2R4</title>
+				<description><![CDATA[
+					<p>
+						This topic describes z/OS OpenSSH migration actions that you can perform on your current (old) system. You do not need the z/OS V2R4 level of code to make these changes, and the changes do not require the z/OS V2R4 level of code to run after they are made.</p>
+					<p>None.</p>
+				]]></description>
+				<condition>
+					<expression><![CDATA[(${discoverystep.stepState} == "Complete") ? true : false]]></expression>
+					<description><![CDATA[ Set this step to Skipped if the variable1's value is disable, or set it to ready if the expression is true.]]></description>
+					<targetStateSet>
+						<description><![CDATA[ Set this step to Skipped if the variable1's value is disable.]]></description>
+						<stateExpression state="Skipped"><![CDATA[${instance_none_status} == 'Skip empty upgrade actions']]></stateExpression>
+					</targetStateSet>
+				</condition>
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>
+				<weight>10</weight>
+			</step>
+<step name="OpenSSH_Actions_Before_IPL">
+				<!--<step level="step_4_25_3">-->
+				<title>z/OS OpenSSH actions to perform before the first IPL of z/OS V2R4</title>
+				<description><![CDATA[
+					<p>
+						This topic describes z/OS OpenSSH migration actions that you can perform after you have installed z/OS V2R4, but before the first time you IPL. These actions might require the z/OS V2R4 level of code to be installed, but do not require it to be active.</p>
+				]]></description>
+			<step name="OpenSSH_V2R4_Version76P1_BeforeIPL">
+					<!--<step level="step_4_4_1_3">-->
+					<title>OpenSSH: Accommodate a new level of OpenSSH</title>
+					<description><![CDATA[
+						<h4>Description</h4>
+						<p>In z/OS V2R4, OpenSSH is upgraded to include the new open source version OpenSSH 7.6p1. This level is referred to as OpenSSH V2R4. The previous version of OpenSSH was Version 6.4p1.</p>
+						<p>With z/OS OpenSSH V2R4, significant new features include:
+							<ul>
+								<li>Elliptic-curve DSA keys are now supported in key rings and FIPS.</li>
+								<li>Support new key algorithms: ssh-ed25519 and <samp>ssh-ed25519-cert-v01@openssh.com</samp></li>
+								<li>Support new key exchange algorithms: diffie-hellman-group14-sha256, diffie-hellman-group16-sha512, diffie-hellman-group18-sha512, curve25519-sha256, and curve25519-sha256@libssh.org.</li>
+								<li>Support new cipher algorithms: <samp>chacha20-poly1305@openssh.com</samp></li>
+								<li>SMF Type 119 subtype 94 and 95 (ssh / sshd connection started) records include a section that identifies the IP addresses and ports for the connection.</li>
+								<li>Command <span class="keyword cmdname">ssh-proxyc</span> is added, which can be used by the SSH client to connect through SOCKS5 proxy servers.</li>
+							</ul>
+							<p>
+								With z/OS OpenSSH V2R4, the following features are no longer available (they are deprecated by the Open Source community in OpenSSH 7.6p1):
+								<ul>
+									<li>SSH Version 1 protocol (also referred to as SSH1).<ul><li>These options from ssh_config are removed: Cipher, CompressionLevel, RhostsAuthentication, RhostsRSAAuthentication, RSAAuthentication.</li>
+										<li>These options from sshd_config are removed: KeyRegenerationInteval, RhostsAuthentication, RhostsRSAAuthentication, RSAAuthentication, ServerKeyBits, UseLogin, and PAMAuthenticationViaKbdInt.</li>
+									</ul>
+								</li>
+								<li>These options from sshd_config are removed: KeyRegenerationInteval, RhostsAuthentication, RhostsRSAAuthentication, RSAAuthentication, ServerKeyBits, UseLogin, and PAMAuthenticationViaKbdInt.</li>
+								<li>These options from sshd_config are removed: KeyRegenerationInteval, RhostsAuthentication, RhostsRSAAuthentication, RSAAuthentication, ServerKeyBits, UseLogin, and PAMAuthenticationViaKbdInt.</li>
+								<li>These options from sshd_config are removed: KeyRegenerationInteval, RhostsAuthentication, RhostsRSAAuthentication, RSAAuthentication, ServerKeyBits, UseLogin, and PAMAuthenticationViaKbdInt.</li>
+								<li>Support for Blowfish and RC4 ciphers and the RIPE-MD160 HMAC (Hash Message Authentication Code), specifically: blowfish-cbc, cast128-cbc, arcfour, arcfour128, arcfour256, hmac-ripemd160, hmac-ripemd160@openssh.com, and hmac-ripemd160-etm@openssh.com.</li>
+								<li>Support for Blowfish and RC4 ciphers and the RIPE-MD160 HMAC (Hash Message Authentication Code), specifically: blowfish-cbc, cast128-cbc, arcfour, arcfour128, arcfour256, hmac-ripemd160, hmac-ripemd160@openssh.com, and hmac-ripemd160-etm@openssh.com. </li>
+							</ul>
+							<p>With z/OS OpenSSH V2R4, the following features are no longer enabled by default:
+								<ul>
+									<li>Support for the 1024-bit Diffie-Hellman key exchange, specifically diffie-hellman-group1-sha1</li>
+									<li>Support for DSA (ssh-dss, ssh-dss-cert-*) host and user keys</li>
+									<li>Support for MD5-based and truncated MD5 and SHA1 HMAC algorithms, specifically: hmac-md5, hmac-md5-96@openssh.com, hmac-sha1-96, hmac-sha1-96@openssh.com, hmac-md5-etm@openssh.com, hmac-md5-96-etm@openssh.com, hmac-sha1-96-etm@openssh.com</li>
+									<li>Support for MD5-based and truncated MD5 and SHA1 HMAC algorithms, specifically: hmac-md5, hmac-md5-96@openssh.com, hmac-sha1-96, hmac-sha1-96@openssh.com, hmac-md5-etm@openssh.com, hmac-md5-96-etm@openssh.com, hmac-sha1-96-etm@openssh.com</li>
+								</ul>
+								<p>z/OS OpenSSH V2R4 also includes enhancements to existing keywords.</p>
+								<p>For a list of the z/OS OpenSSH V2R4 changes that might require upgrade actions, see "Steps to take" in this workflow step.</p>
+			<h4>Information about this upgrade action</h4>
+			<p>
+				The following table provides more details about this upgrade action. Use this information to plan your changes to the system.
+			</p>
+			<table rules="rows" frame="hsides" border="1">
+				<tbody>
+		<tr>
+			<th align="left" valign="top">
+				<p>Element or feature:</p>
+			</th>
+			<td align="left" valign="top">
+				<p>z/OS OpenSSH.</p>
+			</td>
+		</tr>
+		<tr>
+			<th align="left" valign="top">
+				<p>When change was introduced:</p>
+			</th>
+			<td align="left" valign="top">
+				<p>z/OS V2R4. Also, see IBM United States Software Announcement <i>"IBM z/OS Version 2 Release 3 enhancements and statements of direction,"</i> dated November 21, 2017.</p>
+			</td>
+		</tr>
+		<tr>
+			<th align="left" valign="top">
+				<p>Applies to upgrade from:</p>
+			</th>
+			<td align="left" valign="top">
+				<p>z/OS V2R3 and z/OS V2R2.</p>
+			</td>
+		</tr>
+		<tr>
+			<th align="left" valign="top">
+				<p>Timing:</p>
+			</th>
+			<td align="left" valign="top">
+				<p>Before the first IPL of z/OS V2R4.</p>
+			</td>
+		</tr>
+		<tr>
+			<th align="left" valign="top">
+				<p>Is the upgrade action required?</p>
+			</th>
+			<td align="left" valign="top">
+				<p>Yes, if any of the changes in "Steps to take" are applicable to your environment.</p>
+			</td>
+		</tr>
+		<tr>
+			<th align="left" valign="top">
+				<p>Target system hardware requirements:</p>
+			</th>
+			<td align="left" valign="top">
+				<p>None.</p>
+			</td>
+		</tr>
+		<tr>
+			<th align="left" valign="top">
+				<p>Target system software requirements:</p>
+			</th>
+			<td align="left" valign="top">
+				<p>None.</p>
+			</td>
+		</tr>
+		<tr>
+			<th align="left" valign="top">
+				<p>Other system (coexistence or fallback) requirements:</p>
+			</th>
+			<td align="left" valign="top">
+				<p>None.</p>
+			</td>
+		</tr>
+		<tr>
+			<th align="left" valign="top">
+				<p>Restrictions:</p>
+			</th>
+			<td align="left" valign="top">
+				<p>None.</p>
+			</td>
+		</tr>
+		<tr>
+			<th align="left" valign="top">
+				<p>System impacts:</p>
+			</th>
+			<td align="left" valign="top">
+				<p>None.</p>
+			</td>
+		</tr>
+		<tr>
+			<th align="left" valign="top">
+				<p>Related IBM Health Checker for z/OS check:</p>
+			</th>
+			<td align="left" valign="top">
+				<p>
+					IBM provides the following health checks:
+					<ul>
+						<li>
+							Use health check ZOSMIGV2R4_SSH_CONFIG is to check the settings	in the SSH config file. The default check path is /etc/ssh/ssh_config.
+					</li>
+					<li>
+						Use health check ZOSMIGV2R4_SSHD_CONFIG is to check the settings in SSH daemon config file. The default check path is /etc/ssh/sshd_config.
+					</li>
+				</p>
+				<p>
+					These checks are available for z/OS V2R3 and z/OS V2R2 with APAR OA57724 applied.
+				</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<h4>Steps to take</h4>
+<p>
+	The following sections describe potential upgrade actions for the OpenSSH base element.</p>
+	<h4>Changes to the ssh_config file</h4>
+	<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e160" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e162" class="stentry thleft thbot" width="50%">Customization action needed? </th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e160" class="stentry"><p>The BatchMode keyword</p>
+<p>Previously, authentication without passphrase/password querying in batch mode did not include
+SSH_ASKPASS. Now, match mode allows SSH_ASKPASS to be used for authentication.</p>
+</td>
+<td valign="top" headers="d69e162" class="stentry"><p>No, SSH_ASKPASS is not listed as an available authentication option in the previous version. </p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e160" class="stentry"><p>The Ciphers keyword</p>
+<p> Previously, chacha20-poly1305@openssh.com is not supported. Now chacha20-poly1305@openssh.com is
+added to the default list. Also, preciously ‘+’ or ‘-’ character is not supported at the beginning of a specified value. Now ‘+’ or  ‘-’ character is allowed to be used at the beginning of a specified cipher algorithm to append it to the default cipher list.</p>
+</td>
+<td valign="top" headers="d69e162" class="stentry"><p>Yes, if you use the previous default list and do not want to allow the new cipher or the new
+order of the preferred ciphers. </p>
+<p><strong class="ph b">Action:</strong> Specify the previous default list without the deprecated ciphers blowfish-cbc, arcfour, arcfour128, arcfour256, and cast128-cbc.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e160" class="stentry"><p>The ControlPath keyword</p>
+<p>Previously, <code>‘%%’</code> is not supported in the ControlPath argument. Now, if the argument contains
+<code>‘%%’</code>, it is interpreted as a literal percent sign (%).</p>
+</td>
+<td valign="top" headers="d69e162" class="stentry"><p>No, ControlPath argument that contains <code>‘%%’</code> was not considered as a valid option in the previous
+version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e160" class="stentry"><p>The ControlPersist keyword</p>
+<p> Previously, the argument ‘0’ is not supported. Now, if the argument is set to ‘0’, it is the same as setting the argument to ‘yes’ to allow the primary connection to  remain in the background
+indefinitely.</p>
+</td>
+<td valign="top" headers="d69e162" class="stentry"><p>No, setting ControlPersist to 0 was not considered as a valid option in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e160" class="stentry"><p>The HostKeyAlgorithms keyword</p>
+
+<p>Previously, ssh-ed25519 and ssh-ed25519-cert-v01@openssh.com are not supported. Now, ssh-ed25519
+and ssh-ed25519-cert-v01@openssh.com are supported and these algorithms are added to the default
+list. Also, preciously ‘+’ or ‘-’ character is not supported at the beginning of a specified value.
+Now ‘+’ or ‘-’ character is allowed to be used at the beginning of a specified cipher algorithm to
+append it to the default list of host key algorithms.</p>
+
+<p> The complete list of host key algorithms that are used by ssh can be found in ssh_config (see
+HostKeyAlgorithms).</p>
+</td>
+<td valign="top" headers="d69e162" class="stentry"><p>Yes, if you use the previous default list and do not want to allow the new host key algorithms or
+the new order of the preferred host key algorithms. </p>
+
+<p><strong class="ph b">Action:</strong> Specify the previous default list without the deprecated host key algorithms:
+ssh-dss-cert-v00@openssh.com and ssh-rsa-cert-v00@openssh.com.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e160" class="stentry"><p>The HostName keyword</p>
+<p>Previously, <code>‘%%’</code> is not supported in the HostName argument. Now, if the argument contains <code>‘%%’</code>,
+it is interpreted as a literal percent sign (%).</p>
+</td>
+<td valign="top" headers="d69e162" class="stentry"><p>No, HostName argument that contains <code>‘%%’</code> was not considered as a valid option in the previous
+version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e160" class="stentry"><p>The IdentityFile keyword</p>
+<p>Previously, the default list of SSH protocol version 2 did not contain Ed25519 authentication
+identity ~/.ssh/id_ed25519. Now ~/.ssh/id_ed25519 is added and the default list of identities is
+~/.ssh/id_dsa, ~/.ssh/id_ecdsa, ~/.ssh/id_ed25519, and ~/.ssh/id_rsa.</p>
+<p>Previously <code>‘%%’</code> was not supported in the IdentityFile argument. Now, if the argument contains
+<code>‘%%’</code>, it is interpreted as a literal percent sign (%).</p>
+</td>
+<td valign="top" headers="d69e162" class="stentry"><p>Yes, if you use the previous default list and do not want to allow the new identity file or the
+new order of the preferred identity file.</p>
+<p><strong class="ph b">Action:</strong> Specify the previous default list but note that SSH protocol version 1 identity is no longer supported.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e160" class="stentry"><p>The KexAlgorithms keyword</p>
+<p> Previously, the default list does not contain curve25519-sha256, curve25519-sha256@libssh.org,
+diffie-hellman-group14-sha256, diffie-hellman-group16-sha512, and diffie-hellman-group18-sha512.
+Now, the default KEX list contains curve25519-sha256, curve25519-sha256@libssh.org,
+diffie-hellman-group14-sha256, diffie-hellman-group16-sha512, and diffie-hellman-group18-sha512.
+Also, preciously ‘+’ or ‘-’ character is not supported at the beginning of a specified value. Now
+‘+’ or ‘-’ character is allowed to be used at the beginning of a specified KEX algorithm to append
+it to the default KEX list.</p>
+</td>
+<td valign="top" headers="d69e162" class="stentry"><p>Yes, if you use the previous default list and do not want to allow the new key exchange algorithm
+file or the new order of the preferred key exchange algorithm file.</p>
+<p><strong class="ph b">Action:</strong> Specify the previous default list.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e160" class="stentry"><p>The LocalCommand keyword</p>
+<p> Previously, <code>‘%%’</code> is not supported in the LocalCommand argument. Now, if the argument contains
+<code>‘%%’</code>, it is interpreted as a literal percent sign (%).</p>
+</td>
+<td valign="top" headers="d69e162" class="stentry"><p>No, LocalCommand argument that contains <code>‘%%’</code> or set to ‘none’ was not considered as a valid
+option in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e160" class="stentry"><p>The LocalForward keyword</p>
+<p>Previously, the argument does not contain the UNIX socket format
+[bind_address:]port:host:hostport, local_socket:host:hostport, and local_socket:remote_socket. Now
+the argument allows you to specify UNIX socket format [bind_address:]port:host:hostport,
+local_socket:host:hostport, and local_socket:remote_socket for local forward connection. </p>
+</td>
+<td valign="top" headers="d69e162" class="stentry"><p>No, UNIX socket is not allowed to use for local forward connection in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e160" class="stentry"><p>The ProxyCommand keyword</p>
+<p> Previously, <code>‘%%’</code> is not supported in the argument. Now, if the argument contains <code>‘%%’</code>, it is
+interpreted  as a literal percent sign (%). </p>
+<p>Also, the argument ‘none’ is not supported. Now, if the argument is set to ‘none’, the ability of ProxyCommand to use command to connect to the server is unavailable. Further, ssh-proxyc was not available in the previous version. Now, ProxyCommand can be used with ssh-proxyc.</p>
+</td>
+<td valign="top" headers="d69e162" class="stentry"><p>No. ProxyCommand argument that contains <code>‘%%’</code> or set to ‘none’ was not considered as a valid
+option in the previous version. And ssh-proxyc was not available in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e160" class="stentry"><p>The RemoteForward keyword</p>
+<p> Previously, the argument does not allow the UNIX socket format [bind_address:]port:local_socket,
+remote_socket:host:hostport, remote_socket:local_socket nor does it allow SOCKS 4 or 5 proxy format
+[bind_address:]port. Now, the argument allows you to use UNIX socket format
+[bind_address:]port:local_socket, remote_socket:host:hostport, remote_socket:local_socket. And
+[bind_address:]port format is allowed to let ssh act as a SOCKS 4 or 5 proxy and forward connections.</p>
+</td>
+<td valign="top" headers="d69e162" class="stentry"><p>No, the newly added arguments were not valid in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e160" class="stentry"><p>The SendEnv keyword</p>
+<p>Previously, the TERM environment variable is not sent if TERM is not specified in sshd_config
+AcceptEnv keyword whenever the client requests a pseudo-terminal. Now, the TERM environment variable
+is always sent whenever a pseudo-terminal is requested, as it is required by the protocol.</p>
+</td>
+<td valign="top" headers="d69e162" class="stentry"><p>Yes, if previously TERM was not specified as an environment variable for sshd_config
+AcceptEnv.</p>
+<p><strong class="ph b">Action:</strong> Unset TERM unless you do not need it and do not want to send it. Otherwise, ssh
+sends the TERM environment variable by default.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e160" class="stentry"><p>The StrictHostKeyChecking keyword</p>
+<p>Previously, the argument ‘accept-new’ or ‘off’ is not supported. Now, the argument ‘accept-new’ is used to let ssh automatically add new host keys to the user known hosts files but refuse connections to hosts with changed host keys. The argument ‘off’ is used the same as ‘no’ to automatically add new host keys to the user known hosts files and allow connections to hosts with changed host keys to proceed.</p>
+</td>
+<td valign="top" headers="d69e162" class="stentry"><p>No, setting StrictHostKeyChecking to ‘accept-new’ or ‘off’ was not considered as a valid option
+in the previous version.</p>
+</td>
+</tr>
+</table>
+<h4>Changes to the sshd_config file</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e348" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e350" class="stentry thleft thbot" width="50%">Customization action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e348" class="stentry"><p>The AllowUsers keyword</p>
+
+<p>Previously, the CIDR address/masklen format was not supported for the HOST criteria.</p>
+
+<p>Now, HOST criteria can contain addresses to match in CIDR address/masklen format.</p>
+</td>
+<td valign="top" headers="d69e350" class="stentry"><p>No. The CIDR address/masklen format is not valid in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e348" class="stentry"><p>The AuthenticationMethods keyword</p>
+<p>Previously, "any" as the string was not supported.</p>
+<p>Now, “any” to indicate the default behavior of accepting any single authentication method.</p>
+</td>
+<td valign="top" headers="d69e350" class="stentry"><p>No, “any” is not valid in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e348" class="stentry"><p>The AuthorizedKeysCommand keyword</p>
+<p>Previously, tokens (%%, %f, %h, %k, %t, and %u) were not supported for AuthorizedKeysCommand.</p>
+<p>Now, arguments to AuthorizedKeysCommand accept the tokens. If no arguments are specified, the username of the target user is used.</p>
+</td>
+<td valign="top" headers="d69e350" class="stentry"><p>No. Tokens were not valid in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e348" class="stentry"><p>The Ciphers keyword </p>
+<p>Previously, chacha20-poly1305@openssh.com algorithm is not supported by Cipher. Now the cipher supports
+chacha20-poly1305@openssh.com algorithm and added it into the default list.</p>
+<p> Previously, ‘+’ character and ‘-’ character were not supported. Now, if the specified value
+begins with a ‘+’ character, the specified methods are appended to the default set instead of
+replacing them. If the specified value begins with a ‘-’ character, the specified methods (including
+wildcards) are removed from the default set, instead of replacing them.</p>
+</td>
+<td valign="top" headers="d69e350" class="stentry"><p>Yes, if you use the previous default list and do not want to allow the new cipher or the new
+order of the preferred ciphers. </p>
+<p>‘+’ character and ‘-’ character is not valid in the previous version.</p>
+<p><strong class="ph b">Action:</strong> Specify the previous default list without the deprecated ciphers blowfish-cbc, arcfour, arcfour128, arcfour256, and cast128-cbc.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e348" class="stentry"><p>The DenyUsers keyword</p>
+<p>Previously, address/masklen format was not supported for the HOST criteria. Now, HOST criteria
+can additionally contain addresses to match in CIDR address/masklen format.</p>
+</td>
+<td valign="top" headers="d69e350" class="stentry"><p>No, CIDR address/masklen format is not valid in the previous version. </p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e348" class="stentry"><p>The HostKey keyword</p>
+<p>Previously, the default host key was /etc/ssh/ssh_host_rsa_key, /etc/ssh/ssh_host_dsa_key, and
+/etc/ssh/ssh_host_ecdsa_key, for protocol version 2. </p>
+<p>Now, the default host key is /etc/ssh/ssh_host_rsa_key, /etc/ssh/ssh_host_dsa_key,
+/etc/ssh/ssh_host_ecdsa_key, and /etc/ssh/ssh_host_ed25519_key. </p></td>
+<td valign="top" headers="d69e350" class="stentry"><p>Yes, if you want to use the previous default host key for protocol version 2 and don't want to
+use host key /etc/ssh/ssh_host_ ed25519_key.</p>
+
+<p><strong class="ph b">Action:</strong> Specify the previous default host key. </p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e348" class="stentry"><p>The KexAlgorithms keyword</p>
+
+<p>Previously, ‘+’ character and ‘-’ character were not supported. Now, if the specified value
+begins with a ‘+’ character, the specified methods are appended to the default set instead of
+replacing them. If the specified value begins with a ‘-’ character, the specified methods (including
+wildcards) are removed from the default set, instead of replacing them.</p>
+<p>Previously, the default KexAlgorithms List did not contain diffie-hellman-group14-sha256,
+diffie-hellman-group16-sha512, diffie-hellman-group18-sha512, curve25519-sha256, and curve25519-sha256@libssh.org.
+Now the default
+KexAlgorithms list contains diffie-hellman-group14-sha256, diffie-hellman-group16-sha512,
+diffie-hellman-group18-sha512, curve25519-sha256, and curve25519-sha256@libssh.org.</p>
+</td>
+<td valign="top" headers="d69e350" class="stentry"><p>Yes, if you use the previous default list and do not want to allow the new KexAlgorithms. The
+previous default list was ecdh-sha2-nistp256, ecdh-sha2-nistp384, ecdh-sha2-nistp521,
+diffie-hellman-group-exchange-sha256, diffie-hellman-group-exchange-sha1,
+diffie-hellman-group14-sha1, diffie-hellman-group1-sha1.</p>
+<p> ‘+’ character and ‘-’ character is not valid in the previous version.</p>
+<p><strong class="ph b">Action:</strong> Specify the previous default list.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e348" class="stentry"><p>The Match keyword</p>
+<p>Previously, CIDR address/masklen format was not supported for the Address criteria. Now, address
+criteria can additionally contain addresses to match in CIDR address/masklen format.</p>
+<p>Previously, the keywords that could be used on the lines that follow Match did not contain
+AllowStreamLocalForwarding, AuthorizedPrincipalsCommand, AuthorizedPrincipalsCommandUser,
+ClientAliveCountMax, ClientAliveInterval, HostbasedAcceptedKeyTypes, IPQoS, LogLevel, PermitUserRC,
+PubkeyAcceptedKeyTypes, RevokedKeys, StreamLocalBindMask, StreamLocalBindUnlink, TrustedUserCAKeys. </p>
+
+<p>RhostsRSAAuthentication and RSAAuthentication are contained in the keyword list that can be used
+on the lines that follow Match. </p>
+
+<p>Now, the keywords that can be used on the lines that follow Match include
+AllowStreamLocalForwarding, AuthorizedPrincipalsCommand, AuthorizedPrincipalsCommandUser,
+ClientAliveCountMax, ClientAliveInterval, HostbasedAcceptedKeyTypes, IPQoS, LogLevel, PermitUserRC,
+PubkeyAcceptedKeyTypes, RevokedKeys, StreamLocalBindMask, StreamLocalBindUnlink, TrustedUserCAKeys,
+and do not contain RhostsRSAAuthentication and RSAAuthentication. </p>
+</td>
+<td valign="top" headers="d69e350" class="stentry"><p>No. CIDR address/masklen format is not valid in the previous version. Similarly, the following
+are not valid: AllowStreamLocalForwarding, AuthorizedPrincipalsCommand,
+AuthorizedPrincipalsCommandUser, ClientAliveCountMax, ClientAliveInterval,
+HostbasedAcceptedKeyTypes, IPQoS, LogLevel, PermitUserRC, PubkeyAcceptedKeyTypes, RevokedKeys,
+StreamLocalBindMask, StreamLocalBindUnlink, TrustedUserCAKeys.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e348" class="stentry"><p>The PermitOpen keyword</p>
+
+<p>Previously, none and * was not supported. Now, none can be used to prohibit all forwarding
+requests and the wildcard ‘*’ can be used for host or port to allow all hosts or ports.</p>
+</td>
+<td valign="top" headers="d69e350" class="stentry"><p>No. None and * are not valid in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e348" class="stentry"><p>The RevokedKeys keyword</p>
+
+<p> Previously, none was not a supported value. Now, none is used to indicate not use one.</p>
+</td>
+<td valign="top" headers="d69e350" class="stentry"><p>No. None is not valid in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e348" class="stentry"><p>The TrustedUserCAKeys keyword</p>
+
+<p>Previously, none is not a supported value. Now, none is used to indicate not use one. </p>
+</td>
+<td valign="top" headers="d69e350" class="stentry"><p>No. None is not valid in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e348" class="stentry"><p>The XauthLocation keyword</p>
+
+<p>Previously, none is not a supported value. Now, none is used to indicate not use one. </p>
+</td>
+<td valign="top" headers="d69e350" class="stentry"><p>No. None is not valid in the previous version.</p>
+</td>
+</tr>
+</table>
+<h4>Changes to the ssh command</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e527" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e529" class="stentry thleft thbot" width="50%">Customization action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e527" class="stentry"><p>The -c option</p>
+
+<p>Previously, chacha20-poly1305@openssh.com is not supported. Now chacha20-poly1305@openssh.com is
+added to the default list.</p>
+
+<p> The complete list of ciphers that are used by ssh can be found in ssh_config (see Ciphers).</p>
+</td>
+<td valign="top" headers="d69e529" class="stentry"><p>Yes, if you use the previous default list and do not want to allow the new cipher or the new
+order of the preferred ciphers. </p>
+
+<p><strong class="ph b">Action:</strong> Specify the previous default list without the deprecated ciphers blowfish-cbc,
+arcfour, arcfour128, arcfour256, and cast128-cbc.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e527" class="stentry"><p>The -i option</p>
+
+<p> Previously, the default list of SSH protocol version 2 did not contain Ed25519 authentication
+identity ~/.ssh/id_ed25519. Now ~/.ssh/id_ed25519 is added and the default list of identities is
+~/.ssh/id_dsa, ~/.ssh/id_ecdsa, ~/.ssh/id_ed25519, and ~/.ssh/id_rsa.</p>
+</td>
+<td valign="top" headers="d69e529" class="stentry"><p>Yes, if you use the previous default list and do not want to allow the new identity file or the
+new order of the preferred identity file.</p>
+
+<p><strong class="ph b">Action:</strong> Specify the previous default list but note that SSH protocol version 1 identity is
+no longer supported.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e527" class="stentry"><p>The -L option</p>
+
+<p> Previously, the argument does not contain the UNIX socket format
+[bind_address:]port:host:hostport, local_socket:host:hostport, and local_socket:remote_socket. Now,
+the argument allows you to use UNIX socket format [bind_address:]port:host:hostport,
+local_socket:host:hostport, and local_socket:remote_socket for local forward connection.</p>
+</td>
+<td valign="top" headers="d69e529" class="stentry"><p>No, UNIX socket is not allowed to use for local forward connection in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e527" class="stentry"><p>The -O option</p>
+
+<p>Previously, ‘forward’, ‘cancel’, ‘proxy’ and ‘stop’ arguments are not supported. Now ‘forward’ is
+used to request forwarding without command execution; ‘cancel’ is used to cancel forwarding; ‘proxy’
+is used to start multiplexing proxy mode; ‘stop’ is used to request the primary to stop accepting
+further multiplexing requests.</p>
+</td>
+<td valign="top" headers="d69e529" class="stentry"><p>No, the newly added arguments were not valid in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e527" class="stentry"><p>The -Q option</p>
+
+<p> Previously, the available arguments do not include ‘cipher-auth’, ‘key-cert’, ‘key-plain’ and
+‘protocol-version’. Now, ‘cipher-auth’ is used to query supported symmetric ciphers that support
+authenticated encryption, ‘key-cert’ is used to query certificate key types, ‘key-plain’ is used to
+query non-certificate key types, and ‘protocol-version’ is used to query supported SSH protocol
+versions.</p>
+</td>
+<td valign="top" headers="d69e529" class="stentry"><p>No, the newly added arguments were not valid in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e527" class="stentry"><p>The -R option</p>
+
+<p> Previously, the argument does not allow the UNIX socket format [bind_address:]port:local_socket,
+remote_socket:host:hostport, remote_socket:local_socket nor does it allow SOCKS 4 or 5 proxy format
+[bind_address:]port. Now, the argument allows you to use UNIX socket format
+[bind_address:]port:local_socket, remote_socket:host:hostport, remote_socket:local_socket. And
+[bind_address:]port format is allowed to let ssh act as a SOCKS 4 or 5 proxy and forward
+connections.</p>
+</td>
+<td valign="top" headers="d69e529" class="stentry"><p>No, the newly added arguments were not valid in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e527" class="stentry"><p>The ~C escape character </p>
+
+<p> Previously, it does not allow cancellation of local forwarding. Now, -KL[bind_address:]port is
+allowed to cancel local forwarding in command line. </p>
+</td>
+<td valign="top" headers="d69e529" class="stentry"><p>No, the added command is considered as invalid in the previous version.</p>
+</td>
+</tr>
+</table>
+<h4>Changes to the sshd command</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e620" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e622" class="stentry thleft thbot" width="50%">Customization action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e620" class="stentry"><p>The -h option.</p>
+
+<p>Previously, the default host key was /etc/ssh/ssh_host_rsa_key, /etc/ssh/ssh_host_dsa_key, and
+/etc/ssh/ssh_host_ecdsa_key, for protocol version 2. </p>
+
+<p> Now the default host key is /etc/ssh/ssh_host_rsa_key, /etc/ssh/ssh_host_dsa_key,
+/etc/ssh/ssh_host_ecdsa_key, and /etc/<u class="ph u">ssh</u>/ssh_host_ed25519_key.</p>
+</td>
+<td valign="top" headers="d69e622" class="stentry"><p>Yes, if you want to use the previous default host key for protocol version 2 and don't want to
+use host key /etc/ssh/ssh_host_ed25519_key. </p>
+
+<p><strong class="ph b">Action:</strong> Specify the previous default host key for protocol version 2. </p>
+</td>
+</tr>
+</table>
+<h4>Changes to the sftp command</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e651" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e653" class="stentry thleft thbot" width="50%">Customization action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e651" class="stentry"><p>The -f option for put and get subcommands.</p>
+
+<p>Previously, sftp didn’t support fsync() calling.</p>
+
+<p> Now a new option -f was added for fsync() calling. If the -f flag is specified, then it requests
+that files be flushed to disk immediately after transfer.</p>
+</td>
+<td valign="top" headers="d69e653" class="stentry"><p>Yes. The sync() calling is only supported by servers that implement the "fsync@openssh.com"
+extension.</p>
+
+<p><strong class="ph b">Action:</strong> If you want to use -f option, ensure that the server implements the
+"fsync@openssh.com" extension.</p>
+</td>
+</tr>
+</table>
+<h4>Changes to the ssh-keygen command</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e679" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e681" class="stentry thleft thbot" width="50%">Customization action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e679" class="stentry"><p>The -t option</p>
+
+<p>Previously, ssh-keygen didn’t support key type ed25519.</p>
+
+<p> Now, a new supported key type ed25519 was added.</p>
+</td>
+<td valign="top" headers="d69e681" class="stentry"><p>No. Use this new key type as you need.</p>
+</td>
+</tr>
+</table>
+<h4>Changes to the ssh-keyscan command</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e702" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e704" class="stentry thleft thbot" width="50%">Customization action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e702" class="stentry"><p>The -t option</p>
+	<p>Previously, ssh-keyscan didn’t support key type ed25519.</p>
+<p> Now, a new supported key type ed25519 was added.</p>
+</td>
+<td valign="top" headers="d69e704" class="stentry"><p>No. Use this new key type as you need.</p>
+</td>
+</tr>
+</table>
+<h4>Changes to the ssh_config file that might require an upgrade action</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e725" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e727" class="stentry thleft thbot" width="50%">Upgrade action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The AFSTokenPassing keyword</p>
+
+<p>Previously, this keyword indicated whether to pass AFS token to remote host when using SSH
+protocol version 1. Now, AFSTokenPassing keyword is removed because SSH protocol version 1 is no
+longer supported.</p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>No. Because AFSTokenPassing is not supported on z/OS UNIX.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The Cipher keyword</p>
+
+<p>Previously, this keyword specified the cipher to for encryption for SSH protocol version 1. Now,
+Cipher keyword is removed because SSH protocol version 1 is no longer supported.</p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>Yes, if you are using any of the SSH protocol version 1 ciphers: 3des, blowfish, or des. If you
+specify SSH protocol version 1 cipher in the ssh configuration file, a debug message “Deprecated
+option "Cipher"” is returned.</p>
+
+<p><strong class="ph b">Action:</strong> Update your application. Do not specify to use SSH protocol version 1 and its
+ciphers. Use SSH protocol version 2 and its corresponding ciphers.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The Ciphers keyword</p>
+
+<p> Previously, SSH protocol version 2 ciphers blowfish-cbc, arcfour, arcfour128, arcfour256,
+cast128-cbc, 3des-cbc, aes128-cbc, aes192-cbc, and aes256-cbc are supported and listed in the
+default list. Now blowfish-cbc, arcfour, arcfour128, arcfour256, and cast128 are no longer
+supported; 3des-cbc, aes128-cbc, aes192-cbc, and aes256-cbc are removed from the default cipher
+list.</p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>Yes, if you are using any of the listed ciphers: blowfish-cbc, arcfour, arcfour128, arcfour256,
+cast128-cbc, 3des-cbc, aes128-cbc, aes192-cbc, and aes256-cbc. </p>
+
+<p><strong class="ph b">Action:</strong> Do not specify to use blowfish-cbc, arcfour, arcfour128, arcfour256, or
+cast128-cbc. When specifying 3des-cbc, aes128-cbc, aes192-cbc, or aes256-cbc, specify the same
+cipher in sshd.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The CompressionLevel keyword</p>
+
+<p>Previously, this keyword specified the compression level if compression is enabled when using SSH
+protocol version 1. Now, CompressionLevel is removed because the compression level applies to
+compression option in SSH protocol version 1 only and this version is no longer supported.</p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>Yes, if you are using the SSH protocol version 1 and enabled compression option with a specified
+compression level.</p>
+
+<p><strong class="ph b">Action:</strong> Use SSH protocol version 2 without specifying compression option and its
+compression level.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The HostKeyAlgorithms keyword</p>
+
+<p>Previously, host key algorithms ssh-dss, ssh-dss-cert-v00@openssh.com,
+ssh-dss-cert-v01@openssh.com, and ssh-rsa-cert-v00@openssh.com are supported and listed in the
+default list. Now, ssh-dss-cert-v00@openssh.com ssh-rsa-cert-v00@openssh.com is no longer supported;
+ssh-dss and ssh-dss-cert-v01@openssh.com are removed from the default host key algorithms list.</p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>Yes, if you are specifying ssh-dss, ssh-dss-cert-v00@openssh.com, ssh-dss-cert-v01@openssh.com or
+ssh-rsa-cert-v00@openssh.com, or using the previous default host key algorithms list.</p>
+
+<p><strong class="ph b">Action:</strong> Do not specify unsupported host key algorithms: ssh-dss-cert-v00@openssh.com and
+ssh-rsa-cert-v00@openssh.com. When specifying ssh-dss or ssh-dss-cert-v01@openssh.com, specify the
+same host key algorithm in sshd.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The IdentityFile keyword</p>
+
+<p>Previously, SSH protocol version 1 identity ~/.ssh/identity is supported. Now SSH protocol
+version 1 is no longer supported so ~/.ssh/identity or any other specified SSH protocol version 1
+identity is no longer available.</p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>Yes, if you use the default identity list or SSH protocol version 1 identity such as
+~/.ssh/identity is specified. If specifying SSH protocol version 1 identity, error message “FOTS3785
+key_load_public: invalid format” is returned.</p>
+
+<p><strong class="ph b">Action:</strong> Do not specify SSH protocol version 1 identity, use default SSH protocol version 2
+identities only.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The KeepAlive keyword</p>
+
+<p>Previously, this keyword is kept for compatibility with versions of OpenSSH before 3.8.1p1 to
+specify whether the system should send TCP keepalive messages to the other side. Now this keyword is
+no longer supported and is replaced by TCPKeepAlive.</p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>Yes, if you are using this keyword to specify whether the system should send TCP keepalive
+messages to the other side. </p>
+
+<p><strong class="ph b">Action:</strong> Update your application. Use TCPKeepAlive instead of KeepAlive.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The KexAlgorithms keyword</p>
+
+<p>Previously, the default list contains diffie-hellman-group1-sha1. Now, the default KEX list does
+not contain diffie-hellman-group1-sha1.</p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>Yes, if you are specifying the use of diffie-hellman-group1-sha1. When specifying
+diffie-hellman-group1-sha1, an error message “no matching key exchange method found” is
+returned.</p>
+
+<p><strong class="ph b">Action:</strong> Do not use hellman-group1-sha1 as the only KEX algorithm.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The LocalForward keyword</p>
+
+<p>Previously, IPv6 addresses could be specified with the syntax: [bind_address/]port/host/hostport.
+Now, the forward slash (/) is not supported as a separator in the format. IPv6 ad-dresses are
+specified by enclosing the address in square brackets, such as
+[ipv6_bind_address:]port:host:hostport.</p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>Yes, if you are using the previous format to specify the IPv6 address.</p>
+
+<p><strong class="ph b">Action:</strong> Do not use the previous format, use [ipv6_bind_address:]port:host:hostport to
+specify IPv6 address instead.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The MACs keyword</p>
+
+<p>Previously, MAC algorithms hmac-ripemd160, hmac-ripemd160@openssh.com, and
+hmac-ripemd160-etm@openssh.com are supported. Now, hmac-ripemd160, hmac-ripemd160@openssh.com, and
+hmac-ripemd160-etm@openssh.com are no longer supported. </p>
+
+<p>Also, the previous default MAC algorithm list contains hmac-ripemd160,
+hmac-ripemd160@openssh.com, hmac-ripemd160-etm@openssh.com, hmac-sha1-96,
+hmac-sha1-96-etm@openssh.com, hmac-md5, hmac-md5-etm@openssh.com, hmac-md5-96, and
+hmac-md5-96-etm@openssh.com. </p>
+
+<p>Now the default list does not contain hmac-ripemd160, hmac-ripemd160@openssh.com,
+hmac-ripemd160-etm@openssh.com, hmac-sha1-96, hmac-sha1-96-etm@openssh.com, hmac-md5,
+hmac-md5-etm@openssh.com, hmac-md5-96, and hmac-md5-96-etm@openssh.com. </p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>Yes, if you specified any of the removed MAC algorithms: hmac-ripemd160,
+hmac-ripemd160@openssh.com and hmac-ripemd160-etm@openssh.com, or using MAC algorithms that are
+disabled by default: hmac-sha1-96, hmac-sha1-96-etm@openssh.com, hmac-md5, hmac-md5-etm@openssh.com,
+hmac-md5-96, and hmac-md5-96-etm@openssh.com.</p>
+
+<p><strong class="ph b">Action:</strong> Do not specify unsupported MAC algorithms: hmac-ripemd160,
+hmac-ripemd160@openssh.com, and hmac-ripemd160-etm@openssh.com. To use hmac-sha1-96,
+hmac-sha1-96-etm@openssh.com, hmac-md5, hmac-md5-etm@openssh.com, hmac-md5-96, or
+hmac-md5-96-etm@openssh.com, specify the same MAC algorithm in sshd.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The Protocol keyword</p>
+
+<p> Previously, this keyword specified the SSH protocol version to use. The available arguments are
+1 and 2. Now, because SSH protocol version 1 is no longer supported, argument ‘1’ is ignored and
+only SSH protocol version 2 is used by default.</p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>Yes, if you are specifying ‘1’ to use SSH protocol version 1. When ‘1’ is specified, this
+argument is ignored and SSH protocol version 2 is used instead.</p>
+
+<p><strong class="ph b">Action:</strong> Do not specify to use SSH protocol version 1, use the default SSH protocol version
+2.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The RemoteForwardkeyword</p>
+
+<p> Previously, IPv6 addresses can be specified with a syntax: [bind_address/]port/host/hostport.
+Now, forward slash (/) is not supported as a separator in the format, IPv6 addresses are specified
+by enclosing the address in square brackets, such as [ipv6_bind_address:]port:host:hostport.</p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>Yes, if you are using the previous format to specify the IPv6 address. </p>
+
+<p><strong class="ph b">Action:</strong> Do not use the previous format, use [ipv6_bind_address:]port:host:hostport to
+specify IPv6 address instead.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The RhostsRSAAuthentication keyword</p>
+
+<p> Previously, this keyword indicated whether to try rhosts-based authentication with RSA host
+authentication in SSH protocol version 1. Now, this keyword is removed because SSH protocol version
+1 is no longer supported.</p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>Yes, if you are using rhost-based authentication with RSA host authentication in SSH protocol
+version 1. If specifying this keyword, error message “Unsupported option "RhostsRSAAuthentication"”
+is returned.</p>
+
+<p><strong class="ph b">Action:</strong> Update your application. Do not specify the  RhostsRSAAuthentication keyword. </p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The RSAAuthentication keyword</p>
+
+<p> Previously, this keyword indicated whether to try RSA authentication in SSH protocol version 1.
+Now, this keyword is removed because SSH protocol version 1 is no longer supported.</p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>Yes, if you are using RSA authentication in SSH protocol version 1. If specifying this keyword,
+error message “Unsupported option "RSAAuthentication"” is returned.</p>
+
+<p><strong class="ph b">Action:</strong> Update your application. Do not specify the RSAAuthentication keyword.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e725" class="stentry"><p>The UsePrivilegedPort keyword</p>
+
+<p> Previously, this keyword indicated whether to use a privileged port for outgoing connections.
+Now privileged port is not allowed to be used and this keyword is removed.</p>
+</td>
+<td valign="top" headers="d69e727" class="stentry"><p>Yes, if you are using privileged port. If specifying UsePrivilegedPort, this keyword is ignored
+.</p>
+
+<p><strong class="ph b">Action:</strong> Update your application. Do not specify the UsePrivilegedPort keyword.</p>
+</td>
+</tr>
+</table>
+<h4>Changes to the sshd_config file that might require an upgrade action</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e962" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e964" class="stentry thleft thbot" width="50%">Upgrade action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The AcceptEnv keyword </p>
+
+<p>Previously, the TERM environment variable is not sent if TERM is not specified in the AcceptEnv
+keyword whenever the client requests a pseudo-terminal.</p>
+
+<p> Now, the TERM environment variable is always sent whenever the client requests a
+pseudo-termina.l</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>Yes, if you specify TERM as an environment variable in AcceptEnv though ssh and sshd decide
+whether TERM environment variable is copied into the session's environment. </p>
+
+<p><strong class="ph b">Action:</strong> Avoid using TERM as the environment variable for SendEnv. </p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The AFSTokenPassing keyword</p>
+
+<p>Previously, this keyword indicated whether to pass an AFS token to a remote host. It was not
+supported in z/OS UNIX. </p>
+
+<p>Now, AFSTokenPassing keyword is removed.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>No. Because AFSTokenPassing is not supported on z/OS UNIX in previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The Ciphers keyword</p>
+
+<p>Previously, arcfour, arcfour128, arcfour256, blowfish-cbc, and cast128-cbc are supported by
+Cipher. And 3des-cbc, aes128-cbc, aes192-cbc, and aes256-cbc were in the default cipher list.</p>
+
+<p>Now, arcfour, arcfour128, arcfour256, blowfish-cbc, and cast128-cbc algorithms are not supported
+by Cipher and removed from the default list. And 3des-cbc, aes128-cbc, aes192-cbc, and aes256-cbc
+are removed from the default cipher list.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>Yes, if you want to use any of the listed ciphers: arcfour, arcfour128, arcfour256, blowfish-cbc,
+cast128-cbc, 3des-cbc, aes128-cbc, aes192-cbc, and aes256-cbc.</p>
+
+<p><strong class="ph b">Action:</strong> Do not specify unsupported Cipher algorithm: arcfour, arcfour128, arcfour256,
+blowfish-cbc, and cast128-cbc. </p>
+
+<p>Also, specify 3des-cbc, aes128-cbc, aes192-cbc, or aes256-cbc on the Ciphers keyword if you want
+to use these cipher algorithms.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The Compression keyword</p>
+
+<p>Previously, the default value is “no” and "delayed" means to enable delayed (zlib@openssh.com)
+compression only. Now, the default is “yes” and delayed is a legacy synonym for yes.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>Yes, if you want to use the previous default value of compression and want to use delay to enable
+delayed compression only.</p>
+
+<p><strong class="ph b">Action:</strong> Specify no if you want to use the previous default value.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The HostKey keyword</p>
+
+<p>Previously, the default host key is /etc/ssh/ssh_host_key for protocol version 1. </p>
+
+<p>Now, the /etc/ssh/ssh_host_key is not supported because protocol version 1 is not supported.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>Yes, if you want to use /etc/ssh/ssh_host_key as a file to contain a private host key. </p>
+
+<p><strong class="ph b">Action:</strong> Do not specify /etc/ssh/ssh_host_key as a file for containing a private host
+key.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The KeepAlive keyword</p>
+
+<p>Previously, this keyword specified whether the system should send TCP keepalive messages to the
+other side for OpenSSH version before 3.8.1p1.</p>
+
+<p>Now, KeepAlive keyword is removed.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>No. On systems that use OpenSSH 3.8.1p1 or later, use the keyword TCPKeepAlive instead.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The KexAlgorithms keyword</p>
+
+<p>Previously, the default list contains diffie-hellman-group1-sha1. </p>
+
+<p>Now, the default KexAlgorithms list does not contain diffie-hellman-group1-sha1.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>Yes, if you want to use diffie-hellman-group1-sha1. </p>
+
+<p><strong class="ph b">Action:</strong> Specify hellman-group1-sha1 on KexAlgorithms.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The MACs keyword</p>
+
+<p>Previously, MAC algorithms hmac-ripemd160, hmac-ripemd160@openssh.com, and
+hmac-ripemd160-etm@openssh.com are supported. Now, hmac-ripemd160, hmac-ripemd160@openssh.com, and
+hmac-ripemd160-etm@openssh.com are no longer supported. </p>
+
+<p>And previously, the default MAC algorithm list contains hmac-ripemd160,
+hmac-ripemd160@openssh.com, hmac-ripemd160-etm@openssh.com, hmac-sha1-96, hmac-sha1-96-etm@openssh.com, hmac-md5,
+hmac-md5-etm@openssh.com, hmac-md5-96, and hmac-md5-96-etm@openssh.com. Now the default list does
+not contain hmac-ripemd160, hmac-ripemd160@openssh.com, hmac- ripemd160-etm@openssh.com,
+hmac-sha1-96, hmac-sha1-96-etm@openssh.com,
+hmac-md5, hmac-md5-etm@openssh.com, hmac-md5-96, and hmac-md5-96-etm@openssh.com. </p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>Yes, if you specified the unsupported MAC algorithms: hmac-ripemd160, hmac-ripemd160@openssh.com
+and hmac-ripemd160-etm@openssh.com, or are using MAC algorithms that are disabled by default:
+hmac-sha1-96, hmac-sha1-96-etm@openssh.com, hmac-md5, hmac-md5-etm@openssh.com, hmac-md5-96, and
+hmac-md5-96-etm@openssh.com.</p>
+
+<p><strong class="ph b">Action:</strong> Do not specify unsupported MAC algorithms: hmac-ripemd160,
+hmac-ripemd160@openssh.com, and hmac-ripemd160-etm@openssh.com.</p>
+
+<p>Specify hmac-sha1-96, hmac-sha1-96-etm@openssh.com, hmac-md5, hmac-md5-etm@openssh.com, hmac-md5-96, or
+hmac-md5-96-etm@openssh.com to MACs if you want to use these MAC algorithms.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The PAMAuthenticationViaKbdInt keyword</p>
+
+<p>Previously, this keyword whether PAM challenge-response authentication is allowed and is not
+supported on z/OS UNIX. </p>
+
+<p>Now, PAMAuthenticationViaKbdInt keyword is removed.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>No. Because PAMAuthenticationViaKbdInt is not supported on z/OS UNIX in previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The PermitRootLogin keyword</p>
+
+<p> Previously, prohibit-password is not a supported value for PermitRootLogin and the default value
+is yes. Now, prohibit-password as a deprecated alias of without-password to indicate that password
+authentication is disabled for root and the default value is prohibit-password.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>Yes, if you use the previous default value of  yes. </p>
+
+<p><strong class="ph b">Action:</strong> Specify "yes” for this keyword if you want to use the previous default value.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The Protocol keyword</p>
+
+<p>Previously, this keyword specified the protocol versions that sshd must support. </p>
+
+<p>Now, this keyword is removed because protocol 1 is not supported. The protocol of sshd is always
+2.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>Yes, if you want to use protocol 1.</p>
+
+<p><strong class="ph b">Action:</strong> Update your application. Do not use this keyword to Specify protocol.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The RhostsAuthentication keyword</p>
+
+<p>Previously, this keyword indicated whether authentication using rhosts or /etc/hosts.equiv files
+is sufficient for OpenSSH version before 3.8.1p1.</p>
+
+<p> Now, RhostsAuthentication keyword is removed.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>No, because RhostsAuthentication is not supported on z/OS UNIX in the previous version.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The RhostsRSAAuthentication keyword</p>
+
+<p>Previously, this keyword specified whether rhosts or /etc/hosts.equiv authentication together
+with successful RSA host authentication is allowed and applied only to protocol version 1. </p>
+
+<p>Now, RhostsRSAAuthentication is removed because protocol version 1 is not supported.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>Yes, if you are using RhostsRSAAuthentication, an error message “Deprecated option
+RSAAuthentication” is returned.</p>
+
+<p><strong class="ph b">Action:</strong> Update your application. Do not use RhostsRSAAuthentication keyword.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The RSAAuthentication keyword</p>
+
+<p>Previously, this keyword specified whether pure RSA authentication is allowed and applied only to
+protocol version 1. </p>
+
+<p>Now, RSAAuthentication is removed because protocol version 1 is not supported.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>Yes, if you are using RSAAuthentication, an error message “Deprecated option RSAAuthentication”
+is returned.</p>
+
+<p><strong class="ph b">Action:</strong> Update your application. Do not use RSAAuthentication keyword.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The ServerKeyBits keyword</p>
+<p>Previously, this keyword determined the number of bits in the ephemeral protocol version 1 server key. </p>
+<p>Now, ServerKeyBits is removed because protocol version 1 is not supported. </p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>Yes, if you are using ServerKeyBits, an error message “Deprecated option ServerKeyBits” is
+returned.</p>
+<p><strong class="ph b">Action:</strong> Update your application. Do not use the ServerKeyBits keyword.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The UseLogin keyword</p>
+<p>Previously, this keyword specified whether login is used for interactive login sessions. </p>
+<p>Now, this keyword is removed. </p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>Yes, if you use the UseLogin keyword to specify the interactive login sessions, an error message is returned: “Deprecated option UseLogin”</p>
+<p><strong class="ph b">Action:</strong> Update your application.  Do not use the UseLogin keyword.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The UsePrivilegeSeparation keyword</p>
+<p>Previously, this keyword indicated whether sshd separates privileges by creating an unprivileged
+child process to handle incoming network traffic. </p>
+<p>Now, sshd is changed so that APF authorization is not propagated to unprivileged child
+processes.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>Yes, if you want to use UsePrivilegeSeparation to run without privilege separation for sshd,
+which is no longer supported. If you use this keyword, the following error message is returned:
+“Deprecated option UsePrivilegeSeparation”</p>
+<p><strong class="ph b">Action:</strong> Update your application. Do not use the UsePrivilegeSeparation keyword.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The UseDNS keyword</p>
+<p>Previously, yes was the default value. </p>
+<p>Now, no is the default value. It indicates that only addresses and not hostnames can be used in
+~/.ssh/authorized_keys from and sshd_config Match Host directives.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>Yes, if you use the previous default value and use hostnames in ~/.ssh/authorized_keys from
+sshd_config Match Host directives. The previous default value was yes.</p>
+
+<p><strong class="ph b">Action:</strong> Specify yes on this keyword if you want to use the previous default value.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e962" class="stentry"><p>The VerifyReverseMapping keyword</p>
+<p>Previously, this keyword indicated whether sshd should try to verify the remote hostname and
+check that the resolved hostname for the remote IP address maps to the same IP address for OpenSSH
+version before 3.8.1p1.</p>
+</td>
+<td valign="top" headers="d69e964" class="stentry"><p>No. On systems that use OpenSSH 3.8.1p1 or later, use the keyword UseDNS instead.</p>
+</td>
+</tr>
+</table>
+<h4>Changes to the ssh command that might require an upgrade action</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e1288" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e1290" class="stentry thleft thbot" width="50%">Upgrade action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1288" class="stentry"><p>The -1 option</p>
+<p>Previously, this option is used to specify the support of SSH protocol version 1. Now SSH
+protocol version 1 is no longer supported and SSH protocol version 2 is used by default in OpenSSH 7.6p1.</p>
+</td>
+<td valign="top" headers="d69e1290" class="stentry"><p>Yes, if you force ssh to use SSH protocol version 1. If specifying -1 option, error message “SSH protocol v.1 is no longer supported” is returned. </p>
+<p><strong class="ph b">Action:</strong> Update your application. Do not specify -1 option.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1288" class="stentry"><p>The -2 option</p>
+<p>Previously, this option was used to request SSH protocol version 2. Now SSH protocol version 2 is
+used by default in OpenSSH 7.6p1 without any specification. </p>
+</td>
+<td valign="top" headers="d69e1290" class="stentry"><p>No. Specifying -2 option in the previous version is the same as using SSH protocol version 2 by default in OpenSSH 7.6p1.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1288" class="stentry"><p>The -c option</p>
+<p> Previously, SSH protocol version 1 ciphers and version 2 ciphers blowfish-cbc, arcfour,
+arcfour128, arcfour256, cast128-cbc, 3des-cbc, aes128-cbc, aes192-cbc, and aes256-cbc are supported
+and listed in the default list. Now SSH protocol version 1 ciphers and blowfish-cbc, arcfour,
+arcfour128, arcfour256, and cast128-cbc are no longer supported. SSH protocol version 2 ciphers
+3des-cbc, aes128-cbc, aes192-cbc, and aes256-cbc are removed from the default cipher lists.</p>
+</td>
+<td valign="top" headers="d69e1290" class="stentry"><p>Yes, if you are using any of the SSH protocol version 1 ciphers or SSH protocol version 2 ciphers blowfish-cbc, arcfour, arcfour128, arcfour256, cast128-cbc, 3des-cbc, aes128-cbc, aes192-cbc, and aes256-cbc. If you specify a cipher that is no longer supported, an error message such as “Unknown
+cipher type '3des'” is returned.</p>
+<p><strong class="ph b">Action:</strong> Do not specify no longer supported ciphers. To use 3des-cbc, aes128-cbc,
+aes192-cbc, and aes256-cbc, specify the same cipher on sshd. </p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1288" class="stentry"><p>The -C option</p>
+<p>Previously, this option is used to specify whether to use compression in SSH protocol version 1.
+Now this option is removed because it applies to SSH protocol version 1 only and this version is no
+longer supported.</p>
+</td>
+<td valign="top" headers="d69e1290" class="stentry"><p>Yes, if you are using compression option in SSH protocol version 1.</p>
+<p><strong class="ph b">Action:</strong> Do not specify to use SSH protocol version 1 and enable compression option. Use
+SSH protocol version 2 without specifying compression option.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1288" class="stentry"><p>The -i option</p>
+<p>Previously, SSH protocol version 1 identity ~/.ssh/identity is supported. Now SSH protocol
+version 1 is no longer supported so ~/.ssh/identity or any other specified SSH protocol version 1 identity is no longer available.</p>
+</td>
+<td valign="top" headers="d69e1290" class="stentry"><p>Yes, if you use the default identity list or SSH protocol version 1 identity such as
+~/.ssh/identity is specified. If specifying SSH protocol version 1 identity, error message “FOTS3785
+key_load_public: invalid format” is returned.</p>
+<p><strong class="ph b">Action:</strong> Do not specify SSH protocol version 1 identity, use default SSH protocol version 2
+identities only.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1288" class="stentry"><p>The -L option</p>
+<p>Previously, IPv6 addresses were specified with a syntax: [bind_address/]port/host/hostport. Now,
+forward slash (/) is not supported as a separator in the format, IPv6 addresses are specified by
+enclosing the address in square brackets, such as [ipv6_bind_address:]port:host:hostport.</p>
+</td>
+<td valign="top" headers="d69e1290" class="stentry"><p>Yes, if you are using the previous format to specify the IPv6 address.</p>
+
+<p><strong class="ph b">Action:</strong> Do not use the previous format. Instead, use
+[ipv6_bind_address:]port:host:hostport to specify a IPv6 address.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1288" class="stentry"><p>The -m option</p>
+<p>Previously, MAC algorithms hmac-ripemd160, hmac-ripemd160@openssh.com, and
+hmac-ripemd160-etm@openssh.com are supported. Now, hmac-ripemd160, hmac-ripemd160@openssh.com, and
+hmac-ripemd160-etm@openssh.com are no longer supported. </p>
+<p>Also, the previous default MAC algorithm list contains hmac-ripemd160,
+hmac-ripemd160@openssh.com, hmac-ripemd160-etm@openssh.com, hmac-sha1-96,
+hmac-sha1-96-etm@openssh.com, hmac-md5, hmac-md5-etm@openssh.com, hmac-md5-96, and hmac-md5-96-etm@openssh.com.</p>
+<p>Now the default list does not contain hmac-ripemd160, hmac-ripemd160@openssh.com,
+hmac-ripemd160-etm@openssh.com, hmac-sha1-96, hmac-sha1-96-etm@openssh.com, hmac-md5,
+hmac-md5-etm@openssh.com, hmac-md5-96, and hmac-md5-96-etm@openssh.com. </p>
+</td>
+<td valign="top" headers="d69e1290" class="stentry"><p>Yes, if you specified any of the removed MAC algorithms: hmac-ripemd160,
+hmac-ripemd160@openssh.com and hmac-ripemd160-etm@openssh.com, or using MAC algorithms that are
+disabled by default: hmac-sha1-96, hmac-sha1-96-etm@openssh.com, hmac-md5, hmac-md5-etm@openssh.com,
+hmac-md5-96, and hmac-md5-96-etm@openssh.com.</p>
+
+<p><strong class="ph b">Action:</strong> Do not specify unsupported MAC algorithms: hmac-ripemd160,
+hmac-ripemd160@openssh.com, and hmac-ripemd160-etm@openssh.com. </p>
+
+<p>To use hmac-sha1-96, hmac-sha1-96-etm@openssh.com, hmac-md5, hmac-md5-etm@openssh.com,
+hmac-md5-96, or hmac-md5-96-etm@openssh.com, specify the same MAC algorithm in ssh daemon. </p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1288" class="stentry"><p>The -Q option</p>
+
+<p>Previously, supported message integrity codes are specified as ‘MAC’ and key exchange algorithms
+is specified as ‘KEX’. Now, message integrity codes are specified in lowercase ‘mac’ and the latter
+is also specified in lowercase: ‘kex’.</p>
+</td>
+<td valign="top" headers="d69e1290" class="stentry"><p>Yes, if you are specifying ‘MAC’ or ‘KEX’ as a protocol feature argument in the previous
+version.</p>
+
+<p><strong class="ph b">Action:</strong> Instead of using uppercase for specification, use lowercase ‘mac’ and ‘kex’
+instead.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1288" class="stentry"><p>The -R option</p>
+
+<p>Previously, IPv6 addresses can be specified with a syntax: [bind_address/]port/host/hostport.
+Now, forward slash (/) is not supported as a separator in the format, IPv6 addresses are specified
+by enclosing the address in square brackets, such as [ipv6_bind_address:]port:host:hostport.</p>
+</td>
+<td valign="top" headers="d69e1290" class="stentry"><p>Yes, if you are using the previous format to specify the IPv6 address.</p>
+
+<p><strong class="ph b">Action:</strong> Do not use the previous format. Instead, use
+[ipv6_bind_address:]port:host:hostport to specify a IPv6 address.</p>
+</td>
+</tr>
+</table>
+<h4>Changes to the sshd command that might require an upgrade action</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e1437" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e1439" class="stentry thleft thbot" width="50%">Upgrade action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1437" class="stentry"><p>The -b option</p>
+
+<p>Previously, this option specified the number of bits in the ephemeral protocol version 1 server
+key.</p>
+
+<p>Now, the -b option is removed because protocol version 1 is not supported.</p>
+</td>
+<td valign="top" headers="d69e1439" class="stentry"><p>Yes, if you want to use -b option to specify the number of bits, this option is ignored. </p>
+
+<p><strong class="ph b">Action:</strong> Update your application. Do not use -b option.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1437" class="stentry"><p>The -h option</p>
+
+<p>Previously, /etc/ssh/ssh_host_key was used for protocol version 1. </p>
+
+<p>Now, /etc/ssh/ssh_host_key is removed from the supported host key because protocol version 1 is
+not supported.</p>
+</td>
+<td valign="top" headers="d69e1439" class="stentry"><p>Yes. If you want to use /etc/ssh/ssh_host_key as the host key.</p>
+
+<p><strong class="ph b">Action:</strong> Do not specify  /etc/ssh/ssh_host_key host key file with this option.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1437" class="stentry"><p>The -k option</p>
+
+<p>Previously, this option specified how often the ephemeral protocol version 1 server key is
+regenerated. </p>
+
+<p>Now, the -k option is removed because protocol version 1 is not supported.</p>
+</td>
+<td valign="top" headers="d69e1439" class="stentry"><p>Yes, if you want to use -k option to specify how often the ephemeral protocol version 1 server
+key is regenerated, this option is ignored. </p>
+
+<p><strong class="ph b">Action:</strong> Update your application. Do not use -1 option.</p>
+</td>
+</tr>
+</table>
+<h4>Changes to the scp command that might require an upgrade action</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e1501" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e1503" class="stentry thleft thbot" width="50%">Upgrade action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1501" class="stentry"><p>The -1 option.</p>
+<p>Previously, -1 indicated protocol version 1.</p>
+<p>Now, the –1 is removed because protocol 1 is not supported. The protocol of scp is always 2.</p>
+</td>
+<td valign="top" headers="d69e1503" class="stentry"><p>Yes. If you are using -1 option for protocol version 1, you need to change it to -2 or remove the
+-1 option.</p>
+
+<p><strong class="ph b">Action:</strong> Update your application. Do not use -1 option.</p>
+</td>
+</tr>
+</table>
+<h4>Changes to the sftp command that might require an upgrade action</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e1529" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e1531" class="stentry thleft thbot" width="50%">Upgrade action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1529" class="stentry"><p>The -1 option.</p>
+<p>Previously, -1 indicated protocol version 1.</p>
+<p>Now, –1 is removed because protocol 1 is not supported. The protocol for sftp is always 2.</p>
+</td>
+<td valign="top" headers="d69e1531" class="stentry"><p>Yes. If you are using -1 option for protocol version 1, you need to change it to -2 or remove the
+-1 option.</p>
+<p><strong class="ph b">Action:</strong> Update your application. Do not use -1 option.</p>
+</td>
+</tr>
+</table>
+<h4>Changes to the ssh-keygen command that might require an upgrade action</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e1557" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e1559" class="stentry thleft thbot" width="50%">Upgrade action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1557" class="stentry"><p>The –t option.</p>
+<p>Previously, the key types that supported are rsa1, rsa, dsa, and ecdsa.</p>
+<p>Now, the rsa1 key type was removed since the protocol version 1 is no longer supported.</p>
+</td>
+<td valign="top" headers="d69e1559" class="stentry"><p>Yes. Check whether you are still using key type rsa1.</p>
+<p><strong class="ph b">Action:</strong>  Replace the rsa1 key with an appropriate key type.</p>
+</td>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1557" class="stentry"><p>The -b option</p>
+<p>Previously, for RSA keys, the minimum number of bits in the key to create is 768.</p>
+<p>Now, the minimum RSA keys bits changed to 1024.</p>
+</td>
+<td valign="top" headers="d69e1559" class="stentry"><p>Yes. If you are still using 768 bits for RSA keys generating, change it to 1024 bits or higher.
+The maximum size is 16384 bits, and the default is 2048 bits.</p>
+<p><strong class="ph b">Action:</strong> If you are still using 768 bits for RSA keys generating, change it to 1024 bits or
+higher.</p>
+</td>
+</tr>
+</table>
+<h4>Changes to the ssh-keyscan command that might require an upgrade action</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e1603" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e1605" class="stentry thleft thbot" width="50%">Upgrade action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1603" class="stentry"><p>The –t option.</p>
+<p>Previously, the key types that supported are rsa1, rsa, dsa, and ecdsa.</p>
+<p>Now, the rsa1 key type was removed since the protocol version 1 is no longer supported.</p>
+</td>
+<td valign="top" headers="d69e1605" class="stentry"><p>Yes. Key type rsa1 is no longer supported in OpenSSH 7.6p1, as in z/OS V2R4.</p>
+<p><strong class="ph b">Action:</strong> Check whether you are still having rsa1 type keys. If so, replace the rsa1 key
+with an appropriate key type.</p>
+</td>
+</tr>
+</table>
+<h4>Changes to the /samples/ssh_smf.h and FOTSMF77 in SYS1.MACLIB  that might require an upgrade action</h4>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletable"><tr class="sthead"><th valign="bottom" align="left" id="d69e1631" class="stentry thleft thbot" width="50%">What Changed </th>
+<th valign="bottom" align="left" id="d69e1633" class="stentry thleft thbot" width="50%">Upgrade action needed?</th>
+</tr>
+<tr class="strow"><td valign="top" headers="d69e1631" class="stentry"><p>/samples/ssh_smf.h and</p>
+<p>SYS1.MACLIB(FOTSMF77)</p>
+</td>
+<td valign="top" headers="d69e1633" class="stentry"><p>Yes, if you use ssh_smf.h and FOTSMF77.</p>
+<p><strong class="ph b">Action:</strong> Update your application.</p>
+</td>
+</tr>
+</table>
+<p>For more information, see the topic on SMF Type 119 records in <cite class="cite">IBM Ported Tools for z/OS:OpenSSH User's Guide</cite>.</p>
+<h4>Reference information</h4>
+<p>For more information, see
+<a class="xref" href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.4.0/com.ibm.zos.v2r4.foto100/abstract.htm">OpenSSH User’s Guide</a>.
+						</p>
+						]]></description>
+						<feedback name="Complete"/>
+						<feedback name="Difficult"/>
+						<feedback name="Exper"/>
+						<feedback name="Length"/>
+						<feedback name="Comment"/>
+						<instructions>This portion of the Workflow will guide you to submit jobs to run two health checks that are associated with this upgrade action,
+							<strong>IBMSSH,ZOSMIGV2R4_SSH_CONFIG</strong> and
+							<strong>IBMSSH,ZOSMIGV2R4_SSHD_CONFIG</strong>.
+							<p>These checks will be activated if they are not already active. If the checks are activated, they will be deactivated at the end of the job, so that they remain in the same state as they were found.</p>
+							<p>If the health checks run with no exceptions, this step will be marked &quot;Complete&quot; indicating that this upgrade action requires no further activity.</p>
+							<p>If either of the health checks find an exception, this step will be marked as &quot;Failed&quot;. If so, further investigation (and possibly more work) is necessary to complete this upgrade action. If the step is marked &quot;Failed&quot;, you should review the health check output (using any method you use to view health check output, such as SDSF) and correct any situations as appropriate. You can then re-run this workflow step to submit the health check job again, until the health checks no longer receive exceptions and the step is marked &quot;Complete&quot;.</p>
+							<p>
+								<strong>NOTE: The successful running of these health checks only partially covers this upgrade action. Refer to the upgrade action text for the complete list of steps to take.</strong>
+							</p>
+						</instructions>
+						<weight>10</weight>
+						<template>
+							<fileTemplate substitution="true">HC_rexx.txt</fileTemplate>
+							<submitAs maxRc="0">JCL</submitAs>
+							<predefinedVariable name="check">IBMSSH,ZOSMIGV2R4_SSH*</predefinedVariable>
+						</template>
+					</step>
+</step>
+<step name="OpenSSH_Actions_After_IPL">
+				<!--<step level="step_4_9_3">-->
+				<title>z/OS OpenSSH actions to perform after the first IPL of z/OS V2R4</title>
+				<description><![CDATA[
+					<p>
+						This topic describes z/OS OpenSSH migration actions that you can perform only after you have IPLed z/OS V2R4. You need a running z/OS V2R4 system to perform these actions.</p>
+					<p>None.</p>
+				]]></description>
+				<condition>
+					<expression><![CDATA[(${discoverystep.stepState} == "Complete") ? true : false]]></expression>
+					<description><![CDATA[ Set this step to Skipped if the variable1's value is disable, or set it to ready if the expression is true.]]></description>
+					<targetStateSet>
+						<description><![CDATA[ Set this step to Skipped if the variable1's value is disable.]]></description>
+						<stateExpression state="Skipped"><![CDATA[${instance_none_status} == 'Skip empty upgrade actions']]></stateExpression>
+					</targetStateSet>
+				</condition>
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>
+				<weight>10</weight>
+			</step>
+</step>
 <step name="id-75901f0c-b2f4-4d41-a8b8-dfd759882bf3"> 
 			<!--<step level="step_4_25">-->  
 			<title>z/OS UNIX upgrade actions</title>  
@@ -35027,6 +36356,21 @@
 			</step>
 </step>
 </step>
+<step name="id-f6348563-f739-4661-8e8a-acb2eb5d21e4">
+		<!--<step level="step_5">-->
+		<title>Provide feedback to IBM on your upgrade experience</title>
+		<description><![CDATA[ IBM would like your feedback on your upgrade experience]]></description>
+		<feedback name="HelpfulOv"/>
+		<feedback name="ExperOv"/>
+		<feedback name="CommentOv"/>
+		<feedback name="ContactInfo"/>
+		<instructions substitution="false">In this example step, you generate a feedback summary file by selecting the workflow instance and clicking &quot;Generate Feedback Summary&quot; in the &quot;Action&quot; drop-own menu. The summary is based on the values that were entered previously. This step is optional.
+			<p>You can edit the file as you wish after it has been produced. You can reproduce the file, if you change your feedback answers.</p>
+			<p>When you are ready to send it to IBM, attach the file in an email and sent it to zosmig@us.ibm.com. As you can see in the produced feedback file, only the information you wish to provide will be seen by IBM. No other information will be gathered.</p>  
+			<p>Thank you for providing your feedback to IBM.</p>
+		</instructions>
+		<weight>10</weight>
+	</step>
 <preserveOptions>
 		<version type="refresh" value="1.0">
 			<variableSet defaultChecked="true">

@@ -44661,28 +44661,8 @@
 				<description><![CDATA[
 					<p>
 						This topic describes z/OS OpenSSH migration actions that you can perform after you have installed z/OS V2R4, but before the first time you IPL. These actions might require the z/OS V2R4 level of code to be installed, but do not require it to be active.</p>
-					<p>None.</p>
 				]]></description>
-				<condition>
-					<expression><![CDATA[(${discoverystep.stepState} == "Complete") ? true : false]]></expression>
-					<description><![CDATA[ Set this step to Skipped if the variable1's value is disable, or set it to ready if the expression is true.]]></description>
-					<targetStateSet>
-						<description><![CDATA[ Set this step to Skipped if the variable1's value is disable.]]></description>
-						<stateExpression state="Skipped"><![CDATA[${instance_none_status} == 'Skip empty upgrade actions']]></stateExpression>
-					</targetStateSet>
-				</condition>
-				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>
-				<weight>10</weight>
-			</step>
-<step name="OpenSSH_Actions_After_IPL">
-				<!--<step level="step_4_9_3">-->
-				<title>z/OS OpenSSH actions to perform after the first IPL of z/OS V2R4</title>
-				<description><![CDATA[
-					<p>
-						This topic describes z/OS OpenSSH migration actions that you can perform only after you have IPLed z/OS V2R4. You need a running z/OS V2R4 system to perform these actions.</p>
-				]]></description>
-
-			<step name="OpenSSH_V2R4_Version76P1_AfterIPL">
+			<step name="OpenSSH_V2R4_Version76P1_BeforeIPL">
 					<!--<step level="step_4_4_1_3">-->
 					<title>OpenSSH: Accommodate a new level of OpenSSH</title>
 					<description><![CDATA[
@@ -44746,7 +44726,7 @@
 				<p>Applies to upgrade from:</p>
 			</th>
 			<td align="left" valign="top">
-				<p>z/OS V2R3.</p>
+				<p>z/OS V2R3 and z/OS V2R2.</p>
 			</td>
 		</tr>
 		<tr>
@@ -44754,7 +44734,7 @@
 				<p>Timing:</p>
 			</th>
 			<td align="left" valign="top">
-				<p>After the first IPL of z/OS V2R4.</p>
+				<p>Before the first IPL of z/OS V2R4.</p>
 			</td>
 		</tr>
 		<tr>
@@ -44821,7 +44801,7 @@
 					</li>
 				</p>
 				<p>
-					These checks are available for z/OS V2R3 with APAR OA57724 applied.
+					These checks are available for z/OS V2R3 and z/OS V2R2 with APAR OA57724 applied.
 				</p>
 			</td>
 		</tr>
@@ -45956,6 +45936,25 @@ with an appropriate key type.</p>
 						</template>
 					</step>
 </step>
+<step name="OpenSSH_Actions_After_IPL">
+				<!--<step level="step_4_9_3">-->
+				<title>z/OS OpenSSH actions to perform after the first IPL of z/OS V2R4</title>
+				<description><![CDATA[
+					<p>
+						This topic describes z/OS OpenSSH migration actions that you can perform only after you have IPLed z/OS V2R4. You need a running z/OS V2R4 system to perform these actions.</p>
+					<p>None.</p>
+				]]></description>
+				<condition>
+					<expression><![CDATA[(${discoverystep.stepState} == "Complete") ? true : false]]></expression>
+					<description><![CDATA[ Set this step to Skipped if the variable1's value is disable, or set it to ready if the expression is true.]]></description>
+					<targetStateSet>
+						<description><![CDATA[ Set this step to Skipped if the variable1's value is disable.]]></description>
+						<stateExpression state="Skipped"><![CDATA[${instance_none_status} == 'Skip empty upgrade actions']]></stateExpression>
+					</targetStateSet>
+				</condition>
+				<instructions>This information was provided for your understanding and possible further action as dictated by your site policies</instructions>
+				<weight>10</weight>
+			</step>
 </step>
 <step name="id-75901f0c-b2f4-4d41-a8b8-dfd759882bf3"> 
 			<!--<step level="step_4_25">-->  
