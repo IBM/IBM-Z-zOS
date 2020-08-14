@@ -18,7 +18,7 @@ Before you can use the z/OS Upgrade Workflow, ensure that z/OSMF is running on y
 ---
 ## What's new
 
-**New version:** z/OS V2R4 Upgrade Workflow, Version 2.2 (August 15 2020)
+**New version:** z/OS V2R4 Upgrade Workflow, Version 2.2 (August 13 2020)
 
 This workflow replaces the previous version, Version 2.1, from July 31 2020.
 
