@@ -12,8 +12,8 @@ Inside WLM
 * [Textbook: High Availability and Scalability of Mainframe Environments using System z and z/OS as example
 by Robert Vaupel](http://digbib.ubka.uni-karlsruhe.de/volltexte/1000034624)
 
-Running WLM in Goal Mode
-========================
+Running WLM
+===========
 * [WLM Operational Considerations](Documents/WLMwscops.pdf)
 * [Understanding WLM RMF Reports](Documents/WLMwscrmf.pdf)
 * [Workload Manager - Interpreting New Measurements](Documents/WLMmeasurements.pdf)
@@ -44,4 +44,4 @@ Specific WLM Functions
 * [Life's a Batch: MVS Workload Manager Invades JES2](Documents/WLMwlmbt.pdf)
 * [CICS, IMS, and DB2 in a WLM World](Documents/WLMcid.pdf)
 * [WLM Resource Affinity Scheduling](Documents/WLMresource.pdf)
-* [Preemptible SRBS: Understanding, Exploiting, and Managing Them](Documents/WLMpresrb.pdf)
+* [Preemptible SRBs: Understanding, Exploiting, and Managing Them](Documents/WLMpresrb.pdf)
