@@ -18,8 +18,33 @@ Before you can use the z/OS Upgrade Workflow, ensure that z/OSMF is running on y
 ---
 ## What's new
 
-**New version:** z/OS V2R4 Upgrade Workflow, Version 2.2 (August 13 2020)
+**New version:** z/OS V2R4 Upgrade Workflow, Version 2.3 (October 29 2020)
+This workflow replaces the previous version, Version 2.2, from August 13 2020.
 
+The following upgrade actions are new:
+- Prepare for the removal of the internal battery feature
+- Prepare for the removal of support for TLS 1.0 and TLS 1.1 for SE, HMC, and OSC
+- BCP: The ASCB and WEB are backed in 64-bit real storage by default
+- DFSMS: Change DFSMSrmm Web Services to use the HTTPS protocol
+- ISPF: Accommodate the ISPF Gateway access change from HTTP to HTTPS
+- z/OSMF: Ensure that workflow users are authorized to read workflow files
+- z/OSMF: Use the Diagnostic Assistant to collect diagnostic data about z/OSMF
+- z/OSMF: Remove STGADMIN SAF authorization requirements for Software Management
+
+The following upgrade actions are changed:
+- Verify that virtual storage limits are set properly
+- BCP: Accommodate the new DSLIMITNUM default
+- CIM: Accommodate the default change from HTTP to HTTPS
+- DFSMSrmm: Remove the CIM provider registration and its associated files
+- IP Services: Plan to upgrade the FTP server to AT-TLS security
+- RMF: Configure AT-TLS to enable secure communication with the RMF distributed data server
+- Security Server: Check for duplicate class names
+
+Other changes:
+- Terminology, maintenance, and editorial corrections.
+
+
+**Previous version:** z/OS V2R4 Upgrade Workflow, Version 2.2 (August 13 2020)
 This workflow replaces the previous version, Version 2.1, from July 31 2020.
 
 The following upgrade actions are new:
@@ -40,7 +65,6 @@ Other changes:
 
 
 **Previous version:** z/OS V2R4 Upgrade Workflow, Version 2.1 (July 31 2020)
-
 This workflow replaces the previous version, Version 2.0, from September 2019.
 
 The following upgrade actions are new:
@@ -50,7 +74,6 @@ The following upgrade actions are new:
 Other changes:
 - Throughout this workflow, links were corrected or removed to ensure consistent linking.
 - Terminology, maintenance, and editorial corrections.
-
 
 
 ### Changes in earlier versions of this workflow</h2>
@@ -117,4 +140,4 @@ and store them in the same z/OS UNIX directory:
 
 We welcome any contributions or feedback on anything you find. Keep in mind, there are no warranties for any of the files or contributions that you find here. This is a z/OS community that is sharing with others and it is expected that you review what you are using in your environment. This tool is not supported by the IBM Service organization, but rather by the tool owner on a best-can-do basis.
 
-Please report any problems, suggestions, or comments to zosmig@us.ibm.com .
+Report any problems, suggestions, or comments to zosmig@us.ibm.com.

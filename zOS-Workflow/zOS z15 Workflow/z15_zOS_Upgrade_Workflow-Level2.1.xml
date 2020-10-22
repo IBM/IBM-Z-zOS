@@ -1,0 +1,2497 @@
+<?xml version="1.0" encoding="UTF-8"?><workflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../workflow/schemas/workflow_v1.xsd">
+	<autoTakeOwnership>true</autoTakeOwnership>
+	<workflowInfo>
+		<workflowID>z15_zosv2r4</workflowID>
+		<workflowDescription>z15 Upgrade Workflow</workflowDescription>
+		<workflowVersion>2.1</workflowVersion>
+		<vendor>IBM</vendor>
+	</workflowInfo>  
+	<variable name="check"> 
+		<label>Check name</label>  
+		<abstract>IBM Health Check name</abstract>  
+		<description><![CDATA[ This health check will be invoked in association with this upgrade action.]]></description>  
+		<category/>  
+		<string> 
+			<default>IBMZMIG,ZOSMIG_HTTP_SERVER_DOMINO</default> 
+		</string> 
+	</variable>  
+	<feedbackItem name="Complete"> 
+		<question>Did you complete this step?</question>  
+		<answers> 
+			<singleSelect hasOtherAnswer="true"> 
+				<lable value="Yes.">Yes.</lable>  
+				<lable value="No, not applicable. Skip to Comments.">No, not applicable. Skip to Comments.</lable>  
+				<lable value="No, don't know if needed. Skip to comments.">No, don't know if needed. Skip to comments.</lable>  
+				<lable value="No, will defer to later. Skip to Comments.">No, will defer to later. Skip to Comments.</lable> 
+			</singleSelect> 
+		</answers> 
+	</feedbackItem>  
+	<feedbackItem name="Difficult"> 
+		<question>How difficult was performing this upgrade action?</question>  
+		<answers> 
+			<singleSelect hasOtherAnswer="true"> 
+				<lable value="Easier than expected">Easier than expected</lable>  
+				<lable value="More difficult than expected">More difficult than expected</lable>  
+				<lable value="About what was expected">About what was expected</lable> 
+			</singleSelect> 
+		</answers> 
+	</feedbackItem>  
+	<feedbackItem name="Exper"> 
+		<question>How would you best describe your experience with this upgrade action?</question>  
+		<answers> 
+			<singleSelect hasOtherAnswer="true"> 
+				<lable value="Went smoothly, no problems.">Went smoothly, no problems.</lable>  
+				<lable value="Experienced a low impact consequence. Use Comments below.">Experienced a low impact consequence. Use Comments below.</lable>  
+				<lable value="Experienced a high impact consequence. Use Comments below.">Experienced a high impact consequence. Use Comments below.</lable> 
+			</singleSelect> 
+		</answers> 
+	</feedbackItem>  
+	<feedbackItem name="Length"> 
+		<question>How long did this upgrade action take to complete (end to end)?</question>  
+		<answers> 
+			<singleSelect hasOtherAnswer="true"> 
+				<lable value="About as long as expected.">About as long as expected.</lable>  
+				<lable value="About as long as expected, and that was too long.">About as long as expected, and that was too long.</lable>  
+				<lable value="Shorter than expected">Shorter than expected</lable>  
+				<lable value="Longer than expected">Longer than expected</lable> 
+			</singleSelect> 
+		</answers> 
+	</feedbackItem>  
+	<feedbackItem name="Comment"> 
+		<question>If you'd like to add additional information about this upgrade action, provide it here.</question>  
+		<answers> 
+			<text/> 
+		</answers> 
+	</feedbackItem>  
+	<feedbackItem name="HelpfulOv"> 
+		<question>Do you think using the z/OSMF Workflow for the upgrade process was helpful?</question>  
+		<answers> 
+			<singleSelect hasOtherAnswer="true"> 
+				<lable value="Yes, very helpful.">Yes, very helpful.</lable>  
+				<lable value="Yes, somewhat helpful.">Yes, somewhat helpful.</lable>  
+				<lable value="Not helpful.">Not helpful.</lable> 
+			</singleSelect> 
+		</answers> 
+	</feedbackItem>  
+	<feedbackItem name="ExperOv"> 
+		<question>How would you rate your experience with this upgrade overall?</question>  
+		<answers> 
+			<singleSelect hasOtherAnswer="true"> 
+				<lable value="Better than expected.">Better than expected.</lable>  
+				<lable value="About what was expected.">About what was expected.</lable>  
+				<lable value="Worse than expected.">Worse than expected.</lable> 
+			</singleSelect> 
+		</answers> 
+	</feedbackItem>  
+	<feedbackItem name="CommentOv"> 
+		<question>Provide any comments you wish.</question>  
+		<answers> 
+			<text/> 
+		</answers> 
+	</feedbackItem>  
+	<feedbackItem name="ContactInfo"> 
+		<question>If we may contact you about your answers, provide your contact information. This is optional.</question>  
+		<answers> 
+			<text/> 
+		</answers> 
+	</feedbackItem>  
+	
+			 			  	  
+	<step name="id-2e1464db-66ac-437f-a78a-7293fe828478"> 
+		<!--<step level="step_1">-->  
+		<title>Upgrade to an IBM z15 server</title>  
+		<description><![CDATA[  
+			<h4>Description</h4>  
+			<p>
+			With the new IBM® z15™ (z15™) server as the infrastructure, your business has the power to optimize 
+			digital services delivery, accelerate business innovation, and ultimately improve the bottom line. 
+			The z15 can help you adapt to planned or unplanned events while keeping services and operations 
+			running smoothly and continuously, on premises or in the cloud.</p>  
+			<p>
+			The z15 ™ uses a 19-inch form factor and industry-standardized power and networking hardware. 
+			The system is configurable as a one-to-four 19-inch frame system, which easily aligns with the 
+			modern cloud data center.</p>
+			<p>
+			The IBM z15 Model T02 (z15 T02) is the newest addition to the IBM z15 family. The z15 T02 is designed 
+			for clients who do not need the capacity of the larger T01	models.</p>
+			<p>
+			The IBM z15 family of mainframes includes the following hardware models: 
+			<ul>
+				<li>
+				Model T01 (machine type 8561), with five feature codes to represent the processor capacity. 
+				The feature codes are Max34, Max71, Max108, Max145, and Max190 with (respectively) 34, 71, 108, 
+				145, and 190. This system is configurable as a one-to-four 19-inch frame system.</li>
+				<li>
+				Model T02 (machine type 8562), with five CPC size features (one or two drawers). 
+				The system is configurable as a 19-inch frame system.</li>
+			</ul>
+			<p>
+			In this workflow, references to "z15" pertain to all models of the IBM z15, 
+			including the z15 T02, unless otherwise noted.</p>
+			<p>
+			z/OS base support for specific z15 functions depends on the z/OS release. 
+			Not all z15™ functions are available in every z/OS release, as shown in the tables: 
+			<ul>
+			<li>Table 1 lists the z15 functions and indicates whether each function is included in a specific 
+			z/OS release (Yes or No), or whether the function requires a PTF (PTF) or a web deliverable (Web). 
+			For information about z/OS V2R1 support, see the <em>Table Notes</em>.
+			Information about finding the appropriate PTFs is provided in the workflow step	"Actions you can take 
+			before you order an IBM z15 server" and its substeps. </li>
+			<li>Table 2 shows a summary view of which z15 functions are available for exploitation in each z/OS release.
+			Some functions have upgrade or exploitation considerations. Information about the applicable 
+			upgrade actions is provided in the steps and substeps for "Actions you can take before you order an 
+			IBM z15 server" and "Actions you can take after installing an IBM z15 server."</li>
+			</ul>
+			</p>
+			<p>
+			Many functions are enabled or disabled, based on the presence or absence of the required hardware and software. 
+			If you plan to use new z15 functions, you can install the software and hardware in either order. 
+			That is, there is no requirement to install either software or hardware first to use a specific function. 
+			However, because of outage windows and testing considerations, you might want to consider installing all of 
+			the software and PTFs required for the machine and the functions you plan to use first. 
+			Then, upgrade the hardware and, finally, update your customization to use the new functions.</p> 
+			</p>  
+			<table summary="This table shows a summary view of which z15 server functions are included in the base support for z/OS V2R2, z/OS V2R3, and z/OS V2R4" id="z15__znextfuncbc" width="100%" rules="all" frame="border" border="1"> 
+			<caption>Table 1. z15 server functions included in the base support for z/OS V2R2, z/OS V2R3, and z/OS V2R4.</caption>  
+			<thead style="text-align:left;"> 
+					<tr> 
+						<th align="left" valign="top" id="d84e20187"> 
+							<p>z15 function included in base z/OS support (Y/N)</p> 
+						</th>  
+						<th align="left" valign="top" id="d84e20190"> 
+							<p>V2R2 
+								<strong> 
+									<sup>3</sup> 
+								</strong> 
+							</p> 
+						</th>  
+						<th valign="top" id="d84e20196"> 
+							<p>V2R3 
+								<strong> 
+									<sup>3</sup> 
+								</strong> 
+							</p> 
+						</th>  
+						<th valign="top" id="d84e20202"> 
+							<p>V2R4
+								<strong> 
+									<sup>3</sup> 
+								</strong> 
+							</p> 
+						</th> 
+					</tr> 
+				</thead>  
+				<tbody> 
+					<tr> 
+						<td align="left" valign="top" headers="d84e20187 "> 
+							<p>Base support 
+								<strong>¹</strong> 
+							</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20190 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20196 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20202 "> 
+							<p>Yes, and in PTFs</p> 
+						</td> 
+					</tr>
+					<tr> 
+						<td align="left" valign="top" headers="d84e20187 "> 
+							<p>System Recovery Boost</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20190 "> 
+							<p>No</p> 
+						</td>  
+						<td valign="top" headers="d84e20196 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20202 "> 
+							<p>PTF</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20187 "> 
+							<p>CPU measurement facility</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20190 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20196 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20202 "> 
+							<p>PTF</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20187 "> 
+							<p>FICON® Express16S+ (CHPID type FC) when using FICON or channel-to-channel (CTC)
+								<strong> 
+									<sup>1</sup> 
+								</strong> 
+							</p>  
+							<ul> 
+								<li>FICON Express16S+ LX</li>  
+								<li>FICON Express16S+ SX</li> 
+							</ul> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20190 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20196 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20202 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20187 "> 
+							<p>New z15 machine instruction (assembly language support)
+								<strong> 
+									<sup>2</sup> 
+								</strong> 
+							</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20190 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20196 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20202 "> 
+							<p>PTF</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20187 "> 
+							<p>OSA-Express7S 
+								<strong> 
+									<sup>1</sup> 
+								</strong> 
+							</p>  
+							<ul> 
+								<li>OSA-Express7S GbE LX (CHPID type OSC or OSD)</li>  
+								<li>OSA-Express7S GbE SX (CHPID type OSC or OSD)</li>  
+								<li>OSA-Express7S 10 GbE LR (CHPID type OSD)</li>  
+								<li>OSA-Express7S 10 GbE SR (CHPID type OSD)</li>  
+								<li>OSA-Express7S 25 GbE SR (CHPID type OSD)</li> 
+							</ul> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20190 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20196 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20202 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20187 "> 
+							<p>OSA-Express7S 1000BASE-T Ethernet 
+								<strong> 
+									<sup>1</sup> 
+								</strong> (CHPID type OSC or OSD)
+							</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20190 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20196 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20202 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20187 "> 
+							<p>CHPID type CS5 for coupling</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20190 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20196 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20202 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20187 "> 
+							<p>CHPID type OSE supporting 4 or 2 ports per feature</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20190 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20196 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20202 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20187 "> 
+							<p>CFCC Fair Latch Manager</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20190 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20196 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20202 "> 
+							<p>PTF</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td colspan="4" align="left" valign="top" headers="d84e20187 d84e20190 d84e20196 d84e20202 ">Table Notes: 
+							<ol> 
+								<li>z/OS V2R1 (compatibility only). Extended support contract for IBM Software Support Services 
+								for z/OS is required with PTFs.</li>  
+								<li>z/OS V2R1 with an extended support contract for IBM Software Support Services and PTFs.</li>  
+								<li>PTFs for base support have the following fix categories:
+								<ul>
+								<li>For IBM z15 Model T01, use FIXCAT value <q>IBM.Device.Server.z15-8561.RequiredService</q> 
+								and the FIXCATs for earlier processors.</li>
+								<li>For IBM z15 Model T02, use FIXCAT value <q>IBM.Device.Server.z15T02-8562.RequiredService</q> 
+								and the FIXCATs for earlier processors.</li>
+								</ul></li>								
+							</ol> 
+						</td> 
+					</tr> 
+				</tbody> 
+			</table>  
+			<p>
+			The exploitation of specific z15 server functions depends on the z/OS release.
+			The following table lists the z15 functions and indicates whether each function is exploited by a 
+			specific z/OS release (Yes or No), or whether the function requires a PTF (PTF) or a web deliverable (Web). 
+			For information about finding the appropriate PTFs, see the workflow step 
+			"Actions you can take before you order an IBM z15 server." 
+			For more information about z/OS V2R1 support, see the <em>Table Notes</em>.
+			</p>  
+			<table summary="This table shows a summary view of which z15 server functions can be exploited in z/OS V2R2, z/OS V2R3, and z/OS V2R4." id="z15__z15exploitation" width="100%" rules="all" frame="border" border="1"> 
+				<caption>Table 2. Exploitation of z15 server functions supported by z/OS V2R2, z/OS V2R3, and z/OS V2R4.</caption>  
+				<thead style="text-align:left;"> 
+					<tr> 
+						<th align="left" valign="top" id="d84e20479"> 
+							<p>z15 function included in base z/OS support (Y/N)</p> 
+						</th>  
+						<th align="left" valign="top" id="d84e20487"> 
+							<p>V2R2 ²</p> 
+						</th>  
+						<th valign="top" id="d84e20490"> 
+							<p>V2R3 ²</p> 
+						</th>  
+						<th valign="top" id="d84e20493"> 
+							<p>V2R4 ²</p> 
+						</th> 
+					</tr> 
+				</thead>  
+				<tbody> 
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p> 
+								<strong>Processors:</strong> The maximum number of processors that can be configured per server.
+							</p>
+							<p>For the z15 Model T01 (machine type 8561): 
+							<ul>
+							<li>Up to 190 processors configurable as CPs, zIIPs, IFLs, ICFs, or optional SAPs.</li>
+							<li>The sum of CPs and zIIPs configured in a single z/OS LPAR cannot exceed:
+								<ul>
+									<li>190 on z/OS V2R1 or later in non-SMT mode</li>
+									<li>128 on z/OS V2R1 or later in SMT mode.</li>
+								</ul></li>
+							</ul>
+							</p>
+							<p>For the IBM z15 Model T02 (machine type 8562): 
+								<ul>
+									<li>Up to 65 processors configurable as CPs, zIIPs, IFLs, ICFs, or optional SAPs.</li>
+									<li>The sum of CPs and zIIPs configured in a single z/OS LPAR cannot exceed 65 on z/OS V2R1 
+									or later (in either SMT or non-SMT mode).</li>
+								</ul>
+								</p>
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Two-way simultaneous multithreading (SMT) for zIIPs, IFLs, ICFs, or SAPs.</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<strong>Channel subsystems.</strong>  
+							<p>The maximum number of channel subsystems (CSS) that can be configured per server.</p> 
+							<ul>
+							<li>For the z15 Model T01 (machine type 8561): 
+								<ul>
+									<li>Up to six channel subsystems</li>
+									<li>Four subchannel sets per CSS.</li>
+								</ul></li>
+							<li>For the z15 Model T02 (machine type 8562): 
+								<ul>
+									<li>Up to three channel subsystems</li>
+									<li>Three subchannel sets per CSS.</li>
+							</ul>
+							</li>
+							</ul>
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Up to 40 TB of Redundant Array of Independent Memory (RAIM) per server. Up to 4 TB per z/OS LPAR with z/OS V2R1 or later.</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>2 GB Large Pages</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<strong>Logical partitions.</strong>  
+							<p>The maximum number of logical partitions (LPARs) that can be configured per server:
+							<ul>
+								<li>For the z15 Model T01 (machine type 8561), up to 85 LPARs can be configured.</li>
+								<li>For the z15 Model T02 (machine type 8562), up to 40 LPARs can be configured.</li>
+							</ul>
+							</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Coupling Facility Control Code Level 24 (CFLEVEL 24).
+								<sup>3</sup> 
+							</p>  
+							<p>Includes support for:</p>  
+							<ul> 
+								<li>CFCC Fair Latch Manager</li>  
+								<li>CFCC Message Path Resiliency Enhancement</li> 
+							</ul> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>PTF</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Coupling Express3 (CX3) LR 
+								<sup>3</sup> 
+							</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Support for 384 Coupling CHPIDs, 96 physical ICA SR coupling links, and 64 ICP internal coupling channels
+								<sup>3</sup> 
+							</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Support of High-Performance FICON (zHPF) single-track or multitrack operations (CHPID type FC)</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>PTF</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>CHPID type OSC supporting TN3270E and non-SNA DFT</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>CHPID type OSD with exploitation of two ports per CHPID</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>CHPID type OSD without maximum port exploitation (one port on the PCIe adapter is available for use)</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>CHPID type OSE supporting 4 or 2 ports per feature</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>FICON Express16SA (CHPID type FC) when using FICON or channel-to-channel (CTC)¹</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>PTF</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>FICON Express16SA (CHPID type FC) for support of zHPF single track or multi-track operations
+								<sup>1</sup> 
+							</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>PTF</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Checksum offload for IPV6 packets (CHPID type OSD)
+								<sup>1</sup> 
+							</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Checksum offload for LPAR-to-LPAR traffic for IPv4 and IPV6 packets (CHPID type OSD)
+								<sup>1</sup> 
+							</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Large Send for IPV6 packets (CHPID type OSD)
+								<sup>1</sup> 
+							</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Crypto Express7S Toleration</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Crypto Express7S support of VISA Format Preserving Encryption (VFPE)</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Web: Enhanced Cryptographic Support for z/OS V2.2 (HCR77B0)</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Crypto Express7S support of greater than 16 Domains</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Web: Cryptographic Support for V2R2 - V2R4 (HCR77D1) with PTFs</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Web: Cryptographic Support for V2R2 - V2R4 (HCR77D1) with PTFs</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Web: Cryptographic Support for V2R2 - V2R4 (HCR77D1) with PTFs</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Crypto Express6S Exploitation</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Web: Enhanced Cryptographic Support for z/OS V2.2 – z/OS V2.4 (HCD77D1)</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Web: Enhanced Cryptographic Support for z/OS V2.2 – z/OS V2.4 (HCD77D1)</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Web: Enhanced Cryptographic Support for z/OS V2.2 – z/OS V2.4 (HCD77D1)</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Crypto Express7S support of PCI-HSM compliance</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Web: Enhanced Cryptographic Support for z/OS V2.2 – z/OS V2.4 (HCD77D1)</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Web: Enhanced Cryptographic Support for z/OS V2.2 – z/OS V2.4 (HCD77D1)</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Web: Enhanced Cryptographic Support for z/OS V2.2 – z/OS V2.4 (HCD77D1)</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>10 GbE RoCE Express2.1 for Shared Memory Communications-Remote Direct Memory Access (SMC-R)</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>25 GbE RoCE Express2.1 for Shared Memory Communications - Remote Direct Memory Access (SMC-R)</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>IBM Integrated Coupling Adapter (ICA SR1.1) (CHPID type CS5)
+								<sup>3</sup> 
+							</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>zHyperLink Express Reads support
+								<sup>3</sup> 
+							</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>zHyperLink Express Writes support</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>IBM Virtual Flash Memory</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>IBM z/OS XL C/C++ support of the ARCH(13) and TUNE(13) parameters</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>No</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>No</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Integrated Accelerator for z Enterprise Data Compression</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>PTF</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>IBM Fibre Channel Endpoint Security <sup>4</sup> 
+							</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Yes</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Yes</p> 
+						</td> 
+					</tr>
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>IBM Z Data Privacy for Diagnostics</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>No</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>PTF</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>PTF</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td align="left" valign="top" headers="d84e20479 "> 
+							<p>Quantum Safe Support</p> 
+						</td>  
+						<td align="left" valign="top" headers="d84e20487 "> 
+							<p>Web: Enhanced Cryptographic Support for z/OS V2.2 – z/OS V2.4 (HCD77D1) and coexistence PTFs for SMF.</p> 
+						</td>  
+						<td valign="top" headers="d84e20490 "> 
+							<p>Web: Enhanced Cryptographic Support for z/OS V2.2 – z/OS V2.4 (HCD77D1) and coexistence PTFs for SMF.</p> 
+						</td>  
+						<td valign="top" headers="d84e20493 "> 
+							<p>Web: Enhanced Cryptographic Support for z/OS V2.2 – z/OS V2.4 (HCD77D1) and PTFs.</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td colspan="4" align="left" valign="top" headers="d84e20479 d84e20487 d84e20490 d84e20493 ">Table Notes: 
+							<ol>
+								<li>z/OS V2R1 (compatibility only). Extended support contract for IBM Software Support Services for z/OS is 
+								required with PTFs.</li>
+								<li>PTFs for base support have the following fix categories:
+									<ul>
+										<li>For IBM z15 Model T01, use FIXCAT value <q>IBM.Device.Server.z15-8561.RequiredService</q> 
+										and the FIXCATs for earlier processors.</li>
+										<li>For IBM z15 Model T02, use FIXCAT value <q>IBM.Device.Server.z15T02-8562.RequiredService</q> 
+										and the FIXCATs for earlier processors.</li>
+									</ul>
+									</li>
+									<li>z/OS V2R1 with PTFs.</li>
+									<li>IBM Fibre Channel Endpoint Security is supported on the z15 Model T01 (machine type 8561), 
+									but not on the z15 Model T02 (machine type 8562).</li>
+							</ol>
+						</td> 
+					</tr> 
+				</tbody> 
+			</table>  
+			<p>Web deliverables are available from the z/OS downloads page at
+				<a class="xref" href="https://www.ibm.com/systems/z/os/zos/downloads" target="_blank" rel="noopener" title="(Opens in a new tab or window)">z/OS downloads</a>.
+			</p> 
+			<p>
+			The following table provides more details about this upgrade action. Use this information to plan your 
+			changes to the system.</p>  
+			<table summary="This table provides more details about the upgrade action. Use this information to plan your changes to the system" id="z15__migration_details-d18e21152" rules="rows" frame="hsides" border="1"> 
+				<caption>Table 3. Information about this upgrade action</caption>  
+				<tbody> 
+					<tr> 
+						<td valign="top"> 
+							<p>Element or feature:</p> 
+						</td>  
+						<td valign="top"> 
+							<p>Multiple.</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td valign="top"> 
+							<p>When change was introduced:</p> 
+						</td>  
+						<td valign="top"> 
+							<p>IBM z15, which is available September, 2019.</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td valign="top"> 
+							<p>Applies to upgrade from:</p> 
+						</td>  
+						<td valign="top">z/OS V2R4, 
+							<p>z/OS V2R3, and z/OS V2R2.</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td valign="top"> 
+							<p>Timing:</p> 
+						</td>  
+						<td valign="top"> 
+							<p>Before you introduce a z15 server into your environment.</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td valign="top"> 
+							<p>Is the upgrade action required?</p> 
+						</td>  
+						<td valign="top"> 
+							<p>Yes, if you want to run z/OS V2R4, z/OS V2R3, or z/OS V2R2 on a z15 server, or if you want to run a coupling facility 
+							on a z15 server. 
+							If you plan to run only a coupling facility on a z15 system, only the sysplex-related actions are relevant. 
+							However, you must install the appropriate z/OS service for systems that are running on other servers that use the z15 
+							coupling facilities.</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td valign="top"> 
+							<p>Target system hardware requirements:</p> 
+						</td>  
+						<td valign="top"> 
+							<ul> 
+								<li>z/OS V2R4 and z/OS V2R3 require a minimum of 8 GB of memory to IPL. When running as a z/VM guest or on an 
+								IBM Z® Personal Development Tool (zPDT), 
+								at least 2 GB is required for z/OS V2R4 and z/OS V2R3. If the minimum is not met, a warning WTOR is issued at IPL.</li>  
+								<li>A z15 with Hardware Management Console (HMC) Version 2.15.0 plus microcode change levels (MCLs) and the 
+								Support Element Version 2.15.0. 
+								The IBM Z Hardware Management Appliance feature code 0100 can be ordered to provide HMC/SE functions 
+								within the CPC frame, eliminating the need for separate HMCs outside of the frame.</li>  
+								<li>Additional hardware required for specific functions: 
+									<ul> 
+										<li>IBM devices that are attached to z14, z14 ZR1, z13, and z13s servers are supported for attachment to 
+										z15 channels, unless otherwise noted. 
+										The subject I/O devices must meet FICON architecture requirements.</li>  
+										<li>IBM Virtual Flash Memory requires FC #0643.</li>  
+										<li>10 GbE RoCE Express2.1 requires FC #0432.</li>  
+										<li>25 GbE RoCE Express2.1 requires FC #0450.</li>  
+										<li>New OSA-Express7S adapters require the following feature codes: 
+											<ul> 
+												<li>OSA-Express7S GbE LX requires FC #0442</li>  
+												<li>OSA-Express7S GbE SX requires FC #0443</li>  
+												<li>OSA-Express7S 10 GbE LR requires FC #0444</li>  
+												<li>OSA-Express7S 10 GbE SR requires FC #0445</li>  
+												<li>OSA-Express7S 25 GbE SR1.1 requires FC #0449</li>  
+												<li>OSA-Express7S 1000BASE-T requires FC #0446.</li> 
+											</ul> Note: 
+											<p>For storage related requirements for OSA-Express7S 25GbE, 
+											refer to the topic about fixed storage considerations for OSA-Express interfaces in QDIO mode 
+											in 
+											<a class="xref" href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.4.0/com.ibm.zos.v2r4.halz002/abstract.htm">IP Configuration Guide</a>.											topic in the z/OS V2R4 IP Configuration Guide.</p> 
+										</li>  
+										<li>New FICON Express16SA cards require the following feature codes: 
+											<ul> 
+												<li>FICON Express16SA LX requires FC #0436</li>  
+												<li>FICON Express16SA SX requires FC #0437.</li> 
+											</ul> 
+										</li>  
+										<li>zHyperLink Express1.1 adapter requires FC #0451.</li>  
+										<li>Coupling Express LR requires FC #0433.</li>  
+										<li>IBM Integrated Coupling Adapter (ICA SR1.1) requires FC #0176.</li>  
+										<li>zHyperLink Express1.1 requires FC #0451.</li>  
+										<li>If you plan to enable the temporary activation of additional physical zIIP processors to be used with System Recovery Boost, 
+										you require the Boost Authorization feature (FC #9930) and the Sys Recovery Boost Record feature (FC ##6802).</li>  
+										<li>Crypto Express7S adapter: Crypto Express7S (2 port) requires FC #0898; Crypto Express7S (1 port) requires FC #0899.</li>  
+										<li>Use of hardware acceleration for cryptographic operations, including the use of Visa, Inc. Data Secure Platform (DSP) 
+										functions requires CP Assist for Cryptographic Function (CPACF) (#3863) or a supported cryptographic feature, such as Crypto Express7S, or both. 
+										See Table Note 1.</li>  
+										<li>Use of a new Trusted Key Entry (TKE) workstation requires TKE Rack Mount w/4768 (FC #0087) or TKE w/4768 (FC #0086). 
+										The TKE workstation is a combination of hardware and software, with other features required, depending on which functions you plan to use. 
+										Different feature codes are required if you are upgrading an existing TKE workstation from an earlier server. 
+											<p>Trusted Key Entry (TKE) 9.2 License Internal Code (FC ##0881) is required if you plan to use the TKE to manage a Crypto Express7S. 
+											For example, TKE 9.2 is required to:</p>  
+											<ul> 
+												<li>Manage any Crypto Express feature that is running in IBM Enterprise PKCS #11 (EP11) mode.</li>  
+												<li>Manage Common Cryptographic Architecture (CCA) mode PCI-HSM settings that are available on the Crypto Express7S.</li> 
+											</ul>  
+											<p>CCA in PCI-HSM mode and EP11 also require a smart card reader (FC #0885 or #0891), plus FIPS certified smart cards (FC #0892).</p> 
+										</li> 
+									</ul> 
+								</li> 
+							</ul> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td valign="top"> 
+							<p>Target system software requirements:</p> 
+						</td>  
+						<td valign="top"> 
+							<p>For more information, see the step "Support is delivered by service, z/OS features, and web deliverables" 
+							under "General recommendations and considerations for a z15 server." 
+							You will install the required service updates on your system when you perform the step 
+							"Install the necessary z/OS service" under "Actions you can take before you order an IBM z15 server." 
+							</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td valign="top"> 
+							<p>Other system (coexistence or fallback) requirements:</p> 
+						</td>  
+						<td valign="top"> 
+							<ul> 
+								<li>
+								The suggested practice is to install and run the required service on your existing server. 
+								This action enables you to fall back from a hardware perspective, yet maintain your software level.
+								</li>  
+								<li>
+								If you have not installed the preconditioning and exploitation PTFs for CFLEVEL 17-23, 
+								note that those PTFs are required to be installed throughout your sysplex before implementing CFLEVEL 24. 
+								<p>
+								Use the appropriate fix category, as follows:
+								<ul>
+								<li>For IBM z15 Model T01, use FIXCAT value <q>IBM.Device.Server.z15-8561.RequiredService</q></li>
+								<li>For IBM z15 Model T02, use FIXCAT value <q>IBM.Device.Server.z15T02-8562.RequiredService</q>.</li>
+								</ul>
+								</p>
+								</li>
+								<li>No ICSF coexistence PTFs are necessary for the z15 models T01 or T02. 
+								However, if you are using ICSF and plan to share keys with other z/OS systems 
+								that use an earlier level of ICSF, you must install the ICSF coexistence PTFs 
+								on those earlier levels of ICSF. 
+								To identify the ICSF coexistence PTFs, see the workflow step called 
+								"Determine the level of cryptographic support you require on a z15 server" 
+								for the appropriate SMP/E fix category values to use.</li> 
+							</ul> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td valign="top"> 
+							<p>Restrictions:</p> 
+						</td>  
+						<td valign="top"> 
+							<p>See the steps under "Restrictions for a z15 server."</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td valign="top"> 
+							<p>System impacts:</p> 
+						</td>  
+						<td valign="top"> 
+							<p>None.</p> 
+						</td> 
+					</tr>  
+					<tr> 
+						<td valign="top"> 
+							<p>Related IBM Health Checker for z/OS check:</p> 
+						</td>  
+						<td valign="top">Use health check IBMRSM,RSM_MINIMUM_REAL, 
+						which issues a warning for a system that is configured with less than 8 GB of real memory.</td> 
+					</tr>  
+					<tr> 
+						<td colspan="2" valign="top">Table Note: 
+							<ol> 
+								<li>IBM Z® cryptography features include VISA Format Preserving Encryption (VFPE) technology, which forms part of the Visa, Inc. Data Secure Platform (DSP). The use of VFPE technology requires a service agreement with Visa, Inc. For details, contact your Visa account manager or Visa at P2PE@visa.com. Clients who use IBM Z® cryptography features, but do not make use of the FPE functionality, are not required to enter into any such agreement with Visa.</li> 
+							</ol> 
+						</td> 
+					</tr> 
+				</tbody> 
+			</table>  
+			<h4>Steps to take</h4>  
+			<p>Continue your upgrade to the z15 by performing the following steps 
+			in this workflow. Each step contains a number of sub-steps.
+			<ul>
+			    <li>"General recommendations and considerations for a z15 server"</li>
+			    <li>"Restrictions for a z15 server"</li> 
+				<li>"Actions you can take before you order an IBM z15 server"</li>  
+				<li>"Actions you can take after installing an IBM z15 server"</li>  
+				<li>"Accommodate functions for the z15 to be discontinued on future servers"</li> 
+			</ul>  
+			</p>  
+			<h4>Reference information</h4>  
+			<p>For more information about new functions to exploit, see the IBM z15 Library,
+			which is available online in 
+			<a class="xref" href="https://www.ibm.com/servers/resourcelink" target="_blank" rel="noopener" title="(Opens in a new tab or window)">Resource Link™</a>.
+			</p> 
+		]]></description>  
+		<feedback name="Complete"/>  
+		<feedback name="Difficult"/>  
+		<feedback name="Exper"/>  
+		<feedback name="Length"/>  
+		<feedback name="Comment"/>  
+		<instructions>In this portion of the workflow, you submit a job to run the following 
+		    IBM Health Checker for z/OS health check, which is associated with this upgrade action:  
+			<strong>IBMRSM,RSM_MINIMUM_REAL</strong>.
+			<p>This check will be activated if it is not already active. If the check is activated, 
+			it will be deactivated at the end of the job, so that it remains in the same state as it was found.</p>
+			<p>If the health check runs without finding exceptions, this workflow step is marked &quot;complete,&quot; 
+			to indicate that this upgrade action is complete.</p>
+			<p>If the health check finds an exception, this step is marked &quot;failed.&quot;  
+			If so, further investigation (and possibly more work) is necessary to complete this upgrade action. 
+			If the step is marked &quot;Failed,&quot; review the health check output (using your preferred method
+			such as SDSF), and correct any situation as required. Then run this workflow step again to  
+			resubmit the health check job. Repeat this process until the health check no longer receives 
+			an exception and the step is marked &quot;complete.&quot;.</p>
+			<p>This check is available on the following releases: z/OS V2R1 and z/OS V2R2.</p>
+			<p>
+			<strong>Note: The successful running of this IBM Health Checker for z/OS health check only partially 
+			covers this upgrade action. Refer to the upgrade action text for the complete list of steps to take.</strong>
+			</p>
+		</instructions>		
+		<weight>10</weight>
+		<template>
+			<fileTemplate substitution="true">HC_rexx.txt</fileTemplate>
+			<submitAs maxRc="0">JCL</submitAs>
+			<predefinedVariable name="check">IBMRSM,RSM_MINIMUM_REAL</predefinedVariable>
+		</template>
+	</step>
+<step name="id-191e2cbc-2d86-416d-847e-6f3f544d28ab"> 
+		<!--<step level="step_2">-->  
+		<title>General recommendations and considerations for a z15 server</title>  
+		<description><![CDATA[  
+			<p>As you plan your migration to an IBM z15™ server, observe the recommendations and considerations in the steps that follow.</p> 
+		]]></description>  
+		  
+		  
+		  
+		  
+		  
+		 
+	<step name="id-4e9178dd-3c0a-4bcb-9eeb-0bcfd9b6d6a1"> 
+			<!--<step level="step_2_1">-->  
+			<title>Migration actions for IBM servers are cumulative</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>If you upgrade to a z15™ server from a z14™ or z14 ZR1 server, and have performed the upgrade actions 
+				that are associated with the z14 or z14 ZR1, you have fewer upgrade actions than if you upgrade from an 
+				earlier generation server. Thus, if you upgrade from an earlier generation server, you might need to 
+				perform more upgrade actions. For example, if you are upgrading from a z13 and z13s server, you should 
+				perform	the "z14 Upgrade Workflow" or the "Upgrade to an IBM z14 server" steps in the 
+				"z/OS V2R4 Upgrade Workflow".</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated 
+			by your site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-6a8e2a7d-6672-4c56-b8c0-a34426797f40"> 
+			<!--<step level="step_2_2">-->  
+			<title>Support is delivered by service, z/OS features, and web deliverables</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>
+				The base support for the z15™ is delivered through service (PTFs). To determine which PTFs are required, 
+				obtain the current enhanced HOLDDATA file, either by using the SMP/E RECEIVE ORDER command or by downloading 
+				the 2-year file and using the SMP/E RECEIVE command to process it.</p>
+				<p>
+				Then, use the SMP/E REPORT MISSINGFIX command to identify the missing PTFs on your system for the IBM z15. 
+				For example:</p>  
+				<pre>
+				SET BDY(GLOBAL).
+				REPORT MISSINGFIX ZONES( target_zone)
+				FIXCAT(IBM.Device.Server.z15*.**).
+				</pre>  
+				<p>
+				The following SMP/E FIXCATs identify the PTF support for the IBM z15:
+				<ul>
+				<li>For the IBM z15 Model T01 server: 
+				   <ul>
+				      <li>FIXCAT for required service is: <code>IBM.Device.Server.z15-8561.RequiredService</code></li>
+				      <li>FIXCAT for recommended service is: <code>IBM.Device.Server.z15-8561.RecommendedService</code></li>
+				      <li>FIXCAT for exploitation is: <code>IBM.Device.Server.z15-8561.Exploitation</code></li>
+				   </ul>
+				<li>For the IBM z15 Model T02 server:
+				   <ul>
+				      <li>FIXCAT for required service is: <code>IBM.Device.Server.z15T02-8562.RequiredService</code></li>
+				      <li>FIXCAT for recommended service is: <code>IBM.Device.Server.z15T02-8562.RecommendedService</code></li>
+				      <li>FIXCAT for exploitation service is: <code>IBM.Device.Server.z15T02-8562.Exploitation</code></li>
+				   </ul>
+				</ul>
+				<p>
+				The RequiredService FIXCATs identify the minimum PTFs that are required to use  z/OS on the z15 --- you must install these PTFs. 
+				The RecommendedService FIXCATs group the PTFs that the IBM Service organization recommends that you install. 
+				The Exploitation FIXCATs include the new functions that are provided on the z15, which  you can choose to exploit.</p>
+				<p>
+				The Preventive Service Planning (PSP) buckets for the z15 servers are identified by an upgrade name and one or more subset names, as follows:
+				<ul>
+				<li>For the IBM z15 Model T01 server, the PSP Upgrade name is <codeph>8561DEVICE</codeph>, 
+				and the z/OS support can be found in Subset <codeph>8561/ZOS</codeph>.</li>
+				<li>For the IBM z15 Model T02 server, the PSP Upgrade name is <codeph>8562DEVICE</codeph>, 
+				and the z/OS support can be found in Subset <codeph>8562/ZOS</codeph>.</li></ul>
+				</p>
+				</p>
+				<p>Exploitation of some functions requires a web deliverable. Specifically:</p>  
+				<ul> 
+					<li>Exploitation of Crypto Express7S requires the Cryptographic Support for z/OS V2R2 - z/OS V2R4 (FMID HCR77D1) web deliverable. 
+						<p>If you are using this web deliverable and sharing keys with other z/OS systems that have a lower level of ICSF, you require the coexistence PTFs identified by the following fix category:
+							<code>IBM.Coexistence.ICSF.z/OS_V2R2-V2R4-HCR77D1</code> 
+						</p> 
+					</li>  
+					<li>If you are running z/OS V2R1 and require Crypto Express6S exploitation support for the next Generation Coprocessor support or VISA Format Preserving Encryption (FPE), you must download and install the Enhanced Cryptographic Support for z/OS V2R1-z/OS V2R3 web deliverable (FMID HCR77C0) or the Cryptographic Support for z/OS V2R1 - z/OS V2R3 web deliverable (HCR77C1). 
+						<p>If you are using either of these web deliverables (HCR77C0 or HCR77C1) and sharing keys with other z/OS systems that have a lower level of ICSF, you require the coexistence PTFs identified by the appropriate fix category: 
+							<code>IBM.Coexistence.ICSF.z/OS_V2R1-z/OS_V2R3-HCR77C0</code> or 
+							<code>IBM.Coexistence.ICSF.z/OS_V2R1-z/OS_V2R3-HCR77C1</code>.
+						</p> 
+					</li>  
+					<li>If you are running z/OS V2R1 and require Crypto Express5S exploitation support for the next Generation Coprocessor support or VISA Format Preserving Encryption (FPE), you must download and install the Enhanced Cryptographic Support for z/OS V1R13-z/OS V2R1 web deliverable (FMID HCR77B0) or the Cryptographic Support for z/OS V1R13 - z/OS V2R2 web deliverable (HCR77B1). 
+						<p>If you are using either of these web deliverables (HCR77B0 or HCR77B1) and sharing keys with other z/OS systems that have a lower level of ICSF, you require the coexistence PTFs identified by the appropriate fix category:
+							<code>IBM.Coexistence.ICSF.z/OS_V1R13-z/OS_V2R1-HCR77B0</code> or 
+							<code>IBM.Coexistence.ICSF.z/OS_V1R13-z/OS_V2R1-HCR77B1</code>.
+						</p> 
+					</li>  
+					<li>To run z/OS V2R1 on a z15™ server, you require IBM Software Support Services for extended z/OS V2R1 support.</li> 
+				</ul> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-fca7c2b5-17b3-4e51-a34d-c05785c0529a"> 
+			<!--<step level="step_2_3">-->  
+			<title>Larger coupling facility structure sizes might be necessary</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>When you change the coupling facility control code level (CFLEVEL), your coupling facility structure sizes 
+				might change.</p>
+				<p> 
+				If, as part of your upgrade to a z15™ server, you change the CFLEVEL, you might have larger structure sizes 
+				than you did previously. If your CFLEVEL is identical, structure sizes are not expected to change when you 
+				upgrade from a previous server to a newer generation server.</p> 
+				<p>
+				In addition, similar to CFLEVEL 17 and later, ensure that the CF LPAR has at least 512MB of storage. 
+				CFLEVEL 24, introduced on the z15, supports the Coupling Facility use of Large Memory to improve availability 
+				for larger CF cache structures and data sharing performance with larger DB2 Group Buffer Pools (GBP). 
+				This support removes inhibitors to using large CF cache structures, enabling use of Large Memory to 
+				scale to larger DB2 Local Buffer Pools (LBP) and Group Buffer Pools (GBP) in data sharing environments.</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-66c0e44d-a7d2-4cd7-94ff-a911c511a02b"> 
+			<!--<step level="step_2_4">-->  
+			<title>Use the same software level throughout a sysplex</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>Having members of a sysplex at the same software level (other than during brief upgrade periods) is good 
+				software management policy.</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-a387b40a-90c6-4bc3-a3cd-c8e276a55064"> 
+			<!--<step level="step_2_5">-->  
+			<title>Migrate hardware and software at different times</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>To minimize the amount of change that you experience at one time, do not upgrade your software release level 
+				at the same time that you upgrade your hardware.</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-1c893b35-b107-4e11-925e-8b1a813a994b"> 
+			<!--<step level="step_2_6">-->  
+			<title>Use the latest version of SCRT</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>
+				As of z/OS V2R3, you do not need to update SCRT because it is included in the z/OS base. 
+				If you are running an earlier release of z/OS, and you use SCRT, make sure that SCRT is at 
+				the latest level. This is a requirement for sub-capacity pricing.</p>
+				<p>
+				The latest level of SCRT for releases prior to z/OS V2R3 can be downloaded from the SCRT web site at
+				<a class="xref" href="https://www.ibm.com/it-infrastructure/z/software/pricing-tools" target="_blank" rel="noopener" title="(Opens in a new tab or window)">IBM Z software pricing - Licensing - Sub-capacity licensing</a>.
+				</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+</step>
+<step name="id-42045922-1098-4513-a899-d519af4ed69d"> 
+		<!--<step level="step_3">-->  
+		<title>Restrictions for a z15 server</title>  
+		<description><![CDATA[  
+			<p>For a description of each restriction, perform the steps that follow.</p> 
+		]]></description>		  
+		  
+				 
+	<step name="id-e565f7e4-bf97-4953-9bac-cdd36c12c3a3"> 
+			<!--<step level="step_3_1">-->  
+			<title>z15 servers in a sysplex</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>Be aware of the following considerations:
+				<ul> 
+					<li>
+					A Parallel Sysplex® that contains a z15™ server, either for a z/OS image or a coupling facility (CF) image, 
+					can contain only z13 or later servers.</li>
+					<li>
+					The z15 requires ICA-SR and CE-LR fanouts. The older HCA3-O or the HCA3-O LR coupling fanouts are 
+					not supported on the z15 server.
+					</li>
+					<li>
+					Servers such as the z14, z14 ZR1, z13, or z13s, can connect to the z15 by using the Integrated Coupling Adapter 
+					Short Reach (ICA SR) and the Coupling Express Long Reach (CE LR) coupling links. Earlier systems, such as the zEC12 
+					and zBC12, do not support ICA SR or CE LR, and therefore cannot have coupling link connectivity to the z15 server.
+					</li>
+					<li>
+					If you are running z/OS on any servers earlier than a z13 or z13s, you cannot add a z15 to that sysplex; 
+					that is, you will not be able to perform rolling IPLs to introduce a z15 server if you have any of the earlier 
+					servers as z/OS images or coupling facility images in the sysplex.
+					</li>
+					<li>The earlier servers in the sysplex must be upgraded to z13 or z13s or later to have z15™ servers supported 
+					in the sysplex. If you have any z/OS images or coupling facility images on an earlier server, and you intend to 
+					introduce a z15 server into that sysplex, you must move those images to a z13 or z13s or later server before 
+					introducing the z15 server.
+					</li>
+					<li>
+					GRS supports the use of FICON CTCs for Ring configurations. However, if you are currently using ESCON CTCs 
+					for GRS ring configurations within a sysplex, consider converting to GRS Star if possible, or using XCF signaling 
+					in a GRS ring configuration. XCF sysplex signaling is preferred instead of GRS CTC connections.
+					</li>
+					<li>
+					IBM Z® servers that require time synchronization (for example, to support a base or Parallel Sysplex) must be 
+					configured in Server Time Protocol (STP) mode. STP is designed to allow multiple servers and coupling facilities 
+					to maintain time synchronization with each other, in a coordinated timing network (CTN). STP is a hardware feature 
+					of the z15, z14, z14 ZR1, z13, z13s, zEC12, and zBC12. The most recent servers (z15, z14, z14 ZR1, z13, and z13s) 
+					can participate only in an STP-only CTN.
+					</li>
+					<li>
+					Starting with IBM z15, the IBM Z Hardware Management Appliance (FC #0100) can be ordered to provide HMC/SE 
+					functions within the CPC frame, eliminating the need for separate HMCs outside of the frame.
+					</li> 
+				</ul> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-d4f33c0e-d0ef-4fa8-aa1d-bb4ea9e2f0a8"> 
+			<!--<step level="step_3_2">-->  
+			<title>HCD and HCM support for the z15</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>As with previous servers, hardware can be defined on any supported operating system and server. 
+				However, dynamic activation of new server and new adapter types can be done only on z15™ and 
+				future high-end IBM Z® servers. Dynamic activation is supported on z/OS V2R1 and later releases.</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+</step>
+<step name="id-77db8006-3baa-4795-bb53-853459e6c51d"> 
+		<!--<step level="step_4">-->  
+		<title>Actions you can take before you order an IBM z15 server</title>  
+		<description><![CDATA[  
+			<p>These are the upgrade actions that you perform on your current system, either because they require the current 
+			system or because they are possible on the current system. You do not need the z15™ server to make these changes, 
+			and the changes do not require the z15™ server once they are made. 
+			For example, discontinuing use of hardware that is no longer supported.</p> 
+		]]></description>  
+		
+		  
+				  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+	<step name="id-43246d66-9e4a-47e1-abba-cc204deb9e68"> 
+			<!--<step level="step_4_1">-->  
+			<title>Review the Large Systems Performance Reference (LSPR)</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>
+				The Large Systems Performance Reference (LSPR) is designed to provide comprehensive z/Architecture® 
+				processor capacity ratios for different configurations of central processors (CPs) across a wide 
+				variety of system control programs and workload environments.</p>				
+				<p>
+				The LSPR is available in IBM Resource Link™ at the following site: 
+				<a class="xref" href="https://www.ibm.com/servers/resourcelink/lib03060.nsf/pages/lsprindex" target="_blank" rel="noopener" title="(Opens in a new tab or window)">Large Systems Performance Reference for IBM Z</a>.
+			</p>				 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-a0e46993-2e7f-4564-a9d8-f6c20fea6ea5"> 
+			<!--<step level="step_4_3">-->  
+			<title>Implement an STP timing network</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>This action is needed because Sysplex Timers (9037-002) are not supported on z15™ servers.</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-f36c46a9-443a-40e2-a106-fdfba22c5545"> 
+			<!--<step level="step_4_4">-->  
+			<title>Upgrade from unsupported hardware features to newer technology</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>
+				This action is needed because specific features are not available on the z15™ server. 
+				</p>
+				<p>
+				The following hardware features are not supported on the z15™ server. They cannot be ordered on the z15 and 
+				cannot be carried forward from an upgrade on an earlier server to the z15.</p>  
+				<ul> 
+					<li>Host Channel Adapter (HCA) for InfiniBand is no longer supported, including the following features: 
+						<ul> 
+							<li>HCA2-O and HCA2-O LR features</li>  
+							<li>HCA3-O and HCA3-O LR features</li> 
+						</ul>  
+						<p>Enterprises must upgrade from HCA channels to one of the following coupling links:</p>  
+						<ul> 
+							<li>For high-speed short-range coupling connectivity, the IBM Integrated Coupling Adapter (ICA SR) is a two-port, short-distance coupling fanout that uses a new coupling channel type: CS5. The ICA SR can only be used for coupling connectivity between z15, z14, z14 ZR1, z13, and z13s servers. The ICA SR fanout requires new cabling, and can connect only to another ICA SR.</li>  
+							<li>For long-range coupling connectivity, the Coupling Express® Long Reach (CE LR) is a two-port, long-distance coupling adapter that uses a new coupling channel type: CL5. The CE LR can be used only for coupling connectivity between z15, z14, z14 ZR1, z13, and z13s servers.</li> 
+						</ul>  
+						<p>The suggested practice is to order ICA SR (#0172) or CE LR (#0433) on the z15™ servers that are used in a Parallel Sysplex to help ensure coupling compatibility with future server generations.</p> 
+					</li>  
+					<li>CHPID type OSN (OSA-Express for NCP) is not supported on the OSA-Express5S GbE LX feature</li>  
+					<li>OSA-Express4S features</li>  
+					<li>Crypto Express3 and Crypto Express4S</li>  
+					<li>InterSystem Channel-3 (ISC-3) coupling links feature</li>  
+					<li>FICON Express4</li>  
+					<li>zEDC Express (FC #0420). In the z15, the compression functions are moved into the processor chip, 
+					which is referred to as IBM Integrated Accelerator for z Enterprise Data Compression (zEDC). 
+					As an integrated part of the z15™ processor chip, the Integrated Accelerator for zEDC does not require 
+					the purchase of a hardware feature or usage of I/O slots.</li>  
+					<li>IBM Flash Express (features #0402 and #0403), which is replaced by IBM Virtual Flash Memory (VFM), starting with the z14. VFM implements Extended Asynchronous Data Mover (EADM) Architecture that uses HSA-like memory instead of Flash card pairs. No application changes are required to change from IBM Flash Express to VFM.</li>  
+					<li>As of HMC version 2.15.0, new builds of the Hardware Master Console (HMC) and the Support Element (SE) no longer include a CD/DVD drive as part the HMC server hardware. Instead, the HMC provides two options for installing functional updates: USB media and electronic delivery. These solutions are available for: 
+						<ul> 
+							<li>Firmware for the HMC or Support Element</li>  
+							<li>eBusiness on Demand (eBoD) records, such as On/Off Capacity on Demand (On/Off CoD)</li>  
+							<li>Operating system code, as used for 
+								<strong>Load from Removable Media</strong> or the Server task.
+							</li> 
+						</ul>  
+						<p>If you select to use USB media, the appropriate USB Flash Memory Drive Media is provided with the particular feature, using either of the following feature codes:</p>  
+						<ul> 
+							<li><b>Feature code 0843:</b> USB Load media that can be used for IBM Z operating system code</li>
+							<li><b>Feature code 0848:</b> USB Backup media that can be used for an HMC or SE Critical Data Backup task.</li> 
+						</ul>  
+						<p>If USB media is not acceptable for your environment, choose electronic delivery instead. 
+						Order feature code 0846 (No Physical Media Option) and follow the instructions on how to electronically deliver 
+						the required content over the network by using any of the following options:</p>  
+						<ul> 
+							<li>Z Remote Support Facility (zRSF)</li>  
+							<li>IBM Resource Link</li>  
+							<li>FTP/SFTP/FTPS Server connections from the HMC.</li> 
+						</ul>  
+						<p>For an electronic only delivery environment, two HMCs are required on every unique network subnet on which an HMC, SE, or TKE 
+						workstation is connected.</p> 
+					</li> 
+				</ul>
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-3c53228b-9055-4b81-8660-0a58e3e5f5b0"> 
+			<!--<step level="step_4_5">-->  
+			<title>Carry forward hardware features</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>The following hardware features are not orderable on z15™ servers. If they are installed on your existing server at the time of an 
+				upgrade to a z15 server, they can be retained or carried forward.</p>  
+				<ul> 
+					<li>TKE with/4768 #0080 or #0081</li>  
+					<li>TKE workstation #0085 and #0086</li>  
+					<li>HMC #0082, #0083, #0095, #0096</li>  
+					<li>HMC Rack KMM #0154</li>  
+					<li>TKE Rack Keyboard/Monitor/Mouse #0156</li>  
+					<li>Internal Coupling Adapter Short Reach (ICA SR) #0172</li>  
+					<li>Fanout Airflow PCIe #0174</li>  
+					<li>FICON Express8S 10KM LX #0409</li>  
+					<li>FICON Express8S SX #0410</li>  
+					<li>10 GbE RoCE Express #0411</li>  
+					<li>10 GbE RoCE Express #0412</li>  
+					<li>OSA-Express5S GbE LX #0413</li>  
+					<li>OSA-Express5S GbE SX #0414</li>  
+					<li>OSA-Express5S 10 GbE LR #0415</li>  
+					<li>OSA-Express5S 10 GbE SR #0416</li>  
+					<li>OSA-Express5S 1000BASE-T #0417</li>  
+					<li>FICON Express16S LX #0418</li>  
+					<li>FICON Express16S SX #0419</li>  
+					<li>OSA-Express6S GbE LX #0422</li>  
+					<li>OSA-Express6S GbE SX #0423</li>  
+					<li>OSA-Express6S 10 GbE LR #0424</li>  
+					<li>OSA-Express6S 10 GbE SR #0425</li>  
+					<li>OSA-Express6S 1000BASE-T #0426</li>  
+					<li>FICON Express16S+ LX #0427</li>  
+					<li>FICON Express16S+ SX #0428</li>  
+					<li>OSA-Express7S 25 GbE SR #0429</li>  
+					<li>25 GbE RoCE Express2 #0430</li>  
+					<li>zHyperLink Express #0431</li>  
+					<li>Coupling Express LR #0433</li>  
+					<li>Addl smart cards #0884</li>  
+					<li>TKE Smart Card Reader #0885</li>  
+					<li>Crypto Express5S #0890</li>  
+					<li>TKE Smart Card Reader #0891</li>  
+					<li>NXP Smart Card w/FIPS #0892</li>  
+					<li>Crypto Express6S #0893</li>  
+					<li>512 GB MEM DIMM(5/FEAT) #1631.</li> 
+				</ul>  
+				<p>For information about supported storage controllers, see the step 
+				"Ensure that you are using supported servers, storage controllers, and machine facilities" 
+				in the z/OS V2R4 Upgrade Workflow.
+				</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-73b1a43f-6c89-497d-8f43-695fd61f5cb8"> 
+			<!--<step level="step_4_6">-->  
+			<title>Determine the level of cryptographic support you require on a z15 server</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>The level of function that is provided for cryptographic support differs by z/OS release and the installed ICSF 
+				web deliverable. Also, toleration PTFs are available for some cryptographic web deliverables</p>  
+				<p>
+				For z/OS V2R4, consider the following:</p>  
+				<ul> 
+					<li>If you are using the level of ICSF that is shipped as part of z/OS V2R4 (FMID HCR77D0), 
+					you can use most functions of the Crypto Express7S feature on a z15™ server.</li>  
+					<li>ICSF Web Deliverable HCR77D1 - Cryptographic Support for z/OS V2R2 – z/OS V2R4 (FMID HCR77D1) 
+					provides some additional function and also incorporates enhancements that are available in PTFs 
+					for the base level of ICSF included in z/OS V2R4. 
+					This web deliverable includes support for: 
+						<ul> 
+							<li>Crypto Express7S adapter</li>  
+							<li>Ability to use CP Assist for Cryptographic Functions (CPACF) for certain clear key ECC operations</li>  
+							<li>CCA Release 5.5 and CCA Release 6.3</li>  
+							<li>Coupling Facility Level (CFLEVEL) 24</li>  
+							<li>Integrated Accelerator for z Enterprise Data Compression</li>  
+							<li>System Recovery Boost</li>  
+							<li>IBM Data Privacy Passports</li>  
+							<li>IBM Data Privacy for Diagnostics.</li> 
+						</ul>  
+						<p>If you are using this web deliverable and sharing keys with other z/OS systems that have a lower level of ICSF, 
+						you require the coexistence PTFs that are identified by SMP/E fix category
+							<code>IBM.Coexistence.ICSF.z/OS_V2R2-V2R4-HCR77D1</code>.
+						</p> 
+					</li>  
+					<li>If you require support for more than 16 domains on Crypto Express7S, you must install the PTFs that are identified 
+					by the SMP/E fix category for the z15™ server: 
+						<code>IBM.Device.Server.z15-8561.Exploitation</code>.
+					</li> 
+				</ul>  
+				<p>For z/OS V2R3, consider the following:</p>  
+				<ul> 
+					<li>If you are using the level of ICSF that is shipped as part of z/OS V2R3 (FMID HCR77C0), 
+					you can use most functions of the Crypto Express6S feature on a z15™ server.</li>  
+					<li>ICSF Web Deliverable HCR77D1 - Cryptographic Support for z/OS V2R2 – z/OS V2R4 (FMID HCR77D1) 
+					provides additional function and enhancements. 
+					If you are using this web deliverable and sharing keys with other z/OS systems that have a lower level of ICSF, 
+					you require the coexistence PTFs that are identified by SMP/E fix category 
+						<code>IBM.Coexistence.ICSF.z/OS_V2R2-V2R4-HCR77D1</code>.
+					</li>  
+					<li>ICSF Web Deliverable HCR77C1 - Cryptographic Support for z/OS V2R1 - z/OS V2R3 provides some additional 
+					function and also incorporates enhancements that are available in PTFs for the base level of ICSF included in z/OS V2R3. 
+					The web deliverable includes support for a PCI HSM (“ Payment Card Industry Hardware Security Module”) 
+					configured CCA coprocessor. Crypto Express6S also introduces the use of X.509 certificates in CCA. 
+					If you are using this web deliverable and sharing keys with other z/OS systems that have a lower level of ICSF, 
+					you require the coexistence PTFs that are identified by SMP/E fix category
+						<code>IBM.Coexistence.ICSF.z/OS_V2R1-V2R3-HCR77C1</code> 
+					</li> 
+				</ul>  
+				<p>For z/OS V2R2, consider the following:</p>  
+				<ul> 
+					<li>If you are using the level of ICSF that is shipped as part of z/OS V2R2 (FMID HCR77B0), 
+					you can use most functions of the Crypto Express6S feature on a z15™ server.</li>  
+					<li>ICSF Web Deliverable HCR77D1 - Cryptographic Support for z/OS V2R2 – z/OS V2R4 (FMID HCR77D1) 
+					provides additional function and enhancements. If you are using this web deliverable and sharing keys 
+					with other z/OS systems that have a lower level of ICSF, you require the coexistence PTFs that are 
+					identified by SMP/E fix category 
+						<code>IBM.Coexistence.ICSF.z/OS_V2R2-V2R4-HCR77D1</code>.
+					</li>  
+					<li>ICSF Web Deliverable HCR77C1 - Cryptographic Support for z/OS V2R1 – z/OS V2R3 provides some additional function 
+					and also incorporates enhancements that are available in PTFs for the base level of ICSF included in z/OS V2R2. 
+					The web deliverable includes support for a PCI HSM (“ Payment Card Industry Hardware Security Module”) 
+					configured CCA coprocessor. 
+					Crypto Express6S also introduces the use of X.509 certificates in CCA.</li> 
+				</ul> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-4c39ba6a-c576-4980-9818-ccc4396c3b5d"> 
+			<!--<step level="step_4_7">-->  
+			<title>Install the necessary z/OS service</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>IBM recommends that you use the SMP/E REPORT MISSINGFIX command to identify PTFs for the z15™ server that you 
+				do not already have installed. To do so, specify <code>IBM.Device.Server.*</code> and 
+				<code>IBM.Function.*</code> as the fix categories for the REPORT MISSINGFIX command. 
+					This command identifies not only the z15™ support PTFs, but also the PTFs for prior generations of IBM servers 
+					that you might need, and those required to enable various functions. 
+					Also, REPORT MISSINGFIX creates a batch job for the SMP/E RECEIVE ORDER command that you can use to 
+					get any PTFs you do not already have. SMP/E also provides an Explorer function that you can use to find 
+					new fix categories that might be of interest.
+					</p>
+					<p> 
+					For descriptions of the fix categories, see the Values and Descriptions page at
+					<a class="xref" href="https://www.ibm.com/systems/z/os/zos/features/smpe/fix-category.html" target="_blank" rel="noopener" title="(Opens in a new tab or window)">IBM Fix Category Values and Descriptions</a>. 
+					For more information about the REPORT MISSINGFIX command, see
+					<a class="xref" href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.4.0/com.ibm.zos.v2r4.gim1000/abstract.htm">z/OS SMP/E Commands</a>.
+				</p>  
+				<p>Here is an example of the SMP/E control statements you can use for REPORT MISSINGFIX:</p>  
+				<pre>
+				SET BDY(GLOBAL).
+                REPORT MISSINGFIX ZONES( target zone)
+                FIXCAT(IBM.Device.Server.**, IBM.Function.*).
+                </pre>  
+				<p>If you want to use specific fix categories, you can specify the following fix categories either individually or together 
+				for the z/OS PTFs that are required to use a z15™ server, exploit its functions and features, and those that IBM recommends 
+				that you install if you are using a z15™ server. Also needed are the fix categories for intermediate servers.</p> 
+				<p>
+				<ul>
+				<li>For the IBM z15 Model T01: 
+				<ul>
+					<li><code>IBM.Device.Server.z15-8561.RequiredService</code></li>
+					<li><code>IBM.Device.Server.z15-8561.Exploitation</code></li>
+					<li><code>IBM.Device.Server.z15-8561.RecommendedService</code></li>
+				</ul></li>
+				<li>For the IBM z15 Model T02: 
+				<ul>
+				<li><code>IBM.Device.Server.z15T02-8562.RequiredService</code></li>
+				<li><code>IBM.Device.Server.z15T02-8562.Exploitation</code></li>
+				<li><code>IBM.Device.Server.z15T02-8562.RecommendedService</code></li>
+				</ul></li>
+				</ul>
+				</p>
+				<p>
+				If you are exploiting z15™ capabilities by installing a web deliverable, more PTFs might be required. 
+				Follow the instructions in the Program Directory that is associated with each web deliverable to identify 
+				the required PTFs.</p>  
+				<p>
+					If you choose not to use the Recommended Service fix category for your z15 server, 
+					you can, alternatively, find lists of the recommended PTFs in the Preventive Service Planning (PSP) 
+					“buckets” for the applicable hardware and software. 
+					However, note that using PSP buckets and checking the status of the PTFs listed in them is more 
+					time-consuming and potentially error-prone than using REPORT MISSINGFIX with the appropriate fix category: 
+					<ul>
+						<li>For the IBM z15 Model T01, the PSP Upgrade name is <code>8561DEVICE</code>, and the z/OS 
+						support can be found in Subset <code>8561/ZOS</code>.</li>
+						<li>For the IBM z15 Model T02, the PSP Upgrade name is <code>8562DEVICE</code>, and the z/OS 
+						support can be found in Subset <code>8562/ZOS</code>.</li>
+					</ul>
+				</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-19666420-9626-4035-8c18-17dbd9a3bd2a"> 
+			<!--<step level="step_4_8">-->  
+			<title>Run the CFSIZER tool</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>If you are moving your coupling facilities, and the coupling facility structures are on a higher CFLEVEL 
+				than they were previously, run the Coupling Facility Structure Sizer (CFSIZER) tool to find out whether 
+				you must increase coupling facility structure sizes. 
+				Prepare to make the necessary changes to the CFLEVEL as indicated by the tool.</p>  
+				<p>You can download the CFSIZER tool at:  
+				<a class="xref" href="https://www.ibm.com/support/docview.wss?uid=isg3T1027062" target="_blank" rel="noopener" title="(Opens in a new tab or window)">Coupling Facility sizer</a>. 
+				</p>
+				<p>Also, see the following step in the z/OS V2R4 Upgrade Workflow:
+				<ul>
+				<li>"Update your CFRM policy with coupling facility structure size changes"</li>
+				</ul>
+				</p> 
+				<p>
+				<b>Note:</b> After you make a coupling facility available on the new hardware, 
+				you can run the Sizer utility, which is an authorized z/OS program that you can 
+				use to evaluate structure size changes. 
+				The Sizer utility is distinct from CFSizer, and should be run after the new 
+				hardware (CFLEVEL) is installed, but before any CF LPAR on the new hardware is 
+				populated with structures. 
+				You can download the Sizer utility at
+					<a class="xref" href="https://www.ibm.com/support/docview.wss?uid=isg3T1025939" target="_blank" rel="noopener" title="(Opens in a new tab or window)">CFSizer Alternate Sizing Techniques</a>.
+				</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-a6c998c5-6eec-45b6-8ab2-9ade70c48ad6"> 
+			<!--<step level="step_4_9">-->  
+			<title>Prepare for the new machine instruction mnemonics</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>The instruction set has been expanded on the z15™ server, as is usual for new servers. 
+				Each machine instruction is represented by a mnemonic in Assembler language. It is possible that the 
+				new mnemonics can match names that you chose for Assembler macro instructions. 
+				If such naming collisions occur, the Assembler default opcode table (UNI) processes new mnemonics as instructions, 
+				not as macros, after z15™ required service is installed. 
+				If this occurs, it is likely to cause Assembler error messages and can cause incorrect object code to be generated. 
+				If you write programs in Assembler Language, compare the names of your existing Assembler macro instructions 
+				to the new machine instructions, to identify any such conflicts or collisions that would occur. 
+				The Assembler macro instructions are documented in 
+				<a class="xref" href="http://www.ibm.com/support/docview.wss?uid=isg2b9de5f05a9d57819852571c500428f9a" target="_blank" rel="noopener" title="(Opens in a new tab or window)">z/Architecture Principles of Operation</a>.
+				For information about a tool to help in identifying mnemonic conflicts, see the IBM Techdocs web site under 
+				<a class="xref" href="http://www.ibm.com/support/techdocs/atsmastr.nsf/Web/Presentations" target="_blank" rel="noopener" title="(Opens in a new tab or window)">Presentations and Tools</a>. 
+				Search for the Techdoc <q>PRS5289</q>.
+				</p>  
+				<p>If a conflict is identified, take one of these actions:</p>  
+				<ul> 
+					<li>Change the name of your macro instruction.</li>  
+					<li>Specify PARM='...OPTABLE(YOP)...' (or some other earlier opcode table).</li>  
+					<li>Specify a separate ASMAOPT file containing assembler options such as in the previous method (this method requires no changes to source code or JCL).</li>  
+					<li>Add as the first statement of your source program: *PROCESS OPTABLE(YOP) (or some other earlier opcode table).</li>  
+					<li>Specify the PROFILE option either in JCL or the ASMAOPT file, and the specified or default member of the SYSLIB data set is copied into the front of the source program.</li>  
+					<li>If you must use both a new instruction and a macro with the same name in an assembly, 
+					use a coding technique that allows the use of a new instruction and a macro with 
+					the same name in an assembly, such as HLASM mnemonic tags ( 
+						<code>:MAC</code>  
+						<code>:ASM</code>).
+					</li> 
+				</ul> 
+				<p>To help you associate the OPTABLE levels with IBM Z processor generations:
+				<ul>
+				<li>HLASM APAR PH03536 defines OPTABLE names Z9 through Z14 as synonyms for 
+				ZS3 through ZS8.</li>
+				<li>HLASM APAR PH00902 adds OPTABLE name Z15 and synonym ZS9.</li>
+				</ul></p>
+				<p>Similarly, HLASM APAR PH00902 extends the MACHINE option to support various 
+				other names, based on short forms of the IBM machine name, such as zEC12 and z990. 
+				This APAR adds support for values in the form ARCH-n, to select the table that 
+				most closely corresponds to the ARCH(n) option in IBM compilers for 
+				C, COBOL, and PL/I. For example, both MACHINE(z15) and MACHINE(ARCH-13) are 
+				supported with the installation of HLASM APAR PH00902.</p>				
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-6531c038-55a8-444d-a4e0-9606c930d2f4"> 
+			<!--<step level="step_4_10">-->  
+			<title>Learn about the HiperDispatch enhancement</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>In HiperDispatch processing, changes in LPAR weight can cause I/O enabled vertical-high (Vh) and vertical-medium (Vm) 
+				processors to be converted to vertical-low (Vl) processors, and immediately parked by HiperDispatch. 
+				That is, the Vh and Vm processors can be pushed to the lowest configured online processors.</p>  
+				<p>Starting with z/OS V2R4, the system resources manager (SRM) component of z/OS reverses the search direction 
+				that is used to find processors for I/O enablement. SRM enables processors for I/O interrupts from the lowest 
+				configured CPU ID to the highest configured CPU ID. This enhancement keeps Vh or Vm processors enabled for I/O 
+				interrupts after processor topology changes.</p>  
+				<p>The HiperDispatch enhancement is included in the z/OS V2R4 base. It can be added to z/OS V2R2 and z/OS V2R3 
+				by installing the PTF for APAR OA55935. 
+				It is identified by the following SMP/E fix categories: 
+					<ul>
+						<li>For the IBM z15 Model T01, use fix category <code>IBM.Device.Server.z15-8561.Exploitation</code></li>
+						<li>For the IBM z15 Model T02, use fix category <code>IBM.Device.Server.z15T02-8562.Exploitation</code></li>
+					</ul>
+				</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-49d24835-d353-4c49-825f-f8c4bb42674e"> 
+			<!--<step level="step_4_11">-->  
+			<title>Learn about the z/OS SLIP enhancements</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>The z/OS SLIP command is enhanced to monitor an address or range of addresses for a key change and in 
+				response take a memory dump or set a trace. This behavior is supported in z/OS V2R4 running on the z15. 
+				No toleration support is required on earlier releases.</p>  
+				<p>To enable the SLIP function, enter the SLIP command with new options, as follows:</p>  
+				<pre> 
+				<code>SLIP SET[,options],END</code>
+				</pre>  
+				<p>To disable the SLIP function, enter the SLIP command with new options, as follows:</p>  
+				<pre> 
+				<code>SLIP DEL[,options]</code>
+				</pre>  
+				<p>
+				For more information, see 
+				<a class="xref" href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.4.0/com.ibm.zos.v2r4.ieag100/slip.htm" target="_blank" rel="noopener" title="(Opens in a new tab or window)">SLIP command</a>
+				in 
+				<a class="xref" href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.4.0/com.ibm.zos.v2r4.ieag100/abstract.htm">z/OS MVS System Commands</a>.
+				</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-215dbc0a-dbc8-4a13-8a30-67f26a67579b"> 
+			<!--<step level="step_4_12">-->  
+			<title>Accommodate the changes to default ARCH and TUNE level</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>The z15™ supports the new levels ARCH(13) and TUNE(13), which are needed to take advantage of most of the 
+				enhanced vector instructions available on the z15™ in z/Architecture mode. ARCH(13) produces code that uses 
+				instructions that are available on the z15, such as the following:</p>  
+				<ul> 
+					<li>Vector Enhancement Facility 2</li>  
+					<li>Miscellaneous-Instruction-Extension Facility 3</li>  
+					<li>Aligned Vector Load/Store Hint instructions</li>  
+					<li>Limited exploitation of Vector Packed Decimal Enhancement Facility.</li> 
+				</ul>  
+				<p>Application developers can recompile their applications with the ARCH 13 compiler option to instruct the 
+				compiler to generate code that uses the instructions available on the z15. This action can bring performance 
+				improvements for applications without requiring any changes to source code.</p> 
+				<p>It is recommended that you upgrade to the IBM z/OS XL C/C++ V2.4.1 web deliverable for IBM z/OS 
+				V2.4, which became available on December 13, 2019. This new compiler supports the C11, C++11, and C++14 
+				language standards. It combines the C language (Clang) infrastructure with the existing advanced optimization 
+				technology in the IBM XL compilers to exploit the latest z/Architecture, including the IBM z15. 
+				The z/OS XL C/C++ V2.4.1 compiler supports English messages and EBCDIC and ASCII execution character sets, 
+				and generates AMODE 64 code, making it ideal for z/OS UNIX users who are porting applications from 
+				distributed platforms.</p>
+				<p>The XL C/C++ V2.4.1 web download is available as a no-charge add-on for installations that have enabled the 
+				XL C/C++ compiler (an optionally priced feature) on z/OS V2.4 only. It coexists with and does not replace the 
+				base XL C/C++ V2.4 compiler. XL C/C++ V2.4 and V2.4.1 compilers are both designed to be used independently and 
+				are also serviced and supported independently.</p>
+				<p>For the latest offerings from the IBM XL C/C++ compiler family on z/OS, see 
+				the <tm tmtype="reg" trademark="z/OS">z/OS</tm> downloads page at 
+				<a class="xref" href="https://www.ibm.com/systems/z/os/zos/downloads" target="_blank" rel="noopener" title="(Opens in a new tab or window)">z/OS downloads</a>.
+			    </p>
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-dbd1b02a-0c77-4f82-8b42-af97fc7187c4"> 
+			<!--<step level="step_4_13">-->  
+			<title>Upgrade actions for IBM Integrated Accelerator for z Enterprise Data Compression (zEDC)</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>
+				In the z15, the compression functions are moved into the processor chip, which is referred to as 
+				IBM Integrated Accelerator for z Enterprise Data Compression (zEDC). IBM Integrated Accelerator for 
+				zEDC replaces zEDC Express (FC #0420). IBM Integrated Accelerator for zEDC uses industry standard 
+				compression formats for file compression that can enable reduction in the size of data, which can 
+				save storage space and increase data transfer rates. The z/OS APIs, both authorized and zlib, 
+				transparently enable all existing software exploitation on z15, 
+				which was already enabled on z14 and earlier with zEDC Express. 
+				Support is available on z/OS V2R1, z/OS V2R2, z/OS V2R3, and z/OS V2R4 when running on z15. 
+				No toleration support is required.</p>  
+				<p>
+				Data that is compressed with zEDC Express can be decompressed with IBM Integrated Accelerator for zEDC. 
+				The software inflate routine is updated to be RFC-compliant. 
+				This change allows for fallback so that IBM Integrated Accelerator for zEDC compressed data can be decompressed 
+				on z14 and earlier servers.</p>  
+				<p>As with zEDC Express, IBM Integrated Accelerator for zEDC compression supports two types of processing:</p>  
+				<ul> 
+					<li>Synchronous processing in problem state, which is requested through the zlib data compression library services</li>  
+					<li>Asynchronous processing in authorized state, which is requested through the IBM Z authorized compression services.</li> 
+				</ul>  
+				<p>
+				As was done previously for zEDC, parmlib member IFAPRDxx is used to enable compression. 
+				However, with IBM Integrated Accelerator for zEDC compression on the z15, 
+				you use IFAPRDxx only for enabling asynchronous processing. 
+				It is not required for zlib-based (problem state) uses.</p>  
+				<p>
+				The following example shows a typical IFAPRDxx entry for IBM Integrated Accelerator for zEDC compression, 
+				which uses the same format as the zEDC Express. If your IFAPRDxx member already contains this entry, 
+				you can retain it on the z15.</p>  
+				<pre>
+				<code>PRODUCT OWNER('IBM CORP')
+				NAME('Z/OS')
+				FEATURENAME('ZEDC')
+				ID(5650-ZOS)
+				VERSION(*)
+				RELEASE(*)
+				MOD(*)
+				STATE(ENABLED)</code>
+				</pre>  
+				<p>
+				Before upgrading to the z15, you must install the z/OS zlib PTFs for this support, 
+				which are identified by the following SMP/E fix categories: 
+			    <ul>
+				<li>For the IBM z15 Model T01, use fix category <code>IBM.Device.Server.z15-8561.RequiredService</code></li>
+				<li>For the IBM z15 Model T02, use fix category <code>IBM.Device.Server.z15T02-8562.RequiredService</code></li>
+				</ul>
+				</p>
+				<p>Also, you must apply the PTF for APAR OA56143.</p>
+				<p>
+				Then, relink your applications with the updated zlib data compression library. 
+				If the PTFs are not installed, z/OS attempts to find a zEDC device, which is not supported on the z15. 
+				If so, no compression or decompression can occur.</p>
+				<p>
+				The IBM Z Batch Network Analyzer (zBNA) tool is updated to provide usage estimation for 
+				IBM Integrated Accelerator for zEDC compression.</p>
+				<p> 
+				For more information about the zBNA tool, see IBM Techdoc PRS5132 at
+				<a class="xref" href="http://www.ibm.com/support/techdocs/atsmastr.nsf/WebIndex/PRS5132" target="_blank" rel="noopener" title="(Opens in a new tab or window)">IBM Z Batch Network Analyzer (zBNA) Tool</a>. 
+				</p>
+				<p>
+				In the future, after you have upgraded all servers to the z15™ level (including servers that 
+				are used for disaster recovery), and you have installed the related PTFs on all of your z/OS systems, 
+				you might have the following clean-up actions to perform:  
+				<ul> 
+				<li>
+				In parmlib member IQPPRMxx, the MAXSEGMENTS option is obsolete and therefore ignored. 
+				Also, the defaults for DEFMINREQSIZE and INFMINREQSIZE are changed and those values 
+				can no longer be updated through parmlib. You can remove these settings from your 
+				IQPPRMxx parmlib member.</li>
+				<li>
+				Applications that use zlib no longer require READ access to SAF resource 
+				<code>FPZ.ACCELERATOR.COMPRESSION</code> in the FACILITY CLASS.
+				You can remove these application authorizations from your external security manager, 
+				such as RACF</li>
+				</ul></p>				
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as 
+			dictated by your site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-8a79a8e5-2ff2-4629-9a7f-5132ebbd1c70"> 
+			<!--<step level="step_4_14">-->  
+			<title>Upgrade the I/O Configuration Program (IOCP) for z15</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>It is possible carry forward an IOCDS from a z13 or z14, if no new functions are required from the z15. 
+				However, to use the new I/O hardware that is available only on the z15, you must apply the required PTFs, 
+				which are identified by the following SMP/E fix categories:
+				<ul>
+				<li>For the IBM z15 Model T01, use fix category <code>IBM.Device.Server.z15-8561.RequiredService</code></li>
+				<li>For the IBM z15 Model T02, use fix category <code>IBM.Device.Server.z15T02-8562.RequiredService</code></li>
+				</ul></p>
+				<p>
+				Also, you must apply the PTF for APAR OA56761.
+				</p>  
+				<p>Note that the z15™ I/O hardware includes:</p>  
+				<ul> 
+					<li>Increased coupling CHPIDs per CEC from 256 to 384</li>  
+					<li>Support for increased ICA-SR to 96 and ICP to 64.</li> 
+				</ul> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+</step>
+<step name="id-0973e7e9-dc5d-42a2-a904-973f674353e1"> 
+		<!--<step level="step_5">-->  
+		<title>Actions you can take after installing an IBM z15 server</title>  
+		<description><![CDATA[  
+			<p>These are migration actions that you perform only after you have installed the z15™ server. 
+			You need a running z15™ server to perform these actions.</p>  
+			<p>For information about PTFs, see the notes for Table 1 in the step "Migrate to an IBM z15 server."</p> 
+		]]></description>  
+		  
+		  
+		  
+		  
+		  
+		 
+	<step name="id-7debc2a6-3701-4d2b-9258-3d46ab9790c1"> 
+			<!--<step level="step_5_1">-->  
+			<title>FICON Express16SA</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>
+				FICON Express16SA supports a link data rate of 16 gigabits per second (Gbps) and 
+				auto-negotiation to 8 Gbps for synergy with current generation switches, directors, 
+				and storage devices. With support for native FICON, High Performance FICON 
+				for z Systems (zHPF), and Fibre Channel Protocol (FCP),	the IBM z15™ server is 
+				designed to help you to prepare for an end-to-end 16 Gbps infrastructure to 
+				meet the lower latency and increased bandwidth demands of your applications.</p>  
+				<p>
+				The FICON Express16SA adapter will work with your existing fiber optic 
+				cabling environment, both single mode and multimode optical cables.</p> 
+				<p>
+				<b>Note:</b>FICON Express16SA is not supported on the z15 Model T02 server.</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-94fdbd20-9640-4c8e-bd0e-e08ce78a240e"> 
+			<!--<step level="step_5_2">-->  
+			<title>Upgrade to Virtual Flash Memory (VFM)</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>
+				Beginning with the IBM z14 server, IBM Virtual Flash Memory (VFM) is the 
+				replacement for the Flash Express features (#0402, #0403), which were 
+				available on the IBM zEC12 and IBM z13. 
+				No application changes are required to change from IBM Flash Express to VFM. 
+				</p>
+				<p>Ensure that you replace your Flash memory with adequate VFM.</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-f619bc13-f451-46fa-a376-cdec89abdc65"> 
+			<!--<step level="step_5_3">-->  
+			<title>Upgrade actions for Hardware Instrumentation Services (HIS)</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>New extended and crypto counters and diagnostic samples are added for the z15. 
+				If you want to enable them, you must have Hardware Instrumentation Services (HIS) set up on z/OS. 
+				</p>
+				<p>
+				To start or stop collecting extended or crypto counters or diagnostic sampling, enter the command
+					<code>MODIFY HIS</code>.
+				</p>  
+				<p>No toleration support is needed.</p>  
+				<p>
+				If you want to ignore the HIS enhancements, you might need to update your HIS profilers. 
+				For more information, see the topic about 
+				<a class="xref" href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.4.0/com.ibm.zos.v2r4.ieag100/m3his.htm" target="_blank" rel="noopener" title="(Opens in a new tab or window)">starting, configuring, and stopping hardware event data collection</a>.
+				in <a class="xref" href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.4.0/com.ibm.zos.v2r4.ieag100/abstract.htm">z/OS MVS System Commands</a>.
+				</p> 
+				<p><b>Note:</b> If you use the CPU Measurement Facility, IBM recommends that your installation collect 
+				SMF 113 subtype 1 and 2 records. IBM also recommends that products process SMF 113 subtype 1 records 
+				when available because that is where future enhancements are made. If subtype 1 records are not available, 
+				products can process subtype 2 records.</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-d1125948-1719-4d2b-a735-c311bcfabc39"> 
+			<!--<step level="step_5_4">-->  
+			<title>Learn about System Recovery Boost</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>
+				New for the z15, this enhancement can provide faster operating system IPL, middleware and workload 
+				restart and recovery, and planned shutdown. During a boost period that applies during operating system 
+				shutdown and following a reIPL or restart, the IBM z15™ can make additional processing capacity 
+				available to the system in a variety of ways to help accelerate processing, and apply that same 
+				boosted capacity to improve workload throughput and response time and elapsed time during the boost. 
+				Enhancements in Geographically Dispersed Parallel Sysplex (GDPS) automation are also designed to 
+				provide faster, more efficient, and more highly-parallel orchestration of GDPS automated 
+				reconfiguration activities, such as activating or deactivating images, IPLing images, and so on.</p>  
+				<p>
+				System Recovery Boost works by providing additional processor capacity and parallelism during a 
+				boost period, using your installation's already-entitled CPUs and zIIPs. 
+				System Recovery Boost does this without increasing the four-hour rolling average (4HRA) 
+				IBM software billing cost or MSU consumption associated with your workload during this time.</p>
+				<p>
+				<b>Note:</b> The IBM z15 Model T02 does not provide the System Recovery Boost Upgrade 
+				capability to add additional "temporary capacity" zIIP processors. Thus, the z15 Model T02 
+				does not offer System Recovery Boost Upgrade Feature Codes 9930 and 6802.</p>
+				<p>
+				For more information about System Recovery Boost, see the following books: 
+				<ul>
+				<li><cite>IBM z15 Technical Introduction</cite>, SG24-8850</li>
+				<li><cite>IBM Z Capacity on Demand User's Guide</cite>, SC28-6985-03</li>
+				</ul></p> 
+				<p>
+				These books are included in the IBM z15 Library, which is available online in 
+			<a class="xref" href="https://www.ibm.com/servers/resourcelink" target="_blank" rel="noopener" title="(Opens in a new tab or window)">Resource Link™</a>.
+			</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by 
+			your site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-58076787-c574-4f7d-b53e-41b769381f10"> 
+			<!--<step level="step_5_5">-->  
+			<title>Enable BCPii communications on the support element</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>For Support Elements that run on z15, the setting for the “Cross Partition Authority” option is replaced by 
+				new security settings on the System Details panel and the Customize Image Profiles panel. 
+				</p>
+				<p>
+				For more information, see the step named "Enable BCPii communications on the support element" 
+				in the z/OS V2R4 Upgrade Workflow. 
+				</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="id-bd79d3d3-87b3-465f-aa0d-12ac204244db"> 
+			<!--<step level="step_5_6">-->  
+			<title>Learn about IBM Integrated Accelerator for z Enterprise Data Compression (zEDC)</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>
+				Beginning with the z15, IBM Integrated Accelerator for z Enterprise Data Compression (zEDC) replaces 
+				the	zEDC Express (FC #0420). As an integrated part of the z15™ processor chip, the Integrated Accelerator 
+				for zEDC does not require the purchase of a hardware feature or usage of I/O slots.</p>  
+				<p>
+				No change is required when z/OS is upgraded from a z14 to a z15.</p> 
+				<p>
+				Observe the following differences in processing:
+				<ul>
+				<li>RMF changes:
+					<ul>
+					<li>On earlier IBM Z servers, you used the RMF PCIE report to monitor the usage of zEDC devices.
+					Starting with the z15, you can now monitor compression activity by referring to the I/O Queuing 
+					Activity report and the Extended Asynchronous Data Mover (EADM) device summary instead. 					
+					RMF EADM reporting (SMF 74.10), which was previously known as Storage Class Memory (SCM) 
+					Statistics, is enhanced with asynchronous execution information.</li>
+				<li>On the z15, the RMF PCIE report no longer contains any information about compression.</li>
+				</ul></li>
+				<li>Synchronous mode compression is not recorded; it is treated as an instruction invocation.</li>
+				<li>Asynchronous mode compression is recorded, as follows: 
+				<ul>
+				<li>SMF30 information is captured</li>
+				<li>In RMF, the EADM device summary provides information about compression.</li>
+				<li>SAP utilization is updated to include time for compression and decompression.</li>
+				</ul>
+				</li>
+				</ul>
+				</p>			
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+</step>
+<step name="id-c20f0e47-229c-4702-9e01-b4eb1e561c25"> 
+		<!--<step level="step_6">-->  
+		<title>Accommodate functions for the z15 to be discontinued on future servers</title>  
+		<description><![CDATA[ Note: 
+			<p>IBM's statements regarding its plans, directions, and intent are subject to change or withdrawal 
+			without notice at IBM's sole discretion. Information regarding potential future products is intended 
+			to outline our general product direction and it should not be relied on in making a purchasing decision. 
+			The information mentioned regarding potential future products is not a commitment, promise, or legal 
+			obligation to deliver any material, code, or functionality. Information about potential future 
+			products may not be incorporated into any contract. The development, release, and timing of any 
+			future features or functionality described for our products remains at our sole discretion.</p>  
+			<p>The steps in this section involve changes in hardware support that could affect your environment. 
+			Make the appropriate changes, as needed.</p> 
+		]]></description>  
+		 
+	<step name="id-4b94497d-10f5-422b-94dd-0963f3a3b7e2"> 
+			<!--<step level="step_6_1">-->  
+			<title>Prepaid On/Off Capacity on Demand tokens will not carry forward</title>  
+			<description><![CDATA[  
+				<h6>Description</h6>  
+				<p>
+				Beginning with IBM z15™, new prepaid On/Off Capacity on Demand (On/Off CoD) temporary CP 
+				resource tokens do not carry forward to future systems. On/Off CoD from IBM allows you to 
+				enable and disable hardware engines to meet temporary peak business needs. On the IBM Z platform, 
+				this hardware offering is available exclusively on supported IBM Z servers. Charges that are 
+				related to both hardware and software depend on the duration of the temporary enablement 
+				and the capacity enabled.</p> 
+				<p>
+				Beginning with IBM z15 Model T02, prepaid tokens for On/Off Capacity on Demand (On/Off CoD) 
+				will expire 5 years after the LICCC expiration date.			
+				</p>
+				<p>				
+				<b>Note:</b> IBM's statements regarding its plans, directions, and intent are subject to change 
+				or withdrawal without notice at IBM's sole discretion. Information regarding potential future products 
+				is intended to outline our general product direction and it should not be relied on in making a 
+				purchasing decision. The information mentioned regarding potential future products is not a commitment, 
+				promise, or legal obligation to deliver any material, code, or functionality. Information about 
+				potential future products may not be incorporated into any contract. The development, release, and 
+				timing of any future features or functionality described for our products remains at our sole discretion.</p> 
+			]]></description>  
+			<feedback name="Complete"/>  
+			<feedback name="Difficult"/>  
+			<feedback name="Exper"/>  
+			<feedback name="Length"/>  
+			<feedback name="Comment"/>  
+			<instructions>This information was provided for your understanding and possible further action as dictated by your 
+			site policies.</instructions>  
+			<weight>10</weight> 
+		</step>
+<step name="z15_Prepare_for_IBF_Removal">
+			<!--<step level="step_6_1">-->
+			<title>Prepare for the removal of the internal battery feature</title>
+			<description><![CDATA[
+				<h6>Description</h6>
+				<p>
+					IBM z15™ is planned to be the last IBM Z server to offer the Internal Battery Feature (IBF), which is an internal short term uninterruptible power supply (UPS). The IBF is available on z15 T01 servers with the Balanced Power Plan Ahead feature (FC#3003). The IBF is not available on the z15 z15 T02.
+					</p>
+					<p>
+						As client data centers continue to improve power stability and uninterruptible power supply (UPS) coordination, IBM Z continues to innovate to help clients take advantage of common power efficiency and monitoring across their ecosystems.</p>
+					<p>
+						Additional support for data center power planning can berequested through your IBM Sales contact.
+					</p>
+				<p><b>Note:</b> IBM's statements regarding its plans, directions, and intent are subject to change or withdrawal without notice at IBM's sole discretion. Information regarding potential future products is intended to outline our general product direction and it should not be relied on in making a	purchasing decision. The information mentioned regarding potential future products is not a commitment, promise, or legal obligation to deliver any material, code, or functionality. Information about potential future products may not be incorporated into any contract. The development, release, and timing of any future features or functionality described for our products remains at our sole discretion.</p>
+			]]></description>
+			<feedback name="Complete"/>
+			<feedback name="Difficult"/>
+			<feedback name="Exper"/>
+			<feedback name="Length"/>
+			<feedback name="Comment"/>
+			<instructions>This information was provided for your understanding and possible further action as dictated by your
+			site policies.</instructions>
+			<weight>10</weight>
+		</step>
+<step name="z15_Prepare_for_TLS1_Removal">
+			<!--<step level="step_6_1">-->
+			<title>Prepare for the removal of support for TLS 1.0 and TLS 1.1 for SE, HMC, and OSC</title>
+			<description><![CDATA[
+				<h6>Description</h6>
+				<p>
+					IBM z15™ is planned to be the last IBM Z server to to support the use of the Transport Layer Security protocol versions 1.0 (TLS 1.0) and version 1.1 (TLS 1.1) for establishing secure connections to the Support Element (SE), Hardware Management Console (HMC), and Open Systems Adapter (OSA) Integrated Console Controller (channel path type OSC).
+				</p>				
+				<p><b>Note:</b> IBM's statements regarding its plans, directions, and intent are subject to change or withdrawal without notice at IBM's sole discretion. Information regarding potential future products is intended to outline our general product direction and it should not be relied on in making a	purchasing decision. The information mentioned regarding potential future products is not a commitment, promise, or legal obligation to deliver any material, code, or functionality. Information about potential future products may not be incorporated into any contract. The development, release, and timing of any future features or functionality described for our products remains at our sole discretion.</p>
+			]]></description>
+			<feedback name="Complete"/>
+			<feedback name="Difficult"/>
+			<feedback name="Exper"/>
+			<feedback name="Length"/>
+			<feedback name="Comment"/>
+			<instructions>This information was provided for your understanding and possible further action as dictated by your
+			site policies.</instructions>
+			<weight>10</weight>
+		</step>
+</step>
+<step name="id-0415bf38-2e23-47c1-86fb-f2aa4c14939e"> 
+		<!--<step level="step_7">-->  
+		<title>Provide feedback to IBM on your upgrade experience</title>  
+		<description><![CDATA[ IBM would like your feedback on this upgrade experience]]></description>  
+		<feedback name="HelpfulOv"/>  
+		<feedback name="ExperOv"/>  
+		<feedback name="CommentOv"/>  
+		<feedback name="ContactInfo"/>  
+		<instructions substitution="false">In this example step, you generate a feedback summary file by selecting the workflow 
+		instance and clicking &quot;Generate Feedback Summary&quot; in the &quot;Action&quot; drop-own menu. The summary is based on the values that 
+		were entered previously. This step is optional.
+		<p>
+		You can edit the file as needed after it is created. If you want to change your answers, you can recreate the file.</p>  
+		<p>
+		When you are ready to send the file to IBM, attach it to an email and sent it to zosmig@us.ibm.com. 
+		As you can see in the feedback file, only the information you want to provide will be seen by IBM. 
+		No other information is gathered.</p>  
+		<p>
+		Thank you for providing your feedback to IBM.</p> 
+		</instructions>  
+		<weight>10</weight> 
+	</step>
+<preserveOptions> 
+	    <version type="refresh" value="1.0">
+           <variableSet defaultChecked="true">
+                <include regExp="\w*"/>
+           </variableSet>
+           <stepSet defaultChecked="true">
+               <include regExp="[\w-]+"/>
+           </stepSet>
+           <workflowHistory defaultChecked="true"/>
+           <workflowNotes defaultChecked="true"/>
+           <upgradeNotes>Upgrade from version 1.0 to 2.0 and not cancel version 1.0 or 2.0</upgradeNotes> 
+       </version> 
+	   <version type="refresh" value="2.0">
+           <variableSet defaultChecked="true">
+                <include regExp="\w*"/>
+           </variableSet>
+           <stepSet defaultChecked="true">
+               <include regExp="[\w-]+"/>
+           </stepSet>
+           <workflowHistory defaultChecked="true"/>
+           <workflowNotes defaultChecked="true"/>
+           <upgradeNotes>Upgrade from version 1.0, 2.0 or 2.1 to 2.1 and not cancel version 1.0, 2.0 or 2.2</upgradeNotes> 
+       </version> 	
+	</preserveOptions> 
+</workflow>
