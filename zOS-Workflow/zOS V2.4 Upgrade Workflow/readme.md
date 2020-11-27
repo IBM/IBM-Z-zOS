@@ -97,7 +97,7 @@ You can find links to sample exported workflows in the z/OS V2.4 Knowledge Cente
 
 ### Want to see a demo?
 
-If you would like to see a short demo on using the z/OS V2R1 migration workflow, visit the site IBM z/OSMF V2.1 Migration Workflow Demo on [YouTube](https://www.youtube.com/watch?v=ejQRSYaxz9M).
+If you would like to see a short demo on using the z/OS V2R1 migration workflow, visit the site IBM z/OSMF V2.1 Migration Workflow Demo [here](https://mediacenter.ibm.com/media/IBM+zOSMF+V2.1+Migration+Workflow+Demo/1_s1bdgpil).
 
 ### Feedback is welcome
 
