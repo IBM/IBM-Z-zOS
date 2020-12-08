@@ -43,3 +43,31 @@ it in the same way that you uploaded the msglg610.obj file. Use the binder or
 linkage-editor to create the `IPLMERG4` load module in the same way that you
 created the `MSGLG610` load module. See the [iplmerg4.html](iplmerg4.html) documentation for
 information on how to use this program.
+
+## License
+
+Copyright 2000-2020 IBM Corp.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the License for the specific
+language governing permissions and limitations under the
+License.
+
+Disclaimer of Warranties:
+
+The following enclosed code is sample code created by IBM
+Corporation.  This sample code is not part of any standard
+IBM product and is provided to you solely for the purpose
+of assisting you in the development of your applications.
+The code is provided "AS IS", without warranty of any kind.
+IBM shall not be liable for any damages arising out of your
+use of the sample code, even if they have been advised of
+the possibility of such damages.
