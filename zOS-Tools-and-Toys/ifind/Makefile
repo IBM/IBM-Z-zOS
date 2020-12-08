@@ -1,8 +1,8 @@
-# Property of IBM      
-# Copyright IBM Corp. 2018
+# Property of IBM
+# Copyright IBM Corp. 2018-2020
 # All Rights Reserved.
 #
-# Title: Makefile 
+# Title: Makefile
 #
 # Purpose: Make the ifind utility
 #
@@ -15,8 +15,8 @@ CC=c99
 CFLAGS=-O2 -Wc,xplink,inline
 LDFLAGS=-Wl,xplink,edit=no
 
-all: ifind  
+all: ifind
 
 clean:
-	rm -f *.o ifind 
+	rm -f *.o ifind
 
