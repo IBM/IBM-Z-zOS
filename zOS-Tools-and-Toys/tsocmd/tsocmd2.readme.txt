@@ -1,0 +1,45 @@
+Run a TSO/E command from the shell (including authorized commands)
+
+Licensed Materials - Property of IBM
+Copyright IBM Corp. 2010, 2010
+
+tsocmd
+======
+
+This version of the tsocmd command is being made available on the
+Tools and Toys web site, and matches the version of the tsocmd
+command shipped with z/OS V1R12.0. The tsocmd command is provided as
+a REXX program in source form, but may not run on some of the older
+releases prior to z/OS V1R12.0.
+
+tsocmd Usage Information
+------------------------
+
+See z/OS V1R12.0 UNIX System Services Command Reference for usage
+information.
+
+tsocmd Migration Information
+----------------------------
+
+See z/OS V1R12.0 Migration (from z/OS V1R10), chapter 'z/OS UNIX
+migration actions' subsection 'Accommodate new Shell and Utilities
+version of the tsocmd command' for important information regarding
+migration actions if the original version of the tsocmd command
+from Tools and Toys is being used.
+
+tsocmd Install Information
+--------------------------
+
+Prior to installation, if the original version of the tsocmd command
+from Tools and Toys is being used, refer to z/OS V1R12.0 Migration
+(from z/OS V1R10) document for important information regarding
+migration actions. Otherwise, no migration actions or changes are
+required.
+
+Place the downloaded tsocmd in a directory where you keep executable
+programs. Make sure the permission bits are set to 0755 so that it
+is both readable and executable by everyone.
+
+If you obtain this program via FTP, the program is a REXX program
+in source form. Transfer it in text mode.
+

@@ -1,0 +1,1835 @@
+* MEMBER NAME: COMPID
+* ******************************************************************* *
+*              -- W A R N I N G --                                    *
+*                                                                     *
+*   Each entry in this table --MUST-- be 80 bytes in length and       *
+*   --MUST-- consist of an 8 character field containing a             *
+*   left-justified 2-5 character component ID followed by a single    *
+*   blank, a minus sign, another blank, and optionally a description  *
+*   of the component.                                                 *
+*                                                                     *
+*   ENTRIES IN THIS TABLE --MUST-- BE MAINTAINED IN STRICT, EBCDIC    *
+*   COLLATING-SEQUENCE ORDER.  OTHERWISE, LOOK-UP ERRORS WILL OCCUR.  *
+*                                                                     *
+*                     Last updated 2012/07/25 for z/OS 1.12           *
+* ******************************************************************* *
+*      COMPONENT IDENTIFICATION                                       *
+* ******************************************************************* *
+???      - MESSAGES WITHOUT RECOGNIZABLE MESSAGE IDS
+AA       - Auto/Operator
+AACA     - Network Authentication Service Administration
+AAL      - CICS Transaction Server
+AAM      - CICS Transaction Server
+AAO      - TSO STEPLIB Facility / CICS Transaction Server
+AAU      - NetView Session Monitor (NLDM)
+ABA      - DFSMS Hierarchical Storage Manager (DFSMShsm)
+ABINS    - ABEND-AID
+ABL      - OTTO
+ABM      - CICS Transaction Server
+ABR      - CICS Transaction Server
+ABX      - CICS Transaction Server
+ACBY     - Managed System Infrastructure for Setup (msys for Setup)
+ACC      - CICS Transaction Server
+ACF      - Access Control Facility 2 (Computer Associates)
+ACL      - CICS Transaction Server
+ACM      - Continuous State Manager
+ACN      - CICS Transaction Server
+ACO      - --unknown--
+ACP      - LANRES / CICS Transaction Server
+ACT      - --unknown--
+ACU      - CICS Transaction Server
+ADA      - ADABAS (Software AG)
+ADAH     - ADABAS (Software AG)
+ADAM     - ADABAS (Software AG)
+ADAN     - ADABAS (Software AG)
+ADAS     - ADABAS (Software AG)
+ADAU     - ADABAS (Software AG)
+ADCI     - --unknown--
+ADF      - TSO/E Session Manager
+ADM      - Graphics Data Display Manager (GDDM)
+ADMS     - --unknown--
+ADR      - Data Facility Data Set Services  (DFDSS)
+ADRY     - Data Facility Data Set Services  (DFDSS)
+ADS      - Concurrent Copy
+ADSHS    - --unknown--
+ADY      - Dump Analysis and Elimination  (DAE)
+AEC      - CICS Transaction Server
+AED      - CICS Transaction Server
+AEI      - CICS Transaction Server
+AEM      - Graphics Data Display Manager (GDDM)
+AEX      - CICS Transaction Server
+AEY      - CICS Transaction Server
+AFB      - VS FORTRAN Version 2
+AFC      - CICS Transaction Server
+AFP      - VSPC FORTRAN
+AHL      - Generalized Trace Facility (GTF)
+AHS      - --unknown--
+AHX      - DB2 Data Archive Expert for z/OS
+AHXE     - DB2 Data Archive Expert for z/OS
+AHXJ     - DB2 Data Archive Expert for z/OS
+AII      - CICS Transaction Server
+AIR      - Predictive Failure Analysis (PFA)
+AIS      - CICS Transaction Server
+AJA      - CICS Transaction Server
+AJH      - CICS Transaction Server
+AKC      - CICS Transaction Server
+ALA      - DB2 Log Analysis Tool for z/OS
+ALAA     - DB2 Log Analysis Tool for z/OS
+ALC      - DB2 Log Archive Log Accelerator
+ALRT     - SAP on DB2 UDB for z/OS
+ALZ      - IMS Problem Investigator for z/OS
+AM       - --unknown--
+AMA      - Superzap (AMAPTFLE / AMASPZAP)
+AMB      - LIST Service Aid (AMBLIST)
+AMD      - Print Dump / Standalone Dump (AMDPRDMP / AMDSADMP)
+AMI      - CICS Transaction Server
+AMS      - System Availability Management   (RMF)
+AMT      - RESOLVE  (Boole & Babbage)
+AMTA     - RESOLVE  (Boole & Babbage)
+AMTC     - RESOLVE  (Boole & Babbage)
+AMTD     - RESOLVE  (Boole & Babbage)
+AMTE     - RESOLVE  (Boole & Babbage)
+AMTG     - RESOLVE  (Boole & Babbage)
+AMTH     - RESOLVE  (Boole & Babbage)
+AMTI     - RESOLVE  (Boole & Babbage)
+AMTJ     - RESOLVE  (Boole & Babbage)
+AMTO     - RESOLVE  (Boole & Babbage)
+AMTP     - RESOLVE  (Boole & Babbage)
+AMTQ     - RESOLVE  (Boole & Babbage)
+AMTR     - RESOLVE  (Boole & Babbage)
+AMTS     - RESOLVE  (Boole & Babbage)
+AMTU     - RESOLVE  (Boole & Babbage)
+AMTX     - RESOLVE  (Boole & Babbage)
+ANF      - Infoprint Server
+ANFM     - --unknown--
+ANR      - ADSTAR Distributed Storage Manager (ADSM)
+ANT      - Remote Copy (PPRC and System Data Mover)
+ANTB     - Extended Remote Copy (XRC)
+ANTC     - --unknown--
+ANTF     - Flash Copy
+ANTI     - Extended Remote Copy (XRC)
+ANTL     - --unknown--
+ANTM     - Snapshot
+ANTP     - Peer-to-Peer Remote Copy (PPRC)
+ANTT     - Extended Remote Copy (XRC)
+ANTU     - Extended Remote Copy (XRC)
+ANTX     - Extended Remote Copy (XRC)
+AOB      - --unknown--
+AOC      - --unknown--
+AOF      - AOC/MVS and System Automation and msys for Operations
+AOFA     - System Automation and msys for Operations
+AOM      - Administrative Operations Management (AOM)
+AOP      - AF/OPERATOR (Candle/Tivoli) or Infoprint Server
+APA      - VSMANAGER (UCC/Computer Associates)
+APC      - CICS Transaction Server
+APCS     - APCS
+API      - Infoprint Server
+APK      - AFP Conversion and Indexing Facility / DB2 Content Mgr
+APL      - CMS VS APL / CICS Transaction Server
+APLL     - VS APL LIBRARY SERVICE PROGRAM
+APLP     - VSPC VS APL
+APP      - CICS Transaction Server
+APR      - CICS Transaction Server
+APS      - Print Service Facility (PSF)
+AQA      - PL/1 Version 2
+ARC      - DFSMS Hierarchical Storage Manager (DFSMShsm)
+ARM      - CICS Transaction Server
+ARP      - CICS Transaction Server
+ARRP     - System Control Program (SCP)
+ARS      - DB2 Content Manager
+ARSY     - DB2 Content Manager
+ARZ      - CICS Transaction Server
+ASA      - MVS Reuse
+ASB      - MVS/Advanced Program-to-Program Communications (APPC)
+ASD      - LANRES
+ASFP     - Smart Batch/Batch Pipes
+ASH      - CICS Transaction Server
+ASJ      - CICS Transaction Server
+ASM      - Auxiliary Storage Manager (ASM)
+ASMA     - High-Level Assembler      (HLASM)
+ASN      - DATAPROPOGATOR
+ASO      - M4AS                       (Macro4)
+ASP      - CICS Transaction Server
+ASR      - Symptom Record (SYMREC)
+ASU      - VSPC
+ASUB     - AUTOSUB
+ASX      - CA-ASTEX (Computer Associates)
+ATB      - MVS/Advanced Program-to-Program Communications (APPC)
+ATC      - CICS Transaction Server
+ATD      - CICS Transaction Server
+ATF      - Application Trace Facility
+ATR      - Resource Recovery Services (RRS)
+ATRH     - Resource Recovery Services (RRS)
+AU       - --unknown--
+AUD      - SOFTAUDIT MONITOR
+AUO      - DB2 Object Restore for z/OS
+AUZ      - CICS Transaction Server
+AVM      - Availability Manager
+AVR      - AVRS (unknown)
+AWB      - CICS Transaction Server
+AWC      - CICS Transaction Server
+AXF      - CICS Transaction Server
+AXJ      - ICGMON
+AXMER    - CICS Transaction Server
+AXMEV    - CICS Transaction Server
+AXMLF    - CICS Transaction Server
+AXMLK    - CICS Transaction Server
+AXMOS    - CICS Transaction Server
+AXMPG    - CICS Transaction Server
+AXMRS    - CICS Transaction Server
+AXMSC    - CICS Transaction Server
+AXMSI    - CICS Transaction Server
+AXMSR    - CICS Transaction Server
+AXMTR    - CICS Transaction Server
+AXMWH    - CICS Transaction Server
+AXMXM    - CICS Transaction Server
+AXR      - System REXX
+AZI      - CICS Transaction Server
+AZR      - CICS Transaction Server
+AZS      - CICS Transaction Server
+AZT      - CICS Transaction Server
+BAA      - --unknown--
+BAE      - GTAM
+BAF      - --unknown--
+BAK      - --unknown--
+BAM      - --unknown--
+BBCQA    - CICSPlex/SM
+BBCSA    - CICSPlex/SM
+BBCSB    - CICSPlex/SM
+BBCSC    - CICSPlex/SM
+BBCSD    - CICSPlex/SM
+BBCSI    - CICSPlex/SM
+BBCSJ    - CICSPlex/SM
+BBCSZ    - CICSPlex/SM
+BBCZZ    - CICSPlex/SM
+BBDDA    - MAINVIEW Vistapoint    (BMC/Boole & Babbage)
+BBDDI    - MAINVIEW PAS           (BMC/Boole & Babbage)
+BBDDW    - MAINVIEW WLM           (BMC/Boole & Babbage)
+BBDDX    - --unknown--
+BBFAB    - --unknown--
+BBFAE    - --unknown--
+BBFPBD   - IPSM
+BBFPSM   - --unknown--
+BBHEM    - MAINVIEW Alarm Manager (BMC/Boole & Babbage)
+BBMAE    - MAINVIEW Alarm Manager (BMC/Boole & Babbage)
+BBMAT    - MAINVIEW
+BBMEA    - MAINVIEW               (BMC/Boole & Babbage)
+BBMHS    - CICSPlex/SM
+BBMHT    - CICSPlex/SM
+BBMHW    - CICSPlex/SM
+BBMHY    - CICSPlex/SM
+BBMHZ    - CICSPlex/SM
+BBMLA    - CICSPlex/SM
+BBMLD    - CICSPlex/SM
+BBMLX    - CICSPlex/SM
+BBMMD    - CICSPlex/SM
+BBMMF    - CICSPlex/SM
+BBMQ     - CICSPlex/SM
+BBMSD    - CICSPlex/SM
+BBMSE    - CICSPlex/SM
+BBMSS    - MAINVIEW (BMC/Boole & Babbage) / CICSPlex/SM
+BBMSX    - --unknown--
+BBMXBA   - CICSPlex/SM
+BBMXBB   - CICSPlex/SM
+BBMXBC   - CICSPlex/SM
+BBMXBD   - CICSPlex/SM
+BBMXBE   - CICSPlex/SM
+BBMXBF   - CICSPlex/SM
+BBMXBG   - CICSPlex/SM
+BBMXBH   - CICSPlex/SM
+BBMXBI   - CICSPlex/SM
+BBMXBJ   - CICSPlex/SM
+BBMXBK   - CICSPlex/SM
+BBMXBP   - CICSPlex/SM
+BBMXBQ   - CICSPlex/SM
+BBMXBS   - CICSPlex/SM
+BBMXBV   - CICSPlex/SM
+BBMXBX   - CICSPlex/SM
+BBMXBZ   - CICSPlex/SM
+BBMXC    - --unknown--
+BBMXCA   - CICSPlex/SM
+BBMXCB   - CICSPlex/SM
+BBMXCD   - CICSPlex/SM
+BBMXCE   - CICSPlex/SM
+BBMXCF   - CICSPlex/SM
+BBMXCG   - CICSPlex/SM
+BBMXCH   - CICSPlex/SM
+BBMXCJ   - CICSPlex/SM
+BBMXCK   - CICSPlex/SM
+BBMXCL   - CICSPlex/SM / MAINVIEW (BMC/Boole & Babbage)
+BBMXCM   - CICSPlex/SM
+BBMXCN   - CICSPlex/SM
+BBMXCP   - CICSPlex/SM
+BBMXCQ   - CICSPlex/SM
+BBMXCR   - CICSPlex/SM
+BBMXCS   - CICSPlex/SM
+BBMXCT   - CICSPlex/SM
+BBMXCU   - CICSPlex/SM
+BBMXCV   - CICSPlex/SM
+BBMXCY   - CICSPlex/SM
+BBMXNS   - CICSPlex/SM
+BBMXSS   - CICSPlex/SM
+BBMXV    - --unknown--
+BBMXY    - CICSPlex/SM
+BBMYA    - CICSPlex/SM
+BBMYAB   - CICSPlex/SM
+BBMYAD   - CICSPlex/SM
+BBMYAF   - CICSPlex/SM
+BBMYAG   - CICSPlex/SM
+BBMZA    - MAINVIEW (BMC/Boole & Babbage) / CICSPlex/SM
+BBMZB    - CICSPlex/SM
+BBMZC    - CICSPlex/SM
+BBMZE    - CICSPlex/SM
+BBMZL    - MAINVIEW Logger (BMC/Boole & Babbage)
+BBMZS    - MAINVIEW (BMC/Boole & Babbage) / CICSPlex/SM
+BBMZZ    - CICSPlex/SM
+BBO      - Websphere Application Server for z/OS
+BBOJ     - Websphere Application Server for z/OS
+BBOM     - Websphere Application Server for z/OS
+BBON     - Websphere Application Server for z/OS
+BBOO     - Websphere Application Server for z/OS
+BBOQ     - Websphere Application Server for z/OS
+BBOS     - Websphere Application Server for z/OS
+BBOT     - Websphere Application Server for z/OS
+BBOU     - Websphere Application Server for z/OS
+BBQAB    - --unknown--
+BBQBE    - MAINVIEW PAS
+BBQDC    - MAINVIEW Data Collector
+BBQIR    - MAINVIEW Interval Recorder
+BBS      - MainView for Websphere MQ  (BMC)
+BBSX     - --unknown--
+BBTGT    - MAINVIEW TCP/IP Server
+BBTM     - BMC TCP/IP interface
+BBUCI    - --unknown--
+BBUGC    - OEDG
+BBVC     - --unknown--
+BBVL     - MAINVIEW LAS
+BBVS     - --unknown--
+BBVT     - MainView TAS
+BBWIA    - MainView Explorer
+BBWIB    - MainView Explorer
+BBWIC    - MainView Explorer
+BBWIE    - MainView Explorer
+BCA      - CICS Message Intercept
+BCD      - Batch Runtime
+BCO      - --unknown--
+BCT      - DB2 Automation Tool for z/OS
+BCTB     - DB2 Automation Tool for z/OS
+BDE      - --unknown--
+BDG      - BDGBMAIN
+BDK      - 4700 HOST TRANSMISSION FACILITY
+BDT      - Bulk-Data Transfer Facility
+BFS      - IBM LAN Server for MVS
+BGT      - MAINVIEW SRM
+BIP      - Websphere MQ Integrator
+BK       - --unknown--
+BLG      - Information System/Information Management
+BLH      - --unknown--
+BLK      - BLOCKCADE (unknown)
+BLKR     - BLOCKCADE (unknown)
+BLM      - Information System/Information Management
+BLS      - Interactive Problem Control System (IPCS)
+BLW      - LOADWAIT / RESTART
+BLX      - Information System/Information Management
+BMC      - BMC BMCARC / BMCRUV (BMC)
+BMD      - --unknown--
+BMZA     - CICSPlex/SM
+BNG      - DISPLAY EXCEPTION MONITORING FACILITY
+BNH      - NetView Hardware Monitor (NPDA)
+BNI      - NetView Hardware Monitor (NPDA)
+BNJ      - NetView Hardware Monitor (NPDA) / TARA
+BNK      - NetView Hardware Monitor (NPDA)
+BPA      - UNIX System Services Connection Scaling Reference
+BPE      - IMS Database Recovery Facility for z/OS
+BPESVCI  - IMS Performance Monitor for z/OS
+BPEUXRF  - IMS Performance Monitor for z/OS
+BPOK     - DB2 Performance Expert
+BPX      - UNIX System Services (USS)
+BPXF     - UNIX System Services (USS) File System
+BPXI     - UNIX System Services (USS) Initialization
+BPXM     - UNIX System Services (USS)
+BPXN     - UNIX System Services (USS)
+BPXO     - UNIX System Services (USS)
+BPXP     - UNIX System Services (USS)
+BPXT     - UNIX System Services (USS) Transaction File System (TFS)
+BPXTF    - UNIX System Services (USS) Transaction File System (TFS)
+BQB      - 3790 SUBSYSTEM SUPPORT SERVICES
+BQI      - 3790 COMMUNICATIONS SYSTEM
+BQK      - 3600 COMMUNICATIONS SYSTEM
+BQM      - 3790 BATCH TRANSFER FACILITY
+BRD      - --unknown--
+BRM      - --unknown--
+BT       - --unknown--
+BTB      - VSAM SERVER
+BTP      - BLOCKADE (unknown)
+BTS      - --unknown--
+BUV      - --unknown--
+BXCSM    - BBXCSMON
+BXCTL    - BBX
+BXSIN    - BBX
+BXSTB    - BBXS
+BZL      - --unknown--
+CAC      - CA-SCHEDULER                           (Computer Associates)
+CACM     - CA-SCHEDULER                           (Computer Associates)
+CACU     - CA-SCHEDULER                           (Computer Associates)
+CAD      - CA-DYNAM/TLMS                          (Computer Associates)
+CADC     - CA-DYNAM/TLMS                          (Computer Associates)
+CADD     - --unknown--
+CADO     - CA-DYNAM/TLMS                          (Computer Associates)
+CADS     - CA-DYNAM/TLMS                          (Computer Associates)
+CADR     - CA-DYNAM/TLMS                          (Computer Associates)
+CAG      - CA-DYNAM/TLMS                          (Computer Associates)
+CAJU     - CA-JARS/CICS                           (Computer Associates)
+CAL      - CA-7 RIM                               (Computer Associates)
+CAM      - --unknown--
+CAPC     - CA-OPTIMIZIER II                       (Computer Associates)
+CARR     - CA-Intercept                           (Computer Associates)
+CAS      - CA90 Common Services                   (Computer Associates)
+CAT      - CA-DYNAM/TLMS                          (Computer Associates)
+CATL     - CA-DYNAM/TLMS                          (Computer Associates)
+CATS     - CA-DYNAM/TLMS                          (Computer Associates)
+CATZ     - CA-DYNAM/TLMS                          (Computer Associates)
+CAWR     - --unknown--
+CAXPS    - Cross-Platform Scheduler
+CBD      - Hardware Configuration Definition (HCD)
+CBDA     - Hardware Configuration Definition (HCD)
+CBDB     - Hardware Configuration Definition (HCD)
+CBDC     - Hardware Configuration Definition (HCD)
+CBDD     - Hardware Configuration Definition (HCD)
+CBDG     - Hardware Configuration Definition (HCD)
+CBF      - Operator Communication Control Facility (OCCF)
+CBKCH    - CICS Batch Application Control for z/OS
+CBKCM    - CICS Batch Application Control for z/OS
+CBKCP    - CICS Batch Application Control for z/OS
+CBKCQ    - CICS Batch Application Control for z/OS
+CBKCS    - CICS Batch Application Control for z/OS
+CBKCT    - CICS Batch Application Control for z/OS
+CBP      - MVS Configuration Program
+CBR      - Object Access Method (OAM)
+CCA      - CICS ABEND-AID
+CCACI    - CICS ABEND-AID
+CCACT    - CICS ABEND-AID
+CCADT    - CICS ABEND-AID
+CCAMI    - CICS ABEND-AID
+CCAMT    - CICS ABEND-AID
+CCASD    - CICS ABEND-AID
+CCF      - IMS Command Control Facility for z/OS
+CCN      - C/C++ Messages
+CDIMFT   - CDIM FT (?)
+CDR      - DFSMS CDRA
+CDS      - Open Cryptographic Service Facility (OCSF)
+CEA      - Common Event Adapter
+CEE      - Language Environment (LE)
+CEX      - IMS Connect Extensions
+CGR      - Congroup
+CGRP     - Congroup
+CGRS     - Autoswap
+CHASM    - --unknown--
+CHF      - Hierarchical Control Facility  (HCF)
+CHS      - TSO/E Enhanced Coupling Facility (ECF/MVSSERV)
+CI       - CANDLE Common Interface -or- OMEGAMON II     (Candle/Tivoli)
+CII      - Check Image Import
+CIM      - Managed System Infrastructure for Setup (msys for Setup)
+CIMB     - Managed System Infrastructure for Setup (msys for Setup)
+CIMP     - Managed System Infrastructure for Setup (msys for Setup)
+CIMR     - Managed System Infrastructure for Setup (msys for Setup)
+CIMS     - Managed System Infrastructure for Setup (msys for Setup)
+CIMU     - Managed System Infrastructure for Setup (msys for Setup)
+CIMW     - Managed System Infrastructure for Setup (msys for Setup)
+CIS      - Configuration Inventory Services
+CIU      - CICS Interdependency Analyzer
+CKP      - DB2 Path Checker for z/OS
+CKUT     - NC/SynCom
+CLB      - C/C++ Class Library Runtime
+CMB      - CM/APPC and CM/RULES (?)
+CME      - Control-M (BMC)
+CMF      - BMC MainView
+CMI      - --unknown--
+CMNA     - CMNSTART
+CMNC     - CMNSTART
+CMND     - CMNSTART
+CMNE     - CMNSTART
+CMNG     - CMNSTART
+CMNH     - CMNSTART
+CMNI     - CMNSTART
+CMNJ     - CMNSTART
+CMNM     - CMNSTART
+CMNP     - CMNSTART
+CMNT     - CMNSTART
+CMNU     - CMNSTART
+CMNX     - CMNSTART
+CMNY     - CMNSTART
+CMP      - Compression Management Services
+CMX      - UNIX System Services Connection Scaling Reference
+CNDL     - CANDLE Subsystem
+CNL      - MVS Message Service (MMS)
+CNLS     - MVS Message Service (MMS)
+CNM      - NetView Status Monitor (STATMON)
+CNZ      - Communications Task / Multiple Console Support (MCS)
+CNZZ     - Message Flood Automation
+COF      - Virtual Lookaside Facility  (VLF)
+CPF      - Command Prefix Facility (CPF)
+CPM      - Performance Monitoring
+CPMH     - --unknown--
+CPP      - ServerPac
+CQM      - DB2 Query Monitor for z/OS
+CQS      - IMS Version 8
+CQSDSS   - IMS Version 8
+CQSDYNA  - IMS Version 8
+CQSISCI  - IMS Version 8
+CQSIXCF  - IMS Version 8
+CQSLOG   - IMS Version 8
+CQSLOGP  - IMS Version 8
+CQSMOV   - IMS Version 8
+CQSOFL   - IMS Version 8
+CRAD     - --unknown--
+CRE      - Secondary Operator Facility (SOF) FDP
+CRG      - Context Services
+CRU      - Integrated catalog forward recovery utility
+CRYPT    - ICSF CRYPT Services
+CS       - --unknown--
+CSAA     - NetView PS/2 Support (RUNCMD)
+CSF      - Integrated Cryptographic Service Facility (ICSF)
+CSFB     - Integrated Cryptographic Service Facility (ICSF)
+CSFC     - Integrated Cryptographic Service Facility (ICSF)
+CSFE     - Integrated Cryptographic Service Facility (ICSF)
+CSFG     - Integrated Cryptographic Service Facility (ICSF)
+CSFI     - Integrated Cryptographic Service Facility (ICSF)
+CSFM     - Integrated Cryptographic Service Facility (ICSF)
+CSFO     - Integrated Cryptographic Service Facility (ICSF)
+CSFP     - Integrated Cryptographic Service Facility (ICSF)
+CSFV     - Integrated Cryptographic Service Facility (ICSF)
+CSFY     - Integrated Cryptographic Service Facility (ICSF)
+CSL      - IMS Version 8
+CSLM     - IMS Version 8
+CSLN     - IMS Version 8
+CSMIC    - --unknown--
+CSMIN    - --unknown--
+CSMMTS   - --unknown--
+CSMPM    - --unknown--
+CSMSV    - CSM Initiator
+CSMXC    - CSM XCF Server
+CSPA     - --unknown--
+CSQ      - MQ Series
+CSQC     - MQ Series for CICS
+CSQE     - MQ Series
+CSQH     - MQ Series
+CSQI     - MQ Series
+CSQJ     - MQ Series
+CSQK     - MQ Series
+CSQM     - MQ Series
+CSQN     - MQ Series
+CSQP     - MQ Series
+CSQQ     - MQ Series
+CSQR     - MQ Series
+CSQT     - MQ Series
+CSQU     - MQ Series
+CSQV     - MQ Series
+CSQW     - MQ Series
+CSQX     - MQ Series
+CSQY     - MQ Series
+CSR      - Callable Services Requests
+CSUD     - BWK-MVS (unknown)
+CSV      - Contents Supervisor, Virtual Fetch
+CSY      - Operations Planning and Control/A Production Control System
+CSZ      - Operations Planning and Control/A Communicator
+CT       - --unknown--
+CTCTC    - ABEND-Aid for CICS
+CTD      - Control-D (BMC)
+CTG      - CICS Transaction Gateway
+CTM      - Control-M (BMC)
+CTO      - Control-O (BMC)
+CTR      - Control-M (BMC)
+CTTA     - Component Test Tool                       (IBM Internal)
+CTTX     - Component Test Tool                       (IBM Internal)
+CTTXN    - Component Test Tool                       (IBM Internal)
+CTW      - Control-M (BMC)
+CTWH     - Control-M (BMC)
+CTWJ     - Control-M (BMC)
+CTX      - Context Services
+CUN      - Conversion Environment
+CVA      - Common VTOC Access Facility
+CVR      - IMS Multi-Dialog Manager
+CVT      - --unknown--
+CWA      - --unknown--
+CWWKB    - WebSphere for z/OS Angel
+CWWKE    - WebSphere for z/OS Angel
+CWWKF    - WebSphere for z/OS Angel
+CWWKZ    - WebSphere for z/OS Angel
+CYB      - ESP
+CYNS     - --unknown--
+DAS      - Application System (AS)
+DB       - DATACOM                                   (CA)
+DBA      - ADABAS                                    (Software AG)
+DBC      - z/XDC
+DBD      - IMS Version 8
+DBF      - IMS/VS Version 1 FASTPATH
+DBG      - CA Insight
+DBNA     - --unknown--
+DBNB     - Report Management and Distribution System (RMDS)
+DBNV     - --unknown--
+DBRC     - --unknown--
+DCA      - SMART / CAF
+DCI      - --unknown--
+DCK      - Operations Planning and Control  (OPC)
+DCM      - DCM (Computer Associates)
+DDH      - Print Services Access Facility (38PP/3820)
+DDS      - --unknown--
+DDZ      - --unknown--
+DEC      - Data Encryption for IMS and DB2
+DF       - RVSMVS
+DFH      - CICS Transaction Server
+DFHAC    - CICS Transaction Server
+DFHAD    - CICS Transaction Server
+DFHAI    - CICS Transaction Server
+DFHAM    - CICS Transaction Server
+DFHAP    - CICS Transaction Server
+DFHAU    - CICS Transaction Server
+DFHBA    - CICS Transaction Server
+DFHBR    - CICS Transaction Server
+DFHCA    - CICS Transaction Server
+DFHCC    - CICS Transaction Server
+DFHCE    - CICS Transaction Server
+DFHCF    - CICS Transaction Server
+DFHCP    - CICS Transaction Server
+DFHCQ    - CICS Transaction Server
+DFHCR    - CICS Transaction Server
+DFHCZ    - CICS Transaction Server
+DFHDB    - CICS Transaction Server
+DFHDD    - CICS Transaction Server
+DFHDH    - CICS Transaction Server
+DFHDM    - CICS Transaction Server
+DFHDS    - CICS Transaction Server
+DFHDU    - CICS Transaction Server
+DFHDX    - CICS Transaction Server
+DFHEC    - CICS Transaction Server
+DFHEJ    - CICS Transaction Server
+DFHEM    - CICS Transaction Server
+DFHEP    - CICS Transaction Server
+DFHER    - CICS Transaction Server
+DFHEX    - CICS Transaction Server
+DFHFC    - CICS Transaction Server
+DFHFE    - CICS Transaction Server
+DFHIC    - CICS Transaction Server
+DFHIE    - CICS Transaction Server
+DFHII    - CICS Transaction Server
+DFHIN    - CICS Transaction Server
+DFHIR    - CICS Transaction Server
+DFHJC    - CICS Transaction Server
+DFHKC    - CICS Transaction Server
+DFHKE    - CICS Transaction Server
+DFHLD    - CICS Transaction Server
+DFHLG    - CICS Transaction Server
+DFHLM    - CICS Transaction Server
+DFHMC    - CICS Transaction Server
+DFHME    - CICS Transaction Server
+DFHMN    - CICS Transaction Server
+DFHMQ    - CICS Transaction Server
+DFHMS    - CICS Transaction Server
+DFHMU    - CICS Transaction Server
+DFHMV    - CICS Transaction Server
+DFHNC    - CICS Transaction Server
+DFHNQ    - CICS Transaction Server
+DFHOT    - CICS Transaction Server
+DFHPA    - CICS Transaction Server
+DFHPC    - CICS Transaction Server
+DFHPD    - CICS Transaction Server
+DFHPG    - CICS Transaction Server
+DFHPR    - CICS Transaction Server
+DFHPS    - CICS Transaction Server
+DFHPT    - CICS Transaction Server
+DFHRD    - CICS Transaction Server
+DFHRE    - CICS Transaction Server
+DFHRL    - CICS Transaction Server
+DFHRM    - CICS Transaction Server
+DFHRP    - CICS Transaction Server
+DFHRS    - CICS Transaction Server
+DFHRT    - CICS Transaction Server
+DFHRU    - CICS Transaction Server
+DFHRX    - CICS Transaction Server
+DFHRZ    - CICS Transaction Server
+DFHSH    - CICS Transaction Server
+DFHSI    - CICS Transaction Server
+DFHSJ    - CICS Transaction Server
+DFHSK    - CICS Transaction Server
+DFHSM    - CICS Transaction Server
+DFHSN    - CICS Transaction Server
+DFHSO    - CICS Transaction Server
+DFHSR    - CICS Transaction Server
+DFHST    - CICS Transaction Server
+DFHSZ    - CICS Transaction Server
+DFHTC    - CICS Transaction Server
+DFHTD    - CICS Transaction Server
+DFHTF    - CICS Transaction Server
+DFHTI    - CICS Transaction Server
+DFHTM    - CICS Transaction Server
+DFHTO    - CICS Transaction Server
+DFHTP    - CICS Transaction Server
+DFHTR    - CICS Transaction Server
+DFHTS    - CICS Transaction Server
+DFHUP    - CICS Transaction Server
+DFHUS    - CICS Transaction Server
+DFHW     - CICS Web 2.0
+DFHWB    - CICS Transaction Server
+DFHWK    - CICS Transaction Server
+DFHXA    - CICS Transaction Server
+DFHXC    - CICS Transaction Server
+DFHXG    - CICS Transaction Server
+DFHXM    - CICS Transaction Server
+DFHXO    - CICS Transaction Server
+DFHXQ    - CICS Transaction Server
+DFHXS    - CICS Transaction Server
+DFHZC    - CICS Transaction Server
+DFHZE    - CICS Transaction Server
+DFHZN    - CICS Transaction Server
+DFI      - NetView On-Line HELP
+DFQ      - HSM ISMF Panels
+DFS      - IMS Version 8
+DFSI     - IMS Version 8
+DFSIX    - IMS Version 8
+DGEN     - IMS Version 8
+DGO      - Database 2 Performance Monitor (DB2 PM)
+DGOK     - DB2 Performance Expert
+DGOP     - DB2 Performance Expert
+DGOV     - Database 2 Performance Monitor (DB2 PM)
+DGT      - Interactive Space Management Facility (ISMF)
+DH       - --unknown--
+DIF      - Dynamic Install Facility  (vendor)
+DIM      - Dynamic Interface Manager (related to VAM)  (vender)
+DIT      - Interactive Instructional System (IIS) / DITTO
+DKJ      - ACF/VTAM Version 3
+DKMS     - DKMS
+DKN      - Check Processing Control System (CPCS)
+DLC      - DB2 Change Accumulation Tool for z/OS
+DLCB     - DB2 Change Accumulation Tool for z/OS
+DLX      - DLF Installation Exit
+DM       - BBI/DM
+DMAN     - IMS Version 8
+DMB      - DumpMaster          (Macro 4)
+DMC      - DumpMaster for CICS (Macro 4)
+DME      - --unknown--
+DMF      - DumpMaster          (Macro 4)
+DMO      - Device Manager
+DMP      - Dump Server
+DMS      - PL/1 Checkout Compiler
+DNFB     - --unknown--
+DNFT     - --unknown--
+DOM      - LOTUS Domino (NOTES)
+DP       - CA-DADS/PLUS
+DPM      - DASDMON  (vendor)
+DQCB     - APL SV TSIO
+DQCQ     - APL SV
+DQCS     - APL SV
+DQCT     - APL SV
+DQCV     - APL SV
+DQD      - RMF Cache Reporter
+DR       - Synchpoint (vendor)
+DRE      - Service Level Reporter (SLR)
+DRJ      - OMEGAVIEW
+DRJS     - OMEGAVIEW
+DRK      - Operations Planning and Control  (OPC)
+DRL      - Tivoli Decision Support and Problem Determination
+DRS      - DRS
+DRSV     - DRS
+DRU      - DASDR
+DRW      - DASDR
+DSGB     - VS TSIO
+DSI      - NetView Command Facility (NCCF)
+DSIIF    - --unknown--
+DSJ      - VTAM Trace Formatter
+DSL      - MERVA
+DSM      - Document Composition / Library Facility
+DSN      - Database 2  (DB2)
+DSNA     - Database 2  (DB2)
+DSNB     - Database 2  (DB2)
+DSNC     - Database 2  (DB2)
+DSNE     - Database 2  (DB2)
+DSNET    - Database 2  (DB2)
+DSNF     - Database 2  (DB2)
+DSNG     - Database 2  (DB2)
+DSNH     - Database 2  (DB2)
+DSNI     - Database 2  (DB2)
+DSNJ     - Database 2  (DB2)
+DSNL     - Database 2  (DB2)
+DSNM     - Database 2  (DB2)
+DSNN     - Database 2  (DB2)
+DSNP     - Database 2  (DB2)
+DSNR     - Database 2  (DB2)
+DSNT     - Database 2  (DB2)
+DSNU     - Database 2  (DB2)
+DSNV     - Database 2  (DB2)
+DSNW     - Database 2  (DB2)
+DSNX     - Database 2  (DB2)
+DSNY     - Database 2  (DB2)
+DSNZ     - Database 2  (DB2)
+DSP      - DSPRINT / IMS Version 8
+DSPM     - IMS Version 8
+DSQ      - Query Management Facility (QMF)
+DSR      - --unknown--
+DSS      - DSSI
+DSX      - --unknown--
+DTDLQA   - LDTDLQMA
+DTF      - --unknown--
+DTM      - Thruput Manager
+DUI      - NetView Graphics Monitor Facility (GMF)
+DUT      - MVS DITTO
+DVG      - NetView File Transfer Program  (FTP)
+DWO      - NetView (NCCF)
+DWS      - MERVA SWIFT Link
+DWX      - TSO/E ECF Server/Requester
+DWW      - CICS/VR
+DXC      - Airline Control System (TPF/MVS)
+DXK      - SAMON
+DXR      - Installation Resource Lock Manager    (IRLM)
+DYN      - --unknown--
+DZ       - MainView for DB2
+DZI      - Overlay Generation Language  (OGL)
+DZJ      - Print Management Facility    (PMF)
+EAN      - Intersystem Control Facility (ISCF)
+EAS      - --unknown--
+EBX      - --unknown--
+EC       - Epilog
+ECAA     - Control-SA (BMC)
+ECAB     - Control-SA (BMC)
+ECAG     - Control-SA (BMC)
+ECES     - --unknown--
+ECV      - Epilog IMS
+ECW      - Epilog IMS
+EDA      - IBI EDA
+EDC      - Language Environment Runtime Library
+EDG      - DFSMS Removable Media Manager (DFSMSrmm)
+EEQ      - Hardware Configuration Manager (HCM)
+EEQC     - Hardware Configuration Manager (HCM)
+EEQX     - Hardware Configuration Manager (HCM)
+EGS      - Distributed Security Manager (DSM)
+EHK      - ACO/ANO SolutionPaks
+EJES     - EJES                          (Phoenix Software)
+EKA      - MERVA FMT Link
+EKC      - ImagePlus Object Distribution Manager
+EKG      - Resource Object Data Manager (RODM)
+EKS      - --unknown--
+EKY      - Data Propagator
+EKYX     - --unknown--
+EKYZ     - --unknown--
+ELB      - Prolog
+ELM      - Communications Server - SNA
+ELX      - IMS Version 8
+ELXM     - IMS Version 8
+EM       - BBI/EM
+EMC      - EMC Subsystem
+EMCGM    - --unknown--
+EMCIN    - EMC Subsystem SRDF
+EMCMN    - EMC Subsystem SRDF
+EMCPS    - EMC Subsystem
+EMCSI    - EMC Subsystem
+EMN      - CSFI
+EMS      - NetView/Access
+ENF      - --unknown--
+ENL      - MERVA Telex Link
+ENT      - ImagePlus Folder Application Facility
+EPR      - --unknown--
+EPW      - First Failure Support Technology (FFST)
+EQA      - Debug Tool for z/OS
+EQACU    - Debug Tool for z/OS
+EQAZ     - Debug Tool for z/OS
+EQQ      - Tivoli Workload Scheduler (OPC)
+EQQA     - Tivoli Workload Scheduler (OPC)
+EQQAT    - Tivoli Workload Scheduler (OPC)
+EQQC     - Tivoli Workload Scheduler (OPC)
+EQQCL    - Tivoli Workload Scheduler (OPC)
+EQQCN    - Tivoli Workload Scheduler (OPC)
+EQQD     - Tivoli Workload Scheduler (OPC)
+EQQE     - Tivoli Workload Scheduler (OPC)
+EQQEX    - Tivoli Workload Scheduler (OPC)
+EQQF     - Tivoli Workload Scheduler (OPC)
+EQQFA    - Tivoli Workload Scheduler (OPC)
+EQQFAR   - Tivoli Workload Scheduler (OPC)
+EQQFCC   - Tivoli Workload Scheduler (OPC)
+EQQFCM   - Tivoli Workload Scheduler (OPC)
+EQQFCU   - Tivoli Workload Scheduler (OPC)
+EQQFJK   - Tivoli Workload Scheduler (OPC)
+EQQFL    - Tivoli Workload Scheduler (OPC)
+EQQFSD   - Tivoli Workload Scheduler (OPC)
+EQQFSF   - Tivoli Workload Scheduler (OPC)
+EQQFSI   - Tivoli Workload Scheduler (OPC)
+EQQFSK   - Tivoli Workload Scheduler (OPC)
+EQQFSR   - Tivoli Workload Scheduler (OPC)
+EQQFSW   - Tivoli Workload Scheduler (OPC)
+EQQFV    - Tivoli Workload Scheduler (OPC)
+EQQG     - Tivoli Workload Scheduler (OPC)
+EQQH     - Tivoli Workload Scheduler (OPC)
+EQQIC    - Tivoli Workload Scheduler (OPC)
+EQQJ     - Tivoli Workload Scheduler (OPC)
+EQQK     - Tivoli Workload Scheduler (OPC)
+EQQL     - Tivoli Workload Scheduler (OPC)
+EQQM     - Tivoli Workload Scheduler (OPC)
+EQQMA    - Tivoli Workload Scheduler (OPC)
+EQQN     - Tivoli Workload Scheduler (OPC)
+EQQO     - Tivoli Workload Scheduler (OPC)
+EQQP     - Tivoli Workload Scheduler (OPC)
+EQQPH    - Tivoli Workload Scheduler (OPC)
+EQQPS    - Tivoli Workload Scheduler (OPC)
+EQQPT    - Tivoli Workload Scheduler (OPC)
+EQQQ     - Tivoli Workload Scheduler (OPC)
+EQQR     - Tivoli Workload Scheduler (OPC)
+EQQRM    - Tivoli Workload Scheduler (OPC)
+EQQS     - Tivoli Workload Scheduler (OPC)
+EQQSU    - Tivoli Workload Scheduler (OPC)
+EQQT     - Tivoli Workload Scheduler (OPC)
+EQQTT    - Tivoli Workload Scheduler (OPC)
+EQQU     - Tivoli Workload Scheduler (OPC)
+EQQV     - Tivoli Workload Scheduler (OPC)
+EQQW     - Tivoli Workload Scheduler (OPC)
+EQQWL    - Tivoli Workload Scheduler (OPC)
+EQQX     - Tivoli Workload Scheduler (OPC)
+EQQY     - Tivoli Workload Scheduler (OPC)
+EQQZ     - Tivoli Workload Scheduler (OPC) tracker
+EQS      - --unknown--
+EQZ      - CallPath CICS/MVS
+ERB      - Resource Measurement Facility (RMF)
+ERX      - Graphical Data Display Manager (GDDM)
+ESF      - CA-Spool
+ESP      - ESP
+ETCL     - ETrust Cleanup
+ETE      - ETE
+EURO     - --unknown--
+EUV      - Distributed Computing Environment (DCE)
+EUVA     - Distributed Computing Environment (DCE)
+EUVC     - Distributed Computing Environment (DCE)
+EUVF     - Distributed Computing Environment (DCE) security server
+EUVP     - Distributed Computing Environment (DCE)
+EUVS     - Distributed Computing Environment (DCE)
+EUVT     - Distributed Computing Environment (DCE)
+EUY      - NetView On-Line HELP
+EVE      - System Automation CICS automation
+EVI      - System Automation IMS automation
+EVJ      - System Automation OPC automation
+EVS      - Epilog IMS
+EWX      - LANRES
+EXA      - --unknown--
+EXC      - ISTEXCCS
+EXI      - Exigence
+EXR      - Distributed Security Manager/RDM (DSM)
+EXT      - IMS Version 8
+EYU      - CICSPlex/SM (CPSM)
+EYUAR    - CICSPlex/SM (CPSM)
+EYUAZ    - CICSPlex/SM (CPSM)
+EYUBA    - CICSPlex/SM (CPSM)
+EYUBI    - CICSPlex/SM (CPSM)
+EYUBM    - CICSPlex/SM (CPSM)
+EYUBN    - CICSPlex/SM (CPSM)
+EYUBU    - CICSPlex/SM (CPSM)
+EYUCA    - CICSPlex/SM (CPSM)
+EYUCC    - CICSPlex/SM (CPSM)
+EYUCI    - CICSPlex/SM (CPSM)
+EYUCL    - CICSPlex/SM (CPSM)
+EYUCP    - CICSPlex/SM (CPSM)
+EYUCR    - CICSPlex/SM (CPSM)
+EYUCS    - CICSPlex/SM (CPSM)
+EYUCT    - CICSPlex/SM (CPSM)
+EYUCW    - CICSPlex/SM (CPSM)
+EYUDV    - CICSPlex/SM (CPSM)
+EYUEI    - CICSPlex/SM (CPSM)
+EYUEO    - CICSPlex/SM (CPSM)
+EYUIM    - CICSPlex/SM (CPSM)
+EYUMA    - CICSPlex/SM (CPSM)
+EYUMM    - CICSPlex/SM (CPSM)
+EYUNL    - CICSPlex/SM (CPSM)
+EYUNX    - CICSPlex/SM (CPSM)
+EYUPA    - CICSPlex/SM (CPSM)
+EYUPE    - CICSPlex/SM (CPSM)
+EYUPI    - CICSPlex/SM (CPSM)
+EYUPM    - CICSPlex/SM (CPSM)
+EYUPN    - CICSPlex/SM (CPSM)
+EYUPP    - CICSPlex/SM (CPSM)
+EYUPR    - CICSPlex/SM (CPSM)
+EYUPS    - CICSPlex/SM (CPSM)
+EYUPT    - CICSPlex/SM (CPSM)
+EYUTA    - CICSPlex/SM (CPSM)
+EYUTI    - CICSPlex/SM (CPSM)
+EYUTR    - CICSPlex/SM (CPSM)
+EYUTS    - CICSPlex/SM (CPSM)
+EYUTT    - CICSPlex/SM (CPSM)
+EYUVS    - CICSPlex/SM (CPSM)
+EYUWA    - CICSPlex/SM (CPSM)
+EYUWG    - CICSPlex/SM (CPSM)
+EYUWI    - CICSPlex/SM (CPSM)
+EYUWM    - CICSPlex/SM (CPSM)
+EYUWR    - CICSPlex/SM (CPSM)
+EYUWT    - CICSPlex/SM (CPSM)
+EYUXC    - CICSPlex/SM (CPSM)
+EYUXD    - CICSPlex/SM (CPSM)
+EYUXE    - CICSPlex/SM (CPSM)
+EYUXL    - CICSPlex/SM (CPSM)
+EYUXM    - CICSPlex/SM (CPSM)
+EYUXQ    - CICSPlex/SM (CPSM)
+EYUXS    - CICSPlex/SM (CPSM)
+EYUXU    - CICSPlex/SM (CPSM)
+EYUXZ    - CICSPlex/SM (CPSM)
+EYV      - NetView Installation Facility (NIF)
+EZA      - Communications Server - TCP/IP
+EZAIN    - Communications Server - TCP/IP
+EZAOP    - Communications Server - TCP/IP
+EZB      - Communications Server - TCP/IP
+EZD      - Communications Server - TCP/IP
+EZL      - --unknown--
+EZM      - Application Enabling Technology (Auto UNIX)
+EZOSP    - --unknown--
+EZY      - Communications Server - TCP/IP
+EZYFS    - Communications Server - TCP/IP
+EZYFT    - Communications Server - TCP/IP
+EZYPR    - Communications Server - TCP/IP
+EZYRC    - Communications Server - TCP/IP
+EZYRD    - Communications Server - TCP/IP
+EZYRP    - Communications Server - TCP/IP
+EZYRS    - Communications Server - TCP/IP
+EZYTE    - Communications Server - TCP/IP
+EZYTO    - Communications Server - TCP/IP
+EZYTS    - Communications Server - TCP/IP
+EZYTU    - Communications Server - TCP/IP
+EZYTY    - Communications Server - TCP/IP
+EZYXM    - Communications Server - TCP/IP
+EZYXN    - Communications Server - TCP/IP
+EZYXO    - Communications Server - TCP/IP
+EZYXP    - Communications Server - TCP/IP
+EZYXQ    - Communications Server - TCP/IP
+EZYXR    - Communications Server - TCP/IP
+EZYXU    - Communications Server - TCP/IP
+EZYXW    - Communications Server - TCP/IP
+EZZ      - Communications Server - TCP/IP
+FAB      - IMS High Performance Pointer Checker
+FABA     - --unknown--
+FABG     - IMS High Performance Pointer Checker
+FABH     - IMS High Performance Unload
+FABI     - IMS High Performance Unload
+FABJ     - IMS High Performance Image Copy
+FABK     - IMS High Performance Pointer Checker
+FABL     - IMS Library Integrity Utilities
+FABM     - IMS Library Integrity Utilities
+FABN     - IMS Library Integrity Utilities
+FABP     - IMS High Performance Pointer Checker
+FABQ     - IMS Library Integrity Utilities
+FABR     - IMS High Performance Pointer Checker
+FABS     - IMS High Performance Load
+FABT     - IMS High Performance Pointer Checker
+FABU     - IMS High Performance Image Copy / Load / Unload / Ptr Checker
+FAN      - REXX Compiler
+FANG     - REXX Compiler
+FAS      - --unknown--
+FBI      - --unknown--
+FCO      - PDSMan Fastcopy
+FDBRC    - FXTDCAS
+FDBSS    - TDCS
+FDBX     - UNIX System Services (USS)
+FDK      - Application Integration Feature (AIF)
+FDR      - Fast Dump Restore (vendor)
+FEC      - DB2 Change Accumulation Tool for z/OS
+FEE      - Ferret
+FEK      - --unknown--
+FEMJS    - --unknown--
+FINTX    - --unknown--
+FLB      - SNA Topology Manager
+FLD      - IMS Version 8
+FLM      - ISPF Software Configuration and Library Manager
+FLX      - --unknown--
+FMN      - File Manager/IMS
+FNM      - Network Performance Monitor   (NPM)
+FOI      - --unknown--
+FOM      - UNIX System Services (USS) SHELL AND UTILITIES
+FOMC     - UNIX System Services (USS)
+FOMF     - UNIX System Services (USS)
+FOMI     - UNIX System Services (USS)
+FOMM     - UNIX System Services (USS)
+FOMO     - UNIX System Services (USS)
+FOMOA    - UNIX System Services (USS)
+FOMOG    - UNIX System Services (USS)
+FOMOH    - UNIX System Services (USS)
+FOR      - Language Environment - FORTRAN
+FPEA     - DB2 Performance Expert
+FPEB     - DB2 Performance Expert
+FPEC     - DB2 Performance Expert
+FPED     - DB2 Performance Expert
+FPEE     - DB2 Performance Expert
+FPEF     - DB2 Performance Expert
+FPEG     - DB2 Performance Expert
+FPEI     - DB2 Performance Expert
+FPEJ     - DB2 Performance Expert
+FPEL     - DB2 Performance Expert
+FPEM     - DB2 Performance Expert
+FPEQ     - DB2 Performance Expert
+FPER     - DB2 Performance Expert
+FPES     - DB2 Performance Expert
+FPET     - DB2 Performance Expert
+FPEU     - DB2 Performance Expert
+FPEV     - DB2 Performance Expert
+FPEW     - DB2 Performance Expert
+FPEX     - DB2 Performance Expert
+FPEY     - DB2 Performance Expert
+FPEZ     - DB2 Performance Expert
+FRD      - IMS Database Recovery Facility for z/OS
+FRN      - Digital Library
+FSU      - UNIX System Services (USS) Shell and Utilities
+FSUM     - UNIX System Services (USS)
+FSUMA    - UNIX System Services (USS)
+FSUMB    - UNIX System Services (USS)
+FSUMF    - UNIX System Services (USS)
+FT       - MainView CICS
+GAS      - --unknown--
+GCD      - Global Console Director (Computer Associates)
+GDE      - Distributed FileManager/MVS (DFM/MVS)
+GEO      - Geographically Dispersed Parallel Sysplex (GDPS)
+GEOA     - Geographically Dispersed Parallel Sysplex (GDPS)
+GEOC     - Geographically Dispersed Parallel Sysplex (GDPS)
+GEOT     - Geographically Dispersed Parallel Sysplex (GDPS)
+GEOX     - Geographically Dispersed Parallel Sysplex (GDPS)
+GFSA     - Network File System Server
+GFSC     - Network File System Server Client
+GGC      - DB2 Change Accumulation Tool for z/OS
+GIM      - SMP/E
+GLD      - Security Server LDAP Server
+GLX      - IMS Generic Logger Exit
+GM       - GTS
+GMF      - --unknown--
+GOS      - System Object Model (SOM)
+GPM      - Performance Monitor
+GPR      - IMS Tools Generic Partner Exit
+GQD      - Graphical Data Display Manager (GDDM)
+GQF      - Graphical Data Display Manager (GDDM)
+GRI      - DB2 Test Database Generator
+GSK      - System SSL / Integrated Cryptographic Service Facility (ICSF)
+GSV      - CA-SYSVIEW/E                          (Computer Associates)
+GSVX     - CA-SYSVIEW/E                          (Computer Associates)
+GTM      - Tivoli Business Systems Manager (TBSM)
+GTP      - TPF Utilities
+GTZ      - Generic Tracker
+GVB      - CA Hyper-Buf
+GWY      - --unknown--
+HAA      - DB2 Automation Tool for z/OS
+HADM     - DB2 Automation Tool for z/OS
+HAP      - Control Center/MVS
+HAS      - --unknown--
+HASP     - JES2
+HBCG     - HBCI
+HCIHC    - CWSS
+HCO      - IMS Hardware Data Compression Extended for z/OS
+HCOP     - IMS Hardware Data Compression Extended for z/OS
+HCOZ     - IMS Hardware Data Compression Extended for z/OS
+HDS      - --unknown--
+HEM      - HEMS
+HES      - Electronic Service Agent for IBM zSeries
+HGIN     - Hourglass
+HGLV     - Hourglass
+HGST     - Hourglass
+HIM      - IMS Performance Monitor for z/OS
+HIS      - Hardware Information Services
+HLP      - --unknown--
+HMA      - System Modification Program (SMP)
+HOP      - 6670 SNA Support
+HOR      - --unknown--
+HPC      - IMS High Performance Change Accumulation Utility
+HPDA     - PDAS for z/OS
+HPDB     - PDAS for z/OS
+HPDF     - PDAS for z/OS
+HPDO     - PDAS for z/OS
+HPSC     - IMS Parallel Reorganization for z/OS
+HPSD     - IMS Parallel Reorganization for z/OS
+HPSG     - IMS Parallel Reorganization for z/OS
+HPSR     - IMS High Performance Load
+HPSS     - IMS Parallel Reorganization for z/OS
+HPSU     - IMS Parallel Reorganization for z/OS
+HRF      - Online Reorg Facility
+HSAH     - System Automation
+HSAL     - System Automation Automation Manager
+HSAM     - System Automation Automation Manager / msys for Operations
+HSIZ     - --unknown--
+HWI      - BCP Internal Interface (BCPii)
+HWSC     - IMS Connect
+HWSD     - IMS Connect
+HWSM     - IMS Connect
+HWSO     - IMS Connect
+HWSP     - IMS Connect
+HWSR     - IMS Connect
+HWSS     - IMS Connect
+HWSX     - IMS Connect
+HZR      - Runtime Diagnostics
+HZS      - Health Checker
+IA       - --unknown--
+IAP      - Analysis Program-1
+IAR      - Real Storage Manager
+IARH     - Real Storage Manager
+IAS      - External Writer
+IAT      - JES3
+IAZ      - Functional Subsystem (FSS) / JES Common Services
+IB       - OLT
+IBC      - Independent Utilities
+IBM      - PL/1 Transient Library
+IBS      - --unknown--
+IBT      - IBTS Wide-Band Transmission
+ICA      - IP/SEC for TCP/IP (Firewall)
+ICAC     - IP/SEC for TCP/IP (Firewall)
+ICAM     - IP/SEC for TCP/IP (Firewall)
+ICAS     - IP/SEC for TCP/IP (Firewall)
+ICB      - MSS Communicator
+ICE      - DFSORT (Sort / Merge)
+ICF      - Power Warning Feature
+ICG      - MSS Table Create and Trace Reports
+ICH      - RACF
+ICHX     - --unknown--
+ICK      - Device Support Facilities (DSF)
+ICLC     - SAP on DB2 UDB for z/OS
+ICLI     - SAP on DB2 UDB for z/OS
+ICLS     - SAP on DB2 UDB for z/OS
+ICM      - Library Server
+ICMB     - --unknown--
+ICMC     - --unknown--
+ICN      - Network Control Program/SSP/EP
+ICP      - I/O Configuration Program (IOCP)
+ICQA     - Information Center Facility   (TSO/E)
+ICQC     - Information Center Facility   (TSO/E)
+ICS      - --unknown--
+ICT      - Programmed Cryptographic Facility
+ICU      - Cryptographic Unit Support
+ICY      - Media Manager
+IDA      - Virtual Storage Access Method (VSAM)
+IDC      - Access Method Services (AMS)
+IDCY     - Managed System Infrastructure for Setup (msys for Setup)
+IDI      - Fault Analyzer
+IE       - --unknown--
+IEA      - Supervisor
+IEACIM   - Managed System Infrastructure for Setup (msys for Setup)
+IEAS     - Managed System Infrastructure for Setup (msys for Setup)
+IEB      - DFP Data Set Utilities
+IEC      - DFP Data Management
+IED      - TeleCommunications Access Method (TCAM)
+IEE      - Master Scheduler
+IEF      - Job Scheduler
+IEFC     - Converter
+IEFE     - Event Notification Facility (ENF)
+IEFI     - Converter/Interpreter
+IEFJ     - Master Subsystem
+IEFTMS   - CA-1 (TMS)
+IEH      - DFP Utilities
+IEI      - System Generation (SYSGEN)
+IEL      - PL/1 Optimizing Compiler
+IEN      - PL/1 Checkout Compiler
+IEV      - Assembler H
+IEW      - DFP Linkage Editor and Loader
+IEZ      - Multiple Console Support (MCS)
+IFA      - SMF Dump Program
+IFB      - Environment Recording (OBR)
+IFC      - EREP and LOGREC Initialization
+IFD      - Online Test Executive (OLTEP)
+IFE      - FORTRAN IV H Extended
+IFF      - Graphic Programming Services (GAM)
+IFG      - Data Management (ACB/RPL)
+IFL      - Network Control Program (NCP)
+IFN      - Assembler VS (XF)
+IFO      - Assembler F
+IFR      - VIDEO/370
+IFW      - --unknown--
+IFY      - FORTRAN
+IGA      - Phoenix
+IGB      - DASD Calculation Services
+IGC      - System Supervisor Call (SVC)
+IGD      - DFP System Managed Storage (SMS)
+IGF      - Recovery Management (DDR/MCH)
+IGG      - Data Management (3800)
+IGGN     - Data Facility Product (DFP)
+IGI      - FORTRAN IV G1
+IGT      - Vector Processing Subsystem (VPSS)
+IGV      - Virtual Storage Management (VSM)
+IGW      - DFP System Managed Storage
+IGX      - --unknown--
+IGY      - VS COBOL II
+IGZ      - VS COBOL II
+IHA      - Supervisor
+IHB      - Data Management (DCB)
+IHC      - IMS High Availability Large Database Conversion and Maint.
+IHE      - FORTRAN E
+IHG      - FORTRAN G
+IHJ      - DFP Checkpoint / Restart
+IHK      - Conversational Remote Job Entry (CRJE)
+IHN      - FORTRAN FIOCS
+IHO      - FORTRAN IV H Extended Library
+IHS      - TME 10 NetView Event/Automation Services
+IHV      - System Automation - I/O Operations (ESCON MGR)
+IHVA     - System Automation - I/O Operations (ESCON MGR)
+IHVC     - System Automation - I/O Operations (ESCON MGR)
+IHVD     - System Automation - I/O Operations (ESCON MGR)
+IHVF     - System Automation - I/O Operations (ESCON MGR)
+IHVI     - System Automation - I/O Operations (ESCON MGR)
+IHVL     - System Automation - I/O Operations (ESCON MGR)
+IHVN     - System Automation - I/O Operations (ESCON MGR)
+IHVO     - System Automation - I/O Operations (ESCON MGR)
+IHVP     - System Automation - I/O Operations (ESCON MGR)
+IHVQ     - System Automation - I/O Operations (ESCON MGR)
+IHVR     - System Automation - I/O Operations (ESCON MGR)
+IHVS     - System Automation - I/O Operations (ESCON MGR)
+IHVT     - System Automation - I/O Operations (ESCON MGR)
+IHVU     - System Automation - I/O Operations (ESCON MGR)
+IHVV     - System Automation - I/O Operations (ESCON MGR)
+IHVX     - System Automation - I/O Operations (ESCON MGR)
+IHVZ     - System Automation - I/O Operations (ESCON MGR)
+III      - SFG
+IIN      - --unknown--
+IIUB     - IMS Index Builder for z/OS
+IKF      - VS COBOL II
+IKJ      - TSO/E and PL/1 Prompter
+IKM      - PL/1 Syntax Checker
+IKT      - TSO/VTAM and ACF/VTAM
+IKYC     - Cryptographic Services PKI Services
+IKYD     - Cryptographic Services PKI Services
+IKYI     - Cryptographic Services PKI Services
+IKYL     - Cryptographic Services PKI Services
+IKYO     - Cryptographic Services PKI Services
+IKYP     - Cryptographic Services PKI Services
+IKYS     - Cryptographic Services PKI Services
+ILM      - License Manager
+ILMI     - License Manager
+ILR      - Auxiliary Storage Manager (ASM)
+ILX      - VS FORTRAN Compiler
+IM       - MAINVIEW
+IMC      - Service Aids
+IMF      - --unknown--
+IMR      - Traffic Reconciliation
+IMS      - --unknown--
+IMW      - Internet Connection Server (ICSS)
+INA      - Data Link Services (DLS)
+ING      - System Automation
+INGA     - System Automation
+INGC     - System Automation
+INGG     - System Automation
+INGI     - System Automation
+INGY     - System Automation
+INM      - Interactive Data Transmission Facility (IDTF)
+INZCE    - DB2 High Performance Unload for z/OS
+INZCI    - DB2 High Performance Unload for z/OS
+INZDL    - DB2 High Performance Unload for z/OS
+INZE     - DB2 High Performance Unload for z/OS
+INZGE    - DB2 High Performance Unload for z/OS
+INZI     - DB2 High Performance Unload for z/OS
+INZR     - DB2 High Performance Unload for z/OS
+INZRE    - DB2 High Performance Unload for z/OS
+INZSE    - DB2 High Performance Unload for z/OS
+INZSI    - DB2 High Performance Unload for z/OS
+INZU     - DB2 High Performance Unload for z/OS
+INZX     - DB2 High Performance Unload for z/OS
+IOA      - IOACSMON
+IOAC     - OSA Support Facility
+IOAD     - CONTROL-SA (BMC) / OSA Support Facility
+IOAK     - OSA Support Facility
+IOAN     - OSA Support Facility
+IOAX     - OSA Support Facility
+IOB      - OSA Support Facility
+IOD      - --unknown--
+IOE      - zSeries File System (ZFS)
+IOEC     - zSeries File System (ZFS)
+IOEN     - zSeries File System (ZFS)
+IOEP     - zSeries File System (ZFS)
+IOEW     - zSeries File System (ZFS)
+IOEX     - zSeries File System (ZFS)
+IOEZ     - zSeries File System (ZFS)
+IOP      - I/O Configuration Program  (IOCP)
+IOS      - I/O Supervisor
+IOSHM    - Basic Hyperswap - Hyperswap Manager
+IOSHS    - Basic Hyperswap - Hyperswap Services
+IPC      - UCLAMail (freeware)
+IPD      - FORTRAN Syntax Checker
+IPF      - --unknown--
+IPLST    - IPL statistics from IPLSTATZ program
+IPX      - Implex
+IPXDSM   - Implex Data Space Manager
+IQC      - --unknown--
+IQP      - --unknown--
+IRA      - System Resource Manager (SRM)
+IRB      - Measurement Facility/1  (MF/1)
+IRD      - ESCON Director Device Support
+IRM      - Beta 97
+IRR      - RACF
+IRRA     - RACF
+IRRB     - RACF
+IRRC     - RACF
+IRRG     - RACF
+IRRH     - RACF
+IRRI     - RACF
+IRRJ     - RACF
+IRRM     - RACF
+IRRN     - RACF
+IRRX     - RACF
+IRT      - --unknown--
+IRX      - TSO/E REXX
+ISC      - --unknown--
+ISCA     - Extended Generator
+ISCG     - Extended Generator
+ISCN     - Extended Generator
+ISCT     - Extended Generator
+ISDA     - Mass Storage System (MSS)
+ISF      - Spool Data Search Facility    (SDSF)
+ISG      - Global Resource Serialization (GRS)
+ISGSM    - Global Resource Serialization (GRS) Storage Monitor
+ISN      - Service Processor Interface
+ISP      - ISPF Dialog Manager V2
+ISPDX    - ISPF subsystem
+ISQ      - System Automation - Processor Operations / TSCF
+ISQD     - System Automation - Processor Operations / TSCF
+ISQX     - System Automation - Processor Operations / TSCF
+ISR      - ISPF/PDF
+ISRB     - ISPF/PDF
+ISRL     - ISPF/Library Management Facility
+IST      - Communications Server - SNA
+ISU      - Communications Server - SNA
+ISYM     - SYMUPDTE
+ISZ      - IBM Session Manager for z/OS
+ITA      - Terminal Online Executive (TOLTEP)
+ITDFS    - --unknown--
+ITE      - --unknown--
+ITIMS    - --unknown--
+ITSMJ    - --unknown--
+ITP      - Teleprocessing Network Simulator  (TPNS)
+ITT      - Component Trace
+ITV      - Data-in-Virtual
+ITZ      - Transaction Trace
+IUT      - Communications Server - SNA
+IVT      - Communications Server - SNA
+IW       - --unknown--
+IWM      - Workload Manager (WLM)
+IWX      - IMS Workload Router
+IXC      - Cross System Coupling Facility (XCF)
+IXG      - System Logger
+IXL      - Cross System Extended Services (XES)
+IXP      - I/O Configuration Program (IOCP)
+IXZ      - JES Common Coupling Services (JESXCF)
+IYP      - I/O Configuration Program (IOCP)
+IZP      - I/O Configuration Program (IOCP)
+IZT      - IMS ETO Support for z/OS
+JAS      - --unknown--
+JSA      - --unknown--
+JSX      - JES/328X
+JW       - --unknown--
+KAH      - System Automation TEP Agent
+KAT      - OMEGAVIEW System Manager/MVS          (Candle/Tivoli)
+KCA      - --unknown--
+KCFCM    - Candle Configuration Manager          (Candle/Tivoli)
+KCG      - KCG (?)
+KCJ      - --unknown--
+KCNCI    - Coupling Facility Collector          (Candle/Tivoli??)
+KCNDR    - KXCQUERY              (Candle/Tivoli??)
+KCNPR    - --unknown--  (Candle/Tivoli??)
+KCP      - Exception Analysis Manager (XAM)      (Candle/Tivoli)
+KDB      - MQ QManager Monitor
+KDFS     - Candle Dataset I/O                    (Candle/Tivoli)
+KDS      - Tivoli Enterprise Monitoring Server (TEMS)
+KDSMA    - Tivoli Enterprise Monitoring Server (TEMS) data collector
+KEY      - Keyman
+KFAA     - --unknown--
+KHLIRA   - z/OS Management Console (zMC)
+KIPCSQ   - --unknown--
+KLUIN    - --unknown--
+KLV      - Candle Engine
+KLVAF    - Candle Engine - NAF
+KLVBU    - Candle Engine
+KLVDA    - Candle Engine
+KLVDF    - Candle Engine
+KLVDL    - Candle Engine
+KLVDM    - Candle Engine - Dialog Manager
+KLVER    - Candle Engine
+KLVFL    - Candle Engine
+KLVHS    - Candle Engine - Handle Services
+KLVIN    - Candle Engine
+KLVLW    - Candle Engine - Log Writer
+KLVNA    - Candle Engine
+KLVOP    - Candle Engine
+KLVSE    - Candle Engine
+KLVSC    - Candle Engine
+KLVSD    - Candle Engine
+KLVSI    - Candle Engine
+KLVST    - Candle Engine
+KLVTB    - Candle Engine - Table database
+KLVTQ    - Candle Engine
+KLVVL    - Candle Engine - View log
+KLVVP    - Candle Engine - Virtual print manager
+KLVVS    - Candle Engine - VSAM interface
+KLVVT    - Candle Engine - Virtual session manager
+KLXIN    - unknown--
+KMA      - KMA
+KMCRCA   - Candle Websphere MQ Configuration Agent
+KMQCI    - OMEGAMON XE for Websphere MQ
+KMQCR    - OMEGAMON XE for Websphere MQ Agent
+KMQIT    - OMEGAMON XE for Websphere MQ
+KMQMI    - OMEGAMON for Websphere MQ
+KMQMQ    - OMEGAMON for Websphere MQ
+KM2      - OMEGAMON II                           (Candle/Tivoli)
+KNG      - CA Vantage (?)
+KOGPV    - --unknown--
+KON      - OMEGAMON II FOR VTAM                  (Candle/Tivoli)
+KOS      - --unknown--
+KO2E     - OMEGAMON XE for DB2
+KO2H     - OMEGAMON XE for DB2
+KO2I     - OMEGAMON XE for DB2
+KO2O     - OMEGAMON XE for DB2
+KO2R     - OMEGAMON XE for DB2
+KO2X     - OMEGAMON XE for DB2
+KSDST    - SDM Client
+KSDSV    - --unknown--
+KTSP     - --unknown--
+KXMSG    - --unknown--
+KXSUB    - --unknown--
+KXWTO    - --unknown--
+LAF      - VPSS
+LAMDT    - --unknown--
+LAS      - --unknown--
+LCM      - ENF/CICS
+LDM      - LOOK/DATACOM (CA Endeavor)
+LEAID    - LE-Aid
+LIC      - Changeman ZMF
+LM       - File-Aid
+LMI      - --unknown--
+LMRK     - LANDMARK
+LMS      - --unknown--
+LRM      - Look/Roscoe
+LRS      - VPSS
+LUK      - Look
+LWS      - --unknown--
+MAC      - --unknown--
+MDC      - --unknown--
+MDZDC    - Discovery for z/OS
+MDZDZ    - Discovery for z/OS
+MDZTD    - Discovery for z/OS
+MFA      - MFA/MVS
+MFDFD    - --unknown--
+MFM      - Mainframe Access
+MFMDS    - --unknown--
+MIA      - Multi-Image Manager (MIM)             (Computer Associates)
+MII      - Multi-Image Manager (MIM)             (Computer Associates)
+MIM      - Multi-Image Manager (MIM)             (Computer Associates)
+MIN      - Oracle subsystem                      (ORACLE)
+MIR      - Oracle subsystem                      (ORACLE)
+MIS      - Oracle subsystem                      (ORACLE)
+MMSI     - Metamon
+MP       - MainView Focal Point      (BMC)
+MQSM     - MQSeries Event Message Monitor / Batch Trigger Monitor
+MQU      - --unknown--
+MRG      - --unknown--
+MSGF     - Message Flood Automation  (MFA)
+MSI      - Multiple System Integrity (GDI)       (Computer Associates)
+MSM      - Multiple System Manager   (GTA)       (Computer Associates)
+MST      - PADMSTR
+MSX      - Multiple System Driver                (Computer Associates)
+MXDGB    - Xpediter/CICS                         (Compuware)
+MXDLM    - Xpediter/CICS                         (Compuware)
+MXDPA    - Xpediter/CICS                         (Compuware)
+MXDPP    - Xpediter/CICS                         (Compuware)
+MXGC     - MXG
+MXI      - MXI
+MZC      - Change Action
+NA       - NAI
+NAO      - --unknown--
+NAS      - NAS
+NC       - NetView Communications Facility
+NCHG     - --unknown--
+NDM      - --unknown--
+NET      - --unknown--
+NJE      - JES3 NJE PRPQ
+NJR      - --unknown--
+NJS      - --unknown--
+NMS      - --unknown--
+NNT      - Network Navigator
+NPO      - --unknown--
+NRM      - --unknown--
+NSQ      - --unknown--
+NSV      - MC
+NSY      - NetSpy                                (Computer Associates)
+NTD      - NT Data Collection
+OAS      - --unknown--
+OBV      - --unknown--
+OC       - OMEGAMON II
+OCS      - --unknown--
+ODC      - --unknown--
+ODE      - ODEX/XA
+ODX      - ODEX/XSP
+OEC      - Epilog IMS Collector
+OEH      - MVT DEBE
+OEI      - Epilog IMS
+OIB      - --unknown--
+OID      - OMEGAMON for IMS
+OII      - --unknown--
+OMI      - AF/Operator                           (Candle/Tivoli)
+OMII     - AF/Operator                           (Candle/Tivoli)
+OMS      - Beta 92 Process History Manager
+OMV      - OM/VTAM
+ONVS     - --unknown--
+OOC      - --unknown--
+OPF      - OPS/MVS Operator Productivity Facility (Computer Associates)
+OPM      - OPS/MVS                                (Computer Associates)
+OPS      - OPS/MVS                                (Computer Associates)
+OPT      - CopyCross
+ORI      - RTA
+ORX      - Orbix Server
+ORXI     - Orbix Server
+OSZ      - RTCS
+OTR      - ITRF
+PAL      - --unknown--
+PDF      - PDSFast
+PDSM     - PDSMan
+PDSMOPR  - PDSMan
+PDT      - Detector
+PE       - Energizer/CICS
+PEA      - --unknown--
+PEPRS    - Performance Essential Parser
+PICI     - --unknown--
+PM       - BBI/PM
+PMO      - Program Management Optimizer          (Computer Associates)
+PMS      - Beta 93 Distribution Manager
+PNT      - IWave Director
+PSA      - SSAnalze
+PSP      - --unknown--
+PSPE     - --unknown--
+PSS      - IDA Print subsystem
+PTT      - Thread Terminator
+PUT      - --unknown--
+PWSSDV   - AEW
+PXM      - Platinum/XManager
+QA       - Queue Manager
+QCOM     - --unknown--
+QDM      - Queue Data Manager (unknown)
+QFS      - Quick-Fetch                           (Computer Associates)
+QM       - Queue Manager
+QMS      - Beta 91
+QPZ      - z/OS Extended Monitoring
+QZR      - --unknown--
+RADB     - Galaxy
+RBU      - CA-Roscoe
+RCS      - RCS - CA Remote Console (aka CA Remcon)
+RIO      - RIO
+RM       - --unknown--
+ROS      - Roscoe
+RR       - --unknown--
+RTR      - --unknown--
+RTS      - --unknown--
+RTSC     - RT/SMF
+RXT      - REXX Tools
+SAB      - --unknown--
+SAF      - --unknown--
+SAFA     - Connect:Direct
+SAH      - SAS Metadata Server
+SAM      - SAM Courier
+SAMC     - SAM Courier
+SAMD     - SAM Courier
+SAP      - Sapiens
+SAR      - --unknown--
+SAREA    - --unknown--
+SBL      - Beta 88
+SBR      - --unknown--
+SCB      - --unknown--
+SCDA     - ZEKE
+SCDAZ    - ZEKE
+SCF      - EMC ResourcePak                       (EMC)
+SCFS     - Autoswap
+SCM      - --unknown--
+SCMG     - --unknown--
+SCON     - Super Console (GCD/GCI)               (Computer Associates)
+SCP      - Phoenix
+SCS      - MVS/CSC
+SCTC     - --unknown--
+SDAA     - --unknown--
+SDAB     - --unknown--
+SDS      - SSE Developed Solutions
+SER      - Serena/Network (SERNET)
+SERD     - Serena/Network
+SERE     - Serena/Network
+SERH     - Serena/Network
+SERM     - Serena/Network
+SERP     - Serena/Network
+SERT     - Serena/Network
+SERX     - Serena/Network
+SERY     - Serena/Network
+SEZ      - --unknown--
+SFF      - --unknown--
+SGA      - SG-Auto                               (BMC)
+SGRD     - StorageGuard
+SHKE     - Sher-Monitor
+SHKI     - Sher-Monitor
+SIB      - XSA/Reporter                          (SAS)
+SIT      - NDM/MVS
+SITA     - Secure+ SSL
+SITB     - --unknown--
+SKY      - HTTPD Server
+SLS      - Storage-Tek Library System
+SLSX     - --unknown--
+SLV      - Solve/2
+SM       - BBI Journal
+SMC      - SMC
+SME      - ISTEXCAA
+SMEU     - ISTEXCAA
+SMR      - CA SMR
+SMRD     - SMARD
+SNDS     - --unknown--
+SNM      - Communications Server - TCP/IP
+SNOI     - --unknown--
+SNTB     - --unknown--
+SOPB     - --unknown--
+SOPR     - Statistics Facility
+SOV      - EXHPDM
+SPL      - --unknown--
+SPMQ     - --unknown--
+SPS      - SPS/MVS-APA
+SPX      - SPMON
+SPZ      - --unknown--
+SRS      - Smart/Restart
+SRSC     - Smart/Restart
+SRSI     - Smart/Restart
+SS       - BBI/SS
+SSHA     - --unknown--
+SSI      - TABEX/3
+SSTL     - Statistics Facility
+STCA     - IBM TCP/IP
+STCH     - IBM TCP/IP
+STCO     - IBM TCP/IP
+STCP     - IBM TCP/IP
+STM      - STAM (Global Tape Allocation-GTA)     (Computer Associates)
+STR      - STROBE/CV                             (Compuware)
+SUS      - --unknown--
+SVM      - SYMAPI-MVSRM
+SVO      - MainView SRM Operator Services
+SVST     - --unknown--
+SVTA     - --unknown--
+SVTJ     - --unknown--
+SVTM     - --unknown--
+SWA      - Shadow Web Server
+SWB      - Shadow Web Server
+SWS      - Shadow Web Server
+SWSCM    - --unknown--
+SWSCT    - --unknown--
+SWSIN    - --unknown--
+SWSIT    - --unknown--
+SWSLM    - --unknown--
+SWSRC    - --unknown--
+SWSRM    - --unknown--
+SXDR     - --unknown--
+SXTA     - --unknown--
+SYHA     - --unknown--
+SYUD     - --unknown--
+TAL      - --unknown--
+TAO      - APM
+TDA      - TDA
+TDP      - TDP
+TDS      - DSSUMON
+TGR      - Snapshot General Services
+THME     - --unknown--
+THMF     - --unknown--
+THMN     - --unknown--
+THMO     - --unknown--
+THMT     - --unknown--
+THMX     - --unknown--
+TIC      - TicToc
+TIM      - TIM
+TMNT     - MXG Tape Monitor
+TMO      - TMON
+TMON     - TMON
+TMQS     - TMON for MQ
+TMS      - Tape Management System                (Computer Associates)
+TMVS     - --unknown--
+TMVSAGT  - TMON for z/OS agent
+TMVSALR  - TMON for z/OS exception monitor
+TMVSAUX  - TMON for z/OS auxiliary storage monitor
+TMVSCFC  - TMON for z/OS coupling facility monitor
+TMVSCST  - TMON for z/OS common storage monitor
+TMVSDLY  - TMON for z/OS delay monitor
+TMVSGDR  - TMON for z/OS sysplex analyzer
+TMVSHCM  - TMON for z/OS health checker monitor
+TMVSIAG  - TMON for z/OS ?
+TMVSIDM  - TMON for z/OS I/O monitor
+TMVSIMD  - TMON for z/OS I/O data retrieval
+TMVSIO   - TMON for z/OS I/O monitor
+TMVSIOA  - TMON for z/OS I/O monitor
+TMVSJOB  - TMON for z/OS address space monitor
+TMVSLFW  - TMON for z/OS logging service
+TMVSLIM  - TMON for z/OS LPAR information
+TMVSMAI  - TMON for z/OS ?
+TMVSMST  - TMON for z/OS data collector
+TMVSPLX  - TMON for z/OS cross-system API
+TMVSQSC  - TMON for z/OS contention monitor
+TMVSSAX  - TMON for z/OS sysplex analyzer
+TMVSSRM  - TMON for z/OS SRM data collector
+TMVSTAP  - TMON for z/OS tape activity monitor
+TMVSTRM  - TMON for z/OS ?
+TMVSUTL  - TMON for z/OS utilities
+TMVSWLM  - TMON for z/OS WLM monitor
+TMVSWNL  - TMON for z/OS wait analysis
+TMVSXCF  - TMON for z/OS XCF data collector
+TN       - INTUNE / TRITUNE
+TOR      - Beta 39
+TPB      - CA-Terminal Productivity Executive    (Computer Associates)
+TPM      - --unknown--
+TPX      - CA-Terminal Productivity Executive    (Computer Associates)
+TRMS     - TRMS
+TSM      - TSOMON
+TSS      - CA-Top Secret                         (Computer Associates)
+TTC      - TicToc/CICS
+TXAC     - SNMS
+TXM      - --unknown--
+TXNA     - SNMS
+TXNC     - SNMS
+TXND     - SNMS
+TXNM     - SNMS
+TXNN     - SNMS
+TXNV     - SNMS
+TXNY     - SNMS
+TXXD     - NCSI
+UAS      - --unknown--
+UAZ      - --unknown--
+UCA      - AutoCmds
+USS      - Communications Server - SNA
+U01      - UCC-1  Tape Manager                   (Computer Associates)
+U07      - UCC-7  Work Load Manager              (Computer Associates)
+U09      - UCC-9  Hardware Reliability Monitor   (Computer Associates)
+U11      - UCC-11 Rerun Manager                  (Computer Associates)
+VAM      - VAM                                   (Boole & Babbage)
+VAN      - BrightStor CA-Vantage                 (Computer Associates)
+VB       - --unknown--
+VCAM     - VCAM
+VCS      - VCSS
+VCSI     - --unknown--
+VDF      - VTAM Dialog Facility
+VFI      - SMF Extractor
+VKG      - CA Vantage
+VKS      - --unknown--
+VP       - MainView Vistapoint
+VPS      - VPS
+VRA      - Vanguard Administrator Automated Command Scheduler
+VSM      - --unknown--
+VSR      - --unknown--
+VSV      - VPSS
+VTV      - VMCFVTAM
+VWA      - --unknown--
+WARP     - Date Simulator
+WDR      - --unknown--
+WER      - Synch-Sort
+WLM      - Strobe MVS       (Compuware)
+WM       - --unknown--
+WMDSI    - --unknown--
+XCFMSG   - XCFMSG
+XCO      - Unicenter CA-XCOM
+XCOMM    - Unicenter CA-XCOM
+XDCP     - --unknown--
+XES      - --unknown--
+XFF      - --unknown--
+XFS      - --unknown--
+XPD      - Exediter/IMS
+XPFC     - CA-SysView/E for CICS
+XPR      - EXPR
+XRZ      - --unknown--
+XS       - BBI/XS
+XSP      - Xpediter Service Provider
+XURM     - DFHXCURM
+XXD      - --unknown--
+XXM      - --unknown--
+ZAC      - --unknown--
+ZCOE     - Courion Identity Management Suite
+ZCOS     - Courion Identity Management Suite
+ZCOT     - Courion Identity Management Suite
+ZTTX     - z Component Test Tool                     (IBM Internal)
+ZTTXN    - z Component Test Tool                     (IBM Internal)
+ZW       - --unknown--
+****     - END-OF-TABLE
+

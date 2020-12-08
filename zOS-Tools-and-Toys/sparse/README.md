@@ -1,0 +1,1 @@
+This utility creates a sparse file in the UNIX System Services filesystem.  A sparse file is one that is not actually backed on disk, but merely appears to be so.  When read, it will return zeros for any disk block after the first.

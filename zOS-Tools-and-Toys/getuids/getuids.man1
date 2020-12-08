@@ -1,0 +1,82 @@
+Property of IBM      Copyright IBM Corp. 1994, 1998
+All Rights Reserved
+
+getuids 
+
+getuids is a shell-style utility that displays 
+information from the security data base about
+Unix System Services users and groups.
+
+Syntax:
+
+getuids [ -abcdef ] 
+	  -a   ID listing sorted by UID
+                 (This report contains HOME and PROGRAM)
+	  -b   ID listing of shared UIDs
+	  -c   ID listing sorted by LOGNAME
+	  -d   ID listing of shared GIDs
+	  -e   supress headings and column alignment
+	 
+Description:
+
+Getuids is useful for discovering all the Unix System Services users on a
+system.  The information it displays is that information that would 
+be found in an /etc/passwd file on a more UNIX-y system:
+
+  - user name
+  - uid 
+  - primary group
+  - primary gid
+  - group list
+  - HOME directory
+  - initial program
+
+Getuids cannot display user passwords.
+
+Options:
+
+  -a	When -e is specified, the order of fields is
+	<uid><\t><primary_gid><\t><user_name><\t><group_name><\t><home><\t><program>
+	When -e is not specified, the order and appearance of fields 
+	is unspecified
+
+  -b	When -e is specified, the order of fields is
+	<uid><\t><usernamelist>, where <usernamelist> is a comma delimited
+	list of one or more user names that share the same uid.
+	When -e is not specified, the order and appearance of fields is 
+	unspecified
+
+  -c	When -e is specified, the order of fields is
+	<user_name><\t><uid>
+	When -e is not specified, the order and appearance of fields
+	is unspecified
+
+  -d  	When -e is specified, the order of fields is
+	<gid><\t><group_name><\t><usernamelist> where <usernamelist> is a
+	comma delimited list of user names that share the same primary gid.
+	When -e is not specified, the order and appearance of fields 
+	is unspecified.
+
+  -e	Suppress headings and format data records in a sed/awk friendly way
+	with tabs delimiting major fields and commas delimiting subfield
+	entries where they occur.
+
+Examples:
+1) produce all 4 reports with headings
+   $ getuids
+
+   Notes: 
+   - All reports are produced by default, with headers
+
+2) produce a pseudo /etc/passwd file
+   $ getuids -ae | sed -e 's/^I/:/' > /tmp/boguspasswd
+
+   Notes:
+   - The order of fields in /tmp/boguspasswd does not match
+     the order on other systems
+   - The ^I character (a tab character) is a lot easier to
+     enter from an RLOGIN shell session than it is from a TSO OMVS
+     shell session.  See the OpenEdition User's Guide for details
+     on how to enter tab characters using the TSO OMVS shell interface.
+
+Author: Marc J. Warden <mwarden@us.ibm.com>

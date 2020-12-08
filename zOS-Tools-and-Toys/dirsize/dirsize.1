@@ -1,0 +1,98 @@
+  dirsize -- display bytes in files in a directory tree
+
+
+  Format
+
+  dirsize {-i} {-v} { dir ... }
+
+
+  Description
+
+  dirsize does a recursive traversal of all directories specified
+  (the current working directory is assumed if no directories are
+  specified) and gives a report of the number of bytes in the files 
+  contained in the directories and any subdirectory.
+
+
+  Options
+
+  -i	tells dirsize to ignore any symbolic links that can't be found
+  -v	verbose mode: should only be used for debugging purposes
+
+
+  Usage Notes
+
+  Indentation is used to indicate subdirectories.  
+
+  Files are only counted once, no matter how many hard links they have.
+  This means that even though /bin/IBM/FSUMSSH and /bin/sh are links to 
+  the same file, the size of the file is only counted once.
+
+
+  Files
+
+  There are no files used except for those specified on the command
+  line and contained in subdirectories.
+
+
+  Examples
+
+    $ dirsize /bin ~
+      /bin/IBM contains 11005503 bytes
+    /bin contains 11005503 bytes
+    ------------------------------------------------
+      /u/pfuntnr/bin contains 1331712 bytes
+      /u/pfuntnr/dbx contains 0 bytes
+        /u/pfuntnr/external/dirsize contains 6519 bytes
+        /u/pfuntnr/external/ifind contains 7327 bytes
+        /u/pfuntnr/external/omvstape contains 54962 bytes
+        /u/pfuntnr/external/pschart contains 4238 bytes
+        /u/pfuntnr/external/stat contains 6644 bytes
+      /u/pfuntnr/external contains 82799 bytes
+      /u/pfuntnr/oldnotes contains 4945920 bytes
+        /u/pfuntnr/roast/h contains 0 bytes
+      /u/pfuntnr/roast contains 0 bytes
+      /u/pfuntnr/temp contains 30072 bytes
+      /u/pfuntnr/tmp contains 0 bytes
+        /u/pfuntnr/toronto/h contains 0 bytes
+      /u/pfuntnr/toronto contains 0 bytes
+    /u/pfuntnr contains 6797194 bytes
+
+
+  Environment Variables
+
+  None.
+
+
+  Localization
+
+  None.
+
+
+  Exit Values
+
+  0  Successful completion
+  >0 Failure due to any of the following:
+     o   Cannot open a directory.
+     o   Cannot find a file.
+
+
+  Portability
+
+  This program should be extremely portable to Unix systems.
+
+
+  Related Information
+
+  du
+
+
+  Author
+
+  dirsize was written by John Pfuntner.  Please direct any
+  comments or bugs to John_Pfuntner@tivoli.com.
+
+
+  Version
+
+  This is the man page for dirsize e2a Version 1.1.

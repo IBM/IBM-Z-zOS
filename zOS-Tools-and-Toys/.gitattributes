@@ -1,0 +1,8 @@
+# encode all files as EBCDIC unless mentioned elsewhere
+* git-encoding=iso8859-1 zos-working-tree-encoding=ibm-1047
+
+# encode object files as binary.
+*.obj git-encoding=BINARY zos-working-tree-encoding=BINARY
+*.unload git-encoding=BINARY zos-working-tree-encoding=BINARY
+
+

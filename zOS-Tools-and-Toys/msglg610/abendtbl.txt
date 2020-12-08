@@ -1,0 +1,161 @@
+* MEMBER NAME: ABENDTBL
+* ******************************************************************* *
+*                                                                     *
+*              -- W A R N I N G --                                    *
+*                                                                     *
+*   Each entry in this table --MUST-- be 80 bytes in length.          *
+*                                                                     *
+*   The format of an entry is as follows:                             *
+*                                                                     *
+*      4 character ABEND code (e.g. S00C)                             *
+*     32 character ABEND code description (optional)                  *
+*                                                                     *
+*     The remaining 44 characters on the record are ignored.          *
+*                                                                     *
+* ******************************************************************* *
+*       ABEND CODE TABLE                                              *
+* ******************************************************************* *
+SA00 ABEND
+SA14 ABEND
+SA23 ABEND
+SB00 ABEND
+SB06 ABEND
+SB13 ABEND
+SB14 ABEND
+SB23 ABEND
+SC0D ABEND
+SC2D ABEND
+SD2D ABEND
+SE2D ABEND
+SE83 ABEND
+SE84 ABEND
+SE85 ABEND
+SFXX ABEND
+S0AA ABEND
+S0AB ABEND
+S0AC ABEND
+S0AD ABEND
+S0A9 ABEND
+S0BA ABEND
+S0BB ABEND
+S0B0 ABEND
+S0B1 ABEND
+S0B5 ABEND
+S0B7 ABEND
+S0B8 ABEND
+S0B9 ABEND
+S0C1 ABEND
+S0C4 ABEND
+S0C6 ABEND
+S0E1 ABEND
+S0E2 ABEND
+S0E3 ABEND
+S0E4 ABEND
+S0E5 ABEND
+S0E7 ABEND
+S0E8 ABEND
+S0FA ABEND
+S0FB ABEND
+S0FC ABEND
+S0F3 ABEND
+S001 ABEND
+S028 ABEND
+S03A ABEND
+S031 ABEND
+S033 ABEND
+S044 ABEND
+S045 ABEND
+S07A ABEND
+S07B ABEND
+S07C ABEND
+S07E ABEND
+S071 ABEND
+S074 ABEND
+S076 ABEND
+S078 ABEND
+S079 ABEND
+S08F ABEND
+S081 ABEND
+S083 ABEND
+S084 ABEND
+S085 ABEND
+S086 ABEND
+S087 ABEND
+S090 ABEND
+S091 ABEND
+S092 ABEND
+S093 ABEND
+S094 ABEND
+S1FB ABEND
+S1FC ABEND
+S1FD ABEND
+S106 ABEND
+S117 ABEND
+S122 ABEND
+S13F ABEND
+S135 ABEND
+S137 ABEND
+S139 ABEND
+S15F ABEND
+S153 ABEND
+S2FB ABEND
+S2FC ABEND
+S2F3 ABEND
+S20B ABEND
+S212 ABEND
+S213 ABEND
+S214 ABEND
+S218 ABEND
+S219 ABEND
+S22E ABEND
+S22F ABEND
+S222 ABEND due to operator cancel
+S237 ABEND
+S245 ABEND
+S25F ABEND
+S26D ABEND
+S269 ABEND
+S3FB ABEND
+S3FC ABEND
+S306 ABEND
+S313 ABEND
+S314 ABEND
+S315 ABEND
+S317 ABEND
+S32D ABEND
+S4FC ABEND
+S40D ABEND
+S413 ABEND
+S414 ABEND
+S417 ABEND
+S5FC ABEND
+S500 ABEND
+S52A ABEND
+S522 ABEND due to job waiting
+S53E ABEND
+S6FC ABEND
+S613 ABEND
+S614 ABEND
+S622 TSO user ABEND
+S637 ABEND
+S7FB ABEND
+S70A ABEND
+S700 ABEND
+S704 ABEND
+S705 ABEND
+S714 ABEND
+S717 ABEND
+S722 ABEND due to excessive output
+S730 ABEND
+S737 ABEND
+S738 ABEND
+S744 ABEND
+S778 ABEND
+S8FB ABEND
+S800 ABEND
+S806 ABEND
+S838 ABEND
+S92A ABEND
+S922 jobstep initialization ABEND
+****       END-OF-TABLE
+
