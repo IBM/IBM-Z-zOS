@@ -1,8 +1,8 @@
-# Property of IBM      
-# Copyright IBM Corp. 1994, 1998
+# Property of IBM
+# Copyright IBM Corp. 1994, 2020
 # All Rights Reserved.
 #
-# Title: Makefile 
+# Title: Makefile
 #
 # Purpose: Make the getuids utility
 #

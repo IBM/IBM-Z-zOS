@@ -1,18 +1,44 @@
 #define _XOPEN_SOURCE_EXTENDED 1
 #define _XOPEN_SOURCE
 
-/*
- * Property of IBM
- * Copyright IBM Corp. 1995, 1998
- * All Rights Reserved.
- *
- * Title: getuids.c
- *
- * Purpose: getuids mainline.  Report on z/OS UNIX users
- *
- * Author: Marc J. Warden <mwarden@us.ibm.com>
- *
- */
+/**********************************************************************
+** Copyright 1995-2020 IBM Corp.
+**
+**  Licensed under the Apache License, Version 2.0 (the "License");
+**  you may not use this file except in compliance with the License.
+**  You may obtain a copy of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
+**
+**  Unless required by applicable law or agreed to in writing,
+**  software distributed under the License is distributed on an
+**  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+**  either express or implied. See the License for the specific
+**  language governing permissions and limitations under the
+**  License.
+**
+** -----------------------------------------------------------------
+**
+** Disclaimer of Warranties:
+**
+**   The following enclosed code is sample code created by IBM
+**   Corporation.  This sample code is not part of any standard
+**   IBM product and is provided to you solely for the purpose
+**   of assisting you in the development of your applications.
+**   The code is provided "AS IS", without warranty of any kind.
+**   IBM shall not be liable for any damages arising out of your
+**   use of the sample code, even if they have been advised of
+**   the possibility of such damages.
+**
+** -----------------------------------------------------------------
+**
+** Title: getuids.c
+**
+** Purpose: getuids mainline.  Report on z/OS UNIX users.
+**
+** Author: Marc J. Warden <mwarden@us.ibm.com>
+**
+**********************************************************************/
 
 #include <stdio.h>
 #include <pwd.h>
@@ -85,8 +111,8 @@ int main(int argc, char *argv[])
 			case 'z':	z=1;
 					break;
             case 'h':
-			default:	
-			fprintf(stderr, 
+			default:
+			fprintf(stderr,
 				"%s usage:\n\n"
 				"getuids [-a] [-b] [-c] [-d] [-e] [-h]\n\n"
 				"  -a   produce ID listing sorted by UID\n"
@@ -124,7 +150,7 @@ struct Apasswd *bld_t(int *ents) {
 	}
 	errno=0;
 	setpwent();
-	
+
 	errno=0;
 	while (id = getpwent()) {
 		if (errno) {
@@ -134,16 +160,16 @@ struct Apasswd *bld_t(int *ents) {
 			exit(1);
 		}
 		if (z)
-			fprintf(stderr, "%d,%5d,%s\n", i, id->pw_uid, id->pw_name); 
+			fprintf(stderr, "%d,%5d,%s\n", i, id->pw_uid, id->pw_name);
 
 		pw_cpy(&(t[i]), id);
-		if (z) 
+		if (z)
 			fprintf(stderr, "%d, %5d-=-%s\n", i, t[i].A.pw_uid, t[i].A.pw_name);
 		if (++i > (tsize-1) ) {
 			tsize+=tgrow;
 			if ((new=realloc(t, tsize * sizeof(struct Apasswd))) == NULL) {
-				fprintf(stderr, 
-					"%s: realloc() failed.  %s\n", 
+				fprintf(stderr,
+					"%s: realloc() failed.  %s\n",
 					cmmd, strerror(errno));
 				free(t);
 				endpwent();
@@ -161,16 +187,16 @@ struct Apasswd *bld_t(int *ents) {
 void do_reports(struct Apasswd *t, int ents) {
 	int i;
 
-	if (sortbyuid || dupuid) 
+	if (sortbyuid || dupuid)
 		qsort(t, ents, sizeof(struct Apasswd), cf_uid);
 	if (sortbyuid) {
 		if (h)
 			printf("-- Report of users sorted by UID --\n"
 				"      uid        gid  username/groupname home program\n");
 		for (i=0; i<ents; i++)
-			printf(h ?	"%9d %9d %s/%s %s %s\n" 
-				 :	"%d\t%d\t%s\t%s\t%s\t%s\n", 
-					t[i].A.pw_uid, t[i].A.pw_gid, 
+			printf(h ?	"%9d %9d %s/%s %s %s\n"
+				 :	"%d\t%d\t%s\t%s\t%s\t%s\n",
+					t[i].A.pw_uid, t[i].A.pw_gid,
 					t[i].A.pw_name, t[i].pw_grpname, t[i].A.pw_dir, t[i].A.pw_shell);
 	}
 	if (dupuid) {
@@ -235,7 +261,7 @@ void pw_cpy(struct Apasswd *new, struct passwd * old)
 	new->A.pw_gid=old->pw_gid;
 	new->A.pw_dir=strdup(old->pw_dir);
 	new->A.pw_shell=strdup(old->pw_shell);
-	if ((G = getgrgid(new->A.pw_gid)) == NULL) 
+	if ((G = getgrgid(new->A.pw_gid)) == NULL)
 		new->pw_grpname = "no grpname";
 	else
 		new->pw_grpname = strdup(G->gr_name);
