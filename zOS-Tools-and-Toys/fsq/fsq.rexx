@@ -1,52 +1,79 @@
-/* REXX */
-/**********************************************************************/
-/* FSQ  file system query                                             */
-/*                                                                    */
-/*  Property of IBM                                                   */
-/*  Copyright IBM Corp. 2007, 2012                                    */
-/*                                                                    */
-/* Syntax:  fsq [-v | -t template] [-f] pattern | path                */
-/*  options:                                                          */
-/*      -v   verbose:   show long form of output                      */
-/*      -t   template is the name of an output format                 */
-/*      -f   pattern is a file system name.  note: if that file       */
-/*           system is quiesced, fsq may suspend until unquiesced     */
-/*  argument:                                                         */
-/*      path     show information for file system containing path     */
-/*               pathname must start with . or /                      */
-/*      pattern  this is a case insensitive string used to match file */
-/*               system names.  Use * as a wildcard.  If no * is used */
-/*               the pattern form will be *pattern*                   */
-/*               If the -f option is used pattern is treated as a     */
-/*               file system name, not a pattern.  File system names  */
-/*               are mixed case.  This will search for a file system  */
-/*               using the name as entered and if not found, the name */
-/*               upper-cased.                                         */
-/*      template this is the name of an output template:              */
-/*               short    default without -v                          */
-/*               verbose  equivalent to -v                            */
-/*               quiesced show names of quiesced file systems         */
-/*  Return values:                                                    */
-/*      0   at least one file system was found                        */
-/*      1   no file systems were found                                */
-/*     >4   error                                                     */
-/*                                                                    */
-/* Install:                                                           */
-/*  Place this where a rexx exec can be run in the environment you    */
-/*  want to run it.  This can run under TSO, ISPF, shell, and sysrexx.*/
-/*  If run under the shell, you must have read+execute permission     */
-/*  If run under sysrexx, you must log onto the console               */
-/*                                                                    */
-/* Change activity:                                                   */
-/*     2/15/11   zfs owner, view in ispf, show all, sysrexx           */
-/*     2/21/11   added -f, compress line prefix, -pfs in template,    */
-/*               filetag, changed * to ~ in template, rmv synconly,   */
-/*               added norm/excep status lines                        */
-/*     8/05/11   added -t quiesced, &var=val in template, rtn codes   */
-/*     2/22/12   added path, added fragment space                     */
-/*                                                                    */
-/* Bill Schoen  <wsj@us.ibm.com> 10/24/2007                           */
-/**********************************************************************/
+/** REXX **************************************************************
+**                                                                   **
+** Copyright 2007-2020 IBM Corp.                                     **
+**                                                                   **
+**  Licensed under the Apache License, Version 2.0 (the "License");  **
+**  you may not use this file except in compliance with the License. **
+**  You may obtain a copy of the License at                          **
+**                                                                   **
+**     http://www.apache.org/licenses/LICENSE-2.0                    **
+**                                                                   **
+**  Unless required by applicable law or agreed to in writing,       **
+**  software distributed under the License is distributed on an      **
+**  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,     **
+**  either express or implied. See the License for the specific      **
+**  language governing permissions and limitations under the         **
+**  License.                                                         **
+**                                                                   **
+** ----------------------------------------------------------------- **
+**                                                                   **
+** Disclaimer of Warranties:                                         **
+**                                                                   **
+**   The following enclosed code is sample code created by IBM       **
+**   Corporation.  This sample code is not part of any standard      **
+**   IBM product and is provided to you solely for the purpose       **
+**   of assisting you in the development of your applications.       **
+**   The code is provided "AS IS", without warranty of any kind.     **
+**   IBM shall not be liable for any damages arising out of your     **
+**   use of the sample code, even if they have been advised of       **
+**   the possibility of such damages.                                **
+**                                                                   **
+** ----------------------------------------------------------------- **
+** FSQ  file system query                                            **
+**                                                                   **
+**                                                                   **
+** Syntax:  fsq [-v | -t template] [-f] pattern | path               **
+**  options:                                                         **
+**      -v   verbose:   show long form of output                     **
+**      -t   template is the name of an output format                **
+**      -f   pattern is a file system name.  note: if that file      **
+**           system is quiesced, fsq may suspend until unquiesced    **
+**  argument:                                                        **
+**      path     show information for file system containing path    **
+**               pathname must start with . or /                     **
+**      pattern  this is a case insensitive string used to match file**
+**               system names.  Use * as a wildcard.  If no * is used**
+**               the pattern form will be *pattern*                  **
+**               If the -f option is used pattern is treated as a    **
+**               file system name, not a pattern.  File system names **
+**               are mixed case.  This will search for a file system **
+**               using the name as entered and if not found, the name**
+**               upper-cased.                                        **
+**      template this is the name of an output template:             **
+**               short    default without -v                         **
+**               verbose  equivalent to -v                           **
+**               quiesced show names of quiesced file systems        **
+**  Return values:                                                   **
+**      0   at least one file system was found                       **
+**      1   no file systems were found                               **
+**     >4   error                                                    **
+**                                                                   **
+** Install:                                                          **
+**  Place this where a rexx exec can be run in the environment you   **
+**  want to run it. This can run under TSO, ISPF, shell, and sysrexx.**
+**  If run under the shell, you must have read+execute permission    **
+**  If run under sysrexx, you must log onto the console              **
+**                                                                   **
+** Change activity:                                                  **
+**     2/15/11   zfs owner, view in ispf, show all, sysrexx          **
+**     2/21/11   added -f, compress line prefix, -pfs in template,   **
+**               filetag, changed * to ~ in template, rmv synconly,  **
+**               added norm/excep status lines                       **
+**     8/05/11   added -t quiesced, &var=val in template, rtn codes  **
+**     2/22/12   added path, added fragment space                    **
+**                                                                   **
+** Bill Schoen  <wsj@us.ibm.com> 10/24/2007                          **
+**********************************************************************/
 if 0 then
    do
    syntax:
