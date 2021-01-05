@@ -1,37 +1,45 @@
-/************************************************************************\
-* Copyright 1997, IBM Corporation                                        *
-* All rights reserved                                                    *
-*                                                                        *
-* Distribute freely, except: don't remove my name from the source or     *
-* documentation (don't take credit for my work), mark your changes       *
-* (don't get me blamed for your possible bugs), don't alter or           *
-* remove this notice.  No fee may be charged if you distribute the       *
-* package (except for such things as the price of a disk or tape,        *
-* postage, etc.).  No warranty of any kind, express or implied, is       *
-* included with this software; use at your own risk, responsibility      *
-* for damages (if any) to anyone resulting from the use of this          *
-* software rests entirely with the user.                                 *
-*                                                                        *
-* Send me bug reports, bug fixes, enhancements, requests, flames,        *
-* etc.  I can be reached as follows:                                     *
-*                                                                        *
-*          jason m. heim      heim@us.ibm.com                            *
-\************************************************************************/
-
-/******************************************************\ 
-*   l_unix.c                                           *
-*                                                      *
-*      version 1.1                                     *
-*      last modified by Jason M. Heim, 8/15/98         *
-*      heim@us.ibm.com                                 *
-*      IBM 1997                                        *
-*                                                      *
-*   this file contains the main function definitions   *
-*   that may/will need special treatment on porting    *
-*                                                      *
-*   makes extensive use of the curses library          *
-*                                                      *
-\******************************************************/
+/**********************************************************************
+** Copyright 1997-2020 IBM Corp.
+**
+**  Licensed under the Apache License, Version 2.0 (the "License");
+**  you may not use this file except in compliance with the License.
+**  You may obtain a copy of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
+**
+**  Unless required by applicable law or agreed to in writing,
+**  software distributed under the License is distributed on an
+**  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+**  either express or implied. See the License for the specific
+**  language governing permissions and limitations under the
+**  License.
+**
+** -----------------------------------------------------------------
+**
+** Disclaimer of Warranties:
+**
+**   The following enclosed code is sample code created by IBM
+**   Corporation.  This sample code is not part of any standard
+**   IBM product and is provided to you solely for the purpose
+**   of assisting you in the development of your applications.
+**   The code is provided "AS IS", without warranty of any kind.
+**   IBM shall not be liable for any damages arising out of your
+**   use of the sample code, even if they have been advised of
+**   the possibility of such damages.
+**
+** -----------------------------------------------------------------
+**   l_unix.c
+**
+**      version 1.1
+**      last modified by Jason M. Heim, 8/15/98
+**      heim@us.ibm.com
+**
+**   This file contains the main function definitions
+**   that may/will need special treatment on porting.
+**
+**   makes extensive use of the curses library
+**
+**********************************************************************/
 
 #define _XOPEN_SOURCE
 #include <stdio.h>
@@ -86,7 +94,7 @@ char strinstr(line_t * l)
   line_t *ln;
 
   ln = l->next->next->next->next;
-  if(ln && l->num == ln->num){ 
+  if(ln && l->num == ln->num){
     len = COLS-1;
     str = (char *) malloc(COLS+searchlen);
     strncpy(str, l->line, COLS-1);
@@ -101,9 +109,9 @@ char strinstr(line_t * l)
   searchpos = 0;
   for(; c<len && !rc; c++){
     s = 0;     /* initialize inner search */
-    while(1){  
+    while(1){
       if(ucase[searchstr[s]] != ucase[str[c+s]]) break;  /* if different move on */
-      else{      
+      else{
 	s++;                                  /* increment searchstr       */
 	if(s >= searchlen){                   /* if we searched the length */
 	  rc = 1;                             /*     we found it,          */
@@ -154,12 +162,12 @@ char rescreen(void)
    printf("%s\r", blankline);            /* clean the message line             */
 
    /* depending on global variable settings output an appropriate message */
-   if(searching){                        
+   if(searching){
       if(searchfnd){
 	printf(" Searching:  %s", searchstr);
-	fflush(stdout); 
-	printf("\r"); 
-	if(searchlen){ 
+	fflush(stdout);
+	printf("\r");
+	if(searchlen){
 	  x = stdscr->_curx;
 	  y = stdscr->_cury;
 	  if(searchpos >= COLS) move(1+(3*hexmode), searchpos - COLS + 1);
@@ -169,29 +177,29 @@ char rescreen(void)
 	  tmp = getcmd();
 	  refresh();
 	  return(tmp);
-	}  
+	}
       } else {
 	printf(" Not found:  %s", searchstr);
-	fflush(stdout); 
-	printf("\r");   
-      }  
+	fflush(stdout);
+	printf("\r");
+      }
    } else if(gotoing) {
      printf(" Goto line:  %ld", gotonum);
-     fflush(stdout); 
-     printf("\r");   
+     fflush(stdout);
+     printf("\r");
    } else {
-     printf("[%s - %ld to %ld of %ld]", filename, topline->num, 
+     printf("[%s - %ld to %ld of %ld]", filename, topline->num,
 	    search->num, linelist.numlines);
-     fflush(stdout); 
-     printf("\r");   
-   }  
+     fflush(stdout);
+     printf("\r");
+   }
    return(getcmd());  /* get the next command and return it                      */
 }
 
 /* this function reads uses getchar() to read unbuffered input from the keyboard
      and processes the keystrokes */
 /* PORTABILITY NOTE:  these values are very specific to IBM OpenEdition's keyboard
-     handling, and may not respond as expected on other systems */ 
+     handling, and may not respond as expected on other systems */
 char getcmd(void)
 {
    char c, junk;
@@ -202,14 +210,14 @@ char getcmd(void)
       if(junk == 173 && !searching){  /* if we are searching an escape sequence */
          junk = getchar();            /*    should get us out of search mode    */
          if(junk == 193) c = UP;
-         else if(junk == 193) c = UP; 
-         else if(junk == 194) c = DOWN; 
+         else if(junk == 193) c = UP;
+         else if(junk == 194) c = DOWN;
          else if(junk == 245){ c = PGUP; junk = getchar(); }
          else if(junk == 246){ c = PGDN; junk = getchar(); }
          else if(junk == 241){ c = HOME; junk = getchar(); }
          else if(junk == 244){ c = END; junk = getchar(); }
       }
-   } else if(c == 5) c = NEXT;       
+   } else if(c == 5) c = NEXT;
    else if(c == ' ' && !searching) c = PGDN;
    return(c);
 }
@@ -273,13 +281,13 @@ char * get_next_line(FILE *fp)
 	linelist.tail->hexline = 1;
         chars = 0;
       }
-   } 
+   }
    if(currmap[c] == '\n'){
      templine[chars]=' ';
      templine1[chars] = lnibble(c);
      templine2[chars] = rnibble(c);
      chars++;
-   }  
+   }
    while(chars < COLS){         /* this loop fills the rest of     */
      templine[chars]=' ';      /*    the columns with whitespace  */
      templine1[chars] = ' ';
@@ -287,8 +295,8 @@ char * get_next_line(FILE *fp)
      chars++;
    }
    /* if the line is longer than the number of columns, truncate it */
-   if(currmap[c]!='\n' && !feof(fp) && trunc_line) 
-     while(c!='\n' && !feof(fp)) c = fgetc(fp); 
+   if(currmap[c]!='\n' && !feof(fp) && trunc_line)
+     while(c!='\n' && !feof(fp)) c = fgetc(fp);
    templine[chars] = '\0';    /* standard string termination     */
    templine1[chars] = '\0';    /* standard string termination     */
    templine2[chars] = '\0';    /* standard string termination     */
@@ -338,26 +346,26 @@ void terminate(int sig)
    mvcur(0, COLS-1, LINES-1, 0);
    endwin();
    putchar('\r');
-   exit(sig);            
+   exit(sig);
 }
 
 /* graceful termination */
 void terminatep(int sig)
 {
    if(sig) fprintf(stderr, "\nTerminated with signal %d\n", sig);
-   exit(sig);            
+   exit(sig);
 }
 
 /* this function is use to spin a little bar to indicate a load in progress */
 void load_prog_ind(int s){
   printf("\r Loading %s (%c)", filename, searchpi[s]);
   fflush(stdout);                       /* displays stdio message */
-} 
+}
 
 /* creates the linelist and reads into it */
 void read_file_into_linelist(FILE *fp)
 {
-   char * next;              /* holds the pointer to the line */   
+   char * next;              /* holds the pointer to the line */
    int c;                    /* counter                       */
    blankline = (char *)malloc(sizeof(char)*(COLS+1));
    for(c=0;c<COLS;c++){
@@ -375,7 +383,7 @@ void read_file_into_linelist(FILE *fp)
 	load_prog_ind(c);
 	c++;
 	c=c%4;
-      }	
+      }
       next = get_next_line(fp);  /* get next line             */
    }
 }
@@ -405,8 +413,8 @@ void initialize(void)
        setenv("COLUMNS", pipeline, 1);
        sprintf(pipeline, "%d\0", lin);
        setenv("LINES", pipeline, 1);
-     }  
-   }  
+     }
+   }
 
    initscr();                 /* initialize curses screen       */
 
@@ -447,10 +455,10 @@ void initialize(void)
      ucase['x'] = 'X';
      ucase['y'] = 'Y';
      ucase['z'] = 'Z';
-   }  
-   /* this is a list of all of the standard characters available on a 101 key 
+   }
+   /* this is a list of all of the standard characters available on a 101 key
       keyboard.  characters outside of this can cause an uncontrollable core dump
-      that kicks the user back out to a prompt without turning back on normal 
+      that kicks the user back out to a prompt without turning back on normal
       console i/o, which can be very frustrating */
    stdchar['`'] = '`';
    stdchar['1'] = '1';
@@ -566,9 +574,9 @@ void initializep(void)
    }
    if(asciimode) currmap = ATOEMAP;
    else currmap = NOCHANGE;
-   /* this is a list of all of the standard characters available on a 101 key 
+   /* this is a list of all of the standard characters available on a 101 key
       keyboard.  characters outside of this can cause an uncontrollable core dump
-      that kicks the user back out to a prompt without turning back on normal 
+      that kicks the user back out to a prompt without turning back on normal
       console i/o, which can be very frustrating */
    stdchar['`'] = '`';
    stdchar['1'] = '1';

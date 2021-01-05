@@ -1,37 +1,44 @@
-/************************************************************************\
-* Copyright 1997, IBM Corporation                                        *
-* All rights reserved                                                    *
-*                                                                        *
-* Distribute freely, except: don't remove my name from the source or     *
-* documentation (don't take credit for my work), mark your changes       *
-* (don't get me blamed for your possible bugs), don't alter or           *
-* remove this notice.  No fee may be charged if you distribute the       *
-* package (except for such things as the price of a disk or tape,        *
-* postage, etc.).  No warranty of any kind, express or implied, is       *
-* included with this software; use at your own risk, responsibility      *
-* for damages (if any) to anyone resulting from the use of this          *
-* software rests entirely with the user.                                 *
-*                                                                        *
-* Send me bug reports, bug fixes, enhancements, requests, flames,        *
-* etc.  I can be reached as follows:                                     *
-*                                                                        *
-*          jason m. heim      heim@us.ibm.com                            *
-\************************************************************************/
-
-/******************************************************\ 
-*   view.c                                             *
-*                                                      *
-*      version 1.1                                     *
-*      orignal code by Jason M. Heim, 8/8/97           *
-*      last modified by Jason M. Heim, 10/24/97        *
-*      heim@us.ibm.com                                 *
-*      IBM 1997                                        *
-*                                                      *
-*   this file contains the main function definitions   *
-*   that [supposedly] comply with ANSI standards       *
-*                                                      *
-\******************************************************/
-
+/**********************************************************************
+** Copyright 1997-2020 IBM Corp.
+**
+**  Licensed under the Apache License, Version 2.0 (the "License");
+**  you may not use this file except in compliance with the License.
+**  You may obtain a copy of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
+**
+**  Unless required by applicable law or agreed to in writing,
+**  software distributed under the License is distributed on an
+**  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+**  either express or implied. See the License for the specific
+**  language governing permissions and limitations under the
+**  License.
+**
+** -----------------------------------------------------------------
+**
+** Disclaimer of Warranties:
+**
+**   The following enclosed code is sample code created by IBM
+**   Corporation.  This sample code is not part of any standard
+**   IBM product and is provided to you solely for the purpose
+**   of assisting you in the development of your applications.
+**   The code is provided "AS IS", without warranty of any kind.
+**   IBM shall not be liable for any damages arising out of your
+**   use of the sample code, even if they have been advised of
+**   the possibility of such damages.
+**
+** -----------------------------------------------------------------
+*   view.c
+*
+*      version 1.1
+*      original code by Jason M. Heim, 8/8/97
+*      last modified by Jason M. Heim, 10/24/97
+*      heim@us.ibm.com
+*
+*   This file contains the main function definitions
+*   that [supposedly] comply with ANSI standards
+**
+**********************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -47,7 +54,7 @@ int main(int argc, char** argv)
   int argnum, fnfound;
   struct stat st;
   struct stat sto;
-  
+
   if(fstat(fileno(stdin), &st) != 0) perror("stat() error\n");
   if(fstat(fileno(stdout), &sto) != 0) perror("stat() error\n");
   argnum = 1;
@@ -73,15 +80,15 @@ int main(int argc, char** argv)
   if(!S_ISFIFO(sto.st_mode) && !S_ISREG(sto.st_mode)){
     initialize();
     read_file_into_linelist(fp);  /* reads the file into the global var 'linelist' */
-    if(fp == stdin) stdin = freopen("/dev/tty", "r", stdin);   
+    if(fp == stdin) stdin = freopen("/dev/tty", "r", stdin);
     mainloop();                   /* main processing done here                     */
     terminate(0);                 /* cleanup                                       */
   } else {
     initializep();
     read_file_into_linelist(fp);  /* reads the file into the global var 'linelist' */
     pipeout();
-  }  
-  
+  }
+
   return(0);
 }
 
@@ -99,18 +106,18 @@ int process_arg(char * arg){
       else if(arg[i] == 't') trunc_line = 1;
       else usage();
       i++;
-    }  
+    }
     return(0);
-  } 
+  }
   return(1);
-}      
+}
 
 /* this function is used to spin a little bar to indicate a search in progress */
 void search_prog_ind(int s){
   printf(" Searching%c  %s", searchpi[s], searchstr);
   fflush(stdout);                       /* displays stdio message */
   printf("\r");                         /* reset line             */
-} 
+}
 
 /* this is the linear search algorithm, starting from the given line_t *search */
 void search(line_t *search)
@@ -130,13 +137,13 @@ void search(line_t *search)
 	  search_prog_ind(d);
 	  d++;
 	  d=d%4;
-	}  
+	}
       }
       printf("\r");
       fflush(stdout);
       if(searchfnd) topline = search;     /* if found set the global topline    */
    } else searchfnd = 1;                  /* if there is nothing to search for  */
-}                                         /*     set this for the default msg   */   
+}                                         /*     set this for the default msg   */
 
 /* converts a character to a long integer digit */
 long int digit(char c)
@@ -186,7 +193,7 @@ char process_cmd(char cmd)
 	topline = topline->prev->prev->prev->prev;
       else if(cmd == DOWN && topline->next->next->next->next)
 	topline = topline->next->next->next->next;
-      else if(cmd == PGDN){ 
+      else if(cmd == PGDN){
          if(!topline->next) rc = 1;      /* quit by default if user pages out */
          else page_down();
       } else if(cmd == PGUP) page_up();
@@ -209,7 +216,7 @@ char process_cmd(char cmd)
          gotonum = 0;
       } else if(cmd == HEX) {
 	 hexmode = (hexmode ? 0 : 1);
-      } 
+      }
    } else if(searching){     /* these are the searching routines */
       if(cmd == NEXT && search1st->next && searchfnd){  /* search again on NEXT */
 	searchpos -= searchlen-1;
@@ -223,13 +230,13 @@ char process_cmd(char cmd)
             if(!searchlen)topline = search1st;
             search(search1st);
          }
-      } else if(searchlen < MAX_SEARCHLEN-1 && searchfnd){               
+      } else if(searchlen < MAX_SEARCHLEN-1 && searchfnd){
 	/* else add the new character to the search string */
 	if(!stdchar[cmd]) cmd = NON_STD_CHAR;
 	searchstr[searchlen] = cmd;
 	searchpos -= searchlen;
 	searchlen++;
-	searchstr[searchlen] = '\0';   
+	searchstr[searchlen] = '\0';
 	search(topline);
       }
    }  /* otherwise we must be in goto mode, handle key as follows:  */
@@ -237,7 +244,7 @@ char process_cmd(char cmd)
       goto_line(gotonum);   /* on a non-digit exit goto-line    */
       gotoing = 0;          /*     mode and go to gotonum       */
    }  /* if user backs up adjust the gotonum */
-   else if(cmd == '\b') gotonum /= 10; 
+   else if(cmd == '\b') gotonum /= 10;
    else { /* else add the new digit to gotonum */
       gotonum = 10*gotonum + digit(cmd);
    }
@@ -315,4 +322,4 @@ void add_line(char * newline, long int numline)
    }
 }
 
-/* end of file view.c */ 
+/* end of file view.c */
