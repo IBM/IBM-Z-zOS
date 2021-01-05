@@ -1,25 +1,51 @@
-/* REXX */
-/***********************************************************************        
-   Author: Bill Schoen  wjs@us.ibm.com
-                                                                                
-   Title: Shell utility to compile a REXX program
-                                                                                
-   PROPERTY OF IBM                                                              
-   COPYRIGHT IBM CORP. 1994,2000
-------------------------------------------------------------------------
-   This exec runs under the OE shell to compile a REXX exec
-     syntax:   rexxc [-cgV -o output_file] input_file
-   Error messages will be directed to STDERR.
-   -V produces a listing on STDOUT
-   -c is compile for syntax only
-   -g adds the SLINE and TRACE options
-   -o names the output file, default is .cexec appended to input_file
-   The permissions are preserved for an existing output file or set
-   from the permissions of the original for a new file.
-
-   Bill Schoen  5/5/94
-      last update 4/9/00
-***********************************************************************/        
+/** REXX **************************************************************
+**                                                                   **
+** Copyright 1994-2020 IBM Corp.                                     **
+**                                                                   **
+**  Licensed under the Apache License, Version 2.0 (the "License");  **
+**  you may not use this file except in compliance with the License. **
+**  You may obtain a copy of the License at                          **
+**                                                                   **
+**     http://www.apache.org/licenses/LICENSE-2.0                    **
+**                                                                   **
+**  Unless required by applicable law or agreed to in writing,       **
+**  software distributed under the License is distributed on an      **
+**  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,     **
+**  either express or implied. See the License for the specific      **
+**  language governing permissions and limitations under the         **
+**  License.                                                         **
+**                                                                   **
+** ----------------------------------------------------------------- **
+**                                                                   **
+** Disclaimer of Warranties:                                         **
+**                                                                   **
+**   The following enclosed code is sample code created by IBM       **
+**   Corporation.  This sample code is not part of any standard      **
+**   IBM product and is provided to you solely for the purpose       **
+**   of assisting you in the development of your applications.       **
+**   The code is provided "AS IS", without warranty of any kind.     **
+**   IBM shall not be liable for any damages arising out of your     **
+**   use of the sample code, even if they have been advised of       **
+**   the possibility of such damages.                                **
+**                                                                   **
+** ----------------------------------------------------------------- **
+** Shell utility to compile a REXX program                           **
+**                                                                   **
+** Bill Schoen (wjs@us.ibm.com)                                      **
+**                                                                   **
+** This exec runs under the z/OS UNIX shell to compile a REXX exec.  **
+**   syntax:   rexxc [-cgV -o output_file] input_file                **
+** Error messages will be directed to STDERR.                        **
+** -V produces a listing on STDOUT                                   **
+** -c is compile for syntax only                                     **
+** -g adds the SLINE and TRACE options                               **
+** -o names the output file, default is .cexec appended to input_file**
+** The permissions are preserved for an existing output file or set  **
+** from the permissions of the original for a new file.              **
+**                                                                   **
+** Bill Schoen  5/5/94                                               **
+**    last update 4/9/00                                             **
+***********************************************************************/
 
 if arg(1)='-?' then signal help
 lcg='g'
@@ -223,7 +249,7 @@ sayit:
    parse arg saytext.1
    address mvs 'execio 1 diskw 2 (stem saytext.'
    return
-    
+
 usage:
    call sayit "Usage: rexxc [-cgV -o output_file] input_file"
    call sayit "For additional help enter rexxc -?"
@@ -242,9 +268,9 @@ help:
 /*
 <help>
 Syntax:   rexxc [-cgV -o output_file] input_file
- 
+
 This invokes the REXX compiler to compile a REXX program into CEXEC format.
- 
+
 -V produces a listing on STDOUT
 -c is compile for syntax only, no output file is created
 -g adds the SLINE and TRACE options.  This is needed for execs that use
@@ -252,7 +278,7 @@ This invokes the REXX compiler to compile a REXX program into CEXEC format.
 -o names the output file.  Default is .cexec appended to input_file
    The permissions are preserved for an existing output file or set
    from the permissions of the original for a new file.
- 
+
 input_file is the name of the REXX program to be compiled.  Only one
            file can be specified.
 <end>
