@@ -1,47 +1,78 @@
-####################################################################################
-# submit2 - submits JCL and gets output.   
-#                                          
+#!/bin/sh
+###################################################################
+# Copyright 2009-2020 IBM Corp.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing,
+#  software distributed under the License is distributed on an
+#  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+#  either express or implied. See the License for the specific
+#  language governing permissions and limitations under the
+#  License.
+#
+# -----------------------------------------------------------------
+#
+# Disclaimer of Warranties:
+#
+#   The following enclosed code is sample code created by IBM
+#   Corporation.  This sample code is not part of any standard
+#   IBM product and is provided to you solely for the purpose
+#   of assisting you in the development of your applications.
+#   The code is provided "AS IS", without warranty of any kind.
+#   IBM shall not be liable for any damages arising out of your
+#   use of the sample code, even if they have been advised of
+#   the possibility of such damages.
+#
+# -----------------------------------------------------------------
+#
+# submit2 - submits JCL and gets output.
+#
 #    submit2 <option> <the jcl> <target host> <user> <password>
 #        <option>
 #           localpath|lp  - The JCL is in a file on this machine.
 #           localmvs|lm   - The JCL is in a MVS DS on this machine.
 #           remotepath|rp - The JCL is in a file on the target host machine.
 #           remotemvs|rm  - The JCL is in a MVS DS on the target host machine.
-#        <the jcl> 
+#        <the jcl>
 #           This is the path to the file or MVS DS name where the source
 #           JCL resides. This should be in quotes. Explicit path names are
-#           recommended. Wildcards are dangerous to use since input is positional. 
+#           recommended. Wildcards are dangerous to use since input is positional.
 #           The first <option> designates what/where this is.
 #        <target host>
 #           Where the JCL should be run. The target host can be expressed as host
-#           name or its IP address. 
-#        <user> 
+#           name or its IP address.
+#        <user>
 #           User id used to ftp into the target host.
 #        <password>
 #           The password of the user id used to ftp into the target host.
 #
-# Setup/Installation:                      
-# 1. Make sure /etc/ftp.data of the target machine has the option: 
-#    LEVEL JESINTERFACELEVEL 2 
+# Setup/Installation:
+# 1. Make sure /etc/ftp.data of the target machine has the option:
+#    LEVEL JESINTERFACELEVEL 2
 # 2. Put submit2 in a directory where you keep executable programs.
 # 3. Make sure the permission bits are set to 0755 so that it is both
 #    readable and executable by everyone. chmod 755 submit2
 #
-# Examples:                                
-#    submit2 localpath 'my/jcl' 9.168.192.12 USER1 password1 
-#    submit2 remotepath '/this/is/my/jcl' 9.168.192.12 USER1 password1 
+# Examples:
+#    submit2 localpath 'my/jcl' 9.168.192.12 USER1 password1
+#    submit2 remotepath '/this/is/my/jcl' 9.168.192.12 USER1 password1
 #    submit2 remotemvs 'THIS.IS.MY.JCL' PKSTJ44.PDL.POK.IBM.COM USER2 password2
 #    submit2 remotemvs 'THIS.IS.MY.JCL(HERE)' AQTS USER3 password3
 #    submit2 localmvs 'THIS.IS.MY.JCL' PKSTJ44.PDL.POK.IBM.COM USER2 password2
-#                                          
+#
 # Notes:
 # 1. The submit2 command uses ftp to put the JCL into JES of the target host.
 # 2. submit can be installed and run in a bash shell for example on Linux or
 #    in a ksh shell on OMVS.
 #
-# Tool Contact: jffische@us.ibm.com
+# Tool Contact: John Fischer <jffische@us.ibm.com>
 #
-# Change Activity:                         
+# Change Activity:
 #    03/12/09 - John Fischer - Initial code
 #    10/15/09 - John Fischer - Added to Tools and Toys
 #
@@ -55,6 +86,7 @@
 #
 # Copyright IBM Corp 2009
 ####################################################################################
+
 ## Input     #################################
 INOPT=$1
 INJCL=$2
@@ -88,12 +120,12 @@ case $INOPT in
          put $THEJCL
          quit
 SCRIPT
-      )>$JCLOUT 
+      )>$JCLOUT
    ;;
    ##############################################
    # remotepath                                 #
    ##############################################
-   remotepath|rp ) 
+   remotepath|rp )
       (
       ftp -v -n $INHOST << SCRIPT
          user $INUSER $INPSWD
@@ -102,12 +134,12 @@ SCRIPT
          put $THEJCL
          quit
 SCRIPT
-      )>$JCLOUT 
+      )>$JCLOUT
    ;;
    ##############################################
    # localmvs                                   #
    ##############################################
-   localmvs|lm ) 
+   localmvs|lm )
       case $(uname) in
          OS/390 )
             cp "//'$INJCL'" $THEJCL
@@ -118,9 +150,9 @@ SCRIPT
                put $THEJCL
                quit
 SCRIPT
-            )>$JCLOUT 
+            )>$JCLOUT
          ;;
-         * ) 
+         * )
             echo 'ERROR: option '$INOPT 'can only be used on a z/OS machine'
             exit 64
          ;;
@@ -129,7 +161,7 @@ SCRIPT
    ##############################################
    # remotedmvs                                 #
    ##############################################
-   remotemvs|rm ) 
+   remotemvs|rm )
       (
       ftp -v -n $INHOST << SCRIPT
          user $INUSER $INPSWD
@@ -138,7 +170,7 @@ SCRIPT
          put $THEJCL
          quit
 SCRIPT
-      )>$JCLOUT 
+      )>$JCLOUT
    ;;
    * )
       echo ERROR: $INOPT is not a valid Option.
@@ -153,7 +185,7 @@ case $JOBID in
       # get the JOBNAME here
       JOBNAME=$(head -1 $THEJCL|cut -f 1 -d ' '|cut -c 3-10)
       line='Submit Successful.';msg
-      rm $JCLOUT 
+      rm $JCLOUT
       rm $THEJCL
    ;;
    * )
@@ -173,13 +205,13 @@ case $(uname) in
    OS/390 )           # zOS path
       CUTFOUND=3
       CUTSTATUS=5
-      CUTRC=7 
+      CUTRC=7
       LISTCMD=list
    ;;
    * )                # NOT zOS path
       CUTFOUND=2
       CUTSTATUS=4
-      CUTRC=6 
+      CUTRC=6
       LISTCMD=ls
    ;;
 esac
@@ -221,11 +253,11 @@ SCRIPT
                   get $JOBID
                   quit
 SCRIPT
-               )>$JCLJOBOUTPUT     
-               rm $JCLJOBOUTPUT    
+               )>$JCLJOBOUTPUT
+               rm $JCLJOBOUTPUT
                if test -s $JOBID; then
                   line='Output received.';msg
-               else 
+               else
                   line='Output NOT received. Was it DELETED?';msg
                fi
                case $RC in
@@ -234,7 +266,7 @@ SCRIPT
                      rm $JOBID
                      exit 0
                   ;;
-                  *) 
+                  *)
                      cat $JOBID
                      rm $JOBID
                      exit 68
@@ -249,7 +281,7 @@ SCRIPT
          ;;
       * )
          line='Status: NOT FOUND ....Output DELETED?';msg
-         rm $JCLLISTOUT 
+         rm $JCLLISTOUT
          exit 67
          ;;
    esac
