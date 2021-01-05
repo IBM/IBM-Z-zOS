@@ -1,31 +1,53 @@
-/* rexx */
-/****PROPRIETARY_STATEMENT********************************************/
-/*                                                                   */
-/*   Licensed Materials - Property of IBM                            */
-/*   5694-A01 Copyright IBM Corp. 2010, 2010                         */
-/*                                                                   */
-/*   Status = HOT7770                                                */
-/*                                                                   */
-/****END_OF_PROPRIETARY_STATEMENT*************************************/
-/*                                                                   */
-/*  Source File: tsocmd (REXX)                                       */
-/*                                                                   */
-/*  Source File Description: tsocmd runs a TSO/E command from the    */
-/*   shell using the TSO/E TMP (IKJEFT01).  Unlike the tso command,  */
-/*   the tsocmd command can be used to issue authorized TSO/E        */
-/*   commands. The TSO/E TMP is run in a separate address space and  */
-/*   process from the tsocmd command, therefore any issued TSO/E     */
-/*   commands will not affect the environment the tsocmd is issued   */
-/*   from.                                                           */
-/*                                                                   */
-/*                                                                   */
-/* Change Activity:                                                  */
-/*                                                                   */
-/* FLAG REASON    RELEASE  DATE   PROGRAMMER CHANGE DESCRIPTION      */
-/* ---- --------  -------  ------ ---------- ------------------      */
-/* $A0  ME15895   HOT7770  090331 ROCH       Created for DCR B780.00 */
-/*                                                                   */
-/*********************************************************************/
+/** REXX **************************************************************
+**                                                                   **
+** Copyright 2009-2020 IBM Corp.                                     **
+**                                                                   **
+**  Licensed under the Apache License, Version 2.0 (the "License");  **
+**  you may not use this file except in compliance with the License. **
+**  You may obtain a copy of the License at                          **
+**                                                                   **
+**     http://www.apache.org/licenses/LICENSE-2.0                    **
+**                                                                   **
+**  Unless required by applicable law or agreed to in writing,       **
+**  software distributed under the License is distributed on an      **
+**  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,     **
+**  either express or implied. See the License for the specific      **
+**  language governing permissions and limitations under the         **
+**  License.                                                         **
+**                                                                   **
+** ----------------------------------------------------------------- **
+**                                                                   **
+** Disclaimer of Warranties:                                         **
+**                                                                   **
+**   The following enclosed code is sample code created by IBM       **
+**   Corporation.  This sample code is not part of any standard      **
+**   IBM product and is provided to you solely for the purpose       **
+**   of assisting you in the development of your applications.       **
+**   The code is provided "AS IS", without warranty of any kind.     **
+**   IBM shall not be liable for any damages arising out of your     **
+**   use of the sample code, even if they have been advised of       **
+**   the possibility of such damages.                                **
+**                                                                   **
+** ----------------------------------------------------------------- **
+**                                                                   **
+**  Source File: tsocmd (REXX)                                       **
+**                                                                   **
+**  Source File Description: tsocmd runs a TSO/E command from the    **
+**   shell using the TSO/E TMP (IKJEFT01).  Unlike the tso command,  **
+**   the tsocmd command can be used to issue authorized TSO/E        **
+**   commands. The TSO/E TMP is run in a separate address space and  **
+**   process from the tsocmd command, therefore any issued TSO/E     **
+**   commands will not affect the environment the tsocmd is issued   **
+**   from.                                                           **
+**                                                                   **
+**                                                                   **
+** Change Activity:                                                  **
+**                                                                   **
+** FLAG REASON    RELEASE  DATE   PROGRAMMER CHANGE DESCRIPTION      **
+** ---- --------  -------  ------ ---------- ------------------      **
+** $A0  ME15895   HOT7770  090331 ROCH       Created for DCR B780.00 **
+**                                                                   **
+**********************************************************************/
 
   /* Global variables: if needed by function, need to be on functions
      procedure expose statement. It can be easiest to just put on
