@@ -3,13 +3,13 @@
    sdsfout   print output from a job to stdout
 
    Syntax:  sdsfout <jobname | jobid>
-    
+
    PROPERTY OF IBM
    COPYRIGHT IBM CORP. 2009
 
    Install this in a directory where you can run programs.
    Set permissions to read+execute
-    
+
    Bill Schoen  1/22/2009
 ***********************************************************************/
 arg jname
