@@ -1,54 +1,85 @@
-/* REXX */
+/** REXX **************************************************************
+**                                                                   **
+** Copyright 2018-2020 IBM Corp.                                     **
+**                                                                   **
+**  Licensed under the Apache License, Version 2.0 (the "License");  **
+**  you may not use this file except in compliance with the License. **
+**  You may obtain a copy of the License at                          **
+**                                                                   **
+**     http://www.apache.org/licenses/LICENSE-2.0                    **
+**                                                                   **
+**  Unless required by applicable law or agreed to in writing,       **
+**  software distributed under the License is distributed on an      **
+**  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,     **
+**  either express or implied. See the License for the specific      **
+**  language governing permissions and limitations under the         **
+**  License.                                                         **
+**                                                                   **
+** ----------------------------------------------------------------- **
+**                                                                   **
+** Disclaimer of Warranties:                                         **
+**                                                                   **
+**   The following enclosed code is sample code created by IBM       **
+**   Corporation.  This sample code is not part of any standard      **
+**   IBM product and is provided to you solely for the purpose       **
+**   of assisting you in the development of your applications.       **
+**   The code is provided "AS IS", without warranty of any kind.     **
+**   IBM shall not be liable for any damages arising out of your     **
+**   use of the sample code, even if they have been advised of       **
+**   the possibility of such damages.                                **
+**                                                                   **
+**                                                                   **
+**********************************************************************/
 
 /*
  Author: Andrew Mattingly: <andrew_mattingly@au1.ibm.com>
  Copyright IBM Corp. 2018
 
-This is an "IPA crawler" which can find out where an initialization 
+This is an "IPA crawler" which can find out where an initialization
 parameter is set.  Load it into your SYS1.SAXREXEC and give it a whirl.
 It takes the name of a IEASYSxx parameter (or the corresponding PARMLIB
 member prefix) as a parameter, and reports the value detected at
-initialization, where it was set, and where to find the referenced 
-PARMLIB datasets, if the value is a suffix or list of suffices.  It 
-also takes some "special parameters" for the "early stuff":  
+initialization, where it was set, and where to find the referenced
+PARMLIB datasets, if the value is a suffix or list of suffices.  It
+also takes some "special parameters" for the "early stuff":
 LOAD, IODF, {IEASYS|SYS|SYSPARM},{IEASYM|SYM} and NUCLST.
 
 For example:
 
-@WHERE LOAD        
-LOAD = AL          
+@WHERE LOAD
+LOAD = AL
 SYS1.IPLPARM(LOADAL)
 @WHERE IODF
-IODF = 99  
+IODF = 99
 SYS1.IODF99
-@WHERE SYS                
-SYSPARM = AL              
+@WHERE SYS
+SYSPARM = AL
 ADCD.Z21S.PARMLIB(IEASYSAL)
-@WHERE IEASYM              
-IEASYM = 00                
+@WHERE IEASYM
+IEASYM = 00
 ADCD.Z21S.PARMLIB(IEASYM00)
-@WHERE NUCLST        
-NUCLST = 00          
+@WHERE NUCLST
+NUCLST = 00
 SYS1.IPLPARM(NUCLST00)
-@WHERE OMVS                                    
+@WHERE OMVS
 OMVS = (00,BP,IZ,CI,DB,IM,WA)
 Source: IEASYSAL
-ADCD.Z21S.PARMLIB(BPXPRM00)                    
-ADCD.Z21S.PARMLIB(BPXPRMBP)                    
-ADCD.Z21S.PARMLIB(BPXPRMIZ)                    
-ADCD.Z21S.PARMLIB(BPXPRMCI)                    
-ADCD.Z21S.PARMLIB(BPXPRMDB)                    
-ADCD.Z21S.PARMLIB(BPXPRMIM)                    
+ADCD.Z21S.PARMLIB(BPXPRM00)
+ADCD.Z21S.PARMLIB(BPXPRMBP)
+ADCD.Z21S.PARMLIB(BPXPRMIZ)
+ADCD.Z21S.PARMLIB(BPXPRMCI)
+ADCD.Z21S.PARMLIB(BPXPRMDB)
+ADCD.Z21S.PARMLIB(BPXPRMIM)
 ADCD.Z21S.PARMLIB(BPXPRMWA)
-@WHERE SQA                      
+@WHERE SQA
 SQA = (15,128)
-Source: IEASYSAL                    
-@WHERE VATLST              
+Source: IEASYSAL
+@WHERE VATLST
 VAL = DB
 Source: IEASYSAL
 ADCD.Z21S.PARMLIB(VATLSTDB)
 
-This REXX is somewhat imperfect - it doesn't cope with all the nuances of 
+This REXX is somewhat imperfect - it doesn't cope with all the nuances of
 z/OS parameter configuration (but catches most of them).
 
 */
