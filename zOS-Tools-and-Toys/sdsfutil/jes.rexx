@@ -1,34 +1,61 @@
-/* rexx */
-/**********************************************************************/
-/* jes: view and purge jobs                                           */
-/*                                                                    */
-/* PROPERTY OF IBM                                                    */
-/* COPYRIGHT IBM CORP. 2018                                           */
-/*                                                                    */
-/* Syntax:  jes                                                       */
-/*                                                                    */
-/*   subcommands:                                                     */
-/*      H                 help (see help for full subcommand info)    */
-/*      Q                 exit current display                        */
-/*      Enter             refresh page                                */
-/*      U/D|space/L/R/T/B scrolling (can prefix with number: 100d)    */
-/*      /                 find ex: /addr1                             */
-/*      -/                find prev                                   */
-/*      =                 repeat find                                 */
-/*      set <option value>...  set options                            */
-/*          options:    prefix <prefix>   default *                   */
-/*                      owner <owner>     default your userid         */
-/*           ex:  set prefix #* owner wjs                             */
-/*                                                                    */
-/* Notes:                                                             */
-/*  - use this only from a telnet or rlogin session                   */
-/*  - install in a directory where you can execute programs           */
-/*  - set permissions to 755                                          */
-/*  - you must have access to the SDSF REXX API                       */
-/*                                                                    */
-/* Bill Schoen  3/18/2018   wjs@us.ibm.com                            */
-/*                                                                    */
-/**********************************************************************/
+/** REXX **************************************************************
+**                                                                   **
+** Copyright 2018-2020 IBM Corp.                                     **
+**                                                                   **
+**  Licensed under the Apache License, Version 2.0 (the "License");  **
+**  you may not use this file except in compliance with the License. **
+**  You may obtain a copy of the License at                          **
+**                                                                   **
+**     http://www.apache.org/licenses/LICENSE-2.0                    **
+**                                                                   **
+**  Unless required by applicable law or agreed to in writing,       **
+**  software distributed under the License is distributed on an      **
+**  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,     **
+**  either express or implied. See the License for the specific      **
+**  language governing permissions and limitations under the         **
+**  License.                                                         **
+**                                                                   **
+** ----------------------------------------------------------------- **
+**                                                                   **
+** Disclaimer of Warranties:                                         **
+**                                                                   **
+**   The following enclosed code is sample code created by IBM       **
+**   Corporation.  This sample code is not part of any standard      **
+**   IBM product and is provided to you solely for the purpose       **
+**   of assisting you in the development of your applications.       **
+**   The code is provided "AS IS", without warranty of any kind.     **
+**   IBM shall not be liable for any damages arising out of your     **
+**   use of the sample code, even if they have been advised of       **
+**   the possibility of such damages.                                **
+**                                                                   **
+** ----------------------------------------------------------------- **
+** jes: view and purge jobs                                          **
+**                                                                   **
+** Syntax:  jes                                                      **
+**                                                                   **
+**   subcommands:                                                    **
+**      H                 help (see help for full subcommand info)   **
+**      Q                 exit current display                       **
+**      Enter             refresh page                               **
+**      U/D|space/L/R/T/B scrolling (can prefix with number: 100d)   **
+**      /                 find ex: /addr1                            **
+**      -/                find prev                                  **
+**      =                 repeat find                                **
+**      set <option value>...  set options                           **
+**          options:    prefix <prefix>   default *                  **
+**                      owner <owner>     default your userid        **
+**           ex:  set prefix #* owner wjs                            **
+**                                                                   **
+** Notes:                                                            **
+**  - use this only from a ssh or rlogin session                     **
+**  - install in a directory where you can execute programs          **
+**  - set permissions to 755                                         **
+**  - you must have access to the SDSF REXX API                      **
+**                                                                   **
+** Bill Schoen  3/18/2018   wjs@us.ibm.com                           **
+**                                                                   **
+***********************************************************************/
+
 address syscall 'isatty 0'
 r1=retval
 address syscall 'isatty 1'
