@@ -34,7 +34,9 @@
 ** Bill Schoen (wjs@us.ibm.com)                                      **
 **                                                                   **
 ** This exec runs under the z/OS UNIX shell to compile a REXX exec.  **
+**                                                                   **
 **   syntax:   rexxc [-cgV -o output_file] input_file                **
+**                                                                   **
 ** Error messages will be directed to STDERR.                        **
 ** -V produces a listing on STDOUT                                   **
 ** -c is compile for syntax only                                     **
