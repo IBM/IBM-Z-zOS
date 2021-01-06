@@ -2,10 +2,6 @@
 
 Author: Bill Schoen <wjs@us.ibm.com>
 
-PROPERTY OF IBM
-
-COPYRIGHT IBM CORP. 2008
-
 ## Purpose
 
 Show what modules are loaded in the shared library region.
