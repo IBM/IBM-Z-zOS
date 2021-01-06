@@ -40,4 +40,3 @@ or SYSPROC concatenation.
 ## Syntax
 
 `wjssh <command>`
-
