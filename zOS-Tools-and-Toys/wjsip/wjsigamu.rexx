@@ -1,19 +1,47 @@
-/* REXX */
+/** REXX **************************************************************
+**                                                                   **
+** Copyright 2010-2020 IBM Corp.                                     **
+**                                                                   **
+**  Licensed under the Apache License, Version 2.0 (the "License");  **
+**  you may not use this file except in compliance with the License. **
+**  You may obtain a copy of the License at                          **
+**                                                                   **
+**     http://www.apache.org/licenses/LICENSE-2.0                    **
+**                                                                   **
+**  Unless required by applicable law or agreed to in writing,       **
+**  software distributed under the License is distributed on an      **
+**  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,     **
+**  either express or implied. See the License for the specific      **
+**  language governing permissions and limitations under the         **
+**  License.                                                         **
+**                                                                   **
+** ----------------------------------------------------------------- **
+**                                                                   **
+** Disclaimer of Warranties:                                         **
+**                                                                   **
+**   The following enclosed code is sample code created by IBM       **
+**   Corporation.  This sample code is not part of any standard      **
+**   IBM product and is provided to you solely for the purpose       **
+**   of assisting you in the development of your applications.       **
+**   The code is provided "AS IS", without warranty of any kind.     **
+**   IBM shall not be liable for any damages arising out of your     **
+**   use of the sample code, even if they have been advised of       **
+**   the possibility of such damages.                                **
+**                                                                   **
+**                                                                   **
+**********************************************************************/
 /**********************************************************************/
 /* wjsigamu: diagnostic tool to show automount usage information      */
 /*                                                                    */
 /*   Shows all automounted file systems with the last uid, pid, and   */
 /*   jobname that had a lookup operation on the file system and the   */
 /*   automount timer that indicates how many minutes before automount */
-/*   checks the usage status on that file system.  Timer prefixed with*/
+/*   checks the usage status on that file system. Timer prefixed with */
 /*   * indicates the file system is currently in the mount duration   */
 /*   period.                                                          */
 /*   This only shows usage on the system this is run on.              */
 /*   Install this in a place you can run rexx programs.  This can be  */
 /*   run from TSO, the shell, or System REXX.                         */
-/*                                                                    */
-/* PROPERTY OF IBM                                                    */
-/* COPYRIGHT IBM CORP. 2010                                           */
 /*                                                                    */
 /* Bill Schoen    wjs@us.ibm.com   1/15/10 last update 10/18/13       */
 /**********************************************************************/

@@ -1,4 +1,36 @@
-/* REXX */
+/** REXX **************************************************************
+**                                                                   **
+** Copyright 2009-2020 IBM Corp.                                     **
+**                                                                   **
+**  Licensed under the Apache License, Version 2.0 (the "License");  **
+**  you may not use this file except in compliance with the License. **
+**  You may obtain a copy of the License at                          **
+**                                                                   **
+**     http://www.apache.org/licenses/LICENSE-2.0                    **
+**                                                                   **
+**  Unless required by applicable law or agreed to in writing,       **
+**  software distributed under the License is distributed on an      **
+**  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,     **
+**  either express or implied. See the License for the specific      **
+**  language governing permissions and limitations under the         **
+**  License.                                                         **
+**                                                                   **
+** ----------------------------------------------------------------- **
+**                                                                   **
+** Disclaimer of Warranties:                                         **
+**                                                                   **
+**   The following enclosed code is sample code created by IBM       **
+**   Corporation.  This sample code is not part of any standard      **
+**   IBM product and is provided to you solely for the purpose       **
+**   of assisting you in the development of your applications.       **
+**   The code is provided "AS IS", without warranty of any kind.     **
+**   IBM shall not be liable for any damages arising out of your     **
+**   use of the sample code, even if they have been advised of       **
+**   the possibility of such damages.                                **
+**                                                                   **
+**                                                                   **
+**********************************************************************/
+
 /**********************************************************************/
 /* WJSIPNDC:  show zfs file systems without the name cache enabled    */
 /*                                                                    */
@@ -16,9 +48,6 @@
 /*     in order to maintain name space integrity.                     */
 /*                                                                    */
 /*     Send questions or comments to Bill Schoen at wjs@us.ibm.com    */
-/*                                                                    */
-/* PROPERTY OF IBM                                                    */
-/* COPYRIGHT IBM CORP. 2009                                           */
 /*                                                                    */
 /* Bill Schoen    wjs@us.ibm.com  06/26/09                            */
 /*  Change activity:                                                  */
@@ -38,7 +67,7 @@ if 0 then
   end
 signal on novalue
 signal on halt
-call syscalls 'ON'   
+call syscalls 'ON'
 parse arg parm
 if parm='STACK' then
    do
@@ -49,7 +78,7 @@ if parm='STACK' then
    end
 numeric digits 12
 call setglobals
- 
+
 parm=''
 /* REXX */
 parse arg stack
@@ -60,9 +89,9 @@ if stack='STACK' then
    end
    return
    end
- 
+
 counts=0
-gfs@=getstor('1008',4,kasid,fds)   
+gfs@=getstor('1008',4,kasid,fds)
 rootrw=0
 rootlla=1
 rootcl=0
@@ -73,11 +102,11 @@ do while gfs@<>0
    vfs@=getstor(xadd(gfs@,'0c'),4,kasid,fds)
    gfs@=getstor(xadd(gfs@,'08'),4,kasid,fds)
    if gfsname<>'ZFS' then iterate
- 
+
    do while vfs@<>0
       vfsname=strip(x2c(getstor(xadd(vfs@,'38'),44,kasid,fds)))
-      path=x2c(getstor(xadd(vfs@,'a0'),64,kasid,fds))   
-      owner=x2c(getstor(xadd(vfs@,'240'),8,kasid,fds))  
+      path=x2c(getstor(xadd(vfs@,'a0'),64,kasid,fds))
+      owner=x2c(getstor(xadd(vfs@,'240'),8,kasid,fds))
       vnod@=getstor(xadd(vfs@,'2c'),4,kasid,fds)
       flags=x2c(getstor(xadd(vfs@,'34'),4,kasid,fds))
       call setflags
@@ -85,7 +114,7 @@ do while gfs@<>0
          do
          flags=x2c(getstor(xadd(vfs@,'1f0'),1,kasid,fds))
          lla=bitand(flags,'08'x)<>'08'x
-         if path='/' then  
+         if path='/' then
             do
             rootrw=rw
             rootlla=lla
@@ -95,11 +124,11 @@ do while gfs@<>0
             do
             if nolla=0 then
                do
-               say 'zFS file systems with',                      
+               say 'zFS file systems with',
                    'a z/OS directory cache exception'
                end
             nolla=nolla+1
-            call say vfsname               
+            call say vfsname
             end
          end
       vfs@=getstor(xadd(vfs@,'08'),4,kasid,fds)
@@ -107,24 +136,24 @@ do while gfs@<>0
 end
 if nolla=0 then
    do
-   say 'No exceptions found'                                         
+   say 'No exceptions found'
    end
  else
    do
    say
    say 'If a zFS file system was once read-write and sysplex aware but'
-   say 'is no longer sysplex aware due to moving ownership to a zFS'   
-   say 'sysplex=off system or migrating back to sysplex=off from'      
-   say 'sysplex=on, the z/OS UNIX System Services directory cache'     
-   say 'will be disabled for that file system.  It is possible'        
+   say 'is no longer sysplex aware due to moving ownership to a zFS'
+   say 'sysplex=off system or migrating back to sysplex=off from'
+   say 'sysplex=on, the z/OS UNIX System Services directory cache'
+   say 'will be disabled for that file system.  It is possible'
    say 'performance of that file system can be improved by unmounting'
    say 'that file system and mounting it back.'
    end
 say
 if rootrw & rootlla=0 & client then
    do
-   say 'The sysplex root is mounted in read-write mode and has'     
-   say 'its directory cache disabled.  This can significantly'    
+   say 'The sysplex root is mounted in read-write mode and has'
+   say 'its directory cache disabled.  This can significantly'
    say 'impact performance.  Remount the root as read-only or replace'
    say 'the root file system using the NEWROOT support.'
    end
@@ -137,9 +166,9 @@ if rootrw then
    say 'remounted to read-only mode.'
    end
 */
- 
+
 return
- 
+
 setflags:
    ro=bitand('80000000'x,flags)=='80000000'x
    rw=bitand('40000000'x,flags)=='40000000'x
@@ -147,28 +176,28 @@ setflags:
    vfsavail=bitand('00800000'x,flags)=='00800000'x
    vfsdead=bitand('00400000'x,flags)=='00400000'x
    quiesced=bitand('00040000'x,flags)=='00040000'x
-   vfsperm=bitand('00004000'x,flags)=='00004000'x 
+   vfsperm=bitand('00004000'x,flags)=='00004000'x
    client=bitand('00000002'x,flags)=='00000002'x
    agst=zfsgetagstat(vfsname)
-   flag=substr(agst,20,1)                               
-   sysplexaware=bitand(flag,'40'x)<>z1                   
-   return      
- 
+   flag=substr(agst,20,1)
+   sysplexaware=bitand(flag,'40'x)<>z1
+   return
+
 /**********************************************************************/
 /* build an AGID structure from the aggr name */
-makeagid: procedure          
+makeagid: procedure
    arg fsname
    return 'AGID' || '5401'x || left(fsname,45,'00'x) || copies('00'x,33)
- 
+
 /* get aggr info           */
 zfsgetagstat:
-procedure expose opts pl st.                    
+procedure expose opts pl st.
    arg fsname
    z1='00'x
    z4='00000000'x
    pl=32
    agid=makeagid(fsname)
-   agidsz=length(agid)  
+   agidsz=length(agid)
    agstsz=172
    agst='AGST' || '00000200'x || copies(z1,agstsz-8)
    agst=overlay(d2c(length(agst),2),agst,5)
@@ -177,24 +206,24 @@ procedure expose opts pl st.
          d2c(pl+agidsz,4) ||,               /* p1: ofs buff  */
          z4         ||,                     /* p2:           */
          z4||z4||z4||z4||,                  /* p3-p6     */
-         agid || agst  
-   pctcmd=x2d('40000005')   
+         agid || agst
+   pctcmd=x2d('40000005')
    address syscall 'pfsctl ZFS' pctcmd 'pctbf' length(pctbf)
    if rc<0 | retval=-1 then return ''
    if pctbf='' then return ''
    if substr(pctbf,pl+agidsz+1,4)<>'AGST' then return ''
-   agst=substr(pctbf,agidsz+pl+1)  
+   agst=substr(pctbf,agidsz+pl+1)
    return agst
- 
+
 /**********************************************************************/
 /* pfsctl:  issue the pfsctl command and handle errors                */
 /*          command is in variable PCTBF                              */
 /*          arg(1) is 1 for aggr op, 2 for filesys op                 */
 /*          arg(2) is optional errno that is not treated as an error  */
 /**********************************************************************/
- 
+
 zfspfsctl:
-   pctcmd=x2d('40000005')   
+   pctcmd=x2d('40000005')
    address syscall 'pfsctl ZFS' pctcmd 'pctbf' length(pctbf)
    if rc>=0 & retval<>-1 then return
    if errno=arg(2) then return
@@ -202,27 +231,27 @@ zfspfsctl:
       do
       return
       end
-   pcter=errno      
-   pctrs=errnojr      
-   err.=''      
-   address syscall 'strerror' pcter pctrs 'err.'      
-   errno=pcter      
-   errnojr=pctrs      
-   eno=errno'x'      
-   if err.1<>'' then      
-      eno=eno strip(err.1)'.'      
-   rsn='  Reason='errnojr'x'      
-   if err.4<>'' & err.2<>'' then      
-      rsn=rsn strip(err.2)      
-   say eno                     
-   say rsn      
-   rc=0      
-   retval=-1      
-      call dump pctbf      
-   trace ?i;nop      
+   pcter=errno
+   pctrs=errnojr
+   err.=''
+   address syscall 'strerror' pcter pctrs 'err.'
+   errno=pcter
+   errnojr=pctrs
+   eno=errno'x'
+   if err.1<>'' then
+      eno=eno strip(err.1)'.'
+   rsn='  Reason='errnojr'x'
+   if err.4<>'' & err.2<>'' then
+      rsn=rsn strip(err.2)
+   say eno
+   say rsn
+   rc=0
+   retval=-1
+      call dump pctbf
+   trace ?i;nop
    return
- 
- 
+
+
 /* REXX */
 /**********************************************************************/
 /*       general utilities                                            */
@@ -275,7 +304,7 @@ setglobals:
    stok=getstor(d2x(x2d(assb)+48),8,kasid)
    ocve=getstor(d2x(x2d(ocvt)+ocvtocve),4,kasid)
    return
- 
+
 /**********************************************************************/
 getsysnames:
    sysnames.=''
@@ -295,7 +324,7 @@ getsysnames:
       sysnames.entid=entname
    end
    return
- 
+
 /**********************************************************************/
 getstor: procedure expose ipcs pfs  alet. kasid
    arg $adr,$len,$asid,$alet
@@ -318,7 +347,7 @@ getstor: procedure expose ipcs pfs  alet. kasid
       opts=opts 'DSPNAME('$dspname')'
    call $fetch$ $adr,$len,$alet,opts
    return cbx
- 
+
 /**********************************************************************/
 $fetch$:
    arg addr,cblen,alet,opts
@@ -358,11 +387,11 @@ $fetch$:
       cbx=c2x(substr(cbs,1,cblen))
       end
    return 0
- 
+
 /**********************************************************************/
 extr:
    return substr(arg(1),x2d(arg(2))*2+1,arg(3)*2)
- 
+
 /**********************************************************************/
 fixaddr: procedure
    fa=right(arg(1),8,0)
@@ -373,7 +402,7 @@ fixaddr: procedure
       fa=fa1 || substr(fa,2)
       end
    return fa
- 
+
 /**********************************************************************/
 say:
    trace o
@@ -383,7 +412,7 @@ say:
     else
       say pl
    return
- 
+
 /**********************************************************************/
 gettod:
    numeric digits 20
@@ -400,14 +429,14 @@ gettod:
       gmt=e2tod(retval)
       end
    return gmt
- 
+
 /**********************************************************************/
 toddiff:
    numeric digits 22
    parse arg new,old
    diff=x2d(new)-x2d(old)
    return format((diff%4096000)/1000,,3)
- 
+
 /**********************************************************************/
 e2tod: procedure
    arg etime
@@ -416,11 +445,11 @@ e2tod: procedure
    i=i+x2d('7D91048BCA000000')
    tod=d2x(i)
    return tod
- 
+
 /**********************************************************************/
 xadd: procedure
    return d2x(x2d(arg(1))+x2d(arg(2)))
- 
+
 /**********************************************************************/
 /* formatted dump utility                                             */
 /**********************************************************************/
@@ -445,4 +474,4 @@ dump:
          end
    end
    return
- 
+
