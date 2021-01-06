@@ -1,4 +1,36 @@
-/* REXX */
+/** REXX **************************************************************
+**                                                                   **
+** Copyright 2015-2020 IBM Corp.                                     **
+**                                                                   **
+**  Licensed under the Apache License, Version 2.0 (the "License");  **
+**  you may not use this file except in compliance with the License. **
+**  You may obtain a copy of the License at                          **
+**                                                                   **
+**     http://www.apache.org/licenses/LICENSE-2.0                    **
+**                                                                   **
+**  Unless required by applicable law or agreed to in writing,       **
+**  software distributed under the License is distributed on an      **
+**  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,     **
+**  either express or implied. See the License for the specific      **
+**  language governing permissions and limitations under the         **
+**  License.                                                         **
+**                                                                   **
+** ----------------------------------------------------------------- **
+**                                                                   **
+** Disclaimer of Warranties:                                         **
+**                                                                   **
+**   The following enclosed code is sample code created by IBM       **
+**   Corporation.  This sample code is not part of any standard      **
+**   IBM product and is provided to you solely for the purpose       **
+**   of assisting you in the development of your applications.       **
+**   The code is provided "AS IS", without warranty of any kind.     **
+**   IBM shall not be liable for any damages arising out of your     **
+**   use of the sample code, even if they have been advised of       **
+**   the possibility of such damages.                                **
+**                                                                   **
+**                                                                   **
+**********************************************************************/
+
 /**********************************************************************/
 /* WJSIGSHL:  show shared library information                         */
 /*                                                                    */
@@ -9,9 +41,6 @@
 /*                                                                    */
 /*   Syntax:                                                          */
 /*    wjsigshl [-p]                                                   */
-/*                                                                    */
-/* PROPERTY OF IBM                                                    */
-/* COPYRIGHT IBM CORP. 2008,2015                                      */
 /*                                                                    */
 /* Bill Schoen    wjs@us.ibm.com   4/17/08                            */
 /*  Change activity:                                                  */
@@ -42,7 +71,7 @@ if parm='STACK' then
    end
 numeric digits 12
 call setglobals
- 
+
 parm=''
 /* REXX */
 /**********************************************************************/
@@ -73,10 +102,10 @@ if stack='STACK' then
    end
    return
    end
- 
+
 arg prm
 findpaths= ipcs=0 & pos('-P',prm)>0
- 
+
 call say right('Usage',5) right('Meg',4),
          'Used-Unused-Pgs' 'Pathname'
 shlb=getstor(xadd(ocve,'d8'),4,kasid)
@@ -94,7 +123,7 @@ call say right('Total Module (Pages) ',22) right(totalmod,12)
 call say right('Total Unused (Pages) ',22) right(totalunused,12)
 call say right('Total Module Count   ',22) right(totalcount,12)
 return
- 
+
 runshlm:
    do while shlm<>0
       shlmusecnt=x2d(getstor(xadd(shlm,'14'),4,kasid,kds))
@@ -129,7 +158,7 @@ runshlm:
       shlm=getstor(xadd(shlm,'0c'),4,kasid,kds)
    end
    return
- 
+
 /* REXX */
 /**********************************************************************/
 /*       general utilities                                            */
@@ -191,7 +220,7 @@ setglobals:
    stok=getstor(d2x(x2d(assb)+48),8,kasid)
    ocve=getstor(d2x(x2d(ocvt)+ocvtocve),4,kasid)
    return
- 
+
 /**********************************************************************/
 getsysnames:
    sysnames.=''
@@ -211,7 +240,7 @@ getsysnames:
       sysnames.entid=entname
    end
    return
- 
+
 /**********************************************************************/
 getstor: procedure expose ipcs pfs  alet. kasid
    arg $adr,$len,$asid,$alet
@@ -234,7 +263,7 @@ getstor: procedure expose ipcs pfs  alet. kasid
       opts=opts 'DSPNAME('$dspname')'
    call $fetch$ $adr,$len,$alet,opts
    return cbx
- 
+
 /**********************************************************************/
 getstor64: procedure expose ipcs pfs  alet. kasid
    arg $adr,$len,$asid
@@ -249,7 +278,7 @@ getstor64: procedure expose ipcs pfs  alet. kasid
    opts='asid('$asid')'
    call $fetch$ $adr,$len,0,opts
    return cbx
- 
+
 /**********************************************************************/
 $fetch$:
    arg addr,cblen,alet,opts
@@ -304,11 +333,11 @@ $fetch$:
       cbx=c2x(substr(cbs,1,cblen))
       end
    return 0
- 
+
 /**********************************************************************/
 extr:
    return substr(arg(1),x2d(arg(2))*2+1,arg(3)*2)
- 
+
 /**********************************************************************/
 fixaddr: procedure
    if length(arg(1))>8 then return arg(1)
@@ -320,7 +349,7 @@ fixaddr: procedure
       fa=fa1 || substr(fa,2)
       end
    return fa
- 
+
 /**********************************************************************/
 say:
    trace o
@@ -333,7 +362,7 @@ say:
        else
          say pl
    return
- 
+
 /**********************************************************************/
 gettod:
    numeric digits 20
@@ -350,7 +379,7 @@ gettod:
       gmt=e2tod(retval)
       end
    return gmt
- 
+
 /**********************************************************************/
 tod2e:
    numeric digits 22
@@ -360,14 +389,14 @@ tod2e:
    pt=x2d(htod'00000000')-tod1970
    if pt<0 then return 0
    return format(pt/todsec,,0)
- 
+
 /**********************************************************************/
 toddiff:
    numeric digits 22
    parse arg new,old
    diff=x2d(new)-x2d(old)
    return format((diff%4096000)/1000,,3)
- 
+
 /**********************************************************************/
 e2tod: procedure
    arg etime
@@ -376,11 +405,11 @@ e2tod: procedure
    i=i+x2d('7D91048BCA000000')
    tod=d2x(i)
    return tod
- 
+
 /**********************************************************************/
 xadd: procedure
    return d2x(x2d(arg(1))+x2d(arg(2)))
- 
+
 /**********************************************************************/
 /* formatted dump utility                                             */
 /**********************************************************************/
@@ -405,4 +434,4 @@ dump:
          end
    end
    return
- 
+
