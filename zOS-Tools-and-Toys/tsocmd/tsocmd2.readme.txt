@@ -1,7 +1,6 @@
 Run a TSO/E command from the shell (including authorized commands)
 
-Licensed Materials - Property of IBM
-Copyright IBM Corp. 2010, 2010
+Copyright IBM Corp. 2010
 
 tsocmd
 ======

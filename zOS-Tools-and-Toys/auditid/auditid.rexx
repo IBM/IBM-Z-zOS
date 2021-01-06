@@ -31,9 +31,6 @@
 ** ----------------------------------------------------------------- **
 ** List audit ids for a path or find the file that has a specific id **
 **                                                                   **
-** PROPERTY OF IBM                                                   **
-** COPYRIGHT IBM CORP. 1998,2007                                     **
-**                                                                   **
 ** Bill Schoen (wjs@us.ibm.com)                         4/15/98      **
 **    10/9/07   fix for HFS root inode number (Robert Hering)        **
 **                                                                   **

@@ -1,4 +1,3 @@
-# Property of IBM
 # Copyright IBM Corp. 2018-2020
 # All Rights Reserved.
 #
