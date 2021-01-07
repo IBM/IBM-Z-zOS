@@ -1,0 +1,470 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<HTML><HEAD>
+<!-- Begin Header Records ------------------------------------------- -->
+<!-- IPLMERG4 SCRIPT A1 converted by B2H R1.4 (175) (CMS)             -->
+<!--    by KKELLEY at S390VM on 24 May 2009 at 15:02:32               -->
+<META HTTP-EQUIV="updated"  CONTENT="1909-05-24">
+<META HTTP-EQUIV="review"  CONTENT="1910-05-24">
+<META HTTP-EQUIV="expires"  CONTENT="1911-05-24">
+<TITLE>IPLMERG4</TITLE>
+</HEAD><BODY>
+<!-- End Header Records --------------------------------------------- -->
+<A NAME=Top_Of_Page>&#32;</A>
+<H1>IPLMERG4</H1>
+<P>
+Program User's Guide
+Draft&#58; May 24, 2009
+<P>W. Kevin Kelley<BR>
+<P><ADDRESS>
+Mid-Hudson Valley Programming Laboratory<BR>
+Mail Station P330<BR>
+2455 South Road<BR>
+Poughkeepsie, New York 12601-5400<BR>
+-<BR>
+LOTUS NOTES&#58; KevinKelley/Poughkeepsie/IBM@IBMUS<BR>
+Internet&#58; kkelley@us.ibm.com<BR>
+-<BR>
+Phone&#58; 8+295-6697 / (845)-435-6697<BR>
+</ADDRESS>
+<HR><P><H2><A NAME=Table_Of_Contents>Table of Contents</A></H2><P>
+<P><B><A NAME=Table_Of_Contents_1.0 HREF="#Section_1.0" >Introduction</A></B><BR>
+<P><B><A NAME=Table_Of_Contents_2.0 HREF="#Section_2.0" >Program Library</A></B><BR>
+<P><B><A NAME=Table_Of_Contents_3.0 HREF="#Section_3.0" >Program Options</A></B><BR>
+<P><B><A NAME=Table_Of_Contents_4.0 HREF="#Section_4.0" >User Exits</A></B><BR>
+<P><B><A NAME=Table_Of_Contents_5.0 HREF="#Section_5.0" >Input Files</A></B><BR>
+<MENU>
+<LI><A NAME=Table_Of_Contents_5.1 HREF="#Section_5.1" >INPUT1 DD (Required)</A>
+<LI><A NAME=Table_Of_Contents_5.2 HREF="#Section_5.2" >INPUT2 DD (Required)</A>
+</MENU>
+<P><B><A NAME=Table_Of_Contents_6.0 HREF="#Section_6.0" >Output Files</A></B><BR>
+<MENU>
+<LI><A NAME=Table_Of_Contents_6.1 HREF="#Section_6.1" >OUTPUT DD (Required)</A>
+<LI><A NAME=Table_Of_Contents_6.2 HREF="#Section_6.2" >OUTPUT1 DD (Required)</A>
+<LI><A NAME=Table_Of_Contents_6.3 HREF="#Section_6.3" >OUTPUT2 DD (Required)</A>
+</MENU>
+<P><B><A NAME=Table_Of_Contents_7.0 HREF="#Section_7.0" >Output Reports</A></B><BR>
+<MENU>
+<LI><A NAME=Table_Of_Contents_7.1 HREF="#Section_7.1" >Merged Records, Sorted by Event ID report</A>
+<LI><A NAME=Table_Of_Contents_7.2 HREF="#Section_7.2" >Merged Records, Sorted by INPUT1 Event Time report</A>
+<LI><A NAME=Table_Of_Contents_7.3 HREF="#Section_7.3" >Events in INPUT1 Only report</A>
+<LI><A NAME=Table_Of_Contents_7.4 HREF="#Section_7.4" >Events in INPUT2 Only report</A>
+</MENU>
+<P><B><A NAME=Table_Of_Contents_8.0 HREF="#Section_8.0" >Appendix A. Sample JCL for processing a pair of z/OS IPL SYSLOGs</A></B><BR>
+<P><B><A NAME=Table_Of_Contents_9.0 HREF="#Section_9.0" >Appendix B. Getting in touch with the author</A></B><BR>
+<P><B><A NAME=Table_Of_Contents_10.0 HREF="#Section_10.0" >Appendix C. Glossary</A></B><BR>
+<HR><P>
+
+<P><PRE><B>+---NOTE&#58;----------------------------------------------------------------+</B></PRE><BR>
+<B>
+<P>This copyrighted program may be run by customer personnel on customer
+facilities utilizing customer-supplied input and the output of the
+program may be retained by customer personnel.  However, the program and
+its documentation remain the property of the IBM Corporation.
+</B>
+<P>This program is distributed on an as-is basis.  Service is provided
+on a as-time-permits basis.
+<BR><PRE><B>+----------------------------------------------------------------------------+</B></PRE><P>
+<HR><H1>Preface</H1>
+<P>This document describes the operation of the IPLMERG family of MVS
+SYSLOG IPL Comparison programs written by W. Kevin Kelley.
+<P>z/OS, OS/390, Enterprise Systems Architecture/370, ESA/370, MVS/ESA,
+MVS/XA, MVS/SP and NetView are trademarks of the IBM Corporation.
+
+<HR>
+<H1><A NAME="Section_1.0" HREF="#Table_Of_Contents_1.0">Introduction</A></H1>
+<P>The IPLMERG program is designed to compare the time at which
+significant events occurred in one z/OS IPL with the time that the
+same event took in another z/OS IPL.
+<P>This program takes two IPL sequence input data sets, merges them
+and then sorts them by message content. The input data sets are produced
+by the MSGLG610 program using the IPLSTATS(LIST) option. An IPL type
+identifier can be inserted into the data set using the IPLID(identifier)
+option.
+<HR>
+<H1><A NAME="Section_2.0" HREF="#Table_Of_Contents_2.0">Program Library</A></H1>
+<P>The program library currently consists of a single program&#58;
+<UL COMPACT>
+<LI>IPLMERG4
+</UL>
+<P>IPLMERG4 is written in z Architecture Assembly Language and was
+assembled using the High-Level Assembler.
+<P>The instructions used correspond to those included in Architectural
+Level 2 (SYSSTATE ARCHLVL=2).
+<HR>
+<H1><A NAME="Section_3.0" HREF="#Table_Of_Contents_3.0">Program Options</A></H1>
+<P>There are currently no program options.
+<HR>
+<H1><A NAME="Section_4.0" HREF="#Table_Of_Contents_4.0">User Exits</A></H1>
+<P>There are currently no user exits.
+<HR>
+<H1><A NAME="Section_5.0" HREF="#Table_Of_Contents_5.0">Input Files</A></H1>
+<HR>
+<H2><A NAME="Section_5.1" HREF="#Table_Of_Contents_5.1">INPUT1 DD (Required)</A></H2>
+<P><PRE><B>+---NOTE---------------------------------------------------------------------+</B></PRE><BR>
+<P>The input MUST be an IPLSQ data set produced by the MSGLG610 program
+using the IPLSTATS(LIST) input option.
+<P>The MSGLG610 IPLID input option can be used to place a unique
+identifier into the IPLSQ data set so that events in the data set
+can be more easily recognized as having come from this particular
+IPL sequence.
+<P>You should use the MSGLG610 SAMPLSTR and SAMPLEND input options to
+limit the input to the portion of the system initialization that you
+wish to compare. The SAMPLSTR statement should specify when the
+IEA371I message was issued; the SAMPLEND statement should specify a
+time after that.
+<BR><PRE><B>+----------------------------------------------------------------------------+</B></PRE><P>
+<P>The INPUT1 DD statement is required and defines the first input data
+stream (typically the base to which the second input data stream is
+compared).
+<HR>
+<H2><A NAME="Section_5.2" HREF="#Table_Of_Contents_5.2">INPUT2 DD (Required)</A></H2>
+<P><PRE><B>+---NOTE---------------------------------------------------------------------+</B></PRE><BR>
+<P>The input MUST be an IPLSQ data set produced by the MSGLG610 program
+using the IPLSTATS(LIST) input option.
+<P>The MSGLG610 IPLID input option can be used to place a unique
+identifier into the IPLSQ data set so that events in the data set
+can be more easily recognized as having come from this particular
+IPL sequence.
+<P>You should use the MSGLG610 SAMPLSTR and SAMPLEND input options to
+limit the input to the portion of the system initialization that you
+wish to compare. The SAMPLSTR statement should specify when the
+IEA371I message was issued; the SAMPLEND statement should specify a
+time after that.
+<BR><PRE><B>+----------------------------------------------------------------------------+</B></PRE><P>
+<P>The INPUT2 DD statement is required and defines the second input data
+stream (which is typically compared to the first input data stream).
+<HR>
+<H1><A NAME="Section_6.0" HREF="#Table_Of_Contents_6.0">Output Files</A></H1>
+<HR>
+<H2><A NAME="Section_6.1" HREF="#Table_Of_Contents_6.1">OUTPUT DD (Required)</A></H2>
+<P>The OUTPUT DD statement is required and is used by the merged record
+sorted by event ID report.
+<P>This file has the following DCB attributes&#58;
+DCB=(RECFM=FBA,LRECL=133,BLKSIZE=133)
+<HR>
+<H2><A NAME="Section_6.2" HREF="#Table_Of_Contents_6.2">OUTPUT1 DD (Required)</A></H2>
+<P>The OUTPUT1 DD statement is required and is used by the reports that
+are unique to INPUT1.
+<P>This file has the following DCB attributes&#58;
+DCB=(RECFM=FBA,LRECL=160,BLKSIZE=160)
+<HR>
+<H2><A NAME="Section_6.3" HREF="#Table_Of_Contents_6.3">OUTPUT2 DD (Required)</A></H2>
+<P>The OUTPUT2 DD statement is required and is used by the reports that
+are unique to INPUT2.
+<P>This file has the following DCB attributes&#58;
+DCB=(RECFM=FBA,LRECL=160,BLKSIZE=160)
+<HR>
+<H1><A NAME="Section_7.0" HREF="#Table_Of_Contents_7.0">Output Reports</A></H1>
+<HR>
+<H2><A NAME="Section_7.1" HREF="#Table_Of_Contents_7.1">Merged Records, Sorted by Event ID report</A></H2>
+<P>The Merged Records, Sorted by Event ID report shows the IPL events
+from the two input streams ordered by event ID. This should result
+in the same event event in both IPLs being adjacent to one another
+in this report.  Records in the report are in alphabetic order by
+event ID.
+<P>Immediately after the report title there are two lines
+indicating the number of input records that were received through
+INPUT1 and INPUT2 and the number from each that were ignored.
+<P>The following high-frequency events are ignored&#58;
+<UL COMPACT>
+<LI>AOF532I
+<LI>AOF540I
+<LI>AOF570I
+<LI>BBOM0007I
+<LI>HASP373
+<LI>$HASP373
+<LI>HASP395
+<LI>$HASP395
+<LI>IEF403I
+<LI>IEF404I
+<LI>IRR812I
+<LI>S ASCHINT
+<LI>S BPXAS
+<LI>S IEESYSAS
+<LI>S INIT
+<LI>S LOGWRTR
+</UL>
+<P>These events are useful for context in the MSGLG610 IPLSQ report
+but provide too much clutter here.
+<P>There may be a few junk records following the statistics.
+<P>The rest of the records consist of a time in seconds from the
+beginning of the IPL, an optional 8-character IPLID, and the event ID.
+The event ID is a string consisting of a message ID followed by the
+message text or a string containg a command.
+<P>Use of the IPLID option is extremely useful in this report for
+identifying which input stream an event came from.
+<P>At the end of the report, there are further statistics on the
+number of records input from each stream, the total number of
+records ignored, and the number that were passed onto the next stage.
+<HR>
+<H2><A NAME="Section_7.2" HREF="#Table_Of_Contents_7.2">Merged Records, Sorted by INPUT1 Event Time report</A></H2>
+<P>The sorted record stream from the previous report is examined
+and wherever two adjacent records describe the same event, the two
+records are combined into a single record with two timestamps (one
+timestamp from INPUT1 and one timestamp from INPUT2). Ideally all
+of the events pair up and the number of records are halved.
+However, there may be a few events that occurred in one stream and
+not in the other and vice versa.
+<P>The records are sorted by the INPUT1 timestamp and then presented
+in the report.
+<P>The first column is the INPUT1 timestamp. The second column is
+the INPUT2 timestamp. The third column is the difference between
+the two. The third column is followed by the event ID.
+<P>At the end of the report, highest timestamp in each of the
+first two columns is shown. This is effectively the IPL time for
+the sequence of events selected.
+<P>Following the largest timestamps is a set of statistics showing
+how well the program was able to match events in one input stream
+to the events in the other input stream. Ideally the MATCH numbers
+are the same and the OUTPUT number is half of the MATCH numbers.
+All of the other numbers indicate mismatches of one kind or another
+and idelally these should all be zero.
+<HR>
+<H2><A NAME="Section_7.3" HREF="#Table_Of_Contents_7.3">Events in INPUT1 Only report</A></H2>
+<P>This report is just what its title says it is -- a list of events
+that occurred in INPUT1 but not in INPUT2. Ideally, this report is
+null.
+<HR>
+<H2><A NAME="Section_7.4" HREF="#Table_Of_Contents_7.4">Events in INPUT2 Only report</A></H2>
+<P>This report is just what its title says it is -- a list of events
+that occurred in INPUT2 but not in INPUT1. Ideally, this report is
+null.
+<HR>
+<H1><A NAME="Section_8.0" HREF="#Table_Of_Contents_8.0">Appendix A. Sample JCL for processing a pair of z/OS IPL SYSLOGs</A></H1>
+<PRE>
+//IPLMERGY JOB 'xxxxxx,xxxxxxx',
+//  'KEVIN KELLEY',REGION=0M,
+//  MSGLEVEL=(1,1),CLASS=B,NOTIFY=KKELLEY,
+//  MSGCLASS=I
+//* *******************************************************************
+//*            WebDB2  MTTR start-up study                            *
+//*            PDBANN.CONSTR.DB2OD.SYSLOG.D8234ZG1                    *
+//*            KKELLEY.MTTR.R10BASE1.SYSLOG                           *
+//* *******************************************************************
+/*JOBPARM LINES=200
+//* *******************************************************************
+//*                                                                   *
+//* *******************************************************************
+//*-------------------------------------------------------------------*
+//* FORM, FONT, PAGEDEF AND WIDTH DEFINITIONS.                        *
+//*-------------------------------------------------------------------*
+//*                 FORM&#58;     NAR           STD            WIDE       *
+//*                       9.5" X 11"      12" X 8.5"   14.88" X 11"   *
+//* FONT              WIDTH  PAGEDEF  WIDTH  PAGEDEF  WIDTH  PAGEDEF  *
+//* GT10 - 10 CHAR/INCH  85  P108080    110  P108081    140  P1L08080 *
+//* GT12 - 12 CHAR/INCH 102  P108080    132  P108081    168  P1L08080 *
+//* GT13 - 13 CHAR/INCH 110  P108080    143  P108081    182  P1L08080 *
+//* GT15 - 15 CHAR/INCH 127  P1100A0    165  P1100A1    210  P1L100A0 *
+//* GT18 - 18 CHAR/INCH 153  P1100A0    198  P1100A1    252  P1L100A0 *
+//* GT20 - 20 CHAR/INCH 170  P1120C0    220  P1100A1*   280  P1L120C0 *
+//*-------------------------------------------------------------------*
+//STDOUT   OUTPUT CLASS=I,FORMS=STD,JESDS=ALL,COPIES=1,
+//             CHARS=CR15,PAGEDEF=100A1,
+//             DEST=PKEDPS1.LOCAL
+//SMALLOUT OUTPUT CLASS=I,FORMS=STD,COPIES=1,
+//             CHARS=GT20,PAGEDEF=L120C0,
+//             DEST=PKEDPS1.LOCAL
+//MSGRATE1  EXEC PGM=MSGLG610,REGION=8M
+//STEPLIB   DD DSN=KKELLEY.MSGLGPGM.LOAD,DISP=SHR
+//OPTIN     DD *
+TITLE&#58; z/OS R10 WEB DB2 100K OPEN DS MTTR base
+* PDBANN.CONSTR.DB2OD.SYSLOG.D8234ZG1
+* KKELLEY.MTTR.R10BASE1.SYSLOG
+REPORT(SUM,AMSG,CMSG)
+IPLSTATS(LIST)          -- request IPL statistics AND sequence report
+IPLID(BASE100K)
+* DUMPTBL(IPLST)        -- dump IPL start-up statistics data
+* DUMPTBL(MSG,RATE)     -- dump message data
+SAMPLSTR(08234085923)   -- just prior to IEA371I IPL message
+SAMPLEND(08234103017)   -- all DB2 data sets opened
+* RATEMSGS(ALL)
+* IMSGINTV(3)    -- 1 minute intervals
+* IMSGRANGE(60000)
+* IMSGSCAL(LINEAR)
+//*-------------------------------------------------------------------*
+//*  Input data                                                       *
+//*-------------------------------------------------------------------*
+//DATA     DD DSN=KKELLEY.MTTR.R10BASE1.SYSLOG,DISP=SHR
+//TTLLIB   DD DSN=KKELLEY.MSGRTDB.TBLS,DISP=SHR
+//SYSPRINT DD SYSOUT=(,),OUTPUT=(*.STDOUT)
+//*-------------------------------------------------------------------*
+//*  If used, the following DD's should have&#58;  OUTPUT=(*.STDOUT)      *
+//*-------------------------------------------------------------------*
+//PRNTOUT  DD SYSOUT=(,),OUTPUT=(*.STDOUT)
+//COMPRATE DD SYSOUT=(,),OUTPUT=(*.SMALLOUT)
+//COMPMSG  DD SYSOUT=(,),OUTPUT=(*.SMALLOUT)
+//IPLSQ    DD DSN=&&IPLSQ1,UNIT=SYSDA,
+//            DCB=(RECFM=FA,LRECL=256),
+//            SPACE=(TRK,(50,25)),DISP=(NEW,PASS)
+//IPLST    DD SYSOUT=(,),OUTPUT=(*.STDOUT)
+//UNKNOWN  DD DUMMY
+//PREVIEW  DD DUMMY
+//IMSGRATE DD DUMMY
+//BURST    DD DUMMY
+//*-------------------------------------------------------------------*
+//*  The following DD's are used to dump internal tables for reuse.   *
+//*  All of them are&#58; RECFM=F,LRECL=240                               *
+//*  ----> IF USED, 'DUMPRATE' -MUST- HAVE A DISP OF 'MOD' <----      *
+//*-------------------------------------------------------------------*
+//DUMPCNT   DD DUMMY
+//DUMPMSG   DD DUMMY
+//DUMPCMD   DD DUMMY
+//DUMPRATE  DD DUMMY
+//DUMPIPLS  DD DUMMY
+//OUT       DD DUMMY
+//* *******************************************************************
+//*            WebDB2  MTTR start-up study                            *
+//*            PDBANN.CONSTR.DB2OD.SYSLOG.D8234ZG3                    *
+//*            KKELLEY.MTTR.R10BASE3.SYSLOG                           *
+//* *******************************************************************
+//MSGRATE2  EXEC PGM=MSGLG610,REGION=8M
+//STEPLIB   DD DSN=KKELLEY.MSGLGPGM.LOAD,DISP=SHR
+//OPTIN     DD *
+TITLE&#58; z/OS R10 WEB DB2 100K OPEN DS base w/Steve Jones prototype
+* PDBANN.CONSTR.DB2OD.SYSLOG.D8234ZG3
+* KKELLEY.MTTR.R10BASE3.SYSLOG
+REPORT(SUM,AMSG,CMSG)
+IPLSTATS(LIST)          -- request IPL statistics AND sequence report
+IPLID(STJO100K)
+* DUMPTBL(IPLST)        -- dump IPL start-up statistics data
+* DUMPTBL(MSG,RATE)     -- dump message data
+SAMPLSTR(08234134133)   -- just prior to IEA371I IPL message
+SAMPLEND(08234141536)   -- all DB2 data sets opened
+* RATEMSGS(ALL)
+* IMSGINTV(3)    -- 1 minute intervals
+* IMSGRANGE(60000)
+* IMSGSCAL(LINEAR)
+//*-------------------------------------------------------------------*
+//*  Input data                                                       *
+//*-------------------------------------------------------------------*
+//DATA     DD DSN=KKELLEY.MTTR.R10BASE3.SYSLOG,DISP=SHR
+//TTLLIB   DD DSN=KKELLEY.MSGRTDB.TBLS,DISP=SHR
+//SYSPRINT DD SYSOUT=(,),OUTPUT=(*.STDOUT)
+//*-------------------------------------------------------------------*
+//*  If used, the following DD's should have&#58;  OUTPUT=(*.STDOUT)      *
+//*-------------------------------------------------------------------*
+//PRNTOUT  DD SYSOUT=(,),OUTPUT=(*.STDOUT)
+//COMPRATE DD SYSOUT=(,),OUTPUT=(*.SMALLOUT)
+//COMPMSG  DD SYSOUT=(,),OUTPUT=(*.SMALLOUT)
+//IPLSQ    DD DSN=&&IPLSQ2,UNIT=SYSDA,
+//            DCB=(RECFM=FA,LRECL=256),
+//            SPACE=(TRK,(50,25)),DISP=(NEW,PASS)
+//IPLST    DD SYSOUT=(,),OUTPUT=(*.STDOUT)
+//UNKNOWN  DD DUMMY
+//PREVIEW  DD DUMMY
+//IMSGRATE DD DUMMY
+//BURST    DD DUMMY
+//*-------------------------------------------------------------------*
+//*  The following DD's are used to dump internal tables for reuse.   *
+//*  All of them are&#58; RECFM=F,LRECL=240                               *
+//*  ----> IF USED, 'DUMPRATE' -MUST- HAVE A DISP OF 'MOD' <----      *
+//*-------------------------------------------------------------------*
+//DUMPCNT   DD DUMMY
+//DUMPMSG   DD DUMMY
+//DUMPCMD   DD DUMMY
+//DUMPRATE  DD DUMMY
+//DUMPIPLS  DD DUMMY
+//OUT       DD DUMMY
+//* *******************************************************************
+//*   Run the 'IPLMERG4' program to MERGE two IPL sequence data sets  *
+//*   on a page device with the appropriate page breaks. LRECL <= 137 *
+//*-------------------------------------------------------------------*
+//*   The INPUT1 and INPUT2 data sets are produced by the MSGLG610    *
+//*   program using the IPLSTATS(LIST) option. An IPL type identifier *
+//*   can be inserted into the data using the IPLID(identifier)       *
+//*   option. The output is produced through the IPLSQ DD.            *
+//* *******************************************************************
+//IPLMERG4 EXEC PGM=IPLMERG4
+//STEPLIB  DD DSN=KKELLEY.MSGLGPGM.LOAD(IPLMERG4),DISP=SHR
+//INPUT1   DD DSN=&&IPLSQ1,DISP=(OLD,DELETE)
+//INPUT2   DD DSN=&&IPLSQ2,DISP=(OLD,DELETE)
+//OUTPUT   DD SYSOUT=(,),OUTPUT=(*.STDOUT),DCB=OPTCD=J
+//OUTPUT1  DD SYSOUT=(,),OUTPUT=(*.STDOUT),DCB=OPTCD=J
+//OUTPUT2  DD SYSOUT=(,),OUTPUT=(*.STDOUT),DCB=OPTCD=J
+</PRE>
+<HR>
+<H1><A NAME="Section_9.0" HREF="#Table_Of_Contents_9.0">Appendix B. Getting in touch with the author</A></H1>
+<P>Please direct any and all comments, criticisms and suggestions to&#58;
+<PRE>
+                    IBM Corporation
+                    W. Kevin Kelley
+                    Mail Station P330
+                    2455 South Road
+                    Poughkeepsie, New York  12601-5400
+</PRE>
+<P>The author also frequents the IBMMAIN newsgroup run by the University
+of Alabama&#58;
+<UL>
+<P><LI>ibm-main@bama.ua.edu
+</UL>
+<P>The author can be reached directly through the INTERNET at
+<B>kkelley@us.ibm.com</B>
+<P>If you are an IBM internal user, you can contact the author by
+sending a LOTUS NOTES note to&#58;
+<PRE>
+Kevin Kelley/Poughkeepsie/IBM@IBMUS
+</PRE>
+<P>It is also possible to phone the author but this is not recommended
+since he is in and out of his office a lot.
+<HR>
+<H1><A NAME="Section_10.0" HREF="#Table_Of_Contents_10.0">Appendix C. Glossary</A></H1>
+<DL>
+<DT>Action Messages
+<DD>An <I>unsolicited message </I>asking the operator
+<I>to do </I>something, typically to take a physical action
+(such as mounting a tape or adding paper to a printer).
+<DT>Busy Interval
+<DD>A busy interval is a period of time during which at least one
+message occurred.
+<DT>Decision Messages
+<DD>An <I>unsolicited message </I>asking the operator
+<I>to make a decision </I>, usually from a list of options.
+<DT>Known Messages
+<DD>Messages which have been classified in the MSGTYPE2
+table.
+<DT>MLG Messages
+<DD>In a JES3 environment, the destination class for the log.
+Messages sent to MLG are explicitly written to the log only.
+<DT>Re-routed Messages
+<DD>In a JES3 environment, the device-related messages which JES3
+explicitly re-directs to the functional consoles responsible for the
+device.
+<DT>Solicited Messages
+<DD>Messages produced in response to an operator command;
+a command response.
+These messages are typically returned to the console from which the
+command was entered.
+<DT>Suppressible Messages
+<DD>Messages which have been classified as suppressible in the
+MSGTYPE2 table.
+Suppressible messages have been judged to have no important information
+content.
+<DT>Unknown Messages
+<DD>Messages which have not been classified in the MSGTYPE2
+table.
+<DT>Unseen Messages
+<DD>Messages which are not visible to the operator.
+<DT>Unsolicited Messages
+<DD>Messages produced asynchronously; usually indicating some sort
+of state change.  Operator action may or may not be indicated.
+These messages are typically routed to consoles by attributes such as
+<I>route codes</I>
+(which indicate functional area) and
+<I>descriptor codes</I>
+(which describe the importance of the message).
+<DT>Unsuppressible Messages
+<DD>Messages which have been classified as unsuppressible in the
+MSGTYPE2 table.
+Unsuppressible messages have been judged to have important information
+content which should not be lightly ignored.
+<DT>Write-To-Log (WTL) Messages
+<DD>Messages which have been written to the log using the WTL macro.
+Such messages receive no formatting. Use of WTL should be avoided.
+<DT>Write-To-Programmer Messages
+<DD>Messages which have been explicitly routed to Route Code 11, which
+is reserved for sending messages to a job's job log. Such messages are
+typically of no interest to anyone other than the programmer they have
+have been issued to.
+</DL>
+</BODY></HTML>
+

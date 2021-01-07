@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>BBEditDocumentType</key>
+	<string>CodelessLanguageModule</string>
+	<key>BBLMColorsSyntax</key>
+	<true/>
+	<key>BBLMIsCaseSensitive</key>
+	<false/>
+	<key>BBLMKeywordList</key>
+	<array>
+		<string>JOB</string>
+		<string>EXEC</string>
+		<string>DD</string>
+		<string>PROC</string>
+		
+	</array>
+	<key>BBLMLanguageCode</key>
+	<string>JCL</string>
+	<key>BBLMLanguageDisplayName</key>
+	<string>JCL</string>
+	<key>BBLMScansFunctions</key>
+	<true/>
+	<key>BBLMSuffixMap</key>
+	<array>
+		<dict>
+			<key>BBLMLanguageSuffix</key>
+			<string>jcl</string>
+		</dict>
+		<dict>
+			<key>BBLMLanguageSuffix</key>
+			<string>jcp</string>
+		</dict>
+	</array>
+	<key>BBLMCanSpellCheckCodeRuns</key>
+	<false/>
+	<key>Language Features</key>
+	<dict>
+		<key>Close Block Comments</key>
+		<string></string>
+		<key>Close Parameter Lists</key>
+		<string></string>
+		<key>Close Statement Blocks</key>
+		<string></string>
+		<key>Close Strings 1</key>
+		<string>&quot;</string>
+		<key>Close Strings 2</key>
+		<string>&apos;</string>
+		<key>End-of-line Ends Strings 1</key>
+		<false/>
+		<key>End-of-line Ends Strings 2</key>
+		<false/>
+		<key>Escape Char in Strings 1</key>
+		<string></string>
+		<key>Escape Char in Strings 2</key>
+		<string></string>
+		<key>Identifier and Keyword Characters</key>
+		<string>0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz</string>
+		<key>Open Block Comments</key>
+		<string></string>
+		<key>Open Line Comments</key>
+		<string>//*</string>
+		<key>Open Parameter Lists</key>
+		<string></string>
+		<key>Open Statement Blocks</key>
+		<string>EXEC</string>
+		<key>Open Strings 1</key>
+		<string>&quot;</string>
+		<key>Open Strings 2</key>
+		<string>&apos;</string>
+		<key>Prefix for Functions</key>
+		<string></string>
+		<key>Prefix for Procedures</key>
+		<string></string>
+		<key>Terminator for Prototypes 1</key>
+		<string></string>
+		<key>Terminator for Prototypes 2</key>
+		<string></string>
+		<key>Function Pattern</key>
+		<string>//(?P&lt;function&gt;(?P&lt;function_name&gt;[A-Za-z0-9]+) EXEC)</string>
+		<key>Keyword Pattern</key>
+		<string>&amp;[A-Za-z0-9]+[.,]?</string>
+	</dict>
+</dict>
+</plist>
