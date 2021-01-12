@@ -1,0 +1,257 @@
+* Member name: MSGIDS
+* ******************************************************************* *
+*                                                                     *
+*      Message ID template information                                *
+*                                                                     *
+* The default alphabetic and numeric substitution characters are:     *
+*                                                                     *
+* @ - represents any alphabetic character (A-Z)                       *
+* # - represents any numeric character (0-9)                          *
+*                                                                     *
+* ALL OTHER CHARACTERS REPRESENT THEMSELVES.                          *
+*                                                                     *
+* The alphabetic and numeric substitution characters can be redefined *
+* at any time by defining new substitution characters, using the      *
+* ALPHABETIC(@) and NUMERIC(#) specifications, where '@' and '#' can  *
+* be any special (non-alphabetic, non-numeric) character. The         *
+* ALPHABETIC(@) and NUMERIC(#) specifications -MUST- begin in         *
+* column 1. DO NOT have the same special character in use by both     *
+* the ALPHABETIC and NUMERIC specifications at the same time!         *
+*                                                                     *
+* A message ID template -MUST NOT- contain any imbedded blanks.       *
+*                                                                     *
+* An asterisk (*) in column 1 represents a comment statement.         *
+*                                                                     *
+* Comments must be separated from the message ID template by at least *
+* one blank.                                                          *
+*                                                                     *
+* The maximum length of a message ID template is <10> characters.     *
+*                                                                     *
+*---------------------------------------------------------------------*
+*                                                                     *
+* WARNING: The Message Analysis Program assumes that:                 *
+*          # = x'7B' and @ = x'7C'                                    *
+*          If you have uploaded this table from a PC, it is possible  *
+*          that some other translation has occurred. If it has, this  *
+*          will result in errors during processing, typically 0C4.    *
+*          You may be able to replace use of the # and @ characters   *
+*          with other characters that map to the x'7B' and x'7C'      *
+*          values. For example, in some countries "a" with an accent  *
+*          maps to x'7C' and the British Pound symbol maps to x'7B'.  *
+*          Use those characters instead of the @ and # characters.    *
+*                                                                     *
+*---------------------------------------------------------------------*
+*                                                                     *
+* WARNING: An 0C4 ABEND will occur if a template is a proper          *
+*          (completely) subset of another. For example, you cannot    *
+*          specify both @@@#### and @@@####I because the first        *
+*          is a proper subset of the other.                           *
+*                                                                     *
+*          It is recommended that templates with suffixes (such as    *
+*          A, E, I, D and W) be made generic entries and if a         *
+*          specific product produces a message that is a proper       *
+*          subset of the generic template that a specific message     *
+*          template be produced for it. A specific template -can- be  *
+*          a proper subset of a generic template but you cannot have  *
+*          a generic template be a proper subset of another generic   *
+*          entry or a specific template be a proper subset of another *
+*          specific template.                                         *
+*                                                                     *
+********************************************************************* *
+*   GENERIC MESSAGE TEMPLATES                                         *
+********************************************************************* *
+ALPHABETIC(@)
+NUMERIC(#)
+*---------------------------------------------------------------------*
+*   Old message standard                                              *
+*---------------------------------------------------------------------*
+@@@###A      section 3.3.1
+@@@###B     (vender variant)
+@@@###C     (vender variant)
+@@@###D      section 3.3.1
+@@@###E      section 3.3.1
+@@@###I      section 3.3.1
+@@@###N     (vender variant)
+@@@###R     (vender variant)
+@@@###W      section 3.3.1
+*---------------------------------------------------------------------*
+*   New message standard   (IBM Corporate Standard C-S 3-7019-002)    *
+*---------------------------------------------------------------------*
+@@@####     (vender variant)
+@@@####:    (vender variant)
+@@@####A     section 3.4.1
+@@@####D     section 3.4.1
+@@@####E     section 3.4.1
+@@@####H    (vender variant) (OPS/MVS)
+@@@####I     section 3.4.1
+@@@####W     section 3.4.1
+*
+@@@@###A     section 4.3.1
+@@@@###E     section 4.3.1
+@@@@###I     section 4.3.1
+@@@@###D     section 4.3.1
+@@@@###W     section 4.3.1
+*---------------------------------------------------------------------*
+*   Common variants allowed by the new message standard.              *
+*---------------------------------------------------------------------*
+@@@#####A    section 3.5.1
+@@@#####E    section 3.5.1
+@@@#####I    section 3.5.1
+@@@#####D    section 3.5.1
+@@@#####W    section 3.5.1
+*
+@@@@####A    section 4.4.1
+@@@@####E    section 4.4.1
+@@@@####I    section 4.4.1
+@@@@####D    section 4.4.1
+@@@@####W    section 4.4.1
+*
+@@@@#####A   section 4.5.1
+@@@@#####E   section 4.5.1
+@@@@#####I   section 4.5.1
+@@@@#####D   section 4.5.1
+@@@@#####W   section 4.5.1
+*
+@@@@@##A    (vender variant)
+@@@@@##D    (vender variant)
+@@@@@##E    (vender variant)
+@@@@@##I    (vender variant)
+@@@@@##W    (vender variant)
+@@@@@###    (vender variant)
+*
+@@@@@###A    section 5.3.1
+@@@@@###E    section 5.3.1
+@@@@@###I    section 5.3.1
+@@@@@###D    section 5.3.1
+@@@@@###W    section 5.3.1
+*
+@@@@@####A   section 5.4.1
+@@@@@####E   section 5.4.1
+@@@@@####I   section 5.4.1
+@@@@@####D   section 5.4.1
+@@@@@####W   section 5.4.1
+*---------------------------------------------------------------------*
+*   Other common vender variants.                                     *
+*---------------------------------------------------------------------*
+@@####:     (vender variant)
+@@####A     (vender variant)
+@@####D     (vender variant)
+@@####E     (vender variant)
+@@####I     (vender variant)
+@@####W     (vender variant)
+@@#####I    (vender variant)
+*
+@@@@@@##I   (vender variant)
+@@@@@@###I  (vender variant)
+********************************************************************* *
+*   SPECIFIC MESSAGE TEMPLATES                                        *
+********************************************************************* *
+*---------------------------------------------------------------------*
+*   JES
+*---------------------------------------------------------------------*
+EJES###   JES3
+HASP###   JES2
+HASP####  JES2 (as of z/OS R4)
+IAT####   JES3
+JSX###    JES/328X
+*---------------------------------------------------------------------*
+*   Other IBM non-standard
+*---------------------------------------------------------------------*
+DFH####        -CICS-
+DFH@@####
+DSR####        -unknown-
+IEFACTRT00     -unknown- IEFACTRT001I
+*---------------------------------------------------------------------*
+*   IBM Internal messages
+*---------------------------------------------------------------------*
+AOPR###
+CLIC###
+CONS###
+IBTS###
+IBTS-###
+*---------------------------------------------------------------------*
+*   Popular vendor messages
+*---------------------------------------------------------------------*
+ACF#####      -- ACF2
+ADA@##        -- ADABAS
+AOP####       -- AF/Operator
+APA-###       --
+BBM@@###@     --
+BBM@@@##@     --
+BCIM###       --
+BLK#####      -- BLOCKCADE
+BMC#####      -- BMC
+CAS####       -- CA/ENF
+CATL####      -- CA-TLMS
+CSACHK##@     -- CSA Check
+CSFO####      -- PKDSCache
+DADSI####     -- CA-DADS/Plus
+DBA####       -- ADABAS
+DB#####@      --
+DCOMPR##      -- DATACOM
+DIF#####-@    -- Dynamic Install Facility
+DRS###        -- unknown
+EC###:        -- EPILOG
+ESF###        -- CA-Spool
+EXI###        -- Exigence
+EZAIN##@      -- TCP/IP
+EZAOP##@      --
+FDR###        --
+FT###@        -- MainView
+GSDMV##@      -- unknown
+HGIN##@       -- Hourglass
+HGLV##@       -- Hourglass
+HGST##@       -- Hourglass
+IEFTMS#       -- CA-1 (TMS)
+IEFTMS##      -- CA-1 (TMS)
+KLV@@###      --
+KO#@####@     -- CANDLE
+LMRK#####@    -- Landmark
+LOD####       --
+MIA####       --
+MII####       --
+MIM####       --
+OC####        -- Omegamon
+OM#####:      --
+OPS####       -- OPS/MVS
+OUO#####      --
+PDSMOPR-##    -- PDSMAN
+PDSM##-##     -- PDSMAN
+PDT####       --
+PFGS######    --
+PSA####       --
+PWSSDV##      --
+PXM####       -- Platinum/Xmanager
+SAH####I:     -- SAS
+SDB####H      -- unknown
+SEC####       -- unknown
+SHKE####      -- Sher-Monitor
+SHKI####      -- Sher-Monitor
+SIC####       -- unknown
+SMC####       --
+SMR####       --
+STR-###       --
+STX####       --
+SVT1@@@##@    -- CA SVT1
+SVT1@@###@    -- CA SVT1
+SVT1@####@    -- CA SVT1
+TMS###        --
+TDP####       --
+TMVS@@@##@    -- TMON
+TPB###        --
+TPX###        --
+TSM####       --  TSOMON
+TSM#I###      --  TSOMON
+U##-###       --  UCC products
+U##@-####-#   --  UCC products
+VAM####       --  CA-ALLOCATE
+VCCCN##@      --
+X#####@       --  OASIS
+XPLG###       --
+Y2K###I:      --
+Y2K####I      --
+Y2K####E      --
+*---------------------------------------------------------------------*
+*   -END-OF-TABLE
+*---------------------------------------------------------------------*
+
