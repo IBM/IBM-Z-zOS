@@ -1,7 +1,7 @@
 What is a z/OS Archetype?
 =========================
 A z/OS Archetype is an [archetype](https://en.wikipedia.org/wiki/Archetype) that has been defined for tasks related to z/OS.  More specifically, z/OS Archetypes
-are roles that are commonly found associated with the z/OS platform, although these tasks might even involve other platforms.  The responsiblities of the z/OS Archetypes
+are roles that are commonly found associated with the z/OS platform, although these tasks might involve other platforms, too.  The responsiblities of the z/OS Archetypes
 directly relate to making z/OS a world-class operating system!  
 
 A specific person may perform the tasks associated with several z/OS Archtypes, or perhaps a single z/OS Archetype's tasks might be spread amongst several people.
@@ -10,6 +10,12 @@ The important point to understand is that the grouping of the tasks can be gener
 
 What are the z/OS Archtypes?
 ============================
+
+- [Application_Developer](#zOS_Application_Developer)
+- [z/OS Systems Programmer](#zOS_Systems_Programmer)
+
+
+
 <a name="Application_Developer"></a> **Application Developer**
 <p> An Application Developer is part of a product team whose responsibilities include planning, provisioning, deploying, building, and testing their code. 
 </p>
