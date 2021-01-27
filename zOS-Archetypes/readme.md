@@ -11,18 +11,18 @@ Directory of z/OS Archetypes
 ===========================
  Several archetypes are described in this topic.
 
-- [Application_Developer](#Application_Developer)
-- [Automation_Engineer](#Automation_Engineer)
-- [CICS_System_Programmer](#CICS_System_Programmer)
-- [Data_Architect](#Data_Architect)
-- [Db2_System_Programmer](#Db2_System_Programmer)
-- [Enterprise_IT_Architect](#Enterprise_IT_Architect)
-- [IMS_System_Programmer](#IMS_System_Programmer)
-- [MQ_System_Programmer](#MQ_System_Programmer)
-- [zOS_Network_Administrator](#zOS_Network_Administrator)
-- [zOS_Performance_Analyst](#zOS_Performance_Analyst)
-- [z/OS Security_Administrator](#zOS_Security_Administrator)
-- [z/OS Storage_Engineer](#zOS_Storage_Engineer)
+- [Application Developer](#Application_Developer)
+- [Automation Engineer](#Automation_Engineer)
+- [CICS System Programmer](#CICS_System_Programmer)
+- [Data Architect](#Data_Architect)
+- [Db2 System Programmer](#Db2_System_Programmer)
+- [Enterprise IT Architect](#Enterprise_IT_Architect)
+- [IMS System Programmer](#IMS_System_Programmer)
+- [MQ System Programmer](#MQ_System_Programmer)
+- [zOS Network Administrator](#zOS_Network_Administrator)
+- [zOS Performance Analyst](#zOS_Performance_Analyst)
+- [z/OS Security Administrator](#zOS_Security_Administrator)
+- [z/OS Storage Engineer](#zOS_Storage_Engineer)
 - [z/OS Systems Programmer](#zOS_Systems_Programmer)
 
 
@@ -57,10 +57,10 @@ Directory of z/OS Archetypes
 <a name="zOS_Performance_Analyst"></a> **z/OS Performance Analyst**
 <p>The z/OS Performance Analyst is responsible for evaluating z/OS system performance. This person works with z/OS Workload Management (WLM) policies and monitors system resource usage for capacity planning. The z/OS Performance Analyst might also be responsible for SMF/RMF data collection, managing WLM policies based on service level objectives, and performing problem determinations when service level objectives are not met.</p>
 
-<a name="Security_Administrator"></a> **z/OS Security Administrator**
+<a name="zOS_Security_Administrator"></a> **z/OS Security Administrator**
 <p>The z/OS Security Administrator is responsible for creating and managing the security definitions that keep the mainframe secure from internal and external attacks. This work involves interfacing with various groups in the company.</p>
 
-<a name="Storage_Engineer"></a> **z/OS Storage Engineer**
+<a name="zOS_Storage_Engineer"></a> **z/OS Storage Engineer**
 <p>The z/OS Storage Engineer is responsible for ensuring that enterprise data is available and secure for use by z/OS workloads. This person might be resposible for data access performance, disaster recovery, and data confidentiality. The Storage Engineer is also responsible for maintaining the physical devices that are used for storing enterprise data.</p>
 
 <a name="zOS_Systems_Programmer"></a> **z/OS Systems Programmer**
