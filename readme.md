@@ -13,6 +13,8 @@ The following major categories are used:
 
 * [SMF Tools](SMF-Tools)
 
+* [zOS Archetypes](zOS-Archetypes)
+
 * [zOS Automation](zOS-Automation)
 
 * [zOS CPM](zOS-CPM)
@@ -27,7 +29,13 @@ The following major categories are used:
 
 * [zOS RMF](zOS-RMF)
 
+* [zOS Tools and Toys](zOS-Tools-and-Toys)
+
+* [zOS Tools/DLOG Formatter](zOS-Tools/DLOG-Formatter)
+
 * [zOS WLM](zOS-WLM)
+
+* [zOS Workflow](zOS-Workflow)
 
 * [zOSMF](zOSMF)
 
