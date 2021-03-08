@@ -32,7 +32,7 @@ RWJBB13:/u/rwjbb13: >
 
 ## Installing oeconsol
 
-* Download the source code ([oeconsol.asm](https://github.com/IBM/zos-tools-and-toys/blob/master/oeconsol/oeconsol.asm))
+* Download the source code ([oeconsol.asm](oeconsol.asm))
 * Make the following JCL modifications:
   * Provide a valid JOB card
   * Compete the DD card for LKED1.SYSLMOD by providing the name of an APF-authorized library that is in the LNKLST.
