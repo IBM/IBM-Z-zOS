@@ -1,0 +1,175 @@
+/*rexx*/                                                                        
+/**********************************************************************         
+ Licensed Materials - Property of IBM                                           
+ 5694-A01                                                                       
+ Copyright IBM Corp. 2014                                                       
+                                                                                
+ Name:    XSTARTED                                                              
+                                                                                
+ Author: Bruce Wells - brwells@us.ibm.com                                       
+                                                                                
+ Purpose: Health-check the STARTED class by identifying profiles that:          
+           - do not contain a period                                            
+           - do not have an STDATA segment                                      
+           - do not have a user specified                                       
+           - specify an undefined user                                          
+           - specify an un-PROTECTED user                                       
+           - specify an undefined group                                         
+           - specify a user who is not connected to the specified group         
+           - specify =MEMBER for both the user and group                        
+                                                                                
+ Input:   None                                                                  
+                                                                                
+ Example: ex 'MYHLQ.RACF.CLISTS(XSTARTED)'                                      
+                                                                                
+ Authorization required:                                                        
+          - READ access to IRR.RADMIN.RLIST in FACILITY plus                    
+            authority to list the profile's STDATA segment                      
+          - READ access to IRR.RADMIN.LISTUSER in FACILITY plus                 
+            authority to list the user profile of the USER value                
+          - READ access to IRR.RADMIN.LISTGRP in FACILITY plus                  
+            authority to list the group profile of the GROUP value              
+                                                                                
+**********************************************************************/         
+                                                                                
+profile = " "      /* Start at the beginning  */                                
+generic = "FALSE"  /*  with discrete profiles */                                
+                                                                                
+/* Loop until STARTED profiles are exhausted */                                 
+Do Until (resrc = '12 12 4 4 4')                                                
+  /* Extract the next STARTED profile */                                        
+  resrc=IRRXUTIL("EXTRACTN","STARTED",profile,"RES",,generic)                   
+  Select                                                                        
+   When word(resrc,1) = 0 Then      /* No problems        */                    
+     Do                                                                         
+     End                                                                        
+   When resrc = '12 12 4 4 4' Then  /* No more profiles   */                    
+     Leave                                                                      
+   Otherwise                        /* Some sort of error */                    
+     say ''                                                                     
+     say 'Error' resrc 'occurred extracting the profile after' profile          
+     If resrc = '12 12 4 4 20' Then Do                                          
+       say ' The offending profile is a ghost generic.'                         
+       say '  1) Use the SEARCH command to locate the profile after',           
+           profile                                                              
+       say '  2) Issue RDELETE STARTED profile NOGENERIC'                       
+       say '  3) Run this exec again'                                           
+       return                                                                   
+     End                                                                        
+  End                                                                           
+                                                                                
+  /* Initialize a stem of message lines that will get issued after  */          
+  /* we've checked all the conditions.                              */          
+  messages.0 = 1                                                                
+  messages.1 = RES.PROFILE||':'                                                 
+                                                                                
+  /* Check that the profile name contains a period. This checking   */          
+  /* could be much more robust in terms of verifying that the name  */          
+  /* is viable.                                                     */          
+  If Index(RES.PROFILE,'.') = 0 Then                                            
+    Do                                                                          
+      newnum = messages.0+1                                                     
+      messages.newnum = '  Profile name has no period'                          
+      messages.0 = newnum                                                       
+    End                                                                         
+                                                                                
+  /* Check for lack of STDATA segment */                                        
+  If RES.STDATA.0 = '' Then                                                     
+    Do                                                                          
+      newnum = messages.0+1                                                     
+      messages.newnum = '  No STDATA segment is defined'                        
+      messages.0 = newnum                                                       
+    End                                                                         
+  Else Do                                                                       
+    /* Check USER requirements */                                               
+    If RES.STDATA.USER.1 = '' Then Do                                           
+      newnum = messages.0+1                                                     
+      messages.newnum = '  No user ID is assigned to the profile'               
+      messages.0 = newnum                                                       
+    End                                                                         
+    Else If RES.STDATA.USER.1 /= '=MEMBER' Then Do                              
+      myrc=IRRXUTIL("EXTRACT","USER",RES.STDATA.USER.1,"USR",,"FALSE")          
+      If myrc = '12 12 4 4 4' Then Do                                           
+        newnum = messages.0+1                                                   
+        messages.newnum = '  User ' || RES.STDATA.USER.1 ||,                    
+                          ' is not defined to RACF'                             
+        messages.0 = newnum                                                     
+      End                                                                       
+      Else If (word(myrc,1)<>0) then do                                         
+        newnum = messages.0+1                                                   
+        messages.newnum = '  Error ' || myrc 'occurred extracting'||,           
+                          ' user ' || RES.STDATA.USER.1                         
+        messages.0 = newnum                                                     
+      End                                                                       
+      Else If USR.BASE.PROTECTD.1 = 'FALSE' Then Do                             
+        newnum = messages.0+1                                                   
+        messages.newnum = '  User ' || RES.STDATA.USER.1 ||,                    
+                          ' is not PROTECTED'                                   
+        messages.0 = newnum                                                     
+      End                                                                       
+    End                                                                         
+                                                                                
+    /* Check the GROUP value  */                                                
+    If RES.STDATA.GROUP.1 /= '' &,                                              
+       RES.STDATA.GROUP.1 /= '=MEMBER' Then Do                                  
+      myrc=IRRXUTIL("EXTRACT","GROUP",RES.STDATA.GROUP.1,"GRP",,"FALSE")        
+      If myrc = '12 12 4 4 4' Then Do                                           
+        newnum = messages.0+1                                                   
+        messages.newnum = '  Group ' || RES.STDATA.GROUP.1 ||,                  
+                          ' is not defined to RACF'                             
+        messages.0 = newnum                                                     
+      End                                                                       
+      Else If (word(myrc,1)<>0) then do                                         
+        newnum = messages.0+1                                                   
+        messages.newnum = '  Error ' || myrc 'occurred extracting'||,           
+                          ' group ' || RES.STDATA.GROUP.1                       
+        messages.0 = newnum                                                     
+      End                                                                       
+    End                                                                         
+                                                                                
+    /* Check that both the USER and GROUP values aren't =MEMBER */              
+    If RES.STDATA.GROUP.1 = '=MEMBER' &,                                        
+       RES.STDATA.USER.1  = '=MEMBER' Then Do                                   
+        newnum = messages.0+1                                                   
+        messages.newnum = '  =MEMBER is specified for both USER'||,             
+                          ' and GROUP'                                          
+        messages.0 = newnum                                                     
+    End                                                                         
+                                                                                
+    /* Check that USER is connected to GROUP  */                                
+    If RES.STDATA.GROUP.1 /= '=MEMBER' &,                                       
+       RES.STDATA.GROUP.1 /= ''        &,                                       
+       RES.STDATA.USER.1  /= '=MEMBER' &,                                       
+       RES.STDATA.USER.1  /= ''        Then Do                                  
+      connection = RES.STDATA.USER.1||'.'||RES.STDATA.GROUP.1                   
+      myrc=IRRXUTIL("EXTRACT","CONNECT",connection,"CON",,"FALSE")              
+      If myrc = '12 12 4 4 4' Then Do                                           
+        newnum = messages.0+1                                                   
+        messages.newnum = '  User ' || RES.STDATA.USER.1 ||,                    
+                          ' is not connected to group ' ||,                     
+                          RES.STDATA.GROUP.1                                    
+        messages.0 = newnum                                                     
+      End                                                                       
+      Else If (word(myrc,1)<>0) then do                                         
+        newnum = messages.0+1                                                   
+        messages.newnum = '  Error ' || myrc 'occurred extracting'||,           
+                          ' group connection ' || connection                    
+        messages.0 = newnum                                                     
+      End                                                                       
+    End                                                                         
+                                                                                
+  End                                                                           
+                                                                                
+  /* Issue messages we've been accumulating */                                  
+  If messages.0 > 1 Then Do /* If we've identified any problems */              
+    say ''                                                                      
+    Do j = 1 to messages.0                                                      
+      say messages.j                                                            
+    End                                                                         
+  End                                                                           
+                                                                                
+  /* Iterate with next profile name  */                                         
+  profile = RES.PROFILE                                                         
+  generic = RES.GENERIC                                                         
+                                                                                
+End                                                                             

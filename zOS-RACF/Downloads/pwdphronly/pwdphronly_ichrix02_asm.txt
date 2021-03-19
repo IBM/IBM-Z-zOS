@@ -1,0 +1,381 @@
+INIT     TITLE 'RACINIT post-processing Exit ICHRIX02'                  00000100
+ICHRIX02 START 0                                                        00000200
+*********************************************************************** 00000334
+*********************************************************************** 00000434
+***                                                                 *** 00000534
+***      COPYRIGHT IBM CORPORATION, 2014                            *** 00000634
+***                                                                 *** 00000734
+***      THIS CODE HAS NOT BEEN SUBMITTED TO ANY FORMAL IBM TEST    *** 00000834
+***      AND IS DISTRIBUTED ON AN "AS IS" BASIS WITHOUT ANY         *** 00000934
+***      WARRANTY EITHER EXPRESS OR IMPLIED. THE IMPLEMENTATION     *** 00001034
+***      OF ANY OF THE TECHNIQUES DESCRIBED OR USED HEREIN IS A     *** 00001134
+***      CUSTOMER RESPONSIBILITY AND DEPENDS ON THE CUSTOMER'S      *** 00001234
+***      OPERATIONAL ENVIRONMENT. WHILE EACH ITEM MAY HAVE BEEN     *** 00001334
+***      REVIEWED FOR ACCURACY IN A SPECIFIC SITUATION AND MAY      *** 00001434
+***      RUN IN A SPECIFIC ENVIRONMENT, THERE IS NO GUARANTEE       *** 00001534
+***      THAT THE SAME OR SIMILAR RESULTS WILL BE OBTAINED ELSE-    *** 00001634
+***      WHERE. CUSTOMERS ATTEMPTING TO ADAPT THESE TECHNIQUES TO   *** 00001734
+***      THEIR OWN ENVIRONMENTS DO SO AT THEIR OWN RISK.            *** 00001834
+***                                                                 *** 00001934
+***-----------------------------------------------------------------*** 00006000
+***                                                                 *** 00006100
+***  MODULE - ICHRIX02                                              *** 00006200
+***                                                                 *** 00006300
+***      This sample exit fails RACINIT requests which present a    *** 00006424
+***      password instead of a password phrase, unless the user     *** 00006524
+***      has read access to the facility class profile:             *** 00006624
+***        IRR.PASSWORD.ALLOWED                                     *** 00006700
+***                                                                 *** 00006800
+***      Sample profile define:                                     *** 00006926
+***        RDEFINE FACILITY IRR.PASSWORD.ALLOWED UACC(NONE)         *** 00007026
+***           APPLDATA('Enforce usage of phrases via ICHRIX02')     *** 00007126
+***                                                                 *** 00007226
+***      Permit a user to use a password:                           *** 00007326
+***        PERMIT IRR.PASSWORD.ALLOWED CLASS(FACILITY)              *** 00007426
+***           ID(PWDUSER) ACCESS(READ)                              *** 00007526
+***                                                                 *** 00007626
+***                                                                 *** 00007726
+***  INPUT: Registers at entry                                      *** 00007826
+***                                                                 *** 00007926
+***        0 Not applicable                                         *** 00008026
+***        1 Pointer to parameter list (RIXPL)                      *** 00008126
+***        2-12 Not applicable                                      *** 00008226
+***        13 Pointer to register save area                         *** 00008326
+***        14 Return address                                        *** 00008426
+***        15 Entry point address of the exit routine               *** 00008526
+***                                                                 *** 00008626
+***  RETURN CODES:                                                  *** 00008726
+***     0 - Continue, this exit may have changed the RACINIT RCs    *** 00008826
+***     4 - Redrive RACINIT (NOT Used)                              *** 00008926
+***                                                                 *** 00009026
+***  Register usage is documented in the code below.                *** 00009538
+***                                                                 *** 00009626
+*********************************************************************** 00009726
+*********************************************************************** 00009826
+         EJECT                                                          00010026
+         SPACE 3                                                        00014532
+***---------------------------------------------------------------***   00014632
+***      REGISTER CONVENTION                                      ***   00014732
+***---------------------------------------------------------------***   00014832
+         SPACE 1                                                        00014932
+R0       EQU   0                   WORK / PARAMETER REGISTER            00015032
+R1       EQU   1                   WORK / PARAMETER REGISTER            00015132
+R2       EQU   2                   WORK / PARAMETER REGISTER            00015232
+R3       EQU   3                   WORK REGISTER                        00015333
+R4       EQU   4                   WORK REGISTER                        00015433
+R5       EQU   5                   WORK REGISTER                        00015533
+R6       EQU   6                   WORK REGISTER                        00015632
+R7       EQU   7                   WORK REGISTER                        00015732
+R8       EQU   8                   Base Reg. of CVT                     00015833
+R9       EQU   9                   RACF ICHRIX02 Parameter list         00015932
+R10      EQU   10                  Base Reg. of RCVT                    00016032
+R11      EQU   11                  Base Reg. ICHRIX02 (Main Program)    00016132
+R12      EQU   12                  Base Reg. Functions (Subroutines)    00016232
+R13      EQU   13                  Base Reg. of SaveArea                00016332
+R14      EQU   14                  RETURN Addr                          00016432
+R15      EQU   15                  RC, Base of small Subroutine         00016532
+         SPACE 3                                                        00016632
+***---------------------------------------------------------------***   00016732
+***                                                               ***   00016832
+*** Main Program                                                  ***   00016932
+***                                                               ***   00018100
+***---------------------------------------------------------------***   00018200
+         EJECT                                                          00018300
+ICHRIX02 CSECT                                                          00018400
+ICHRIX02 AMODE 31                                                       00018500
+ICHRIX02 RMODE 24                                                       00018600
+***---------------------------------------------------------------***   00018800
+***      set SubPool number for GETMAIN of the SaveArea, etc.     ***   00018900
+***---------------------------------------------------------------***   00019000
+         LCLA  &SUBPOOL                                                 00019200
+&SUBPOOL SETA  229                 SubPool 229                          00019410
+         SPACE 1                                                        00020400
+***---------------------------------------------------------------***   00026100
+***      Prepare Addressability                                   ***   00026200
+***---------------------------------------------------------------***   00026300
+         USING ICHRIX02,R15        establish Base Reg. for ICHRIX02     00026400
+         USING SAVEAREA,R13        establish Base Reg. for SaveArea     00026600
+         STM   R14,R12,SAVER14     save Registers                       00026700
+         DROP  R15                 release Entry Register               00026800
+         USING ICHRIX02,R11        establish Base Reg. for ICHRIX02     00026900
+         LR    R11,R15             get Base Register of ICHRIX02        00027000
+         SPACE 1                                                        00027100
+         USING RIXPL,R9            establish Base Reg. for Parm. List   00027200
+         LR    R9,R1               get Base Reg. of Parm. List          00027300
+         XR    R15,R15             set Exit ReturnCode 0                00027400
+         ST    R15,SAVER15         set RC in case of immediate return   00027500
+         SPACE 1                                                        00027610
+***---------------------------------------------------------------***   00027704
+***      If this is a DELETE, CHANGE, PASSCHECK=NO, passticket,   ***   00027827
+***      or started procedure - EXIT                              ***   00027927
+***---------------------------------------------------------------***   00028023
+         L     R7,RIXFLAG          RIXFLAG via R7                       00028123
+         TM    0(R7),RIXENVDE      DELETE requested?                    00028223
+         BO    EXIT                yes, leave ICHRIX02                  00028323
+         TM    0(R7),RIXENVCH      CHANGE requested?                    00028423
+         BO    EXIT                yes, leave ICHRIX02                  00028523
+         TM    0(R7),RIXPSCKN      PASSCHK=NO requested?                00028623
+         BO    EXIT                yes, leave ICHRIX02                  00028723
+         L     R7,RIXFLAG2         RIXFLAG2 via R7                      00028823
+         TM    0(R7),RIXPTAUT      PASSTICKET?                          00028923
+         BO    EXIT                yes, leave ICHRIX02                  00029023
+         L     R14,RIXSTART                                             00029123
+         CLI   0(R14),C' '         Started Procedure Name specified?    00029223
+         BNE   EXIT                yes, leave ICHRIX02                  00029323
+         SPACE 1                                                        00029440
+***---------------------------------------------------------------***   00029523
+***      Since this is a post exit, RACINIT could have already    ***   00029623
+***      failed with a bad RC. EXIT on bad RC.                    ***   00029723
+***---------------------------------------------------------------***   00029820
+         L     R14,RIXRCODE                                             00029922
+         L     R7,0(R14)                                                00030022
+         LTR   R7,R7               RACINIT Return code is zero?         00030123
+         BNZ   EXIT                no?, leave ICHRIX02                  00030220
+         SPACE 1                                                        00031020
+***---------------------------------------------------------------***   00031136
+***      Check the initiating UserID                              ***   00031236
+***---------------------------------------------------------------***   00031336
+         L     R14,RIXUID          load UserID                          00031536
+         CLI   0(R14),0            Length of UserID = 0?                00031636
+         BE    EXIT                yes, leave ICHRIX02                  00031740
+         SPACE 1                                                        00031836
+***---------------------------------------------------------------***   00031936
+***      Verify RACF Environment active                           ***   00032036
+***---------------------------------------------------------------***   00032136
+         USING CVT,R8              establish Base Reg. for CVT          00032236
+         L     R8,CVTPTR           get Addr of CVT                      00032336
+         SPACE 1                                                        00032436
+         USING RCVT,R10            establish Base Reg. for RCVT         00032536
+         ICM   R10,B'1111',CVTRAC  get Addr of RACF CVT                 00032636
+         BZ    EXIT                no RCVT => RETURN TO CALLER          00032740
+         TM    RCVTSTAT,RCVTRNA    RACF inactive ?                      00032836
+         BO    EXIT                yes, leave ICHRIX02                  00032940
+         DROP  R8                  release addressing of CVT            00033036
+         SPACE 1                                                        00033240
+***---------------------------------------------------------------***   00033340
+***      Check the given Password, if really a characters string  ***   00033440
+***---------------------------------------------------------------***   00033540
+CHECKPWD DS    0H                                                       00033640
+         ICM   R3,B'1111',RIXPWD   get Addr of Password                 00033740
+         BZ    EXIT                no password given, leave ICHRIX02    00033840
+         XR    R6,R6               clear Register 6                     00033940
+         IC    R6,0(R3)            get password length                  00034040
+         LTR   R6,R6               check password length                00034140
+         BZ    EXIT                no PW specified, leave ICHRIX02      00034240
+         SPACE 1                                                        00034340
+***---------------------------------------------------------------***   00034412
+***      CREATE EXTENDED SAVEAREA FOR THE RACF-EXIT               ***   00034512
+***---------------------------------------------------------------***   00034612
+GETSAVE  DS    0H                                                       00034712
+         L     R2,=A(TOTALSIZ)     LENGTH                               00034812
+         LA    R3,&SUBPOOL                                              00034912
+         GETMAIN RC,LV=(2),SP=(R3),                                    *00035012
+               LOC=BELOW,BNDRY=DBLWD   => R1 - Addr, R0 - Length        00035112
+         ST    R1,SAVENEW-SAVEAREA(,R13) Foreward Ptr in old SaveArea   00035212
+         ST    R13,SAVEOLD-SAVEAREA(,R1) Backward Ptr in new SaveArea   00035312
+         LR    R13,R1              SET UP SAVEAREA POINTER              00035412
+         ST    R2,SAVCORE          save length calculated by exit       00035512
+         XC    SAVENEW,SAVENEW     CLEAR FORWARD POINTER                00035612
+         MVC   SAVER14(SAVESIZ),SAVENEW  initialize SaveArea with       00035712
+         SPACE 1                                                        00036012
+***---------------------------------------------------------------***   00054400
+***                                                               ***   00054500
+***      Function: Verify user is authorized to use a password    ***   00054638
+***                                                               ***   00054700
+***---------------------------------------------------------------***   00054800
+EXPWCHK  DS    0H                                                       00055038
+         ICM   R12,B'1111',=V(PWDATH)    load address of Function       00055338
+         BZ    FREEAREA            Address = 0000, not installed        00055412
+         BASR  R14,R12             execute the Function                 00055537
+         SPACE 1                                                        00055701
+***---------------------------------------------------------------***   00064800
+***      Free the allocated WorkArea                              ***   00064900
+***---------------------------------------------------------------***   00065000
+FREEAREA DS    0H                                                       00065200
+         L     R15,RETCDE          LOAD ReturnCode                      00065300
+         LR    R1,R13              SET UP Addr OF NEW SAVEAREA          00065400
+         L     R2,SAVCORE          LOAD SP AND LENGTH                   00065500
+         L     R13,SAVEOLD-SAVEAREA(,R1)  Addr OF PREV. SAVEAREA        00065600
+         ST    R15,SAVER15         PLUG (R15) FOR RESTORE (R14-R12)     00065700
+         LA    R15,&SUBPOOL                                             00065800
+         FREEMAIN RC,A=(1),LV=(2),SP=(15)  FREE SAVEAREA                00065900
+         XC    SAVENEW,SAVENEW     BREAK SAVEAREA CHAIN POINTER         00066038
+         SPACE 1                                                        00066202
+***---------------------------------------------------------------***   00066300
+***      Return to Caller                                         ***   00066400
+***---------------------------------------------------------------***   00066500
+EXIT     DS    0H                                                       00066700
+         RETURN (14,12)            RESTORE REGISTERS                    00066800
+         SPACE 1                                                        00067002
+***---------------------------------------------------------------***   00068014
+***      code for EXecute statements                              ***   00069014
+***---------------------------------------------------------------***   00070014
+         SPACE 1                                                        00071014
+MOVERACR MVC   RACRLIST(0),0(R1)   bring Mask into RACROUTE Buffer      00072014
+         SPACE 1                                                        00073014
+***---------------------------------------------------------------***   00078700
+***      Global Constants for Main Program and Functions          ***   00078800
+***---------------------------------------------------------------***   00078900
+         SPACE 1                                                        00079000
+CLFACIL  DC    XL1'08'             Class Length for RACROUTE Macros     00079700
+         DC    CL8'FACILITY'       Class Name for RACROUTE Macros       00079800
+         SPACE 1                                                        00079928
+LOGSTR   DC    AL1(L'LOGTXT)                                            00080147
+LOGTXT   DC    CL27'ICHRIX02 - Phrase Only Exit'                        00080247
+         SPACE 1                                                        00080346
+***---------------------------------------------------------------***   00080900
+***      LITERALS                                                 ***   00081000
+***---------------------------------------------------------------***   00081100
+         LTORG                                                          00081300
+         EJECT                                                          00081400
+***---------------------------------------------------------------***   00081500
+***      Masks for RACF calls, Macro expansions                   ***   00081600
+***---------------------------------------------------------------***   00081700
+MASKAUTH RACROUTE REQUEST=AUTH,WORKA=*-*,RELEASE=1.9,MSGSUPP=NO,       *00082825
+               ENTITY=*-*,ATTR=READ,MF=L                                00082900
+LENAUTH  EQU   *-MASKAUTH-1                                             00083000
+ALENAUTH DC    A(LENAUTH)                                               00083100
+         EJECT                                                          00083700
+***---------------------------------------------------------------***   00083800
+***                                                               ***   00083900
+*** Function 1: Check if user is allowed to use a password        ***   00084002
+*** ----------------------------------------------                ***   00084100
+***                                                               ***   00084200
+*** If UserID and Password have been specified, the RACF Profile  ***   00084300
+*** IRR.PASSWORD.ALLOWED is checked. If the UserID is not         ***   00084418
+*** authorized to that profile with at least READ, the RIXRCODE   ***   00084518
+*** is set to 8, to indicate a bad password.                      ***   00084618
+***                                                               ***   00084718
+***---------------------------------------------------------------***   00086500
+PWDATH   CSECT                                                          00086738
+         USING PWDATH,R12                                               00086838
+         ST    R14,RETADDR                                              00086902
+         XR    R15,R15             set Function ReturnCode 0            00087002
+         SPACE 1                                                        00087202
+***---------------------------------------------------------------***   00087300
+***      Check the UserID whether it is protected by this         ***   00087400
+***      function which is controlled by the FACILITY profile     ***   00087538
+***      IRR.PASSWORD.ALLOWED                                     ***   00087618
+***---------------------------------------------------------------***   00087700
+         MVI   ENTITY,C' '         Fill entity with blanks              00087939
+         MVC   ENTITY+1(L'ENTITY-1),ENTITY                              00088043
+         MVC   ENTITY(20),=C'IRR.PASSWORD.ALLOWED'  set Profile         00088143
+         LA    R1,MASKAUTH         get Mask of RACROUTE=AUTH            00088202
+         L     R14,ALENAUTH        get Length RACAUTH param. list       00088302
+         EX    R14,MOVERACR        load RACAUTH parameter list          00088402
+         LA    R1,RACRLIST         get Addr in WorkArea                 00088502
+         LA    R5,WORKA            get Addr of return WorkArea          00088602
+         L     R6,RIXACEE          get Addr of RIXACEE                  00088712
+         RACROUTE REQUEST=AUTH,                                        *00088800
+               RELEASE=1.9,                                            *00088900
+               ENTITY=(ENTITY),                                        *00089000
+               CLASS=CLFACIL,                                          *00089100
+               ATTR=READ,                                              *00089200
+               WORKA=(R5),                                             *00089300
+               LOGSTR=LOGSTR,                                          *00089428
+               ACEE=(R6),MF=(E,(R1))                                    00089528
+         LTR   R15,R15                                                  00089628
+         BZ    AUTHOK              User has access to profile           00089741
+         SPACE 1                                                        00089944
+***---------------------------------------------------------------***   00090600
+***      The job is failed with the RIXRCODE = 8 (X'8')           ***   00090706
+***      the job ends with RC = x'00' in register 15              ***   00090806
+***      which means: bad password                                ***   00090906
+***---------------------------------------------------------------***   00091000
+         LA    R2,X'8'             set RACINIT ReturnCode: failed       00091216
+         L     R1,RIXRCODE         get Addr of ret. code field          00091300
+         ST    R2,0(R1)                                                 00091400
+         LA    R1,0                set Exit ReturnCode 0                00091505
+         ST    R1,RETCDE           SET RET. CODE                        00091606
+         SPACE 1                                                        00091900
+***---------------------------------------------------------------***   00092044
+***      AUTH successful                                          ***   00092144
+***---------------------------------------------------------------***   00092244
+AUTHOK   DS    0H                                                       00092341
+         L     R14,RETADDR                                              00092401
+         BR    R14                 return to calling main program       00092501
+         SPACE 3                                                        00092600
+***---------------------------------------------------------------***   00164400
+***      Release the Addressing                                   ***   00164500
+***---------------------------------------------------------------***   00164600
+         DROP  R9                  release addressing of RIXPL          00164800
+         DROP  R10                 release addressing of RCVT           00164900
+         DROP  R11                 release Base Register Main Program   00165000
+         DROP  R12                 release Base Register Function       00165109
+         SPACE 1                                                        00165201
+***---------------------------------------------------------------***   00167600
+***      SaveArea for normal MVS Interface                        ***   00167700
+***---------------------------------------------------------------***   00167800
+***      First Part must be initialized with x'00'                ***   00167900
+***---------------------------------------------------------------***   00168000
+         SPACE 1                                                        00168100
+SAVEAREA DSECT                                                          00168200
+SAVEPL1  DS    F                                                        00168345
+SAVEOLD  DS    F                   BACKWARD POINTER                     00168400
+SAVENEW  DS    F                   FORWARD POINTER                      00168500
+SAVER14  DS    F                   R14                                  00168600
+SAVER15  DS    F                   R15                                  00168700
+SAVER0   DS    F                   R0                                   00168800
+SAVER1   DS    F                   R1                                   00168900
+SAVER2   DS    F                   R2                                   00169031
+SAVER3   DS    F                   R3                                   00169100
+SAVER4   DS    F                   R4                                   00169231
+SAVER5   DS    F                   R5                                   00169331
+SAVER6   DS    F                   R6                                   00169431
+SAVER7   DS    F                   R7                                   00169531
+SAVER8   DS    F                   R8                                   00169631
+SAVER9   DS    F                   R9                                   00169731
+SAVER10  DS    F                   R10                                  00169831
+SAVER11  DS    F                   R11                                  00169900
+SAVER12  DS    F                   R12                                  00170000
+         SPACE 1                                                        00170100
+RETCDE   DS    F                   Exit ReturnCode reached so far       00170200
+         SPACE 3                                                        00171700
+SAVESIZ  EQU   *-SAVER14           total Size to be filled with x'00'   00171800
+         SPACE 3                                                        00171900
+***---------------------------------------------------------------***   00172000
+***      Second Part will be filled by normal processing          ***   00172100
+***---------------------------------------------------------------***   00172200
+         SPACE 1                                                        00172300
+SAVCORE  DS    F                                                        00172600
+         SPACE 1                                                        00172700
+RETADDR  DS    A                   Return Address to Main Program       00172802
+         SPACE 1                                                        00172900
+***---------------------------------------------------------------***   00175200
+***      RACRLIST must be the maximum of: (actual as of last asm) ***   00175300
+***      LENSTAT (x73), LENEXTR (x93), LENAUTH (xC3), and         ***   00175400
+***      LENINIT (xCB)                                            ***   00175500
+***      xCB = d203, 60F = d240                                   ***   00175600
+***---------------------------------------------------------------***   00175700
+         DS 0D                                                          00175830
+RACRLIST DS CL(LENAUTH+1)                                               00176127
+         SPACE 1                                                        00176227
+WORKA    DS    CL512                                                    00176300
+         SPACE 1                                                        00176400
+ENTITY   DS    CL39                                                     00176500
+         EJECT                                                          00176600
+***---------------------------------------------------------------***   00176800
+***      Total size                                               ***   00176911
+***---------------------------------------------------------------***   00177000
+         SPACE 1                                                        00177100
+TOTALSIZ EQU   *-SAVEAREA          total Size of GETMAINed Area         00177400
+         SPACE 3                                                        00177500
+***---------------------------------------------------------------***   00177611
+***      Release saveArea                                         ***   00177711
+***---------------------------------------------------------------***   00177811
+         DROP  R13                 release addressing of SaveArea       00177900
+         EJECT                                                          00178100
+***---------------------------------------------------------------***   00178211
+***      Control Blocks                                           ***   00178311
+***---------------------------------------------------------------***   00178411
+         PRINT OFF                                                      00178516
+         ICHRIXP                                                        00178600
+         EJECT                                                          00178700
+         IHAACEE                                                        00178900
+         EJECT                                                          00179000
+         ICHPRCVT                                                       00179100
+         EJECT                                                          00179200
+         CVT      LIST=YES,DSECT=YES                                    00179500
+         EJECT                                                          00179616
+         PRINT ON                                                       00180000
+         END   ICHRIX02                                                 00190000

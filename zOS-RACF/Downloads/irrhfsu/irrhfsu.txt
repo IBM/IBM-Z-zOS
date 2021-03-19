@@ -1,0 +1,1077 @@
+/**********************************************************************/
+/* hfsu : C program which unloads the security data of HFS files in   */
+/*        a manner compatible with that of the IRRDBU00 utility.      */
+/*                                                                    */
+/* Copyright Copyright IBM Corporation, 2000                          */
+/* Author: Bruce Wells  brwells@us.ibm.com                            */
+/*                                                                    */
+/* This program contains code made available by IBM Corporation on    */
+/* an AS IS basis. Any one receiving these programs is considered to  */
+/* be licensed under IBM copyrights to use the IBM-provided source    */
+/* code in any way he or she deems fit, including copying it,         */
+/* compiling it, modifying it, and redistributing it, with or without */
+/* modifications, except that it may be neither sold nor incorporated */
+/* within a product that is sold.  No license under any IBM patents   */
+/* or patent applications is to be implied from this copyright        */
+/* license.                                                           */
+/*                                                                    */
+/* The software is provided "as-is", and IBM disclaims all warranties,*/
+/* express or implied, including but not limited to implied warranties*/
+/* of merchantibility or fitness for a particular purpose.  IBM shall */
+/* not be liable for any direct, indirect, incidental, special or     */
+/* consequential damages arising out of this agreement or the use or  */
+/* operation of the software.                                         */
+/*                                                                    */
+/* A user of this program should understand that IBM cannot provide   */
+/* technical support for the program and will not be responsible for  */
+/* any consequences of use of the program.                            */
+/*                                                                    */
+/* NOTE: Some variant characters were replaced by their trigraph      */
+/*       representation in order to avoid problems using codepage     */
+/*       1047 in various countries.                                   */
+/*                                                                    */
+/*       The              is replaced by                              */
+/*       ---              --------------                              */
+/*       left bracket     ??(                                         */
+/*       right bracket    ??)                                         */
+/*       vertical bar     ??!                                         */
+/*                                                                    */
+/* Return values:                                                     */
+/*   0  - Successful completion                                       */
+/*   1  - ftw() error                                                 */
+/*   2  - w_getmntent() error                                         */
+/*   3  - Unable to obtain mount table storage                        */
+/*   5  - File I/O error                                              */
+/*                                                                    */
+/*   Note: When using BPXBATCH, it multiplies the return value        */
+/*         by 256.                                                    */
+/*                                                                    */
+/* Change Activity:                                                   */
+/*                                                                    */
+/* $L0=HFSU     HRF2608 000301 PDBRW1: Original Code              @L0A*/
+/* $L1=HFSACL   HRF7706 010615 PDSN1:  ACL support                @L1A*/
+/* $P1=Defect1  HRF7706 020529 PDBRW1: ACL fix                    @P1A*/
+/* $L2=MLS      HRF7708 020605 PDBRW1: MultiLevel Security        @L2A*/
+/* $L3=Filesys  HRF7780 121017 PDBRW1: Show file system container @L3A*/
+/* $L4=Links    HRF7780 121017 PDBRW1: Show contents of links     @L4A*/
+/* $P2=Defect2  HRF7780 121105 PDBRW1: Propagate bad RC to exit   @P2A*/
+/* $L5=FsAttrs  HRF7780 121119 PDBRW1: Show file system attrs     @L5A*/
+/* $P3=Defect3  HRF7780 130712 PDBRW1: Fix conditional compile    @P3A*/
+/* $P4=Defect4  HRF7780 130730 PDBRW1: Change 0904 logic          @P4A*/
+/*                                                                    */
+/* Change Description:                                                */
+/*                                                                    */
+/* A000000-999999  Original Code                                      */
+/* A - Updated by Shozab Naqvi to support the shared library      @L1A*/
+/*     extended attribute, and Access Control Lists (ACLs).       @L1A*/
+/* C - Wrap conditional logic around include of acl.h             @P1A*/
+/*   - Put defaults into fields which can currently be null       @P1A*/
+/*   - Use trigraph representations of some variant characters    @P1A*/
+/*     to minimize codepage problems                              @P1A*/
+/* A - Unload the SECLABEL (security label) field                 @L2A*/
+/* A - Show data set containing the file system containing each   @L3A*/
+/*     object                                                     @L3A*/
+/* A - Show contents of symlinks and external links               @L4A*/
+/*   - Remove obsolete conditional compiler directives            @L4A*/
+/* C - File error is not being propagated all the way out         @P2A*/
+/* A - Add support to unload mount table information              @L5A*/
+/* A - Allow code to be compiled on an R12 system                 @P3A*/
+/* A - Instead of first calculating how many file systems there   @P4A*/
+/*     are, and then retrieving them, structure the logic more    @P4A*/
+/*     like the documented samples by iteratively passing in a    @P4A*/
+/*     fixed size buffer. This seems to fix a reported problem    @P4A*/
+/*     where not all mounted file systems were being returned.    @P4A*/
+/*                                                                    */
+/**********************************************************************/
+
+#define _XOPEN_SOURCE
+#define _OPEN_SYS
+#define _POSIX_SOURCE
+#include <stdio.h>
+#include <time.h>
+#include <sys/time.h>
+#include <sys/acl.h>
+#include <sys/stat.h>
+/*#include <sys/mntent.h>                                   /*@L5A*/
+#define __UU
+#include <ftw.h>
+#include <pwd.h>
+#include <grp.h>
+#include <errno.h>
+
+int  traverse (const char *file);
+int  unload (const char *file, const struct stat *st, int type);
+char* mapit(const char idtype, int idvalue);
+
+int FS_Info();      /* Unload mount table information             @L5A*/
+
+int ACL_Info(const char *file,acl_type_t type_d,const struct stat *st,
+             int aclType);
+static lacl_t Get_acl (const char *file,acl_type_t type_d,int *ret_num);
+
+FILE *stream;
+int cleanup=0,entry_delete_counter=0; /* entry_delete_counter keeps
+                                         track of the deleted ACL
+                                         entries                      */
+int mountinfo=0;                      /* Don't include mount table info.
+                                          1 = add mount info to output
+                                          2 = output contains *only*
+                                              mount info          @L5A*/
+/**********************************************************************/
+/* Declarations associated with the mount table entry             @L3A*/
+/**********************************************************************/
+struct {                              /* Contains single mount entry  */
+  MNTE3H   header;
+  W_MNTENT3 mount_table??(1??);
+} work_area;                                                    /*@L3A*/
+
+dev_t devnum=0;                       /* Device number of current file
+                                         system                   @L3A*/
+char fsname??(45??)="not specified";  /* Current file system data set
+                                         name                     @L3A*/
+
+/**********************************************************************/
+/* Declarations associated with the uid/user and gid/group caches     */
+/**********************************************************************/
+const int maxcache = 10;        /* max no. of cache elements          */
+struct cachelem {               /* structure of a cache element       */
+  struct cachelem *prev;        /* ptr to previous element            */
+  struct cachelem *next;        /* ptr to next element                */
+  int id;                       /* uid or gid value                   */
+  char name??(9??);             /* associated user ID or group name
+                                                                  @P1C*/
+};
+struct cachelem *uidcache = 0;  /* ptr to head of uid cache           */
+struct cachelem *gidcache = 0;  /* ptr to head of gid cache           */
+int uidcount,gidcount;          /* no. elements in uid,gid cache      */
+
+char *outvalue = NULL;
+const char usertype = 'U';
+const char grouptype = 'G';
+
+
+
+/**********************************************************************/
+/* main:                                                              */
+/*    Read the input arguments and see if -c for cleanup is           */
+/*    specified. If so, set cleanup = 1. Cleanup removes ACL          */
+/*    references that can't be mapped to a user or group.             */
+/*                                                                    */
+/*    Read the input arguments and see if -f filename was             */
+/*    specified.  If so, see if it refers to an MVS data set.         */
+/*    If so, insert quotes into the path name. Open the output        */
+/*    file, if specified. Else use stdout. Then, invoke the           */
+/*    tree traversal routine for each specified file/directory.       */
+/*                                                                    */
+/*    When done, free storage associated with the uid/gid cache       */
+/*    mechanisms.                                                     */
+/**********************************************************************/
+int
+main(int argc, register char **argv)
+{
+   int ret,ret2;
+   int FS_rc = 0;       /* rc from FS_Info routine                @L5A*/
+   int myargc = --argc; /* Subtract one for program name          @L5A*/
+   char outfile??(50??);                                        /*@P1C*/
+   struct cachelem *tempptr;
+   struct cachelem *nextptr;
+   struct stat* info;
+   FILE *fd;
+
+   uidcount =0;
+   gidcount =0;
+   stream = stdout;
+   ++argv;
+   if (myargc > 0) {                                            /*@L5C*/
+      if (strcmp(*argv,"-c")==0) {
+        ++argv;
+        --myargc;                                               /*@L5C*/
+        cleanup=1;
+      }
+      if ((myargc > 0) &&
+          (strcmp(*argv,"-m")==0)) {
+        ++argv;
+        --myargc;                                               /*@L5C*/
+        mountinfo=1; /* Add mount table info to output            @L5A*/
+      }
+      if ((myargc > 0) &&
+          (strcmp(*argv,"-M")==0)) {
+        ++argv;
+        --myargc;                                               /*@L5C*/
+        mountinfo=2; /* Mount table is the only output            @L5A*/
+      }
+      if ((myargc > 0) &&
+          (strcmp(*argv,"-f")==0))
+       {
+         ++argv;
+         --myargc;                                              /*@L5C*/
+         if (strncmp("//",*argv,2)==0)
+          {
+            strcpy(outfile,"//");
+            strcat(outfile,"'");
+            strcat(outfile,&(argv??(0??)??(2??)));              /*@P1C*/
+            strcat(outfile,"'");
+          }
+         else strcpy(outfile,*argv);
+
+         stream = fopen(outfile,"a,lrecl=4096,recfm=vb");
+         ++argv;
+         --myargc;                                              /*@L5C*/
+       }
+   }
+
+   if (stream == 0) {
+     perror("IRR67700I fopen() error on output file\n");
+     exit(2);
+   }
+
+   /* Allocate storage for uid/gid name string                        */
+   outvalue = (char *)malloc(9);
+
+   /*******************************************************************/
+   /* Initialize the mount table header. This single-entry table      */
+   /* will be used to obtain an individual mount entry when a         */
+   /* mount point is crossed.                                     @L3A*/
+   /*******************************************************************/
+   memset(&work_area, 0x00, sizeof(work_area));                 /*@L3A*/
+   /* 'header' initialization to specify MNTE3 mapping format     @L3A*/
+   memcpy(work_area.header.mnt3H_cbid, MNTE3H_ID, 4);           /*@L3A*/
+   work_area.header.mnt3H_cblen = sizeof(struct mnte3);         /*@L3A*/
+   work_area.header.mnt3H_bodylen = sizeof(struct w_mntent3);   /*@L3A*/
+
+   /*******************************************************************/
+   /* If mount table information is desired, go create 0904 records   */
+   /* for all mounted file systems.                               @L5A*/
+   /*******************************************************************/
+   if (mountinfo > 0) {
+    FS_rc = FS_Info();
+    if ((mountinfo == 2) && (FS_rc > 0)) {
+      ret2 = fclose(stream);
+      return FS_rc;
+    }
+   }
+
+   /*******************************************************************/
+   /* If we are not being asked for mount table information           */
+   /* exclusively, then go process input path names as usual.     @L5A*/
+   /*******************************************************************/
+   if (mountinfo != 2) {                                        /*@L5A*/
+     for (; *argv != NULL; ++argv)
+        ret ??!= traverse(*argv);                               /*@P1C*/
+   }                                                            /*@L5A*/
+
+   ret2 = fclose(stream);
+
+   /* Release storage for uid/gid name string                         */
+   free(outvalue);
+
+   /* Release uid cache storage                                       */
+   for (tempptr = uidcache ; uidcount ; tempptr = nextptr)
+      {
+         nextptr = tempptr->next;
+         free(tempptr);
+         --uidcount;
+      }
+
+   /* Release gid cache storage                                       */
+   for (tempptr = gidcache ; gidcount ; tempptr = nextptr)
+      {
+         nextptr = tempptr->next;
+         free(tempptr);
+         --gidcount;
+      }
+
+  /* Print out a message indicating how many ACL entries were         */
+  /* deleted as a result of specifying the -c option.  We will write  */
+  /* this message to the terminal, but if there is an error opening   */
+  /* the terminal (for example, if we are invoked by BPXBATCH),       */
+  /* then we will write the message to stderr instead.                */
+   if (cleanup==1) {
+     fd = fopen("/dev/tty","w");
+     if (!fd) {
+       fprintf(stderr,"IRR67707I error opening /dev/tty\n");
+       fprintf(stderr,"IRR67708I There were %d extended ACL entries" \
+                        " deleted as a result of specifying the" \
+                        " -c option.\n",entry_delete_counter);
+     }
+     else {
+       fprintf(fd,"IRR67708I There were %d extended ACL entries" \
+                        " deleted as a result of specifying the" \
+                        " -c option.\n",entry_delete_counter);
+       fclose(fd);
+     }
+   }
+  return (ret);
+}
+
+/**********************************************************************/
+/* traverse:                                                          */
+/*    Use the C library function ftw() to invoke the unload routine   */
+/*    for every object in the subtree specified by the input file.    */
+/*    The input can be a single file, in which case its contents      */
+/*    are unloaded.                                                   */
+/**********************************************************************/
+int
+traverse(const char *file)
+{
+  int ftw_rc = 0;                                               /*@P2A*/
+
+  ftw_rc = ftw(file, unload, 10);                               /*@P2A*/
+  if (ftw_rc < 0)                                               /*@P2C*/
+    {
+      perror("IRR67701I ftw() error\n");
+      return (1);
+    }
+  return (ftw_rc);                                              /*@P2C*/
+}
+
+/**********************************************************************/
+/* unload:                                                            */
+/*    Unload the security contents of the file into the output file.  */
+/*    The data is taken from the stat structure passed in by ftw.     */
+/*    In addition, UIDs are mapped into RACF user IDs and GIDs are    */
+/*    mapped into RACF group names.                                   */
+/*                                                                    */
+/*    Checks for the existence of access, file default and directory  */
+/*    default ACLs. For each ACL that exists a call to ACL_Info is    */
+/*    made to unload that ACL.                                        */
+/**********************************************************************/
+int
+unload(const char *file, const struct stat *st, int type)
+{
+   char *tempval;
+   char *filetype;
+   struct tm *timeptr;
+   int i,ch;
+   char dest??(11??);                                           /*@P1C*/
+   int p_ret;
+
+   switch (type)
+   {
+      case FTW_NS:
+         fprintf(stderr,"IRR67702I stat() could not be executed" \
+                        " on %s. Possible search error on parent" \
+                        " directory.\n",file);
+         break;
+
+      case FTW_DNR:
+         fprintf(stderr,"IRR67703I Unable to read directory %s\n",file);
+         break;
+
+      case FTW_D:
+      case FTW_F:
+      case FTW_SL:
+             /*********************************************************/
+             /* If the file system device number is different from    */
+             /* the previous object's, then we have crossed a         */
+             /* mount point into a different file system.             */
+             /* Obtain its information via w_getmntent() so we can    */
+             /* output the correct file system data set name. The     */
+             /* current devno and fsname are saved globally so we     */
+             /* can reuse them when nothing has changed.          @L5M*/
+             /*********************************************************/
+             if (st->st_dev != devnum) { /* If devno has changed      */
+               /* Save new value as current value.                    */
+               devnum = st->st_dev;                             /*@L5M*/
+               /* Set devno in mount table header to request only     */
+               /* this entry from w_getmntent().                      */
+               work_area.header.mh3_devno = devnum;             /*@L5M*/
+               if (w_getmntent((char *) &work_area,
+                               sizeof(work_area)) == -1) {
+                 perror("IRR67709I w_getmntent() error\n");     /*@L5M*/
+                 devnum = 0; /* Reset devnum so we try again      @L5M*/
+               }
+               else {
+                 memcpy(fsname,
+                        work_area.mount_table??(0??).mnt3_fsname,
+                        sizeof(fsname)); /* Save new fsname       @L5M*/
+               }
+             }
+
+             /* HFSBD_RECORD_TYPE - Type of this "IRRDBU00" record    */
+             /*                                                       */
+             /* For each file, we will check the fprintf return code  */
+             /* once to see if we're still ok.  If not, exit.  For    */
+             /* example, if the output file runs out of space, this   */
+             /* program would chug merrily on unless we detect this   */
+             /* and stop.  Theoretically, any of the following fprintf*/
+             /* statements could fail, and with buffering, it is hard */
+             /* to predict, so we will just check once for every file.*/
+             p_ret = fprintf(stream,"0900");
+             if (p_ret < 0)
+               {
+                 perror("IRR67704I fprintf() error while writing to" \
+                        " output file\n");
+                 return (5);   /* Arbitary number... */
+               }
+             /* HFSBD_NAME - path name of file being unloaded         */
+             fprintf(stream," %-1023.1023s",file);
+             /* HFSBD_INODE - inode (file serial number)              */
+             fprintf(stream," %010u",st->st_ino);
+             /* HFSBD_FILE_TYPE - type of file                        */
+             if (S_ISREG(st->st_mode))
+                filetype="FILE    ";
+             else if (S_ISDIR(st->st_mode))
+                filetype="DIR     ";
+             else if (S_ISSOCK(st->st_mode))
+                filetype="SOCKET  ";
+             else if (S_ISEXTL(st->st_mode,st->st_genvalue))
+                filetype="EXTLINK ";
+             else if (S_ISLNK(st->st_mode))
+                filetype="SYMLINK ";
+             else if (S_ISFIFO(st->st_mode))
+                filetype="FIFO    ";
+             else if (S_ISBLK(st->st_mode))
+                filetype="BLOCK   ";
+             else if (S_ISCHR(st->st_mode))
+                filetype="CHAR    ";
+             else
+                filetype="????????";                            /*@P1C*/
+             fprintf(stream," %s",filetype);
+
+
+             /* HFSBD_FILE_OWN_UID - owning UID                       */
+             fprintf(stream," %010u",st->st_uid);
+             /* HFSBD_FILE_OWN_UNAM - corresponding RACF user ID      */
+             fprintf(stream," %-8s",mapit(usertype,st->st_uid));
+             /* HFSBD_FILE_OWN_GID - owning GID                       */
+             fprintf(stream," %010u",st->st_gid);
+             /* HFSBD_FILE_OWN_GNAM - corresponding RACF group name   */
+             fprintf(stream," %-8s",mapit(grouptype,st->st_gid));
+
+             /* HFSBD_S_ISUID - set-uid bit                           */
+             (st->st_mode & S_ISUID)?
+                 fprintf(stream," YES "): fprintf(stream," NO  ");
+             /* HFSBD_S_ISGID - set-gid bit                           */
+             (st->st_mode & S_ISGID)?
+                 fprintf(stream," YES "): fprintf(stream," NO  ");
+             /* HFSBD_S_ISVTX - sticky bit                            */
+             (st->st_mode & S_ISVTX)?
+                 fprintf(stream," YES "): fprintf(stream," NO  ");
+             /* HFSBD_OWN_READ - owner read permission bit            */
+             (st->st_mode & S_IRUSR)?
+                 fprintf(stream," YES "): fprintf(stream," NO  ");
+             /* HFSBD_OWN_WRITE - owner write permission bit          */
+             (st->st_mode & S_IWUSR)?
+                 fprintf(stream," YES "): fprintf(stream," NO  ");
+             /* HFSBD_OWN_EXEC - owner search/execute permission bit  */
+             (st->st_mode & S_IXUSR)?
+                 fprintf(stream," YES "): fprintf(stream," NO  ");
+             /* HFSBD_GRP_READ - group read permission bit            */
+             (st->st_mode & S_IRGRP)?
+                 fprintf(stream," YES "): fprintf(stream," NO  ");
+             /* HFSBD_GRP_WRITE - group write permission bi t         */
+             (st->st_mode & S_IWGRP)?
+                 fprintf(stream," YES "): fprintf(stream," NO  ");
+             /* HFSBD_GRP_EXEC - group search/execute permission bit  */
+             (st->st_mode & S_IXGRP)?
+                 fprintf(stream," YES "): fprintf(stream," NO  ");
+             /* HFSBD_OTH_READ - other read permission bit            */
+             (st->st_mode & S_IROTH)?
+                 fprintf(stream," YES "): fprintf(stream," NO  ");
+             /* HFSBD_OTH_WRITE - other write permission bit          */
+             (st->st_mode & S_IWOTH)?
+                 fprintf(stream," YES "): fprintf(stream," NO  ");
+             /* HFSBD_OTH_EXEC - other search/execute permission bit  */
+             (st->st_mode & S_IXOTH)?
+                 fprintf(stream," YES "): fprintf(stream," NO  ");
+
+             /* HFSBD_APF - APF authorization setting                 */
+             (S_ISAPF_AUTH(st->st_mode,st->st_genvalue))?
+                 fprintf(stream," YES "): fprintf(stream," NO  ");
+             /* HFSBD_PROGRAM - program control setting               */
+             (S_ISPROG_CTL(st->st_mode,st->st_genvalue))?
+                 fprintf(stream," YES "): fprintf(stream," NO  ");
+             /* HFSBD_SHAREAS - runs in shared address space setting. */
+             /* This is a "negative" flag so the tests are reversed   */
+             (S_ISNO_SHAREAS(st->st_mode,st->st_genvalue))?
+                 fprintf(stream," NO  "): fprintf(stream," YES ");
+
+             /* HFSBD_AAUD_READ - auditor read setting                */
+             if ((st->st_auditoraudit & (AUDTREADFAIL+AUDTREADSUCC))
+                  == (AUDTREADFAIL+AUDTREADSUCC) )
+               tempval = "ALL     ";
+             else if (st->st_auditoraudit & AUDTREADFAIL)
+               tempval = "FAIL    ";
+             else if (st->st_auditoraudit & AUDTREADSUCC)
+               tempval = "SUCCESS ";
+             else
+               tempval = "NONE    ";
+             fprintf(stream," %s",tempval);
+             /* HFSBD_AAUD_WRITE - auditor write setting              */
+             if ((st->st_auditoraudit & (AUDTWRITEFAIL+AUDTWRITESUCC))
+                  == (AUDTWRITEFAIL+AUDTWRITESUCC) )
+               tempval = "ALL     ";
+             else if (st->st_auditoraudit & AUDTWRITEFAIL)
+               tempval = "FAIL    ";
+             else if (st->st_auditoraudit & AUDTWRITESUCC)
+               tempval = "SUCCESS ";
+             else
+               tempval = "NONE    ";
+             fprintf(stream," %s",tempval);
+             /* HFSBD_AAUD_EXEC - auditor execute setting             */
+             if ((st->st_auditoraudit & (AUDTEXECFAIL+AUDTEXECSUCC))
+                  == (AUDTEXECFAIL+AUDTEXECSUCC) )
+               tempval = "ALL     ";
+             else if (st->st_auditoraudit & AUDTEXECFAIL)
+               tempval = "FAIL    ";
+             else if (st->st_auditoraudit & AUDTEXECSUCC)
+               tempval = "SUCCESS ";
+             else
+               tempval = "NONE    ";
+             fprintf(stream," %s",tempval);
+
+             /* HFSBD_UAUD_READ - owner read setting                  */
+             if ((st->st_useraudit & (AUDTREADFAIL+AUDTREADSUCC))
+                  == (AUDTREADFAIL+AUDTREADSUCC) )
+               tempval = "ALL     ";
+             else if (st->st_useraudit & AUDTREADFAIL)
+               tempval = "FAIL    ";
+             else if (st->st_useraudit & AUDTREADSUCC)
+               tempval = "SUCCESS ";
+             else
+               tempval = "NONE    ";
+             fprintf(stream," %s",tempval);
+             /* HFSBD_UAUD_WRITE - owner write setting                */
+             if ((st->st_useraudit & (AUDTWRITEFAIL+AUDTWRITESUCC))
+                  == (AUDTWRITEFAIL+AUDTWRITESUCC) )
+               tempval = "ALL     ";
+             else if (st->st_useraudit & AUDTWRITEFAIL)
+               tempval = "FAIL    ";
+             else if (st->st_useraudit & AUDTWRITESUCC)
+               tempval = "SUCCESS ";
+             else
+               tempval = "NONE    ";
+             fprintf(stream," %s",tempval);
+             /* HFSBD_UAUD_EXEC - owner execute setting               */
+             if ((st->st_useraudit & (AUDTEXECFAIL+AUDTEXECSUCC))
+                  == (AUDTEXECFAIL+AUDTEXECSUCC) )
+               tempval = "ALL     ";
+             else if (st->st_useraudit & AUDTEXECFAIL)
+               tempval = "FAIL    ";
+             else if (st->st_useraudit & AUDTEXECSUCC)
+               tempval = "SUCCESS ";
+             else
+               tempval = "NONE    ";
+             fprintf(stream," %s",tempval);
+
+             /* HFSBD_AUDIT_ID - RACF audit id for this file          */
+             fprintf(stream," ");
+             for (i=0;i<sizeof(st->st_auditid);++i)
+               fprintf(stream,"%02X",(int)st->st_auditid??(i??));/*
+                                                                  @P1C*/
+
+             /* HFSBD_FID - file identifier                           */
+             fprintf(stream," ");
+             for (i=0;i<sizeof(st->st_fid);++i)
+               fprintf(stream,"%02X",(int)st->st_fid??(i??));   /*@P1C*/
+
+             /* HFSBD_CREATE_DATE - file create date                  */
+             timeptr = localtime(&st->st_createtime);
+             ch = strftime(dest,sizeof(dest),"%Y-%m-%d",timeptr);
+             fprintf(stream," %s",dest);
+             /* HFSBD_CREATE_TIME - file create time                  */
+             ch = strftime(dest,sizeof(dest),"%H:%M:%S",timeptr);
+             fprintf(stream," %s",dest);
+             /* HFSBD_LASTREF_DATE - file last access date            */
+             timeptr = localtime(&st->st_atime);
+             ch = strftime(dest,sizeof(dest),"%Y-%m-%d",timeptr);
+             fprintf(stream," %s",dest);
+             /* HFSBD_LASTREF_TIME - file last access date            */
+             ch = strftime(dest,sizeof(dest),"%H:%M:%S",timeptr);
+             fprintf(stream," %s",dest);
+             /* HFSBD_LASTCHG_DATE - file last status change date     */
+             timeptr = localtime(&st->st_ctime);
+             ch = strftime(dest,sizeof(dest),"%Y-%m-%d",timeptr);
+             fprintf(stream," %s",dest);
+             /* HFSBD_LASTCHG_TIME - file last status change date     */
+             ch = strftime(dest,sizeof(dest),"%H:%M:%S",timeptr);
+             fprintf(stream," %s",dest);
+             /* HFSBD_LASTDAT_DATE - file last data modification date */
+             timeptr = localtime(&st->st_mtime);
+             ch = strftime(dest,sizeof(dest),"%Y-%m-%d",timeptr);
+             fprintf(stream," %s",dest);
+             /* HFSBD_LASTDAT_TIME - file last data modification date */
+             ch = strftime(dest,sizeof(dest),"%H:%M:%S",timeptr);
+             fprintf(stream," %s",dest);
+
+             /* HFSBD_NUMBER_LINKS - number of links to file          */
+             fprintf(stream," %010u",st->st_nlink);
+
+             /* HFSBD_SHARELIB                                        */
+             (S_ISSHARE_LIB(st->st_mode, st->st_genvalue))?
+                fprintf(stream, " YES "): fprintf(stream, " NO  ");
+
+             /* Check for Access ACL                                  */
+             if (st->st_fspflag2&S_ACCESSACL) {
+               fprintf(stream, " YES ");
+              }
+              else  fprintf(stream, " NO  ");
+
+             /* Check for file default ACL                            */
+             if (st->st_fspflag2&S_FMODELACL){
+               fprintf(stream, " YES ");
+             }
+             else fprintf(stream, " NO  ");
+
+             /* Check for directory default ACL                       */
+             if (st->st_fspflag2&S_DMODELACL){
+               fprintf(stream, " YES ");
+             }
+             else fprintf(stream, " NO  ");
+
+             /* HFSBD_SECLABEL                                    @L2A*/
+             if (st->st_seclabel) /* If not binary 0's            @L2A*/
+               fprintf(stream," %-8s",st->st_seclabel);         /*@L2A*/
+             else                                               /*@L2A*/
+               fprintf(stream, "        ");                     /*@L2A*/
+
+             /*********************************************************/
+             /* Output the file system data set name. If we had an    */
+             /* error obtaining the mount entry above, the devnum     */
+             /* will be set to 0, and we simply output blanks.    @L5C*/
+             /*********************************************************/
+             if (devnum == 0) {          /* If error obtaining mntent */
+                 fprintf(stream, " %-44.44s", " "); /* Blanks     @L3A*/
+               }
+             /* Write out the current file system data set name       */
+             else
+               fprintf(stream, " %-44.44s", fsname);            /*@L3A*/
+
+
+             /*********************************************************/
+             /* If the file is a symlink, report its contents. This   */
+             /* works for external links as well.                 @L4A*/
+             /*********************************************************/
+             if (S_ISLNK(st->st_mode)) {
+               char symbuff??(1024??); /* Max=1023, + ending null @L4A*/
+               int linksize = readlink(file,
+                                       symbuff,
+                                       sizeof(symbuff));        /*@L4A*/
+               if (linksize < 0) {
+                 perror("IRR67710I readlink() error\n");        /*@L4A*/
+                 fprintf(stream," %-1023.1023s"," "); /* Blanks   @L4A*/
+               }
+               else {
+                 symbuff??(linksize??) = 0; /* Add null at end    @L4A*/
+                 fprintf(stream," %-1023.1023s", symbuff);      /*@L4A*/
+               }
+             }
+             else
+               fprintf(stream," %-1023.1023s"," "); /* Blanks     @L4A*/
+
+
+             /*********************************************************/
+             /* Done with basic data record!!!                        */
+             /* Add a newline character at end of record              */
+             /*********************************************************/
+             fprintf(stream,"\n");
+
+
+             /*********************************************************/
+             /* Now unload ACL information.                           */
+             /*********************************************************/
+
+             /* Check for Access ACL                                  */
+             if (st->st_fspflag2&S_ACCESSACL)
+               ACL_Info(file, ACL_ACCESS, st, 901);
+
+             /* Check for file default ACL                            */
+             if (st->st_fspflag2&S_FMODELACL)
+               ACL_Info(file, ACL_FILDEF, st, 902);
+
+             /* Check for directory default ACL                       */
+             if (st->st_fspflag2&S_DMODELACL)
+               ACL_Info(file, ACL_DIRDEF, st, 903);
+
+         break;
+
+
+      default:
+         break;
+   }
+   return (0);
+}
+
+/**********************************************************************/
+/* mapit:                                                             */
+/*    Map the input uid to a RACF user ID, or an input gid to a RACF  */
+/*    group name.  A local cache is maintained.  It contains the      */
+/*    mappings for the 10 most recently encountered uids and gids.    */
+/*    When a match is found, it is moved to the front of the linked   */
+/*    list.  When a new entry is needed, it is placed at the head of  */
+/*    the list, and if maxcache entries already exist, the last one   */
+/*    is removed. Because files within a directory generally have the */
+/*    same owner, this should drastically reduce the number of calls  */
+/*    to the user/group database, and hence, pathlength and RACF I/O. */
+/**********************************************************************/
+char*
+mapit(const char idtype, int idvalue)
+{
+   int match = 0;
+   int toobig = 0;
+   struct passwd *p;
+   struct group *grp;
+   struct cachelem **cacheptr;  /* ptr to head of relevant cache      */
+   struct cachelem *tempptr;    /* ptr to current cache element       */
+
+   /* Get cache type appropriate to input type (user or group)        */
+   if (idtype == usertype)
+      cacheptr = &uidcache;
+   else
+      cacheptr = &gidcache;
+
+   /* Scan the cache for a match on the input uid/gid                 */
+   for (tempptr = *cacheptr ; tempptr ; tempptr = tempptr->next) {
+
+     if (tempptr->id == idvalue)
+       {
+        strcpy(outvalue,tempptr->name);
+        /* If the cache element is not already at the head of the list,
+           move it there now.                                         */
+        if (tempptr != *cacheptr)
+         {
+           /* Dequeue the matched element                             */
+           (tempptr->prev)->next = tempptr->next;
+           (tempptr->next)->prev = tempptr->prev;
+           /* Insert matched element at head of queue                 */
+           tempptr->prev = (*cacheptr)->prev;
+           tempptr->next = *cacheptr;
+           ((*cacheptr)->prev)->next = tempptr;
+           (*cacheptr)->prev = tempptr;
+           *cacheptr = tempptr;
+         }
+        match = 1;
+        break;
+       }
+
+     /* Bail out if we've come full circle in the linked list         */
+     if (tempptr->next == *cacheptr)
+        break;
+   }
+
+   /* If no match was found, call to map the id to a name.  Create a  */
+   /* new cache element and insert it at the front of the list.       */
+   if (!match)
+    {
+     /* Map the id to a name                                          */
+     if (idtype == usertype)
+       if ((p = getpwuid(idvalue)) == NULL)
+          strcpy(outvalue,"        ");
+       else
+          strcpy(outvalue,p->pw_name);
+     else
+       if ((grp = getgrgid(idvalue)) == NULL)
+          strcpy(outvalue,"        ");
+       else
+          strcpy(outvalue,grp->gr_name);
+
+     /* Create a new cache element                                    */
+     tempptr = (struct cachelem*)malloc(sizeof(struct cachelem));
+     tempptr->id = idvalue;
+     strcpy(tempptr->name,outvalue);
+
+     /* If the cache exists, insert new element as 1st element        */
+     if (*cacheptr)
+      {
+       /* Set new element's next and prev ptrs                        */
+       tempptr->prev = (*cacheptr)->prev;
+       tempptr->next = *cacheptr;
+       /* Set last element's prev ptr to new element                  */
+       ((*cacheptr)->prev)->next = tempptr;
+       /* Set original first's prev ptr to new element                */
+       (*cacheptr)->prev = tempptr;
+       /* Set cache head to new element                               */
+       *cacheptr = tempptr;
+       /* increment the cache counter                                 */
+       if (idtype == usertype)
+         if (uidcount < maxcache)
+           ++uidcount;
+         else
+           toobig = 1;
+       else
+         if (gidcount < maxcache)
+           ++gidcount;
+         else
+           toobig = 1;
+
+       /* If maxcache elements has been exceeded, dequeue and free the
+          last element.                                               */
+       if (toobig)
+        {
+         tempptr = (*cacheptr)->prev;
+         (tempptr->prev)->next = tempptr->next;
+         (tempptr->next)->prev = tempptr->prev;
+         free(tempptr);
+        }
+      }
+     /* Nothing in cache yet. Initialize cache ptr to this new element,
+        and set the element's next and prev ptr to itself.            */
+     else
+      {
+       *cacheptr = tempptr;
+       tempptr->next = tempptr;
+       tempptr->prev = tempptr;
+       if (idtype == usertype)
+         uidcount = 1;
+       else
+         gidcount = 1;
+      }
+    }
+
+   return(outvalue);
+ }
+
+/**********************************************************************/
+/* FS_Info:                                                           */
+/*    Create a type 0904 record for every mounted file system.        */
+/*    We use w_getmntent to iteratively obtain a chunk of mount       */
+/*    ta ble entries.  We create a Type 0904 record for each          */
+/*    returned entry.                                             @L5A*/
+/**********************************************************************/
+int FS_Info(){
+
+  int p2_ret;
+  char *mountmode;
+
+  int entries;          /* Number of mount entries returned          */
+  int tot_entries = 0;  /* Total number of mounted file systems  @P4A*/
+  int entry;            /* Index into mount table                    */
+  struct {
+    MNTE3H   header;
+    W_MNTENT3 mount_table??(100??);
+  } work_area;          /* Buffer to contain 100 entries         @P4C*/
+  W_MNTENT3 *tabentry;  /* Pointer to a mount table entry            */
+
+
+  /* Clear the buffer storage                                    @P4C*/
+  memset(&work_area, 0x00, sizeof(work_area));
+  /* 'header' initialization to specify MNTE3 mapping format     @P4C*/
+  memcpy(work_area.header.mnt3H_cbid, MNTE3H_ID, 4);
+  work_area.header.mnt3H_cblen = sizeof(struct mnte3);
+  work_area.header.mnt3H_bodylen = sizeof(struct w_mntent3);
+
+  /*******************************************************************/
+  /* Iteratively obtain 100 entries at a time.                   @P4A*/
+  /*******************************************************************/
+  do {  /* While there are still entries to process              @P4A*/
+    if ((entries = w_getmntent((char *) &work_area,
+                               sizeof(work_area))) == -1)
+      perror("w_getmntent() error");
+
+    /*****************************************************************/
+    /* Loop for the number of returned entries, creating a type      */
+    /* 904 record for each entry.                                    */
+    /*****************************************************************/
+    else {  /* No error */
+    /*fprintf(stdout,"There are %d entries returned\n", entries);*/
+      tot_entries+=entries; /* add number returned to total      @P4A*/
+
+      for (entry=0; entry<entries; entry++) {
+
+        tabentry = &work_area.mount_table??(entry??);          /*@P4A*/
+
+        /* HFMFS_RECORD_TYPE                                         */
+        p2_ret = fprintf(stream,"0904");
+        if (p2_ret < 0)
+          {
+            perror("IRR67704I fprintf() error while writing to" \
+                   " output file\n");
+            return (5);        /* Arbitary number... */
+          }
+
+        /* HFMFS_DSNAME - File system data set name                  */
+        fprintf(stream, " %-44.44s", tabentry->mnt3_fsname);
+
+        /* HFMFS_TYPE - File system type                             */
+        fprintf(stream, " %-8.8s", tabentry->mnt3_fstname);
+
+        /* HFMFS_INODE - the root inode - Doesn't seem very useful?  */
+        /*fprintf(stream, " %010u", tabentry->mnt3_rootino);*/
+
+        /* HFMFS_MODE - mount mode: READONLY or READWRITE            */
+        if (tabentry->mnt3_mode.mntentfsmoderdonly)
+           mountmode="READONLY  ";
+        else
+           mountmode="READWRITE ";
+        fprintf(stream," %s",mountmode);
+
+        /* HFMFS_SECURITY- mount mode: SECURITY or NOSECURITY        */
+        if (tabentry->mnt3_mode.mntentfsmodenosec)
+           mountmode="NOSECURITY";
+        else
+           mountmode="SECURITY  ";
+        fprintf(stream," %s",mountmode);
+
+        /* HFMFS_SETUID - mount mode: SETUID or NOSETUID             */
+        if (tabentry->mnt3_mode.mntentfsmodenosuid)
+           mountmode="NOSETUID  ";
+        else
+           mountmode="SETUID    ";
+        fprintf(stream," %s",mountmode);
+
+        /* HFMFS_MUID - mounting UID                                 */
+        #if __EDC_TARGET > __EDC_LE410C /* Must be >= z/OS R13   @P3C*/
+        fprintf(stream," %010u", tabentry->mnt3_fsusrmntUID);
+
+        /* HFMFS_MUSER - corresponding RACF user ID                  */
+        fprintf(stream," %-8s", mapit(usertype,
+                                tabentry->mnt3_fsusrmntUID));
+        #else /* Lower than R13, just print blanks                   */
+        fprintf(stream,"                    ");
+        #endif /* __EDC_LE410C */                              /*@P3C*/
+
+        /* HFMFS_MOUNTPOINT - path name of mount point               */
+        fprintf(stream," %-1023.1023s", tabentry->mnt3_mountpoint);
+
+        fprintf(stream, "\n");
+
+      } /* For each returned entry   */
+    }   /* No w_getmntent() error    */
+  } while (entries > 0); /* Iterate if any entries were returned @P4A*/
+
+/*fprintf(stdout,"There were %d total entries returned\n",
+                 tot_entries);
+*/
+  return (0);
+}                                                              /*@L5A*/
+
+/**********************************************************************/
+/* ACL_Info:                                                          */
+/*    Extracting information from a Access ACL                        */
+/*    Process is similar to the unload function. The                  */
+/*    sys/acl.h and sys/stat.h libraries are utilized                 */
+/*    in this function.                                               */
+/*                                                                    */
+/*    Also if -c was specified the function will remove               */
+/*    ACL references that do not map to a user or group.              */
+/**********************************************************************/
+int ACL_Info(const char *file,acl_type_t type_d,const struct stat *st,
+             int aclType){
+  lacl_t acl_d, acl_delete;
+  acl_entry_t entry_d;
+  int ret_num;
+  struct passwd *p;
+  struct group *grp;
+
+  acl_delete = acl_init(1024);
+
+  if ((acl_d=Get_acl(file, type_d, &ret_num)) == NULL) {
+    return(1);
+  }
+    while (acl_get_entry(acl_d, &entry_d)==1) {
+
+      /* TYPE_RECORD_TYPE                                             */
+         fprintf(stream, "0%d", aclType);
+
+
+     /* TYPE_NAME - path name of file being unloaded                  */
+       fprintf(stream," %-1023.1023s",file);
+
+     /* TYPE_INODE                                                    */
+       fprintf(stream, " %010u", st->st_ino);
+
+     /* TYPE_TYPE                                                     */
+       if (entry_d->acle_type == ACL_USER)
+         fprintf(stream, " USER    ");
+       else if (entry_d->acle_type == ACL_GROUP)
+         fprintf(stream, " GROUP   ");
+
+
+     /* TYPE_ID                                                       */
+     fprintf(stream, " %010u", entry_d->acle_id);
+
+   /* TYPE_ID_NAME                                                    */
+     if (entry_d->acle_type == ACL_USER) {
+       fprintf(stream, " %-8s", mapit(usertype, entry_d->acle_id));
+     }
+
+     else if (entry_d->acle_type == ACL_GROUP) {
+       fprintf(stream, " %-8s", mapit(grouptype, entry_d->acle_id));
+     }
+
+
+   /* TYPE_READ                                                       */
+      if (entry_d->acle_value.aclp_read==1)
+        fprintf (stream, " YES ");
+      else fprintf (stream, " NO  ");
+
+   /* TYPE_WRITE                                                      */
+      if (entry_d->acle_value.aclp_write==1)
+        fprintf (stream, " YES ");
+      else fprintf (stream, " NO  ");
+
+   /* TYPE_EXECUTE                                                    */
+      if (entry_d->acle_value.aclp_execute==1)
+        fprintf (stream, " YES ");
+      else fprintf (stream, " NO  ");
+
+   /* Inserting ACL entries into buffer that need to be deleted       */
+     if (entry_d->acle_type == ACL_USER) {
+      if ((p = getpwuid(entry_d->acle_id))==NULL && cleanup==1){
+       entry_delete_counter ++;
+       acl_create_entry(&acl_delete, entry_d, ACL_VER_1);
+       }
+     }
+
+     else if (entry_d->acle_type == ACL_GROUP) {
+     if ((grp = getgrgid(entry_d->acle_id))==NULL && cleanup==1){
+       entry_delete_counter++;
+       acl_create_entry(&acl_delete, entry_d, ACL_VER_1);
+       }
+     }
+
+     fprintf(stream, "\n");
+
+  }
+  /* Deleting ACL entries                                             */
+   acl_set_file(file, type_d, acl_delete, ACL_DELETE, &entry_d);
+   acl_free(acl_delete);
+
+   return (0);
+ }
+
+/**********************************************************************/
+/* Get_acl:                                                           */
+/*  Function contructs the ACL buffer from the file provided.         */
+/*  the ACL is returned, if there was no entry NULL is returned       */
+/**********************************************************************/
+static lacl_t Get_acl (char const *file,acl_type_t type_d,int *ret_num){
+  static lacl_t acl_d = NULL;
+  char *string;
+  int rc;
+  int num, num2;
+
+  *ret_num = 0;
+
+  /* call acl_init() to get ACL buffer                                */
+  if (acl_d == NULL)
+    if ((acl_d = acl_init(1024)) == NULL)
+      return (NULL);
+
+  /*Check buffer                                                      */
+  rc = acl_get_file(file, type_d, acl_d, &num);
+
+  /*Checking for error from acl_get_file                              */
+  if (rc < 0 && type_d==ACL_ACCESS) {
+     perror("IRR67705I acl_get_file() error\n");
+     fprintf(stderr,"IRR67706I Error retrieving the ACCESS ACL" \
+      " for the file %s \n", file);
+     return(NULL);
+  }
+  if (rc < 0 && type_d==ACL_FILDEF) {
+     perror("IRR67705I acl_get_file() error\n");
+     fprintf(stderr,"IRR67706I Error retrieving the FILE DEFAULT ACL" \
+      " for the file %s \n", file);
+     return(NULL);
+  }
+  if (rc < 0 && type_d==ACL_DIRDEF) {
+     perror("IRR67705I acl_get_file() error\n");
+     fprintf(stderr,"IRR67706I Error retrieving the DIRECTORY" \
+      " DEFAULT ACL for the file %s \n", file);
+     return(NULL);
+  }
+    /* if acl_get_file() was successful                               */
+   return (acl_d);
+
+ }

@@ -1,0 +1,59 @@
+/* REXX */                                                                      
+/**********************************************************************         
+ Licensed Materials - Property of IBM                                           
+ 5694-A01                                                                       
+ Copyright IBM Corp. 2010                                                       
+                                                                                
+ Name:    XLGRES                                                                
+                                                                                
+ Author: Bruce Wells - brwells@us.ibm.com                                       
+                                                                                
+ Purpose: Resumes all members of a specified group                              
+                                                                                
+ Input:   A RACF group name                                                     
+                                                                                
+ Example: ex 'MYHLQ.RACF.CLISTS(XLGRES)' 'Group'                                
+                                                                                
+ Authorization required:                                                        
+          - READ access to IRR.RADMIN.LISTGRP in FACILITY plus                  
+            authority to list the group profile                                 
+          - Authority to RESUME a given user's group connection                 
+                                                                                
+ Notes: - This will have limited benefit for universal groups                   
+                                                                                
+**********************************************************************/         
+parse arg profile                                                               
+/*-------------------------------------------------------------------*/         
+/* Use IRRXUTIL to extract the group into the stem named "GRP".      */         
+/*-------------------------------------------------------------------*/         
+myrc=IRRXUTIL("EXTRACT","GROUP",profile,"GRP")                                  
+if (word(myrc,1)<>0) then do                                                    
+   say "MYRC="myrc                                                              
+   say "An error occurred "                                                     
+   exit 1                                                                       
+end                                                                             
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* If there are no connected users for this group, then there        */         
+/* is no point in going any further. In this case, the variable      */         
+/* containing the count simply will not have been created.           */         
+/*-------------------------------------------------------------------*/         
+If GRP.BASE.CONNECTS.REPEATCOUNT = '' then do                                   
+   say "There are no users connected to group" profile                          
+   exit 0                                                                       
+end                                                                             
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* For each connected user, resume its group connection.             */         
+/*-------------------------------------------------------------------*/         
+ucnt = GRP.BASE.CONNECTS.REPEATCOUNT                                            
+do i = 1 to GRP.BASE.CONNECTS.REPEATCOUNT                                       
+  ADDRESS TSO "CONNECT" GRP.BASE.GUSERID.i "GROUP("profile") RESUME"            
+end                                                                             
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Now display the group, just to make sure that worked.             */         
+/*-------------------------------------------------------------------*/         
+ADDRESS TSO "LISTGRP" profile                                                   
+                                                                                
+exit                                                                            

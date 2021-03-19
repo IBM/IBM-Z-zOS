@@ -1,0 +1,120 @@
+Documentation for DBSECLV
+--------------------------------------------------------------------------------
+  This file contains the following sections:
+     DISCLAIMERS, ETC
+     ABOUT DBSECLV
+     PERFORMANCE NOTE
+     PROCESSING NOTES
+     SAMPLE JCL
+--------------------------------------------------------------------------------
+DISCLAIMERS, ETC:
+
+This program contains code made available by IBM Corporation on an AS IS
+basis. Any one receiving this program is considered to be licensed under
+IBM copyrights to use the IBM-provided source code in any way he or she
+deems fit, including copying it, compiling it, modifying it, and
+redistributing it, with or without modifications, except that it may be
+neither sold nor incorporated within a product that is sold.  No license
+under any IBM patents or patent applications is to be implied from this
+copyright license.
+
+The software is provided "as-is", and IBM disclaims all warranties,
+express or implied, including but not limited to implied warranties of
+merchantibility or fitness for a particular purpose.  IBM shall not be
+liable for any direct, indirect, incidental, special or consequential
+damages arising out of this agreement or the use or operation of the
+software.
+
+A user of this program should understand that IBM cannot provide
+technical support for the program and will not be responsible for any
+consequences of use of the program.
+
+The program's author will attempt to provide informal support and
+assistance, if he has the time to do so.  If you have questions about
+using this program, or suggestions for enhancements, please communicate
+them via the the RACF-L mailing list.  
+
+To subscribe to RACF-L, you should send a note to 
+  listserv@listserv.uga.edu 
+and include the following line in the body of the note, 
+substituting your first name and last name as indicated:
+  subscribe racf-l first_name last_name
+
+To post messages to RACF-L, send them to 
+  racf-l@listserv.uga.edu
+and include a relevant Subject: line.
+
+
+The program's author can also be reached directly via the following
+e-mail address: wfarrell@us.ibm.com
+ 
+However, he would strongly prefer that all contact regarding this
+program be via the mechanisms indicated above.
+
+--------------------------------------------------------------------------------
+ABOUT DBSECLV:
+
+DBSECLV is a REXX exec that will read a RACF database unloaded by
+IRRDBU00 and create a copy of the unloaded database with external names added
+wherever a profile had an internal seclevel or category number.
+(Exception: the information for SECDATA profiles is not modified.)
+
+DBSECLV is intended to be used as a pre-processing step for the DBSYNC exec,
+which must use the external names of seclevels and categories when comparing
+RACF databases, not the internal seclevel and category numbers.
+
+--------------------------------------------------------------------------------
+PERFORMANCE NOTE:
+                    For best performance, especially with large
+  databases, you should compile this exec using the REXX compiler.
+  However, the exec will run interpreted, though it will be much slower
+  and take much more CPU time.  If you choose to compile it, you should
+  specify options SL and CEXEC when you invoke the compiler.
+
+--------------------------------------------------------------------------------
+PROCESSING NOTES:
+
+  DBSECLV will process two input files, INDD1 and INDD2. INDD1 is a file
+  produced by IRRDBU00.  INDD2 is a file created from INDD1 by using
+  DFSORT or another sort utility to extract the type 0503 records that
+  define the seclevels and categories.
+
+  DBSECLV will produce one output file, OUTDD1, which is a copy of INDD1 with
+  external names appended to each record that contains a numeric seclevel or
+  category number (except for the 0503 records that define the seclevels and
+  categories).
+
+Return codes:
+  0 -- Processing was successful
+  4 -- Processing was successful.  However, DBSECLV found that some seclevel
+       or category number was duplicated.  This may result in incorrect
+       DBSYNC processing later.  Refer to the SYSTSPRT messages for more
+       information.
+ 16 -- An error in DBSECLV was detected by the REXX processor.  DBSECLV
+       probably did not finish processing INDD1, and OUTDD1 is probably
+       incomplete and should not be used.
+
+--------------------------------------------------------------------------------
+SAMPLE JCL:
+
+//jobname JOB  your job statement info here
+//SORT1   EXEC PGM=SORT
+//SYSOUT    DD SYSOUT=*
+//SORTIN    DD DISP=SHR,DSN=your.dbu00.output.file
+//SORTOUT   DD DISP=(,PASS),DSN=&&TEMP,
+//  UNIT=SYSDA,SPACE=(TRK,(5,5),RLSE),
+//  DCB=your.dbu00.output.file
+//SYSIN   DD *
+ INCLUDE COND=(5,4,EQ,C'0503',AND,257,8,EQ,C'SECDATA '),FORMAT=CH
+ OPTION  COPY,VLSHRT
+//S1 EXEC PGM=IKJEFT01,REGION=5000K,DYNAMNBR=50,PARM='%DBSECLV'
+//SYSPRINT DD SYSOUT=*
+//SYSTSPRT DD SYSOUT=*
+//SYSTSIN  DD DUMMY
+//SYSEXEC  DD DISP=SHR,DSN=your.sysexec.file (preferrably compiled)
+//INDD1    DD DISP=SHR,DSN=your.first.dbu00.output.file
+//INDD2    DD DISP=(OLD,DELETE),DSN=&&TEMP
+//OUTDD1   DD DSN=your.modified.dbu00.file,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=your.dbu00.output.file

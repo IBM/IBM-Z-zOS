@@ -1,0 +1,247 @@
+/* REXX */                                                                      
+/**********************************************************************         
+ Licensed Materials - Property of IBM                                           
+ 5694-A01                                                                       
+ Copyright IBM Corp. 2010, 2014                                                 
+                                                                                
+ Name:    XSETRPWD                                                              
+                                                                                
+ Author: Bruce Wells - brwells@us.ibm.com                                       
+                                                                                
+ Purpose: Displays only the password-related SETROPTS settings,                 
+          and the status of password and password phrase enveloping.            
+                                                                                
+ Input:   None                                                                  
+                                                                                
+ Example: ex 'MYHLQ.RACF.CLISTS(XSETRPWD)'                                      
+                                                                                
+ Authorization required:                                                        
+          - READ access to IRR.RADMIN.SETROPTS.LIST in FACILITY plus            
+            authority to list the SETROPTS options                              
+          - READ access to IRR.RADMIN.RLIST in FACILITY plus                    
+            authority to list the PASSWORD.ENVELOPE and                         
+            PASSPHRASE.ENVELOPE resources in the RACFEVNT class                 
+                                                                                
+ Notes: - Left as an exercise for the reader: Accept a parameter (or            
+          parameters) requesting any old category of SETROPTS settings          
+          (e.g. class-related options, audit options, MultiLevel                
+          Security, JES, etc) and display only those settings.                  
+                                                                                
+**********************************************************************/         
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* - Extract the SETROPTS settings using IRRXUTIL.                   */         
+/* ----------------------------------------------------------------- */         
+myrc=IRRXUTIL("EXTRACT","_SETROPTS","_SETROPTS","RES")                          
+say ""                                                                          
+say ""                                                                          
+say ""                                                                          
+if (word(myrc,1)<>0) then do                                                    
+   say "MYRC="myrc                                                              
+   say "An IRRXUTIL or R_admin error occurred "                                 
+   exit 1                                                                       
+end                                                                             
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* Dump out the SETROPTS settings.                                   */         
+/*                                                                   */         
+/* Note that SETROPTS (unlike profiles) returns leading zeroes on    */         
+/* some numeric fields.                                              */         
+/* ----------------------------------------------------------------- */         
+say "The following password policy rules are in effect:"                        
+say                                                                             
+if RES.BASE.PWDALG.1 <> "RES.BASE.PWDALG.1" then                                
+  say " The password encryption algorithm in effect is:",                       
+      RES.BASE.PWDALG.1                                                         
+                                                                                
+if RES.BASE.MIXDCASE.1 = "TRUE" then                                            
+  say " Mixed case passwords are allowed."                                      
+else                                                                            
+  say " Mixed case passwords are not allowed."                                  
+                                                                                
+if RES.BASE.PWDSPEC.1 = "TRUE" then                                             
+  say " Special characters are allowed."                                        
+else                                                                            
+  say " Special characters are not allowed."                                    
+                                                                                
+if RES.BASE.HISTORY.1 <> "" then                                                
+  say " Password history:" Strip(RES.BASE.HISTORY.1,'L',0)                      
+else                                                                            
+  say " Password history is not in effect."                                     
+                                                                                
+if RES.BASE.INTERVAL.1 <> "" then                                               
+  say " Password interval:" Strip(RES.BASE.INTERVAL.1,'L',0)                    
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* Not only does MINCHANG contain leading zeroes, it may contain     */         
+/* *all* zeroes.                                                     */         
+/* ----------------------------------------------------------------- */         
+if RES.BASE.MINCHANG.1 <> "" & RES.BASE.MINCHANG.1 <> "000" then                
+  say " Password minimum change interval:",                                     
+        Strip(RES.BASE.MINCHANG.1,'L',0)                                        
+else                                                                            
+  say " Password history minimum change interval is not in effect."             
+                                                                                
+if RES.BASE.REVOKE.1 <> "" then                                                 
+  say " Password revoke threshold:" Strip(RES.BASE.REVOKE.1,'L',0)              
+else                                                                            
+  say " Users are not being revoked due to invalid password attempts."          
+                                                                                
+if RES.BASE.WARNING.1 <> "" then                                                
+  say " Password expiration warning threshold:",                                
+        Strip(RES.BASE.WARNING.1,'L',0)                                         
+else                                                                            
+  say " Users are not being warned when their password will expire."            
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* Process password rules.                                           */         
+/* ----------------------------------------------------------------- */         
+if RES.BASE.RULES.1 = "FALSE" then                                              
+  say " There are no password syntax rules in effect."                          
+else do                                                                         
+  do i = 1 to 8                                                                 
+    rule = "RULE"||i                                                            
+    if RES.BASE.rule.1 <> "" Then                                               
+      say " Password rule" i "is: Length("Word(RES.BASE.rule.1,1)")",           
+                                 "Rule("Word(RES.BASE.rule.1,2)")"              
+  end                                                                           
+  say                                                                           
+  say "   Legend:"                                                              
+  say "    A-Alpha C-Consonant L-Alphanum N-Numeric V-Vowel W-Novowel"          
+  say "    c-Mixed consonant m-Mixed numeric v-Mixed vowel $-National"          
+  say "    *-Anything s-Special"                                                
+end                                                                             
+say                                                                             
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* Locate the RCVT so we can tell if exits are installed.            */         
+/* ----------------------------------------------------------------- */         
+cvt = c2d(storage(10,4))                                                        
+rcvt = C2d(Storage(D2x(CVT + 992),4))                                           
+RCVTID   = Storage(D2x(RCVT),4)                                                 
+If RCVTID <> 'RCVT' then do                                                     
+   say "The RCVT does not have the expected identifier for RACF."               
+   exit 2                                                                       
+end                                                                             
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* See if new password exit is active.                                */        
+/* ----------------------------------------------------------------- */         
+pwx01hex = Storage(D2x(RCVT + 236),4)                                           
+RCVTPWDX = C2d(BITAND(pwx01hex,'7FFFFFFF'x))                                    
+If RCVTPWDX = 0 Then                                                            
+  YesOrNo = 'is NOT'                                                            
+else                                                                            
+  YesOrNo = 'IS'                                                                
+say " There" YesOrNo "a new password exit (ICHPWX01) installed."                
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* See if new password phrase exit is active.                        */         
+/* ----------------------------------------------------------------- */         
+pwx11hex = Storage(D2x(RCVT + 476),4)                                           
+RCVTPHRX = C2d(BITAND(pwx11hex,'7FFFFFFF'x))                                    
+If RCVTPHRX = 0 Then                                                            
+  YesOrNo = 'is NOT'                                                            
+else                                                                            
+  YesOrNo = 'IS'                                                                
+say " There" YesOrNo "a new password phrase exit (ICHPWX11) installed."         
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* See if a password encryption exit is active.                      */         
+/* ----------------------------------------------------------------- */         
+dex01hex = Storage(D2x(RCVT + 416),4)                                           
+RCVTDESX = C2d(BITAND(dex01hex,'7FFFFFFF'x))                                    
+If RCVTDESX = 0 Then                                                            
+  YesOrNo = 'is NOT'                                                            
+else                                                                            
+  YesOrNo = 'IS'                                                                
+say " There" YesOrNo "a password encryption exit (ICHDEX01) installed."         
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* See if the other password encryption exit is active. It is called */         
+/* by RACROUTE REQUEST=EXTRACT,TYPE=ENCRYPT,ENCRYPT=(...,INST) when  */         
+/* BRANCH=YES is specified, and it should exist if ICHDEX01 exists.  */         
+/* ----------------------------------------------------------------- */         
+dex11hex = Storage(D2x(RCVT + 732),4)                                           
+RCVTDX11 = C2d(BITAND(dex11hex,'7FFFFFFF'x))                                    
+If RCVTDX11 = 0 Then                                                            
+  YesOrNo = 'is NOT'                                                            
+else                                                                            
+  YesOrNo = 'IS'                                                                
+say " There" YesOrNo "a password encryption exit (ICHDEX11) installed."         
+                                                                                
+say                                                                             
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* While not strictly a SETROPTS option, it will be instructive and  */         
+/* entertaining to display the status of password and phrase         */         
+/* enveloping. Not only do we get to search a repeat field in the    */         
+/* SETROPTS output, but we get to extract a general resource profile */         
+/* as well.  Using the generic option is an extra bonus.             */         
+/*                                                                   */         
+/* Enveloping can be considered active if the RACFEVNT class is      */         
+/* active and the appropriate resource is defined within the class.  */         
+/* ----------------------------------------------------------------- */         
+found = "false"                                                                 
+env_active = "false"                                                            
+do i = 1 to RES.BASE.CLASSACT_CT.REPEATCOUNT Until(found="true")                
+  if RES.BASE.CLASSACT.i = "RACFEVNT" then                                      
+    found = "true"                                                              
+end                                                                             
+if found = "true" then do                                                       
+  myrc =,                                                                       
+    IRRXUTIL("EXTRACT","RACFEVNT","PASSWORD.ENVELOPE","ENV",,"TRUE")            
+  if Word(myrc,1) = "0" Then do                                                 
+    If Length(ENV.BASE.APPLDATA.1) > 0 then                                     
+      strength = ENV.BASE.APPLDATA.1                                            
+    else                                                                        
+      strength = "MD5/STRONG"                                                   
+    say " Password enveloping is in effect with values:" strength               
+    env_active="true"                                                           
+  end                                                                           
+  else                                                                          
+    say " Password enveloping is not in effect."                                
+  myrc =,                                                                       
+    IRRXUTIL("EXTRACT","RACFEVNT","PASSPHRASE.ENVELOPE","ENV",,"TRUE")          
+  if Word(myrc,1) = "0" Then do                                                 
+    If Length(ENV.BASE.APPLDATA.1) > 0 then                                     
+      strength = ENV.BASE.APPLDATA.1                                            
+    else                                                                        
+      strength = "MD5/STRONG"                                                   
+    say " Password phrase enveloping is in effect with values:" strength        
+    env_active="true"                                                           
+  end                                                                           
+  else                                                                          
+    say " Password phrase enveloping is not in effect."                         
+end                                                                             
+else do                                                                         
+  say " Password enveloping is not in effect."                                  
+  say " Password phrase enveloping is not in effect."                           
+end                                                                             
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* If enveloping is active, display the contents of the enveloping   */         
+/* key ring.  We need to extract RRSF information to obtain the      */         
+/* user ID of the RACF susbsystem address space. Also display        */         
+/* the profile protecting envelope retrieval.                        */         
+/* ----------------------------------------------------------------- */         
+ADDRESS TSO                                                                     
+if env_active="true" then do                                                    
+  myrc=IRRXUTIL("EXTRACT","_RRSFEXTR","_RRSFEXTR","RRSF")                       
+  if Word(myrc,1) = "0" Then do                                                 
+    say                                                                         
+    say "Displaying contents of enveloping key ring:"                           
+    cmd = "RACDCERT ID("||RRSF.SUBSYS_USER||") "||,                             
+                    "LISTRING(IRR.PWENV.KEYRING)"                               
+    cmd                                                                         
+    myrc = IRRXUTIL("EXTRACT","FACILITY",                      ,                
+                    "IRR.RADMIN.EXTRACT.PWENV","ENV",,"TRUE")                   
+    if Word(myrc,1) = "0" Then do                                               
+      say "Listing the profile which authorizes the retrieval of " ||,          
+          "password envelopes using R_admin:"                                   
+      say                                                                       
+      cmd = "RLIST FACILITY " || ENV.PROFILE || " ALL"                          
+      cmd                                                                       
+    end                                                                         
+  end                                                                           
+end                                                                             

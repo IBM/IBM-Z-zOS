@@ -1,0 +1,245 @@
+/* REXX */                                                                      
+/**********************************************************************         
+ Licensed Materials - Property of IBM                                           
+ 5694-A01                                                                       
+ Copyright IBM Corp. 2010                                                       
+                                                                                
+ Name:    XRLIST                                                                
+                                                                                
+ Author: Bruce Wells - brwells@us.ibm.com                                       
+                                                                                
+ Purpose: Displays the standard access list of a general resource               
+          profile. It first shows an alphabetized list of the users,            
+          with the users' names and access levels. It then shows the            
+          alphabetized groups with the access levels. XRLIST will find          
+          a matching generic profile if no discrete profile exists.             
+          If no input is provided, FACILITY is used as the class and            
+          IRR.RADMIN.LISTUSER is used as the resource.                          
+                                                                                
+ Input:   A RACF class and resource name                                        
+                                                                                
+ Example: ex 'MYHLQ.RACF.CLISTS(XRLIST)' 'FACILITY BPX.SUPERUSER'               
+                                                                                
+ Authorization required:                                                        
+          - READ access to IRR.RADMIN.RLIST in FACILITY plus                    
+            authority to list the profile's access list                         
+          - READ access to IRR.RADMIN.LISTUSER in FACILITY plus                 
+            authority to list the user profile for a given acl entry            
+          - READ access to IRR.RADMIN.LISTGRP in FACILITY plus                  
+            authority to list the group profile for a given acl entry           
+                                                                                
+          Users and groups for which you are not authorized will not            
+          be included in the output (though they could be with some             
+          minor modifications).                                                 
+                                                                                
+ Notes: - Due to its use of ISPF tables, this exec must be                      
+          executed from an ISPF environment.                                    
+        - Left as an exercise for the reader: the groups could further          
+          be expanded into an indented, alphabetized list of users and          
+          their names.                                                          
+                                                                                
+**********************************************************************/         
+parse arg type profile                                                          
+Upper type                                                                      
+if type="" then type="FACILITY"                                                 
+if profile="" then profile="IRR.RADMIN.LISTUSER"                                
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Use IRRXUTIL to extract the profile into the stem named "RES".    */         
+/*-------------------------------------------------------------------*/         
+myrc=IRRXUTIL("EXTRACT",type,profile,"RES",,TRUE)                               
+say ""                                                                          
+say ""                                                                          
+say ""                                                                          
+if (word(myrc,1)<>0) then do                                                    
+   say "MYRC="myrc                                                              
+   say "An error occurred "                                                     
+   exit 1                                                                       
+end                                                                             
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* If the input resource name was covered by a generic profile,      */         
+/* let the user know.                                                */         
+/*-------------------------------------------------------------------*/         
+If RES.PROFILE <> profile then do                                               
+  say profile 'is covered by the generic profile' RES.PROFILE                   
+  say ""                                                                        
+end                                                                             
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* If there are no entries on the standard access list, then there   */         
+/* is no point in going any further. In this case, the variable      */         
+/* containing the count simply will not have been created.           */         
+/*-------------------------------------------------------------------*/         
+If RES.BASE.ACLCNT.REPEATCOUNT = '' then do                                     
+   say "There are no entries on the standard access list."                      
+   exit 0                                                                       
+end                                                                             
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Create an ISPF table to store the user IDs contained within the   */         
+/* access list.                                                      */         
+/*-------------------------------------------------------------------*/         
+TBCMD="TBCREATE        "||,  /* Create command                       */         
+    "ACLUSERS"||,            /* Table name.                          */         
+    " KEYS(ACUSERID) "||,    /* Key (db key) is user ID              */         
+    "NAMES(ACNAME  "||,      /* User name                            */         
+    "ACLVL) "||,             /* Access level                         */         
+    "NOWRITE "||,            /* temporary in-storage only table      */         
+    "REPLACE "               /* Replace if already exists            */         
+ADDRESS ISPEXEC TBCMD                                                           
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Set up sorting for the table by User ID.                          */         
+/*-------------------------------------------------------------------*/         
+TBCMD="TBSORT ACLUSERS FIELDS(ACUSERID,C,A)"                                    
+ADDRESS ISPEXEC TBCMD                                                           
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Create an ISPF table to store the groups contained within the     */         
+/* access list.                                                      */         
+/*-------------------------------------------------------------------*/         
+TBCMD="TBCREATE        "||,  /* Create command                       */         
+    "ACLGRPS"||,             /* Table name.                          */         
+    " KEYS(ACGRPNM) "||,     /* Key (db key) is group name           */         
+    "NAMES(ACLVL) "||,       /* Access Level                         */         
+    "NOWRITE "||,            /* temporary in-storage only table      */         
+    "REPLACE "               /* Replace if already exists            */         
+ADDRESS ISPEXEC TBCMD                                                           
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Set up sorting for the table by group name.                       */         
+/*-------------------------------------------------------------------*/         
+TBCMD="TBSORT ACLGRPS FIELDS(ACGRPNM,C,A)"                                      
+ADDRESS ISPEXEC TBCMD                                                           
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Create an ISPF table to store the orphans contained within the    */         
+/* access list. These are dead entries that no longer map to a user  */         
+/* or group.                                                         */         
+/*-------------------------------------------------------------------*/         
+TBCMD="TBCREATE        "||,  /* Create command                       */         
+    "ACLORFS"||,             /* Table name.                          */         
+    " KEYS(ACORFNM) "||,     /* Key (db key) is name                 */         
+    "NAMES(ACLVL) "||,       /* Access Level                         */         
+    "NOWRITE "||,            /* temporary in-storage only table      */         
+    "REPLACE "               /* Replace if already exists            */         
+ADDRESS ISPEXEC TBCMD                                                           
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Set up sorting for the table by name.                             */         
+/*-------------------------------------------------------------------*/         
+TBCMD="TBSORT ACLORFS FIELDS(ACORFNM,C,A)"                                      
+ADDRESS ISPEXEC TBCMD                                                           
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* For each access list entry, extract the entry name as a user      */         
+/* using IRRXUTIL.  If it's not found, try it as a group. If it's    */         
+/* still not found, then it is an orphaned entry. Add the entry to   */         
+/* the appropriate ISPF table (users, groups, or orphans) and keep   */         
+/* track of the total number of each category.                       */         
+/*-------------------------------------------------------------------*/         
+ucnt = 0                                                                        
+gcnt = 0                                                                        
+ocnt = 0                                                                        
+do i = 1 to RES.BASE.ACLCNT.REPEATCOUNT                                         
+  myrc=IRRXUTIL("EXTRACT","USER",RES.BASE.ACLID.i,"TEST")                       
+  if (word(myrc,1)=0) then do                                                   
+    ACUSERID = RES.BASE.ACLID.i                                                 
+    ACNAME = TEST.BASE.NAME.1                                                   
+    ACLVL = RES.BASE.ACLACS.i                                                   
+    TBCMD="TBADD ACLUSERS ORDER"                                                
+    ADDRESS ISPEXEC TBCMD                                                       
+    ucnt = ucnt + 1                                                             
+  end                                                                           
+  else if (myrc = '12 12 4 4 4') then do       /* If user not found */          
+    myrc=IRRXUTIL("EXTRACT","GROUP",RES.BASE.ACLID.i,"TEST")                    
+    if (word(myrc,1)=0) then do                                                 
+      ACGRPNM = RES.BASE.ACLID.i                                                
+      ACLVL = RES.BASE.ACLACS.i                                                 
+      TBCMD="TBADD ACLGRPS ORDER"                                               
+      ADDRESS ISPEXEC TBCMD                                                     
+      gcnt = gcnt + 1                                                           
+    end                                                                         
+    else if (myrc = '12 12 4 4 4') then do    /* If group not found */          
+      ACORFNM = RES.BASE.ACLID.i                                                
+      ACLVL = RES.BASE.ACLACS.i                                                 
+      TBCMD="TBADD ACLORFS ORDER"                                               
+      ADDRESS ISPEXEC TBCMD                                                     
+      ocnt = ocnt + 1                                                           
+      myrc = '0 0 0 0 0'                /* Reset in case last entry */          
+    end                                                                         
+  end                                                                           
+end                                                                             
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Now display the user IDs from the access list.                    */         
+/*-------------------------------------------------------------------*/         
+If ucnt > 0 Then do                                                             
+  say "The access list contains the following user IDs:"                        
+  say                                                                           
+  say " User ID    Name                  Access level"                          
+  say " ======== ====================    ============"                          
+  address ISPEXEC "TBTOP ACLUSERS"                                              
+  do i = 1 to ucnt                                                              
+    TBCMD = "TBSKIP ACLUSERS"                                                   
+    ADDRESS ISPEXEC TBCMD                                                       
+    if rc = 0 then do                                                           
+      say " "Left(ACUSERID,10) Left(ACNAME,21) ACLVL                            
+    end                                                                         
+  end                                                                           
+end                                                                             
+else                                                                            
+  say "There are no users on the access list."                                  
+                                                                                
+say ""                                                                          
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Now display the groups from the access list.                      */         
+/*-------------------------------------------------------------------*/         
+If gcnt > 0 Then do                                                             
+  say "The access list contains the following groups:"                          
+  say                                                                           
+  say " Group      Access level"                                                
+  say " ========   ============"                                                
+  address ISPEXEC "TBTOP ACLGRPS"                                               
+  do i = 1 to gcnt                                                              
+    TBCMD = "TBSKIP ACLGRPS"                                                    
+    ADDRESS ISPEXEC TBCMD                                                       
+    if rc = 0 then do                                                           
+      say " "Left(ACGRPNM,10) ACLVL                                             
+    end                                                                         
+  end                                                                           
+end                                                                             
+else                                                                            
+  say "There are no groups on the access list."                                 
+                                                                                
+say ""                                                                          
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Now display any orphan entries that were encountered.             */         
+/*-------------------------------------------------------------------*/         
+If ocnt > 0 Then do                                                             
+  say "The access list contains the following orphaned entries:"                
+  say                                                                           
+  say " Name       Access level"                                                
+  say " ========   ============"                                                
+  address ISPEXEC "TBTOP ACLORFS"                                               
+  do i = 1 to ocnt                                                              
+    TBCMD = "TBSKIP ACLORFS"                                                    
+    ADDRESS ISPEXEC TBCMD                                                       
+    if rc = 0 then do                                                           
+      say " "Left(ACORFNM,10) ACLVL                                             
+    end                                                                         
+  end                                                                           
+  say ""                                                                        
+  say "The IRRRID00 utility can be used to identify and remove",                
+      "orphaned entries."                                                       
+end                                                                             
+                                                                                
+address ISPEXEC "TBEND ACLUSERS"        /* Delete the tables         */         
+address ISPEXEC "TBEND ACLGRPS"         /* Delete the tables         */         
+address ISPEXEC "TBEND ACLORFS"         /* Delete the tables         */         
+                                                                                
+say                                                                             
+say "retval="||myrc                                                             

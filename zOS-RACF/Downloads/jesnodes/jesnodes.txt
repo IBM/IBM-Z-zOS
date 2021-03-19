@@ -1,0 +1,455 @@
+/*rexx*/                                                                        
+/**********************************************************************         
+                                                                                
+ Name:    JESNODES                                                              
+                                                                                
+ Purpose: - Display the names of trusted NODES profiles (those with             
+            a UACC greater than READ) and cover a defined node name             
+            in the context of inbound jobs.                                     
+          - Display the local nodes defined in the &RACLNODE profile            
+                                                                                
+ Input:   None.                                                                 
+          - When JES2 is active, a command will be issued to obtain             
+            the node names automatically                                        
+          - When JES3 is active, the user will be prompted for a                
+            data set name containing a list of JES nodes, one per line.         
+                                                                                
+ Example: ex 'MYHLQ.RACF.CLISTS(JESNODES)'                                      
+                                                                                
+ Authorization required:                                                        
+          - READ access to IRR.RADMIN.RLIST in FACILITY plus                    
+            authority to list NODES class and RACFVARS class                    
+            profiles.  E.G.:                                                    
+                                                                                
+            RDEFINE FACILITY IRR.RADMIN.RLIST UACC(READ)                        
+            SETROPTS CLASSACT(FACILITY) RACLIST(FACILITY)                       
+            SETROPTS RACLIST(FACILITY) REFRESH                                  
+                                                                                
+          - A note on R_admin authorization:                                    
+             The FACILITY check was originally implemented because              
+             some clients use the PROGRAM class to restrict some                
+             RACF commands, and without the FACILITY check, R_admin             
+             extract functions would have allowed a user to circumvent          
+             the PROGRAM protection for "list" commands (e.g. RLIST).           
+                                                                                
+             If you are not protecting the RLIST command,                       
+             then there is no issue with granting the FACILITY                  
+             authorization required by this Rexx exec.  Remember,               
+             the issuer still requires standard RLIST command                   
+             authority.                                                         
+                                                                                
+ For JES2, a CONSOLE command will be issued, which requires:                    
+          - READ access to the CONSOLE resource in the TSOAUTH class            
+          - READ access to the MVS.MCSOPER.userid resource in the               
+            OPERCMDS class (where userid is the issuer of this exec).           
+                                                                                
+ Notes: - The R_Admin service, used by IRRXUTIL, will not find a                
+          profile in the RACFVARS class if generics are enabled for it.         
+          This program will instruct you to disable generics if a               
+          RACFVARS profile is not found.  Disabling generics will               
+          have no effect on the operational use of RACFVARS profiles.           
+                                                                                
+**********************************************************************/         
+/*******************************************************************/           
+/*                                                                 */           
+/* This program contains code made available by IBM Corporation    */           
+/* on an AS IS basis. Any one receiving this program is            */           
+/* considered to be licensed under IBM copyrights to use the       */           
+/* IBM-provided source code in any way he or she deems fit,        */           
+/* including copying it, compiling it, modifying it, and           */           
+/* redistributing it, with or without modifications, except that   */           
+/* it may be neither sold nor incorporated within a product that   */           
+/* is sold.  No license under any IBM patents or patent            */           
+/* applications is to be implied from this copyright license.      */           
+/*                                                                 */           
+/* The software is provided "as-is", and IBM disclaims all         */           
+/* warranties, express or implied, including but not limited to    */           
+/* implied warranties of merchantibility or fitness for a          */           
+/* particular purpose.  IBM shall not be liable for any direct,    */           
+/* indirect, incidental, special or consequential damages arising  */           
+/* out of this agreement or the use or operation of the software.  */           
+/*                                                                 */           
+/* A user of this program should understand that IBM cannot        */           
+/* provide technical support for the program and will not be       */           
+/* responsible for any consequences of use of the program.         */           
+/*                                                                 */           
+/*******************************************************************/           
+                                                                                
+nodes.0 = 0                           /* Initialize node names count */         
+                                                                                
+/*********************************************************************/         
+/* Determine the JES product active and act accordingly              */         
+/*********************************************************************/         
+myjes = WORD(sysvar(sysjes),1)                                                  
+/*myjes = "JES3"     For testing JES3 on a JES2 system */                       
+                                                                                
+If myjes = "JES2" Then Do                                                       
+  /* Note the we assume "$" here, but You can redefine the                      
+     identifier to another character by using the CONCHAR=                      
+     parameter on the CONDEF initialization statement.     */                   
+  cmd = "$DNODE(*),NAME,L=Z"                                                    
+  cart = "CARTMAN"                                                              
+  "CONSPROF UNSOLDISPLAY(NO) SOLDISPLAY(NO)"                                    
+  "CONSOLE SYSCMD("cmd") CART("cart")"                                          
+                                                                                
+  /* Get the output of the command */                                           
+  timeout = 15     /* Wait 15 seconds maximum for response */                   
+  x = getmsg("outdata.","sol",cart,,timeout)                                    
+  If x = 0 Then                                                                 
+    /* Build a stem of node names by extracting them from the output */         
+    do i=2 to outdata.0  /* Skip header line */                                 
+      nodes.0 = nodes.0 + 1                                                     
+      j = i-1            /* Fudge to account for skipped header line */         
+      nodes.j = STRIP(SUBSTR(outdata.i,POS("=",outdata.i)+1))                   
+    end                                                                         
+  Else Do                                                                       
+    say 'Unexpected return code' x 'from the GETMSG service.'                   
+    If x = 4 then Do                                                            
+      say 'Return code 4 may indicate that you need to increase the',           
+          'value of the timeout variable within the Rexx program.'              
+    End                                                                         
+  End                                                                           
+End                                                                             
+Else Do                            /* JES3 - no command is available */         
+  say 'Enter the unquoted fully qualified data set name',                       
+      'containing your JES node names'                                          
+  PULL MYDSNAME                                                                 
+                                                                                
+  "ALLOC FI(MYDATA) DA('"MYDSNAME"') SHR REUSE"                                 
+  "EXECIO * DISKR MYDATA (FINIS STEM NODES."                                    
+  "FREE FI(MYDATA)"                                                             
+                                                                                
+  /* More validation is probably warranted */                                   
+  do i = 1 to nodes.0                                                           
+   nodes.i = WORD(nodes.i,1)                                                    
+  end                                                                           
+End                                                                             
+                                                                                
+If nodes.0 = 0 Then Do                                                          
+  say "No node names were found!"                                               
+  exit                                                                          
+End                                                                             
+                                                                                
+                                                                                
+/* Uncomment the following for debug */                                         
+/*                                                                              
+say 'The following' nodes.0 'node names were found:'                            
+Do i = 1 to nodes.0                                                             
+  say nodes.i                                                                   
+End                                                                             
+*/                                                                              
+                                                                                
+profile = " "                           /* Start at the beginning    */         
+generic = "FALSE"                       /*  with discrete profiles   */         
+                                                                                
+/*********************************************************************/         
+/* Initialize a stem of profile names and stems with corresponding   */         
+/* UACCs and translation user IDs that will get listed after we've   */         
+/* checked all the profiles.                                         */         
+/*********************************************************************/         
+profs.0 = 0                                                                     
+uacc.0 = 0                                                                      
+tuser.0 = 0                                                                     
+i = 0                                   /* Number of trusted nodes   */         
+                                                                                
+/*********************************************************************/         
+/* Loop through all NODES profile until they are exhausted.          */         
+/*                                                                   */         
+/* For each profile with a UACC higher than READ, we will see if     */         
+/* it covers any of the node names defined in the list for           */         
+/* inbound jobs.  That is, if the first NODES profile qualifier      */         
+/* covers the node name, and the second qualifier (if it exists)     */         
+/* covers "USERJ", then we will add it to a list to be displayed     */         
+/* after all NODES profiles have been inspected.                     */         
+/*                                                                   */         
+/* Note that RACF enforces a strict set of naming rules for          */         
+/* NODES class profiles, and this program works under those          */         
+/* assumptions.                                                      */         
+/*                                                                   */         
+/*********************************************************************/         
+Do Until (resrc = '12 12 4 4 4')                                                
+  /* Extract the next NODES profile into a stem variable named RES.  */         
+  resrc=IRRXUTIL("EXTRACTN","NODES",profile,"RES",,generic)                     
+  Select                                                                        
+   When word(resrc,1) = 0 Then      /* No problems        */                    
+     Do                                                                         
+     End                                                                        
+   When resrc = '12 12 8 8 24' Then /* No more profiles   */                    
+     Do                                                                         
+       say 'You do not have READ access to the IRR.RADMIN.RLIST',               
+           'resource in the FACILITY'                                           
+       say ' class. Try again after you have been granted access.'              
+       Return                                                                   
+     End                                                                        
+   When resrc = '12 12 4 4 4' Then  /* No more profiles   */                    
+     Leave                                                                      
+   Otherwise                        /* Some sort of error */                    
+     say ''                                                                     
+     say 'Error' resrc 'occurred extracting the profile after' profile          
+     If resrc = '12 12 4 4 20' Then Do                                          
+       say ' The offending profile is a ghost generic.'                         
+       say '  1) Use the SEARCH command to locate the profile after',           
+           profile                                                              
+       say '  2) Issue RDELETE NODES profile NOGENERIC'                         
+       say '  3) Run this exec again'                                           
+     End                                                                        
+     return                                                                     
+  End                                                                           
+                                                                                
+  /*******************************************************************/         
+  /* Isolate the qualifiers in the profile name, with the under-     */         
+  /* standing that they may not all exist.                           */         
+  /*******************************************************************/         
+  quals = TRANSLATE(RES.PROFILE,' ','.')                                        
+  q1 = WORD(quals,1)                                                            
+  q2 = WORD(quals,2)                                                            
+  q3 = WORD(quals,3)                                                            
+                                                                                
+  /*******************************************************************/         
+  /* Loop for each node name defined in the nodes stem, seeing       */         
+  /* if the current NODES profile covers it for inbound jobs.        */         
+  /*******************************************************************/         
+  covers = "FALSE"                                                              
+  already_processed = 0                                                         
+  do j = 1 to nodes.0                                                           
+                                                                                
+    /*****************************************************************/         
+    /* A generic profile may cover several node names, and we do not */         
+    /* want to add duplicates to our list of trusted NODES profiles. */         
+    /*****************************************************************/         
+    do y = 1 to profs.0 until already_processed = 1                             
+      if profs.y = RES.PROFILE then                                             
+        already_processed = 1                                                   
+    end                                                                         
+                                                                                
+    /*****************************************************************/         
+    /* See if the first qualifier covers the node name, the second   */         
+    /* qualifier pertains to "USERJ", and the UACC is greater than   */         
+    /* READ.  The contents of the third qualifier is irrelevant.     */         
+    /* If the first and only qualifier is * or **, this is a match.  */         
+    /*****************************************************************/         
+    If already_processed = 0 Then Do                                            
+      If ((q1="*" | q1="**") & q2='') Then                                      
+        covers = "TRUE"                                                         
+      Else                                                                      
+        If match(q1,nodes.j) & match(q2,"USERJ") Then                           
+          covers = "TRUE"                                                       
+                                                                                
+      If covers = "TRUE" then do                                                
+        /*say "Profile name" RES.PROFILE "covers" nodes.j".USERJ"*/             
+        /*say "  and has a UACC of" RES.BASE.UACC.1              */             
+                                                                                
+        /* Check if the UACC is greater than READ.                   */         
+        If RES.BASE.UACC.1 = 'UPDATE' | ,                                       
+           RES.BASE.UACC.1 = 'CONTROL' | ,                                      
+           RES.BASE.UACC.1 = 'ALTER' Then Do                                    
+          /***********************************************************/         
+          /* Add the profile name, its UACC, and translation user    */         
+          /* (or "None" if one does not exist) to a set of stem      */         
+          /* variables for display after processing all profiles.    */         
+          /***********************************************************/         
+          profs.0 = profs.0 + 1                                                 
+          i = profs.0                                                           
+          profs.i = RES.PROFILE                                                 
+          uacc.i = RES.BASE.UACC.1                                              
+          /***********************************************************/         
+          /* A translation user ID is optionally specified in the    */         
+          /* member list. Only one should be specified, but if       */         
+          /* multiple values exist, RACF uses the last one.          */         
+          /***********************************************************/         
+          user = 'None'                                                         
+          index = RES.BASE.MEMBER.0                                             
+          If index /= '' Then                                                   
+            user = RES.BASE.MEMBER.index                                        
+          tuser.i = user                                                        
+        End                                                                     
+      End                                                                       
+      Else do                                                                   
+        /*say "Profile name" RES.PROFILE "does not cover ", */                  
+        /*    nodes.j".USERJ"                               */                  
+      End                                                                       
+    End                                                                         
+    Else do                                                                     
+      /*say "Skipping profile" RES.PROFILE "for node" nodes.j*/                 
+    end                                                                         
+  End                                                                           
+                                                                                
+  /*******************************************************************/         
+  /* Iterate with next profile name and its generic indicator.       */         
+  /*******************************************************************/         
+  profile = RES.PROFILE                                                         
+  generic = RES.GENERIC                                                         
+                                                                                
+End                                                                             
+                                                                                
+/*********************************************************************/         
+/* Display the profile names and UACCs that we have accumulated.     */         
+/*********************************************************************/         
+If profs.0 > 0 Then Do                                                          
+  say ''; say ''; say ''; say ''                                                
+  say 'Profile name               UACC        TRANSLATION USER'                 
+  say '============               ====        ================'                 
+  Do i = 1 to profs.0                                                           
+    say " "Left(profs.i,25) Left(uacc.i,11) Left(tuser.i,9)                     
+  End                                                                           
+End                                                                             
+Else                                                                            
+  Say 'There are no matching NODES profiles with a UACC',                       
+      'greater than READ'                                                       
+                                                                                
+/*********************************************************************/         
+/* Now we will display the local node names that are defined in      */         
+/* the &RACLNDE profile in the RACFVARS class.  These nodes are      */         
+/* also considered trusted.                                          */         
+/*********************************************************************/         
+say ''                                                                          
+varrc=IRRXUTIL("EXTRACT","RACFVARS","&RACLNDE","LOC",,"FALSE")                  
+Select                                                                          
+ When word(varrc,1) = 0 Then Do                /* No problems        */         
+   say 'The following are defined in &RACLNDE as local nodes:'                  
+   If LOC.BASE.MEMBER.0 = '' Then                                               
+     say '  There are no members defined in &RACLNDE!'                          
+   Else                                                                         
+     do k = 1 to LOC.BASE.MEMBER.0                                              
+       say LOC.BASE.MEMBER.k                                                    
+     end                                                                        
+ End                                                                            
+ When varrc = '12 12 4 4 4' Then Do          /* Profile not defined  */         
+   say 'The &RACLNDE profile does not exist.'                                   
+   say 'It is possible that you need to deactivate generics for the',           
+       'RACFVARS class:'                                                        
+   say '    SETROPTS NOGENERIC(RACFVARS) NOGENCMD(RACFVARS)'                    
+   say 'and re-run this program.'                                               
+ End                                                                            
+ When varrc = '12 12 8 8 24' Then Do         /* Not authorized       */         
+   say 'You are not authorized to see the &RACLNDE profile',                    
+       'in the RACFVARS class'                                                  
+ End                                                                            
+ Otherwise                                   /* Some sort of error   */         
+   say 'Error' varrc 'occurred extracting the &RACLNDE RACFVARS profile'        
+End                                                                             
+                                                                                
+exit                                                                            
+                                                                                
+/*********************************************************************/         
+/* Function name: match                                              */         
+/*                                                                   */         
+/* Purpose: Determine if the first string "covers" the second        */         
+/*          string using the rules of RACF generic pattern           */         
+/*          matching for the NODES class.                            */         
+/*                                                                   */         
+/* Input: - qual: The NODES class profile name                       */         
+/*        - val: The corresponding resource name qualifier           */         
+/*                                                                   */         
+/* Returns: - 0: qualfier does not cover value                       */         
+/*          - 1: qualfier covers value                               */         
+/*                                                                   */         
+/*********************************************************************/         
+match: arg qual, val                                                            
+                                                                                
+/*say 'qual='qual 'val='val*/                                                   
+                                                                                
+isMatch = 0                                                                     
+                                                                                
+/*********************************************************************/         
+/* An exact match implies a discrete profile and always matches.     */         
+/*********************************************************************/         
+if qual = val then do                                                           
+  isMatch = 1                                                                   
+end                                                                             
+                                                                                
+/*********************************************************************/         
+/* A qualifier of * or ** matches anything.                          */         
+/*********************************************************************/         
+if isMatch = 0 &,                                                               
+   qual = "*" | qual = "**" then do                                             
+  isMatch = 1                                                                   
+end                                                                             
+                                                                                
+/*********************************************************************/         
+/* A non-leading * must appear at the end of the qualifier. If       */         
+/* the substring prior to the * matches the beginning of the value   */         
+/* for the same length, then this is a match.                        */         
+/*********************************************************************/         
+if isMatch = 0 &,                                                               
+   SUBSTR(qual,LENGTH(qual),1) = "*" then                                       
+  If SUBSTR(qual,1,LENGTH(qual)-1) = SUBSTR(val,1,LENGTH(qual)-1) then          
+    Do                                                                          
+      isMatch = 1                                                               
+    End                                                                         
+                                                                                
+/*********************************************************************/         
+/* A % can appear in any or all positions of the first qualifier,    */         
+/* but only at the end of the second qualifier. However, we can      */         
+/* simply apply the more general rules in either case. We test       */         
+/* for a match by constructing a work string for both the qualifier  */         
+/* and value. If a % is detected in the qualifier, then we           */         
+/* replace it with a blank in that position of both strings.         */         
+/* Otherwise, we simply copy the character.  At the end, if the      */         
+/* two strings are the same, then it's a match.                      */         
+/*********************************************************************/         
+if isMatch = 0 &,                                                               
+   POS("%",qual) > 0 Then Do                                                    
+  qualcopy = ''                                                                 
+  valcopy = ''                                                                  
+  Do k = 1 to MAX(Length(qual),Length(val))                                     
+    If SUBSTR(qual,k,1) = "%" Then Do                                           
+      qualcopy = qualcopy||' '                                                  
+      valcopy = valcopy||' '                                                    
+    End                                                                         
+    Else Do                                                                     
+      qualcopy = qualcopy||SUBSTR(qual,k,1)                                     
+      valcopy = valcopy||SUBSTR(val,k,1)                                        
+    End                                                                         
+  End                                                                           
+                                                                                
+  If qualcopy = valcopy then do                                                 
+    isMatch = 1                                                                 
+  end                                                                           
+End                                                                             
+                                                                                
+/*********************************************************************/         
+/* Finally, we see if a RACF variable provides a match. The variable */         
+/* may comprise the entire qualifier, but might also follow a        */         
+/* discrete prefix (e.g. NOD&TRST). We must extract the RACFVARS     */         
+/* profile and append each value in the member list to any prefix    */         
+/* specified in the qualifier.  If the result is equal to the        */         
+/* input value, we have a match.                                     */         
+/*                                                                   */         
+/* Cautionary note: RACFVARS profiles are discrete even though       */         
+/*   they contain the "&" character. If they are defined when        */         
+/*   generics are enabled for the RACFVARS class, then they won't    */         
+/*   be found.                                                       */         
+/*********************************************************************/         
+if isMatch = 0 &,                                                               
+   POS("&",qual) > 0 Then Do                                                    
+  prefix = SUBSTR(qual,1,POS("&",qual)-1)                                       
+  qualvar = SUBSTR(qual,POS("&",qual))                                          
+  varrc=IRRXUTIL("EXTRACT","RACFVARS",qualvar,"VAR",,"FALSE")                   
+  Select                                                                        
+   When word(varrc,1) = 0 Then                 /* No problems        */         
+     do k = 1 to VAR.BASE.MEMBER.0 until isMatch=1                              
+       if prefix||VAR.BASE.MEMBER.k = val then do                               
+         isMatch = 1                                                            
+       end                                                                      
+     end                                                                        
+   When varrc = '12 12 4 4 4' Then Do        /* Profile not defined  */         
+     say 'The' qualvar 'profile does not exist in the RACFVARS class.'          
+     say 'It is possible that you need to deactivate generics for',             
+         'the RACFVARS class:'                                                  
+     say '    SETROPTS NOGENERIC(RACFVARS) NOGENCMD(RACFVARS)'                  
+     say 'and re-run this program.'                                             
+   End                                                                          
+   When varrc = '12 12 8 8 24' Then Do         /* Not authorized     */         
+     say 'You are not authorized to see the' qualvar 'profile in',              
+         'the RACFVARS class'                                                   
+   End                                                                          
+   Otherwise                        /* Some sort of error */                    
+     say 'Error' varrc 'occurred extracting the RACFVARS profile',              
+         qualvar                                                                
+  End                                                                           
+                                                                                
+                                                                                
+end                                                                             
+/*say 'isMatch=' isMatch*/                                                      
+return isMatch                                                                  

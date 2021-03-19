@@ -1,0 +1,142 @@
+/* REXX */                                                                      
+/**********************************************************************         
+ Licensed Materials - Property of IBM                                           
+ 5694-A01                                                                       
+ Copyright IBM Corp. 2010                                                       
+                                                                                
+ Name:    XSETRPWD                                                              
+                                                                                
+ Author: Bruce Wells - brwells@us.ibm.com                                       
+                                                                                
+ Purpose: Displays only the password-related SETROPTS settings,                 
+          and the status of password and password phrase enveloping.            
+                                                                                
+ Input:   None                                                                  
+                                                                                
+ Example: ex 'MYHLQ.RACF.CLISTS(XSETRPWD)'                                      
+                                                                                
+ Authorization required:                                                        
+          - READ access to IRR.RADMIN.SETROPTS.LIST in FACILITY plus            
+            authority to list the SETROPTS options                              
+          - READ access to IRR.RADMIN.RLIST in FACILITY plus                    
+            authority to list the PASSWORD.ENVELOPE and                         
+            PASSPHRASE.ENVELOPE resources in the RACFEVNT class                 
+                                                                                
+ Notes: - Left as an exercise for the reader: Accept a parameter (or            
+          parameters) requesting any old category of SETROPTS settings          
+          (e.g. class-related options, audit options, MultiLevel                
+          Security, JES, etc) and display only those settings.                  
+                                                                                
+**********************************************************************/         
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* - Extract the SETROPTS settings using IRRXUTIL.                   */         
+/* ----------------------------------------------------------------- */         
+myrc=IRRXUTIL("EXTRACT","_SETROPTS","_SETROPTS","RES")                          
+say ""                                                                          
+say ""                                                                          
+say ""                                                                          
+if (word(myrc,1)<>0) then do                                                    
+   say "MYRC="myrc                                                              
+   say "An error occurred "                                                     
+   exit 1                                                                       
+end                                                                             
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* Dump out the SETROPTS settings.                                   */         
+/*                                                                   */         
+/* Note that SETROPTS (unlike profiles) returns leading zeroes on    */         
+/* some numeric fields.                                              */         
+/* ----------------------------------------------------------------- */         
+say "The following password policy rules are in effect:"                        
+say                                                                             
+if RES.BASE.MIXDCASE.1 = "TRUE" then                                            
+  say " Mixed case passwords are allowed."                                      
+else                                                                            
+  say " Mixed case passwords are not allowed."                                  
+                                                                                
+if RES.BASE.HISTORY.1 <> "" then                                                
+  say " Password history:" Strip(RES.BASE.HISTORY.1,'L',0)                      
+else                                                                            
+  say " Password history is not in effect."                                     
+                                                                                
+if RES.BASE.INTERVAL.1 <> "" then                                               
+  say " Password interval:" Strip(RES.BASE.INTERVAL.1,'L',0)                    
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* Not only does MINCHANG contain leading zeroes, it may contain     */         
+/* *all* zeroes.                                                     */         
+/* ----------------------------------------------------------------- */         
+if RES.BASE.MINCHANG.1 <> "" & RES.BASE.MINCHANG.1 <> "000" then                
+  say " Password minimum change interval:",                                     
+        Strip(RES.BASE.MINCHANG.1,'L',0)                                        
+else                                                                            
+  say " Password history minimum change interval is not in effect."             
+                                                                                
+if RES.BASE.REVOKE.1 <> "" then                                                 
+  say " Password revoke threshold:" Strip(RES.BASE.REVOKE.1,'L',0)              
+else                                                                            
+  say " Users are not being revoked due to invalid password attempts."          
+                                                                                
+if RES.BASE.WARNING.1 <> "" then                                                
+  say " Password expiration warning threshold:",                                
+        Strip(RES.BASE.WARNING.1,'L',0)                                         
+else                                                                            
+  say " Users are not being warned when their password will expire."            
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* Process password rules.                                           */         
+/* ----------------------------------------------------------------- */         
+if RES.BASE.RULES.1 = "FALSE" then                                              
+  say " There are no password syntax rules in effect."                          
+else do                                                                         
+  do i = 1 to 8                                                                 
+    rule = "RULE"||i                                                            
+    if RES.BASE.rule.1 <> "" Then                                               
+      say " Password rule" i "is: Length("Word(RES.BASE.rule.1,1)")",           
+                                 "Rule("Word(RES.BASE.rule.1,2)")"              
+  end                                                                           
+  say                                                                           
+  say "   Legend:"                                                              
+  say "    A-Alpha C-Consonant L-Alphanum N-Numeric V-Vowel W-Novowel"          
+  say "    c-Mixed consonant m-Mixed numeric v-Mixed vowel $-National"          
+  say "    *-Anything"                                                          
+end                                                                             
+say                                                                             
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* While not strictly a SETROPTS option, it will be instructive and  */         
+/* entertaining to display the status of password and phrase         */         
+/* enveloping. Not only do we get to search a repeat field in the    */         
+/* SETROPTS output, but we get to extract a general resource profile */         
+/* as well.  Using the generic option is an extra bonus.             */         
+/*                                                                   */         
+/* Enveloping can be considered active if the RACFEVNT class is      */         
+/* active and the appropriate resource is defined within the class.  */         
+/* ----------------------------------------------------------------- */         
+found = "false"                                                                 
+do i = 1 to RES.BASE.CLASSACT_CT.REPEATCOUNT Until(found="true")                
+  if RES.BASE.CLASSACT.i = "RACFEVNT" then                                      
+    found = "true"                                                              
+end                                                                             
+if found = "true" then do                                                       
+  myrc =,                                                                       
+    IRRXUTIL("EXTRACT","RACFEVNT","PASSWORD.ENVELOPE","ENV",,"TRUE")            
+  if Word(myrc,1) = "0" Then                                                    
+    say " Password enveloping is in effect."                                    
+  else                                                                          
+    say " Password enveloping is not in effect."                                
+  myrc =,                                                                       
+    IRRXUTIL("EXTRACT","RACFEVNT","PASSPHRASE.ENVELOPE","ENV",,"TRUE")          
+  if Word(myrc,1) = "0" Then                                                    
+    say " Password phrase enveloping is in effect."                             
+  else                                                                          
+    say " Password phrase enveloping is not in effect."                         
+end                                                                             
+else do                                                                         
+  say " Password enveloping is not in effect."                                  
+  say " Password phrase enveloping is not in effect."                           
+end                                                                             
+                                                                                
+say                                                                             
+say "retval="||myrc                                                             

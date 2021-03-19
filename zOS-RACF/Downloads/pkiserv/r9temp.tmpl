@@ -1,0 +1,4885 @@
+#
+# =====================================================================
+#
+# COMPONENT_NAME: pkiserv.tmpl
+#
+# Licensed Materials - Property of IBM
+# 5694-A01
+# Copyright IBM Corp. 2001, 2007
+# Status = HKY7740
+#
+# =====================================================================
+# Change-Activity:
+#  $L1=PKIS4  , HKY7708, 020426, MSF: PKI Services
+#  $D1=MG00882, HKY7708, 020605, MSF: PKI Services
+#  $D2=OW55613, HKY7708, 020712, BRW: PKI Services
+#  $D3=MG01221, HKY7708, 021004, MSD: PKI Services
+#  $D3=MG01364, HKY7708, 021025, JWS: PKI Services
+#  $L2=PKIS6  , HKY7720, 031106, WFC: PKI Services VI
+#  $L3=MG03429, HKY7708, 040312, WFC: PKI Services
+#  $L4=PKIS6  , HKY7720, 040312, WFC: PKI Services VI
+#  $D4=MG04363, HKY7720, 040805, TCG: PKI Services VI
+#  $L5=PKIS7  , HKY7730, 050124, WFC: PKI Services VII
+#  $L6=PKIS7  , HKY7730, 050408, WFC: PKI Services VII
+#  $L7=PKIS7  , HKY7730, 050502, WFC: PKI Services VII
+#  $L8=PKIS7  , HKY7730, 051021, WFC: PKI Services VII
+#  $L9=PKIS7  , HKY7730, 051107, TCG: Microsoft Smart Card logon
+#  $LA=PKIS9  , HKY7740, 060508, WFC: PKI Services IX
+#  $01=OA16805, HKY7740, 061114, WFC: Certificate renewal error
+#  $LB=MG10078, HKY7740, 080103, TCG: CertEnroll Updates
+#
+# Change Descriptions:
+#   A - Support for additional APPLICATION sections               @L1A
+#   C - Added suspend button to user renew page                   @D1A
+#   C - Use AltEmail in S/MIME template                           @D2A
+#   A - Check for vertion of IE with certificate fix              @D3A
+#   C - Typo correction                                           @D3A
+#   A - Add AltOther INSERTs and a new template to include it,    @L2A
+#       add multiple HostIdMap support
+#   D - Remove some templates                                     @L3D
+#   D - Add the DEBUG option and fix the IE PublicKey Insert      @L4A
+#   C - Updated headings for cert request web pages               @D4A
+#   A - Multiple CA Domain support                                @L5A
+#       1)replace the PKISERV Application section with a trimmed
+#         down version, which contains a new subsection -
+#         ADMINSCOPE                                              @L5A
+#       2)add the SelectCADomain INSERT                           @L5A
+#
+#     - Simple Certificate Enrollment Protocol (SCEP) support     @L5A
+#       1)add a new template for SCEP certificate preregistration
+#         which contains a new subsection PREREGISTER             @L5A
+#       2)add the following INSERTs                               @L5A
+#         a. preregok                                             @L5A
+#         b. ClientName                                           @L5A
+#         c. SerialNumber                                         @L5A
+#         d. UnstructAddr                                         @L5A
+#         e. UnstructName                                         @L5A
+#       3)update the n-year template with SerialNumber,           @L5A
+#         UnstructAddr and UnstructName fields                    @L5A
+#   A - PreRegister Request support                               @L6A
+#     - EmailAddr support for EMAIL attribute                     @L6A
+#     - Change Email field name to Mail for MAIL attribute        @L6A
+#   A - Update the demo template                                  @L7A
+#   A - Update the preregister template with prologue             @L8A
+#   C - Microsoft Smart Card Logon extended keyUsage support      @L9A
+#   A - Add AutoRenew support                                     @LAA
+#   C - Updated logic to support renewing a certificate from a
+#       smart card on a different workstaion.                     @01A
+#   A - Add code to enroll certificates using CertEnroll.dll
+#       interfaces (to support IE on Microsoft Windows Vista) as
+#       well as XEnroll.dll interfaces (for other browers & OS).
+#       Also updated Smart Card Logon template and inserts to fix
+#       an inconsistency in the templates file and CGI scripts:
+#       - Changed %%SmartCard[browsertype]%%
+#              to %%PublicKey2[browsertype]%%
+#       - Changed SmartCardNS to PublicKey2NS%%
+#       - Changed SmartCardIE to PublicKey2IE%%                   @LBA
+#
+#======================================================================
+#
+# Configuration file for interfacing with R_PKIServ. This file may be
+# customized as required by the installation. Any line with an '#' in
+# column 1 is considered a comment.
+#
+# Structure:
+#
+#   The file contains a mixture of true HTML and HTML like tags. The
+#   main tags divide the file into sections, APPLICATION, TEMPLATE,
+#   and INSERT, where APPLICATION and TEMPLATE may contain various
+#   subsections, named fields, and substitution variables as explained
+#   below.
+#
+#   <APPLICATION NAME=appl-name> ... </APPLICATION>
+#
+#     This section identifies the applications that will make use of
+#     PKI Services for Z/OS. The product ships with one application
+#     defined, "PKISERV". This section may contain the following subsections:
+#
+#     <CONTENT> ... </CONTENT>
+#
+#        This subsection contains the HTML to be presented to the end
+#        user requesting and retrieving certificates
+#
+#        The subsection should contain one or more named fields
+#        identifying certificate templates to be used for requesting
+#        or managing certificates through this application. (See below
+#        for a description of named fields.) These template names
+#        should match the HTML selection value associated with them.
+#
+#     <RECONTENT> ... </RECONTENT>
+#
+#        This subsection contains the HTML which will display the
+#        certificate details so that the end user may confirm that
+#        that is the certificate to be renewed or revoked. This will
+#        make use of a new substitution variable,[printablecert],
+#        which contains the data extracted from the ICL entry.
+#
+#     <RESUCCESSCONTENT> ... </RESUCCESSCONTENT>
+#
+#        This subsection contains the HTML to be presented to the end
+#        user when the certificate revoke request
+#        was submitted successfully.
+#        Any named fields in this subsection are interpreted as
+#        content inserts defined by INSERT sections. For PKISERV, the
+#        INSERT sections are included as part of the HTML presented
+#        to the end user.
+#
+#     <REFAILURECONTENT> ... </REFAILURECONTENT>
+#
+#        This subsection contains the HTML to be presented to the end
+#        user when the certificate renew/revoke request submit failed.
+#        Any named fields in this subsection are interpreted as
+#        content inserts defined by INSERT sections. For PKISERV, the
+#        INSERT sections are included as part of the HTML presented
+#        to the end user.
+#
+#     <ADMINHEADER> ... </ADMINHEADER>
+#
+#     This subsection contains the general installation specific HTML
+#     content for the header of all admin pages.
+#
+#     <ADMINFOOTER> ... </ADMINFOOTER>
+#
+#     This subsection contains the general installation specific HTML
+#     content for the footer of all admin pages.
+#
+#
+#   <TEMPLATE NAME=tmpl-name> ...
+#   <TEMPLATE NAME=tmpl-name alias>
+#   <NICKNAME=nick-name>
+#   <AUTORENEW=Y or N>
+#      This tag is for setting up automatic certificate renewal. The
+#      values Y or N indicate automatic renewal is enabled or disabled
+#      respectively. It must be placed right below the NICKNAME tag.
+#      If you add this tag, you must also have NotifyEmail as a
+#      required input field.
+#   </TEMPLATE>
+#
+#     This section defines the certificate templates referenced in the
+#     APPLICATION sections. You may refer to a single template by
+#     more than one name using alias. Also since the template name
+#     needs to be recalled in order to renew a certificate, it will
+#     need to be stored with the certificate. The nick name of the
+#     template will serve this purpose.
+#
+#     Applicable subsections are:
+#
+#     <CONTENT> ... </CONTENT>
+#
+#        This subsection contains the HTML to be presented to the end
+#        user requesting certificates of this type. Any named fields
+#        in this subsection are interpreted as certificate field names
+#        defined by INSERT sections. (See below for a description of
+#        named fields.) For PKISERV, the INSERT sections
+#        are included as part of the HTML presented to the end user.
+#        (i.e., the end user provides values for these fields.)
+#        Named fields in this subsection are considered optional if
+#        the named field contains more that one word within the %%
+#        delimiters, e.g., %%AltName (Optional)%%. The user need not
+#        supply a value for AltName
+#
+#     <APPL> ... </APPL>
+#
+#        This subsection identifies certificate fields that the
+#        application itself should provide values for. This subsection
+#        should contain named fields only, one per line.  Currently,
+#        the only supported named field allowed in this section is
+#        "UserId"
+#
+#     <CONSTANT> ... </CONSTANT>
+#
+#        This subsection identifies certificate fields that have a
+#        constant (hardcoded) value for everyone. This subsection
+#        should contain named fields only, one per line. The syntax
+#        for specifying the values is %%field-name=field-value%%,
+#        e.g., %%KeyUsage=handshake%%
+#
+#     <ADMINAPPROVE> ... </ADMINAPPROVE>
+#
+#     This subsection contains the named fields that the administrator
+#     can modify before the request is approved.
+#
+#     <ADMINSCOPE> ... </ADMINSCOPE>
+#
+#        This subsection allows the administrator to choose a different
+#        CA domain to work on.
+#
+#     <SUCCESSCONTENT> ... </SUCCESSCONTENT>
+#
+#        This subsection contains the HTML to be presented to the end
+#        user when the certificate request was submitted successfully.
+#        Any named fields in this subsection are interpreted as
+#        content inserts defined by INSERT sections. For PKISERV, the
+#        INSERT sections are included as part of the HTML presented
+#        to the end user.
+#
+#     <FAILURECONTENT> ... </FAILURECONTENT>
+#
+#        This subsection contains the HTML to be presented to the end
+#        user when the certificate request submit failed.
+#        Any named fields in this subsection are interpreted as
+#        content inserts defined by INSERT sections. For PKISERV, the
+#        INSERT sections are included as part of the HTML presented
+#        to the end user.
+#
+#     <RETRIEVECONTENT> ... </RETRIEVECONTENT>
+#
+#        This subsection contains the HTML to be presented to the end
+#        user to enable certificate retrieval.
+#        Any named fields in this subsection are interpreted as
+#        content inserts defined by INSERT sections. For PKISERV, the
+#        INSERT sections are included as part of the HTML presented
+#        to the end user.
+#
+#     <RETURNCERT> ... </RETURNCERT>
+#
+#     This subsection contains the HTML to be presented to the
+#     enduser upon successful certificate retrieval. For PKISERV, if
+#     the certificate being retrieved is a browser certificate, then
+#     this section must contain a  single line containing a browser
+#     qualified INSERT name, e.g.,  %%returnbrowsercert
+#     [browsertype]%%.  Additionally, INSERTs for Netscape
+#     (returnbrowsercertNS) and Internet Explorer (returnbrowsercertIE)
+#     containing browser specific HTML for returning certificates must
+#     be defined elsewhere in the configuration file.  If the
+#     certificate being retrieved is a server certificate, this section
+#     should contain the HTML necessary to present the certificate
+#     to the user as text
+#
+#     <PREREGISTER> ... </PREREGISTER>
+#
+#        The presence of this subsection indicates the creation of a
+#        preregistration record. It contains the rules of approval of
+#        this record.
+#
+#   <INSERT NAME=insert-name> ... </INSERT>
+#     This section contains HTML that either describes a certificate
+#     field or defines other common HTML that may be referenced in
+#     the TEMPLATE sections.  INSERTs are referenced elsewhere by
+#     using a named field of the form %%insert-name%%
+#
+#   Named Fields - Delineated with %%, e.g., %%Label%%. Their meaning
+#   is specific to the section they are contained in.  Named fields
+#   are case sensitive. Named fields are also used to reference common
+#   includeable HTML. Note, PKISERV treats named fields that begin with
+#   a dash as just includeable code. Any special meaning a named field
+#   may have, given the section its contained in, is ignored if it
+#   begins with a dash. For example, if %%-pagefooter%% was specified
+#   in a TEMPLATE CONTENT section, -pagefooter would not be considered
+#   a certificate field name. However, the INSERT with the name
+#   -pagefooter would be included in the HTML page presented to the
+#   end user.
+#
+#   Substitution Variables - Delineated with square brackets, e.g.,
+#   [base64cert]. They represent variables that get replaced with
+#   an actual value at run time. Substitution variables are case
+#   sensitive. The valid substitution variables are:
+#
+#     transactionid - Unique value returned from a certificate request.
+#
+#     tmplname - Certificate template name. Primed from the HTML tag
+#     <SELECT NAME="Template"> in the <APPLICATION NAME=PKISERV>
+#     section.  This is selected by the end user on the first web page.
+#
+#     iecert - The requested certificate in a form the Microsoft
+#              Internet Explorer accepts.
+#
+#     base64cert - The requested base64 encoded certificate.
+#
+#     browsertype - Special substitution variable to be used to qualify
+#     named field only. Its use enables the different browsers,
+#     Netscape and Internet Explorer, to perform browser specific
+#     operations, i.e., Netscape uses a KEYGEN HTML tag to generate a
+#     public/private key pair while Internet Explorer uses ACTIVEX
+#     controls. For example, if %%PublicKey[browsertype]%% was
+#     specified in a TEMPLATE CONTENT section referenced by a user
+#     with the Netscape Navigator browser then INSERT PublicKeyNS
+#     would be included. Likewise, if the users browser was the
+#     Microsoft Internet Explorer, INSERT PublicKeyIE would be included.
+#
+#     optfield - Special substitution variable that should be placed in
+#     any certificate field name INSERT where the value may be supplied
+#     by the end user. It enables the field to be displayed as optional
+#     if desired.
+#
+#     printablecert - Summary information about the certificate to be
+#                     renewed/revoked, such as issuer's name, subject's
+#                     name...
+#
+#     errorinfo - Information about the failing SAF call such as the
+#                 return code and reason code.
+#
+#     altrawvalue- The concatenated value of the AltOther field(s)
+#                  without the OID in the AltOther_<OID>
+#                  INSERT.
+#
+#     readonly  -  An attribute of the INPUT field in the AltOther_<OID>
+#                  INSERT. It will be converted to a NULL string when
+#                  the INSERT is used for input purpose, eg. when
+#                  requesting a certificate; it will be substituted
+#                  with string 'readonly' for output purposes, eg. when
+#                  display request/certificate information.
+#
+#     cadomain  -  The CA Domain name used to examine the preregister
+#                  record.
+#
+#   Note, depending on where a substitution variable is used, it may
+#   not have a valid meaning, e.g., base64cert would be meaningless
+#   prior to the certificate being retrieved. The value of
+#   [base64cert] would be the empty string (a.k.a. NULL) in this case.
+#
+# =====================================================================
+# Change DEBUG=0 to DEBUG=1 to get the CGIs debugging information.
+<DEBUG=0>
+
+# =====================================================================
+#
+# Application - PKISERV
+#
+# The installation should customize the CONTENT, ADMINHEADER
+# ADMINFOOTER, and ADMINSCOPE subsections as appropriate
+#
+# =====================================================================
+#
+<APPLICATION NAME=PKISERV>
+<CONTENT>
+<HTML><HEAD>
+<TITLE>PKI Administrators Start Page</TITLE>
+%%-copyright%%
+</HEAD>
+<BODY>
+<H1>PKI Administrators Start Page</H1>
+<p>
+<A HREF="/PKIServ/cacerts/cacert.der">
+Install the CA certificate to enable SSL sessions for PKI Services </A>
+<H2>Choose one of the following:</H1>
+<p>
+<h3>Manage existing certificates and certificate requests</h3>
+# The following action will force userid/pw authentication for
+# administrators
+<FORM name=admform METHOD=GET ACTION="/PKIServ/ssl-cgi/auth/admmain.rexx">
+# The following action will force client certificate authentication for administrators
+#<FORM name=admform METHOD=GET
+# ACTION="/PKIServ/clientauth-cgi/auth/admmain.rexx">
+<p>
+<INPUT TYPE="submit" VALUE="Administration Page">
+</FORM>
+# Multiple CA mode - replicate and modify the following H3 and FORM
+# section for each CA domain.
+<h3>Go to the Customers' home page </h3>
+<FORM name=admform METHOD=GET ACTION="/Customers/public-cgi/camain.rexx">
+<p>
+<INPUT TYPE="submit" VALUE="Customers' Home Page">
+</FORM>
+<p> %%-pagefooter%%
+</BODY>
+</HTML>
+</CONTENT>
+<ADMINHEADER>
+<HTML><HEAD>
+<TITLE>Web Based Certificate Generation Administration</TITLE>
+%%-copyright%%
+</HEAD>
+<BODY>
+</ADMINHEADER>
+<ADMINFOOTER>
+<p> %%-pagefooter%%
+</BODY>
+</HTML>
+</ADMINFOOTER>
+<ADMINSCOPE>
+# Uncomment the following line to enable multiple CA domains
+#%%SelectCADomain%%
+</ADMINSCOPE>
+</APPLICATION>
+
+
+# =====================================================================
+#
+# Application - CUSTOMERS
+#
+# The installation should customize the CONTENT subsection as appropriate
+#
+# =====================================================================
+#
+<APPLICATION NAME=CUSTOMERS>
+<CONTENT>
+<HTML><HEAD>
+<TITLE> Customers Certificate Generation Application </TITLE>
+%%-copyright%%
+</HEAD>
+<BODY>
+<H1>PKI Services Certificate Generation Application</H1>
+<p>
+<A HREF="/PKIServ/cacerts/cacert.der">
+Install the CA certificate to enable SSL sessions for PKI Services </A>
+<H2>Choose one of the following:</H2>
+<ul>
+<li><h3>Request a new certificate using a model</h3>
+<FORM name=mainform METHOD=GET ACTION="/[application]/ssl-cgi/catmpl.rexx">
+<p> Select the certificate template to use as a model
+<SELECT NAME="Template">
+ %%1-Year PKI SSL Browser Certificate%%
+     <OPTION>1-Year PKI SSL Browser Certificate
+ %%1-Year PKI S/MIME Browser Certificate%%
+     <OPTION>1-Year PKI S/MIME Browser Certificate
+ %%2-Year PKI Windows Logon Certificate%%
+     <OPTION>2-Year PKI Windows Logon Certificate
+ %%2-Year PKI Browser Certificate For Authenticating To z/OS%%
+     <OPTION>2-Year PKI Browser Certificate For Authenticating To z/OS
+ %%5-Year PKI SSL Server Certificate%%
+     <OPTION>5-Year PKI SSL Server Certificate
+ %%5-Year PKI IPSEC Server (Firewall) Certificate%%
+     <OPTION>5-Year PKI IPSEC Server (Firewall) Certificate
+ %%5-Year PKI Intermediate CA Certificate%%
+     <OPTION>5-Year PKI Intermediate CA Certificate
+ %%2-Year PKI Authenticode - Code Signing Certificate%%
+     <OPTION>2-Year PKI Authenticode - Code Signing Certificate
+ %%5-Year SCEP Certificate - Preregistration%%
+     <OPTION>5-Year SCEP Certificate - Preregistration
+ %%n-Year PKI Certificate for Extensions Demonstration%%
+     <OPTION>n-Year PKI Certificate for Extensions Demonstration
+ %%1-Year SAF Browser Certificate%%
+     <OPTION>1-Year SAF Browser Certificate
+ %%1-Year SAF Server Certificate%%
+     <OPTION>1-Year SAF Server Certificate
+</SELECT>
+<p>
+<INPUT TYPE="submit" VALUE="Request Certificate">
+</FORM>
+<li><h3>Pick up a previously requested certificate</h3>
+<FORM name=selform METHOD=GET
+   ACTION="/[application]/ssl-cgi/caretrieve.rexx" onSubmit=
+   "return ValidateEntry(this)">
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidTransactionId(frm)) {
+# Add your own Javascript here if needed ---
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+%%-TransactionId%%
+<br>Select the certificate return type
+<SELECT NAME="Template">
+ %%PKI Browser Certificate%%
+     <OPTION>PKI Browser Certificate
+ %%PKI Server Certificate%%
+     <OPTION>PKI Server Certificate
+ %%SAF Browser Certificate%%
+     <OPTION>SAF Browser Certificate
+ %%SAF Server Certificate%%
+     <OPTION>SAF Server Certificate
+</SELECT>
+#-- End user input fields and validation Javascript ------------
+<p>
+<INPUT TYPE="submit" VALUE="Pick up Certificate">
+</FORM>
+<li><h3>Renew or revoke a previously issued browser certificate</h3>
+<FORM name=selform METHOD=GET ACTION="/[application]/clientauth-cgi/cadisplay.rexx">
+<p>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function RenewRevokeAlert(){
+var STRING_RenewRevokePrompt=
+                  "You will be prompted by the browser to select " +
+                  "the certificate you want to renew or revoke. " +
+                  "Once you select the certificate you will be " +
+                  "given the opportunity to confirm your selection. " +
+                  "Note that you can only renew or revoke a single " +
+                  "certificate per one browser session. If you wish " +
+                  "to renew or revoke another certificate, you must " +
+                  "close your browser and restart it.";
+ alert(STRING_RenewRevokePrompt);
+ return true;
+}
+
+//-->
+</SCRIPT>
+<INPUT TYPE="submit" VALUE="Renew or Revoke Certificate"
+onClick="return RenewRevokeAlert()">
+</FORM>
+</ul>
+<p> %%-pagefooter%%
+</BODY>
+</HTML>
+</CONTENT>
+<RECONTENT>
+<HTML><HEAD>
+<TITLE> Customers Renew or Revoke a Browser Certificate </TITLE>
+#-- Create a certmgr object for use in the renew process @01A
+<OBJECT
+  classid="clsid:127698e4-e730-4e5c-a2b1-21490a70c8a1"
+  CODEBASE="xenroll.cab#Version=5,131,3659,0"
+  id="certmgr"
+>
+</OBJECT>
+#-- Create g_objWCF object for CertEnroll process                  6@LBA
+<OBJECT
+  classid="clsid:884e2049-217d-11da-b2a4-000e7bbb2b09"
+  id="g_objWCF"
+>
+</OBJECT>
+%%-copyright%%
+</HEAD>
+<BODY>
+<H1>Renew or Revoke a Browser Certificate</H1>
+<h3>Here is the certificate you selected:</h3>
+<p>
+[printablecert]
+<h2>If this is the correct certificate, choose one of the following:</h2>
+<b>(otherwise you need to restart your browser to pick another certificate)</b>
+<ul>
+<h3><li>Renew the above certificate</h3>
+<FORM name=renform METHOD=POST
+ ACTION="/[application]/clientauth-cgi/camodify.rexx" OnSubmit=
+ "return ValidateEntry(this)">
+<INPUT NAME="action" TYPE="hidden" VALUE="renew">
+#-- User input fields and validation Javascript ---------------
+#-- Added call to ValidRenewKeySet to ValidateEntry function @01C
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidNotifyEmail(frm)
+ && ValidPassPhrase(frm)
+ && ValidRenewKeySet(frm)
+   ) {
+# Add your own Javascript here if needed ---
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+%%NotifyEmail (optional)%%
+%%PassPhrase%%
+# Add RenewKeySet for the browse type in use. @01A
+%%-RenewKeySet[browsertype]%%
+#-- End user input fields and validation Javascript ------------
+<p>
+<INPUT TYPE="submit" VALUE="Renew">
+</FORM>
+<h3><li>Revoke the above certificate</h3>
+<FORM name=revform METHOD=POST
+ ACTION="/[application]/clientauth-cgi/camodify.rexx">
+<INPUT NAME="action" TYPE="hidden" VALUE="revoke">
+<INPUT TYPE="submit" VALUE="Revoke">
+<SELECT NAME="reason">
+ <OPTION Selected VALUE="0">No Reason
+ <OPTION VALUE="1">User key was compromised
+ <OPTION VALUE="2">CA key was compromised
+ <OPTION VALUE="3">User changed affiliation
+ <OPTION VALUE="4">Certificate was superseded
+ <OPTION VALUE="5">Original use no longer valid
+</SELECT>
+</FORM>
+<h3><li>Suspend the above certificate</h3>
+<FORM name=suspform METHOD=POST
+ ACTION="/[application]/clientauth-cgi/camodify.rexx">
+<INPUT NAME="action" TYPE="hidden" VALUE="suspend">
+<INPUT TYPE="submit" VALUE="Suspend">
+</FORM>
+</ul>
+<p>
+<FORM METHOD=GET ACTION="/[application]/public-cgi/camain.rexx">
+<center>
+<INPUT TYPE="submit" VALUE="Home Page">
+</FORM>
+</center>
+<p> %%-pagefooter%%
+</BODY>
+</HTML>
+</RECONTENT>
+<RESUCCESSCONTENT>
+ %%-renewrevokeok%%
+</RESUCCESSCONTENT>
+<REFAILURECONTENT>
+ %%-renewrevokebad%%
+</REFAILURECONTENT>
+</APPLICATION>
+
+#
+# =====================================================================
+#
+# Sample Templates - Browser and Server Certificate Requesting
+#
+# =====================================================================
+#
+# Template Name - 1-Year SAF Server Certificate
+#
+# Function - Allows end users to request certificates for servers
+# using native SAF certificate generation facilities. The end user
+# may provide values for any of the following fields:
+#
+#  CommonName - optional
+#  OrgUnit - required
+#  Org - required
+#  Locality  - optional
+#  StateProv  - optional
+#  Country - required
+#  AltEmail  - optional
+#  AltDomain  - optional
+#  AltURI  - optional
+#  AltIPAddr  - optional
+#  Label - required
+#  PublicKey - required (This is the PKCS#10 request)
+#
+# PKISERV will provide the authenticated client UserId. The certificate
+# will be used for handshaking only (e.g., SSL) and is good for 1
+# year. The CERTAUTH certificate with Label "Local SAF CA" will be
+# used for signing the certificate
+#
+# =====================================================================
+#
+<TEMPLATE NAME=1-Year SAF Server Certificate>
+<TEMPLATE NAME=SAF Server Certificate>
+<CONTENT>
+<HTML><HEAD>
+<TITLE> Web Based SAF Certificate Generation Application Pg 2</TITLE>
+%%-copyright%%
+</HEAD>
+<BODY>
+<H1> SAF Server Certificate 1-Year (Auto Approved)</H1>
+<p>
+<H2>Choose one of the following:</H2>
+<p>
+<ul>
+<h3><li>Request a New Certificate</h3>
+# This ACTION forces userid/pw authentication and runs the task under
+# the client's ID
+#<FORM NAME=serverform METHOD=POST ACTION=
+#                "/[application]/ssl-cgi-bin/auth/careq.rexx" onSubmit=
+
+# This ACTION forces userid/pw authentication but runs the task under
+# the surrogate ID
+ <FORM NAME=serverform METHOD=POST ACTION=
+               "/[application]/ssl-cgi-bin/surrogateauth/careq.rexx" onSubmit=
+
+# This ACTION is for non z/OS clients. The task runs under the
+# surrogate ID
+#<FORM NAME=serverform METHOD=POST ACTION=
+#              "/[application]/ssl-cgi-bin/careq.rexx" onSubmit=
+    "return ValidateEntry(this)">
+
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+ if (ValidCommonName(frm) &&
+   ValidOrgUnit(frm) &&
+   ValidOrgUnit2(frm) &&
+   ValidOrg(frm) &&
+   ValidLocality(frm) &&
+   ValidStateProv(frm) &&
+   ValidCountry(frm) &&
+   ValidAltEmail(frm) &&
+   ValidAltDomain(frm) &&
+   ValidAltURI(frm) &&
+   ValidAltIPAddr(frm) &&
+   ValidLabel(frm) &&
+   ValidPublicKey(frm)){
+# Add your validation Javascript here if needed ---
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%Label%%
+ %%CommonName (Optional)%%
+ %%OrgUnit%%
+ %%OrgUnit2 (Optional)%%
+ %%Org%%
+ %%Locality (Optional)%%
+ %%StateProv (Optional)%%
+ %%Country%%
+ %%AltEmail (Optional)%%
+ %%AltDomain (Optional)%%
+ %%AltURI (Optional)%%
+ %%AltIPAddr (Optional)%%
+ %%PublicKey%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="Submit" VALUE="Submit certificate request">
+<INPUT TYPE="reset" VALUE="Clear">
+</FORM>
+<p>
+<H3><li>Pick Up a Previously Issued Certificate</H3>
+
+<FORM METHOD=GET ACTION="/[application]/ssl-cgi/caretrieve.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Retrieve your certificate">
+</FORM>
+</ul>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</CONTENT>
+<APPL>
+ %%UserId%%
+</APPL>
+<CONSTANT>
+ %%KeyUsage=handshake%%
+ %%NotAfter=365%%
+ %%SignWith=SAF:CERTAUTH/taca%%
+</CONSTANT>
+<SUCCESSCONTENT>
+ %%-requestok%%
+</SUCCESSCONTENT>
+<FAILURECONTENT>
+ %%-requestbad%%
+</FAILURECONTENT>
+
+<RETRIEVECONTENT>
+<HTML><HEAD>
+<TITLE> Web Based SAF Certificate Generation Application Pg 3</TITLE>
+%%-copyright%%
+</HEAD>
+
+<BODY>
+<H1> Retrieve Your [tmplname]</H1>
+<H3>Please bookmark this page</h3>
+<p>Since your certificate may not have been issued yet, we recommend
+that you create a bookmark to this location so that when you return to
+this bookmark, the browser will display your transaction ID.
+This is the easiest way to check your status.
+
+# This ACTION forces userid/pw authentication and runs the task
+# under the client's ID
+<FORM NAME=retrieveform METHOD=POST ACTION=
+      "/[application]/ssl-cgi-bin/auth/cagetcert.rexx" onSubmit=
+#
+# This ACTION forces userid/pw authentication but runs the task
+# under the surrogate ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/surrogateauth/cagetcert.rexx" onSubmit=
+#
+# This ACTION is for non z/OS clients. The task runs under surrogate ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/cagetcert.rexx" onSubmit=
+      "return ValidateEntry(this)">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidTransactionId(frm)){
+# Add your own Javascript here if needed
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%-TransactionId%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Continue">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</RETRIEVECONTENT>
+<RETURNCERT>
+%%-returnpkcs10cert%%
+</RETURNCERT>
+</TEMPLATE>
+
+#
+# =====================================================================
+#
+# Template Name - 1-Year SAF Browser Certificate
+#
+# Function - Allows end users to request certificates for their
+# browsers using native SAF certificate generation facilities. The end
+# user may provide values for any of the following fields:
+#
+#  Label - required
+#  PublicKey - required (Provided by the browser itself)
+#
+# PKISERV will provide the authenticated client UserId. The certificate
+# will be used for handshaking only (e.g., SSL) and is good for 1
+# year. The CERTAUTH certificate with Label "Local SAF CA" will be
+# used for signing the certificate. The Subject's Distinguished Name
+# will be formed as:
+#
+#  C=US/O=The Firm/OU=SAF template certificate/
+#           OU=Nuts and Bolts Division/CN=<determined by SAF>
+#
+#  The presence of CommonName without a value tells SAF to determine
+#  the CN value from the PGMRNAME field of the user's USER profile.
+#  See the RACF Callable Services Guide for more information
+#
+# =====================================================================
+#
+<TEMPLATE NAME=1-Year SAF Browser Certificate>
+<TEMPLATE NAME=SAF Browser Certificate>
+<CONTENT>
+<HTML><HEAD>
+<TITLE> Web Based SAF Certificate Generation Application Pg 2</TITLE>
+%%-copyright%%
+%%-AdditionalHead[browsertype]%%
+</HEAD>
+
+<BODY>
+<H1> SAF Browser Certificate 1-Year (Auto Approved)</H1>
+<p>
+<H2>Choose one of the following:</H2>
+<p>
+<ul>
+<h3><li>Request a New Certificate</h3>
+# This ACTION forces userid/pw authentication and runs the task under
+# the client's ID
+#<FORM NAME="CertReq" METHOD=POST ACTION=
+#                "/[application]/ssl-cgi-bin/auth/careq.rexx" onSubmit=
+
+# This ACTION forces userid/pw authentication but runs the task under
+# the surrogate ID
+ <FORM NAME="CertReq" METHOD=POST ACTION=
+               "/[application]/ssl-cgi-bin/surrogateauth/careq.rexx" onSubmit=
+
+# This ACTION is for non z/OS clients. The task runs under the
+# surrogate ID
+#<FORM NAME="CertReq" METHOD=POST ACTION=
+#              "/[application]/ssl-cgi-bin/careq.rexx" onSubmit=
+    "return ValidateEntry(this)">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidLabel(frm) &&
+   ValidPublicKey(frm)){
+# Add your validation Javascript here if needed ---
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%Label%%
+ %%PublicKey[browsertype]%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="Submit" VALUE="Submit certificate request">
+<INPUT TYPE="reset" VALUE="Clear">
+</FORM>
+<p>
+<H3><li>Pick Up a Previously Issued Certificate</H3>
+<FORM METHOD=GET ACTION="/[application]/ssl-cgi/caretrieve.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Retrieve your certificate">
+</FORM>
+</ul>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</CONTENT>
+<APPL>
+ %%UserId%%
+</APPL>
+<CONSTANT>
+ %%CommonName=%%
+ %%KeyUsage=handshake%%
+ %%OrgUnit=SAF template certificate%%
+ %%OrgUnit=Nuts and Bolts Division%%
+ %%Org=The Firm%%
+ %%Country=US%%
+ %%NotAfter=365%%
+ %%SignWith=SAF:CERTAUTH/taca%%
+</CONSTANT>
+<SUCCESSCONTENT>
+ %%-requestok%%
+</SUCCESSCONTENT>
+<FAILURECONTENT>
+ %%-requestbad%%
+</FAILURECONTENT>
+<RETRIEVECONTENT>
+
+<HTML><HEAD>
+%%-copyright%%
+<TITLE> Web Based SAF Certificate Generation Application Pg 3</TITLE>
+</HEAD>
+
+<BODY>
+<H1> Retrieve Your [tmplname]</H1>
+<H3>Please bookmark this page</h3>
+<p>Since your certificate may not have been issued yet, we recommend
+that you create a bookmark to this location so that when you return to
+this bookmark, the browser will display your transaction ID.
+This is the easiest way to check your status.
+
+# This ACTION forces userid/pw authentication and runs the task
+# under the client's ID
+<FORM NAME=retrieveform METHOD=POST ACTION=
+      "/[application]/ssl-cgi-bin/auth/cagetcert.rexx" onSubmit=
+#
+# This ACTION forces userid/pw authentication but runs the task
+# under the surrogate ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/surrogateauth/cagetcert.rexx" onSubmit=
+#
+# This ACTION is for non z/OS clients. The task runs under surrogate ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/cagetcert.rexx" onSubmit=
+      "return ValidateEntry(this)">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidTransactionId(frm)) {
+# Add your own Javascript here if needed
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%-TransactionId%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Retrieve and Install Certificate">
+</FORM>
+<p>
+<H2>To check that your certificate installed properly, follow the
+procedure below:</h2>
+<p><B>Netscape V6</B> - Click Edit->Preferences, then Privacy and Security->
+Certificates. Click the Manage Certificates button to start the Certificate Manager.
+Your new certificate should appear in the Your Certificates list.
+Select it then click View to see more information.
+<p><B>Netscape V4</B> - Click the Security button, then Certificates->
+Yours. Your certificate should appear in the list.  Select it then
+click Verify.
+<p><B>Internet Explorer V5</B> - Click Tools->Internet Options, then
+Content, Certificates.
+Your certificate should appear in the Personal list. Click Advanced to
+see additional information.
+<p>
+<FORM METHOD=GET ACTION="/[application]/public-cgi/camain.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Home page">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</RETRIEVECONTENT>
+<RETURNCERT>
+%%returnbrowsercert[browsertype]%%
+</RETURNCERT>
+</TEMPLATE>
+
+#
+#
+# =====================================================================
+#
+# Template Name - 1-Year PKI SSL Browser Certificate
+#
+# Function - Creates a 1-year certificate good for general SSL client
+#            authentication using a browser. If approved, the
+#            certificate becomes valid after it's requested.
+#            (You may delay the valid date by specifying a non zero
+#             number for the value of 'NotBefore',
+#             eg. NotBefore=5. That means if the request is approved,
+#             the certificate will become valid 5 days after it's
+#             requested.)
+#
+#            These certificates will be stored in LDAP if The O= and
+#            OU= suffixes have already been created
+#
+# Other than the user input fields, all other information is hard coded.
+#
+# User input fields:
+#  CommonName - required
+#  Requestor - optional
+#  PassPhrase - required
+#  PublicKey - required (Provided by the browser itself)
+#  NotifyEmail - optional
+#  Mail - optional
+#
+#  RACF userid/password authentication : not required
+#  Administrator approval              : required
+#
+# =====================================================================
+#
+<TEMPLATE NAME=1-Year PKI SSL Browser Certificate>
+<TEMPLATE NAME=PKI Browser Certificate>
+<NICKNAME=1YBSSL>
+#<AUTORENEW=Y>
+<CONTENT>
+<HTML><HEAD>
+<TITLE> Web Based PKIX Certificate Generation Application Pg 2</TITLE>
+%%-copyright%%
+%%-AdditionalHead[browsertype]%%
+</HEAD>
+
+<BODY>
+<H1>1-Year PKI SSL Browser Certificate</H1>
+<p>
+<H2>Choose one of the following:</H2>
+<p>
+<ul>
+<h3><li>Request a New Certificate</h3>
+# This ACTION forces userid/pw authentication and runs the task under
+# the client's ID
+#<FORM NAME="CertReq" METHOD=POST ACTION=
+#                "/[application]/ssl-cgi-bin/auth/careq.rexx" onSubmit=
+
+# This ACTION forces userid/pw authentication but runs the task under
+# the surrogate ID
+#<FORM NAME="CertReq" METHOD=POST ACTION=
+#              "/[application]/ssl-cgi-bin/surrogateauth/careq.rexx" onSubmit=
+
+# This ACTION is for non z/OS clients. The task runs under the
+# surrogate ID
+ <FORM NAME="CertReq" METHOD=POST ACTION=
+               "/[application]/ssl-cgi-bin/careq.rexx" onSubmit=
+    "return ValidateEntry(this)">
+
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidRequestor(frm) &&
+    ValidMail(frm) &&
+    ValidCommonName(frm) &&
+    ValidNotifyEmail(frm) &&
+    ValidPassPhrase(frm) &&
+    ValidPublicKey(frm)) {
+# Add your validation Javascript here if needed ---
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%Requestor (optional)%%
+ %%NotifyEmail (optional)%%
+ %%PassPhrase%%
+ %%Mail (optional)%%
+ %%CommonName%%
+ %%PublicKey[browsertype]%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="Submit" VALUE="Submit certificate request">
+<INPUT TYPE="reset" VALUE="Clear">
+</FORM>
+<p>
+<H3><li>Pick Up a Previously Issued Certificate</H3>
+<FORM METHOD=GET ACTION="/[application]/ssl-cgi/caretrieve.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Retrieve your certificate">
+</FORM>
+</ul>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</CONTENT>
+<CONSTANT>
+ %%OrgUnit=Class 1 Internet Certificate CA%%
+ %%Org=The Firm%%
+ %%KeyUsage=handshake%%
+ %%ExtKeyUsage=clientauth%%
+ %%NotBefore=0%%
+ %%NotAfter=365%%
+ %%SignWith=PKI:%%
+</CONSTANT>
+<ADMINAPPROVE>
+ %%CommonName (Optional)%%
+ %%OrgUnit (Optional)%%
+ %%OrgUnit (Optional)%%
+ %%Org (Optional)%%
+ %%KeyUsage (Optional)%%
+ %%HostIdMap (Optional)%%
+ %%HostIdMap (Optional)%%
+ %%HostIdMap (Optional)%%
+ %%HostIdMap (Optional)%%
+ %%NotBefore (optional)%%
+ %%NotAfter (Optional)%%
+</ADMINAPPROVE>
+<SUCCESSCONTENT>
+ %%-requestok%%
+</SUCCESSCONTENT>
+<FAILURECONTENT>
+ %%-requestbad%%
+</FAILURECONTENT>
+
+<RETRIEVECONTENT>
+<HTML><HEAD>
+%%-copyright%%
+<TITLE> Web Based PKIX Certificate Generation Application Pg 3</TITLE>
+</HEAD>
+
+<BODY>
+<H1> Retrieve Your [tmplname]</H1>
+<H3>Please bookmark this page</h3>
+<p>Since your certificate may not have been issued yet, we recommend
+that you create a bookmark to this location so that when you return to
+this bookmark, the browser will display your transaction ID.
+This is the easiest way to check your status.
+
+# This ACTION forces userid/pw authentication and runs the task
+# under the client's ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#     "/[application]/ssl-cgi-bin/auth/cagetcert.rexx" onSubmit=
+#
+# This ACTION forces userid/pw authentication but runs the task
+# under the surrogate ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/surrogateauth/cagetcert.rexx" onSubmit=
+#
+# This ACTION is for non z/OS clients. The task runs under surrogate ID
+<FORM NAME=retrieveform METHOD=POST ACTION=
+       "/[application]/ssl-cgi-bin/cagetcert.rexx" onSubmit=
+      "return ValidateEntry(this)">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidTransactionId(frm) &&
+    ValidChallengePassPhrase(frm)) {
+# Add your own Javascript here if needed
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%-TransactionId%%
+ %%ChallengePassPhrase (optional)%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Retrieve and Install Certificate">
+</FORM>
+<p>
+<H2>To check that your certificate installed properly, follow the
+procedure below:</h2>
+<p><B>Netscape V6</B> - Click Edit->Preferences, then Privacy and Security->
+Certificates. Click the Manage Certificates button to start the Certificate Manager.
+Your new certificate should appear in the Your Certificates list.
+Select it then click View to see more information.
+<p><B>Netscape V4</B> - Click the Security button, then Certificates->
+Yours. Your certificate should appear in the list.  Select it then
+click Verify.
+<p><B>Internet Explorer V5</B> - Click Tools->Internet Options, then
+Content, Certificates.
+Your certificate should appear in the Personal list. Click Advanced to
+see additional information.
+<p>
+<FORM METHOD=GET ACTION="/[application]/public-cgi/camain.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Home page">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</RETRIEVECONTENT>
+<RETURNCERT>
+%%returnbrowsercert[browsertype]%%
+</RETURNCERT>
+</TEMPLATE>
+
+#
+#
+# =====================================================================
+#
+# Template Name - 1-Year PKI S/MIME Browser Certificate
+#
+# Function - Creates a 1-year certificate good for S/MIME
+#            authentication using a browser. If approved, the
+#            certificate becomes valid after it's requested.
+#            (You may delay the valid date by specifying a non zero
+#             number for the value of 'NotBefore',
+#             eg. NotBefore=5. That means if the request is approved,
+#             the certificate will become valid 5 days after it's
+#             requested.)
+#
+#            These certificates will be stored in LDAP if The O= and
+#            OU= suffixes have already been created
+#
+# Other than the user input fields, all other information is hard coded.
+#
+# User input fields:
+#  CommonName - required
+#  AltEmail - required                                              @D2C
+#  Requestor - optional
+#  PassPhrase - required
+#  PublicKey - required (Provided by the browser itself)
+#  NotifyEmail- optional
+#
+#  RACF userid/password authentication : not required
+#  Administrator approval              : required
+#
+#
+# =====================================================================
+#
+<TEMPLATE NAME=1-Year PKI S/MIME Browser Certificate>
+<TEMPLATE NAME=PKI Browser Certificate>
+<NICKNAME=1YBSM>
+#<AUTORENEW=Y>
+<CONTENT>
+<HTML><HEAD>
+<TITLE> Web Based PKIX Certificate Generation Application Pg 2</TITLE>
+%%-copyright%%
+%%-AdditionalHead[browsertype]%%
+</HEAD>
+
+<BODY>
+<H1>1-Year PKI S/MIME Browser Certificate</H1>
+<p>
+<H2>Choose one of the following:</H2>
+<p>
+<ul>
+<h3><li>Request a New Certificate</h3>
+# This ACTION forces userid/pw authentication and runs the task under
+# the client's ID
+#<FORM NAME="CertReq" METHOD=POST ACTION=
+#                "/[application]/ssl-cgi-bin/auth/careq.rexx" onSubmit=
+
+# This ACTION forces userid/pw authentication but runs the task under
+# the surrogate ID
+#<FORM NAME="CertReq" METHOD=POST ACTION=
+#              "/[application]/ssl-cgi-bin/surrogateauth/careq.rexx" onSubmit=
+
+# This ACTION is for non z/OS clients. The task runs under the
+# surrogate ID
+ <FORM NAME="CertReq" METHOD=POST ACTION=
+               "/[application]/ssl-cgi-bin/careq.rexx" onSubmit=
+    "return ValidateEntry(this)">
+
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+  if (ValidRequestor(frm) &&
+   ValidAltEmail(frm) &&
+   ValidCommonName(frm) &&
+   ValidNotifyEmail(frm) &&
+   ValidPassPhrase(frm) &&
+   ValidPublicKey(frm)) {
+# Add your validation Javascript here if needed ---
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%Requestor (optional)%%
+ %%NotifyEmail (optional)%%
+ %%PassPhrase%%
+ %%CommonName%%
+ %%AltEmail%%
+ %%PublicKey[browsertype]%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="Submit" VALUE="Submit certificate request">
+<INPUT TYPE="reset" VALUE="Clear">
+</FORM>
+<p>
+<H3><li>Pick Up a Previously Issued Certificate</H3>
+<FORM METHOD=GET ACTION="/[application]/ssl-cgi/caretrieve.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Retrieve your certificate">
+</FORM>
+</ul>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</CONTENT>
+<CONSTANT>
+ %%OrgUnit=Class 1 Internet Certificate CA%%
+ %%Org=The Firm%%
+ %%KeyUsage=handshake%%
+ %%NotBefore=0%%
+ %%NotAfter=365%%
+ %%SignWith=PKI:%%
+</CONSTANT>
+<ADMINAPPROVE>
+ %%CommonName (Optional)%%
+ %%OrgUnit (Optional)%%
+ %%Org (Optional)%%
+ %%KeyUsage (Optional)%%
+ %%AltEmail (Optional)%%
+ %%NotBefore (Optional)%%
+ %%NotAfter (Optional)%%
+</ADMINAPPROVE>
+<SUCCESSCONTENT>
+ %%-requestok%%
+</SUCCESSCONTENT>
+<FAILURECONTENT>
+ %%-requestbad%%
+</FAILURECONTENT>
+
+<RETRIEVECONTENT>
+<HTML><HEAD>
+%%-copyright%%
+<TITLE> Web Based PKIX Certificate Generation Application Pg 3</TITLE>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function MissingTransIdAlert(){
+var STRING_MissingTransIdPrompt=
+    "Enter the transaction ID assigned to the certificate.";
+if(document.retrieveform.TransactionId.value==""){
+ alert(STRING_MissingTransIdPrompt);
+ document.retrieveform.TransactionId.focus();
+ return true;
+}
+else {
+ return false;
+ }
+}
+//-->
+</SCRIPT>
+</HEAD>
+
+<BODY>
+<H1> Retrieve Your [tmplname]</H1>
+<H3>Please bookmark this page</h3>
+<p>Since your certificate may not have been issued yet, we recommend
+that you create a bookmark to this location so that when you return to
+this bookmark, the browser will display your transaction ID.
+This is the easiest way to check your status.
+
+# This ACTION forces userid/pw authentication and runs the task
+# under the client's ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/auth/cagetcert.rexx" onSubmit=
+#
+# This ACTION forces userid/pw authentication but runs the task
+# under the surrogate ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/surrogateauth/cagetcert.rexx" onSubmit=
+#
+# This ACTION is for non z/OS clients. The task runs under surrogate ID
+ <FORM NAME=retrieveform METHOD=POST ACTION=
+       "/[application]/ssl-cgi-bin/cagetcert.rexx" onSubmit=
+      "return ValidateEntry(this)">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidTransactionId(frm) &&
+    ValidChallengePassPhrase(frm)) {
+# Add your own Javascript here if needed
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%-TransactionId%%
+ %%ChallengePassPhrase (optional)%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Retrieve and Install Certificate">
+</FORM>
+<p>
+<H2>To check that your certificate installed properly, follow the
+procedure below:</h2>
+<p><B>Netscape V6</B> - Click Edit->Preferences, then Privacy and Security->
+Certificates. Click the Manage Certificates button to start the Certificate Manager.
+Your new certificate should appear in the Your Certificates list.
+Select it then click View to see more information.
+<p><B>Netscape V4</B> - Click the Security button, then Certificates->
+Yours. Your certificate should appear in the list.  Select it then
+click Verify.
+<p><B>Internet Explorer V5</B> - Click Tools->Internet Options, then
+Content, Certificates.
+Your certificate should appear in the Personal list. Click Advanced to
+see additional information.
+<p>
+<FORM METHOD=GET ACTION="/[application]/public-cgi/camain.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Home page">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</RETRIEVECONTENT>
+<RETURNCERT>
+%%returnbrowsercert[browsertype]%%
+</RETURNCERT>
+</TEMPLATE>
+#
+#
+#
+#
+# =====================================================================
+#
+# Template Name - 2-Year PKI Windows Logon Certificate
+#
+# Function - Creates a 2-year certificate good for logon in
+#            Windows application.
+#
+#            These certificates will be stored in LDAP if The O= and
+#            OU= suffixes have already been created
+#
+# Other than the user input fields, all other information is hard coded.
+#
+# User input fields:
+#  CommonName - required
+#  AltEmail - optional
+#  Requestor - optional
+#  PassPhrase - required
+#  PublicKey - required (Provided by the browser itself)
+#  NotifyEmail- optional
+#
+#  RACF userid/password authentication : not required
+#  Administrator approval              : required
+#
+# =====================================================================
+#
+<TEMPLATE NAME=2-Year PKI Windows Logon Certificate>
+<TEMPLATE NAME=PKI Browser Certificate>
+<NICKNAME=2YBWL>
+#<AUTORENEW=Y>
+<CONTENT>
+<HTML><HEAD>
+<TITLE> Web Based PKIX Certificate Generation Application Pg 2</TITLE>
+%%-copyright%%
+%%-AdditionalHead[browsertype]%%
+</HEAD>
+
+<BODY>
+<H1>2-Year PKI Windows Logon Certificate</H1>
+<p>
+<H2>Choose one of the following:</H2>
+<p>
+<ul>
+<h3><li>Request a New Certificate</h3>
+# This ACTION forces userid/pw authentication and runs the task under
+# the client's ID
+#<FORM NAME="CertReq" METHOD=POST ACTION=
+#                "/[application]/ssl-cgi-bin/auth/careq.rexx" onSubmit=
+
+# This ACTION forces userid/pw authentication but runs the task under
+# the surrogate ID
+#<FORM NAME="CertReq" METHOD=POST ACTION=
+#              "/[application]/ssl-cgi-bin/surrogateauth/careq.rexx" onSubmit=
+
+# This ACTION is for non z/OS clients. The task runs under the
+# surrogate ID
+ <FORM NAME="CertReq" METHOD=POST ACTION=
+               "/[application]/ssl-cgi-bin/careq.rexx" onSubmit=
+    "return ValidateEntry(this)">
+
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+  if (ValidRequestor(frm) &&
+   ValidCommonName(frm) &&
+   ValidAltEmail(frm) &&
+   ValidAltOther_1_3_6_1_4_1_311_20_2_3(frm) &&
+   ValidNotifyEmail(frm) &&
+   ValidPassPhrase(frm) &&
+   ValidSmartcard(frm)) {
+# Add your validation Javascript here if needed ---
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%Requestor (optional)%%
+ %%CommonName%%
+ %%AltEmail (optional)%%
+ %%AltOther_1_3_6_1_4_1_311_20_2_3%%
+ %%NotifyEmail (optional)%%
+ %%PassPhrase%%
+ %%PublicKey2[browsertype]%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="Submit" VALUE="Submit certificate request">
+<INPUT TYPE="reset" VALUE="Clear">
+</FORM>
+<p>
+<H3><li>Pick Up a Previously Issued Certificate</H3>
+<FORM METHOD=GET ACTION="/[application]/ssl-cgi/caretrieve.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Retrieve your certificate">
+</FORM>
+</ul>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</CONTENT>
+<CONSTANT>
+ %%NotBefore=0%%
+ %%NotAfter=730%%
+ %%KeyUsage=digitalsig%%
+ %%ExtKeyUsage=clientauth%%
+ %%ExtKeyUsage=mssmartcardlogon%%
+ %%OrgUnit=Class 1 Internet Certificate CA%%
+ %%Org=The Firm%%
+ %%SignWith=PKI:%%
+</CONSTANT>
+<ADMINAPPROVE>
+ %%CommonName (Optional)%%
+ %%OrgUnit (Optional)%%
+ %%Org (Optional)%%
+ %%AltEmail (Optional)%%
+ %%AltOther_1_3_6_1_4_1_311_20_2_3%%
+ %%NotBefore (Optional)%%
+ %%NotAfter (Optional)%%
+ %%KeyUsage (Optional)%%
+ %%ExtKeyUsage (Optional)%%
+</ADMINAPPROVE>
+<SUCCESSCONTENT>
+ %%-requestok%%
+</SUCCESSCONTENT>
+<FAILURECONTENT>
+ %%-requestbad%%
+</FAILURECONTENT>
+
+<RETRIEVECONTENT>
+<HTML><HEAD>
+%%-copyright%%
+<TITLE> Web Based PKIX Certificate Generation Application Pg 3</TITLE>
+</HEAD>
+
+<BODY>
+<H1> Retrieve Your [tmplname]</H1>
+<H3>Please bookmark this page</h3>
+<p>Since your certificate may not have been issued yet, we recommend
+that you create a bookmark to this location so that when you return to
+this bookmark, the browser will display your transaction ID.
+This is the easiest way to check your status.
+
+# This ACTION forces userid/pw authentication and runs the task
+# under the client's ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/auth/cagetcert.rexx" onSubmit=
+#
+# This ACTION forces userid/pw authentication but runs the task
+# under the surrogate ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/surrogateauth/cagetcert.rexx" onSubmit=
+#
+# This ACTION is for non z/OS clients. The task runs under surrogate ID
+<FORM NAME=retrieveform METHOD=POST ACTION=
+       "/[application]/ssl-cgi-bin/cagetcert.rexx" onSubmit=
+      "return ValidateEntry(this)">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidTransactionId(frm) &&
+    ValidChallengePassPhrase(frm)) {
+# Add your own Javascript here if needed
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%-TransactionId%%
+ %%ChallengePassPhrase (optional)%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Retrieve and Install Certificate">
+</FORM>
+<p>
+<H2>To check that your certificate installed properly, follow the
+procedure below:</h2>
+<p><B>Netscape V6</B> - Click Edit->Preferences, then Privacy and Security->
+Certificates. Click the Manage Certificates button to start the Certificate Manager.
+Your new certificate should appear in the Your Certificates list.
+Select it then click View to see more information.
+<p><B>Netscape V4</B> - Click the Security button, then Certificates->
+Yours. Your certificate should appear in the list.  Select it then
+click Verify.
+<p><B>Internet Explorer V5</B> - Click Tools->Internet Options, then
+Content, Certificates.
+Your certificate should appear in the Personal list. Click Advanced to
+see additional information.
+<p>
+<FORM METHOD=GET ACTION="/[application]/public-cgi/camain.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Home page">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</RETRIEVECONTENT>
+<RETURNCERT>
+%%returnbrowsercert[browsertype]%%
+</RETURNCERT>
+</TEMPLATE>
+#
+#
+# =====================================================================
+#
+# Template Name - 2-Year PKI Browser Certificate For Authenticating
+#                 to z/OS
+#
+# Function - Creates a 2-year certificate good for authenticating to
+#            z/OS. If approved, the certificate becomes valid after
+#            it's requested.
+#            (You may delay the valid date by specifying a non zero
+#             number for the value of 'NotBefore',
+#             eg. NotBefore=5. That means if the request is approved,
+#             the certificate will become valid 5 days after it's
+#             requested.)
+#            HostidMap is formed by putting %%Userid%% and
+#            %%HostIdMap=@host-name in the APPL section.
+#
+#            These certificates will be stored in LDAP if The O= and
+#            OU= suffixes have already been created
+#
+# Other than the user input fields, all other information is hard coded.
+#
+# User input fields:
+#  Requestor - optional
+#  PassPhrase - required
+#  PublicKey - required (Provided by the browser itself)
+#  NotifyEmail - optional
+#
+#  The presence of CommonName without a value tells SAF to determine
+#  the CN value from the PGMRNAME field of the user's USER profile.
+#  See the RACF Callable Services Guide for more information
+#
+#  RACF userid/password authentication : required
+#  Administrator approval              : not required
+#
+#
+# =====================================================================
+#
+<TEMPLATE NAME=2-Year PKI Browser Certificate For Authenticating To z/OS>
+<TEMPLATE NAME=PKI Browser Certificate>
+<NICKNAME=2YBZOS>
+#<AUTORENEW=Y>
+<CONTENT>
+<HTML><HEAD>
+<TITLE> Web Based PKIX Certificate Generation Application Pg 2</TITLE>
+%%-copyright%%
+%%-AdditionalHead[browsertype]%%
+</HEAD>
+
+<BODY>
+<H1>2-Year PKI Browser Certificate For Authenticating To z/OS</H1>
+<p>
+<H2>Choose one of the following:</H2>
+<p>
+<ul>
+<h3><li>Request a New Certificate</h3>
+# This ACTION forces userid/pw authentication and runs the task under
+# the client's ID
+#<FORM NAME="CertReq" METHOD=POST ACTION=
+#                "/[application]/ssl-cgi-bin/auth/careq.rexx" onSubmit=
+
+# This ACTION forces userid/pw authentication but runs the task under
+# the surrogate ID
+ <FORM NAME="CertReq" METHOD=POST ACTION=
+               "/[application]/ssl-cgi-bin/surrogateauth/careq.rexx" onSubmit=
+
+# This ACTION is for non z/OS clients. The task runs under the
+# surrogate ID
+#<FORM NAME="CertReq" METHOD=POST ACTION=
+#              "/[application]/ssl-cgi-bin/careq.rexx" onSubmit=
+    "return ValidateEntry(this)">
+
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+  if (ValidRequestor(frm) &&
+   ValidNotifyEmail(frm) &&
+   ValidPassPhrase(frm) &&
+   ValidPublicKey(frm)){
+# Add your validation Javascript here if needed ---
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%Requestor (optional)%%
+ %%NotifyEmail (optional)%%
+ %%PassPhrase%%
+ %%PublicKey[browsertype]%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="Submit" VALUE="Submit certificate request">
+<INPUT TYPE="reset" VALUE="Clear">
+</FORM>
+<p>
+<H3><li>Pick Up a Previously Issued Certificate</H3>
+<FORM METHOD=GET ACTION="/[application]/ssl-cgi/caretrieve.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Retrieve your certificate">
+</FORM>
+</ul>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</CONTENT>
+<APPL>
+ %%UserId%%
+ %%HostIdMap=@host-name%%
+</APPL>
+<CONSTANT>
+ %%CommonName=%%
+ %%OrgUnit=Class 1 Internet Certificate CA%%
+ %%Org=The Firm%%
+ %%KeyUsage=handshake%%
+ %%ExtKeyUsage=clientauth%%
+ %%NotBefore=0%%
+ %%NotAfter=730%%
+ %%SignWith=PKI:%%
+</CONSTANT>
+<SUCCESSCONTENT>
+ %%-requestok%%
+</SUCCESSCONTENT>
+<FAILURECONTENT>
+ %%-requestbad%%
+</FAILURECONTENT>
+
+<RETRIEVECONTENT>
+<HTML><HEAD>
+%%-copyright%%
+<TITLE> Web Based PKIX Certificate Generation Application Pg 3</TITLE>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function MissingTransIdAlert(){
+var STRING_MissingTransIdPrompt=
+    "Enter the transaction ID assigned to the certificate.";
+if(document.retrieveform.TransactionId.value==""){
+ alert(STRING_MissingTransIdPrompt);
+ document.retrieveform.TransactionId.focus();
+ return true;
+}
+else {
+ return false;
+ }
+}
+//-->
+</SCRIPT>
+</HEAD>
+
+<BODY>
+<H1> Retrieve Your [tmplname]</H1>
+<H3>Please bookmark this page</h3>
+<p>Since your certificate may not have been issued yet, we recommend
+that you create a bookmark to this location so that when you return to
+this bookmark, the browser will display your transaction ID.
+This is the easiest way to check your status.
+
+# This ACTION forces userid/pw authentication and runs the task
+# under the client's ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/auth/cagetcert.rexx" onSubmit=
+#
+# This ACTION forces userid/pw authentication but runs the task
+# under the surrogate ID
+ <FORM NAME=retrieveform METHOD=POST ACTION=
+       "/[application]/ssl-cgi-bin/surrogateauth/cagetcert.rexx" onSubmit=
+#
+# This ACTION is for non z/OS clients. The task runs under surrogate ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/cagetcert.rexx" onSubmit=
+      "return ValidateEntry(this)">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidTransactionId(frm) &&
+    ValidChallengePassPhrase(frm)) {
+# Add your own Javascript here if needed
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%-TransactionId%%
+ %%ChallengePassPhrase (optional)%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Retrieve and Install Certificate">
+</FORM>
+<p>
+<H2>To check that your certificate installed properly, follow the
+procedure below:</h2>
+<p><B>Netscape V6</B> - Click Edit->Preferences, then Privacy and Security->
+Certificates. Click the Manage Certificates button to start the Certificate Manager.
+Your new certificate should appear in the Your Certificates list.
+Select it then click View to see more information.
+<p><B>Netscape V4</B> - Click the Security button, then Certificates->
+Yours. Your certificate should appear in the list.  Select it then
+click Verify.
+<p><B>Internet Explorer V5</B> - Click Tools->Internet Options, then
+Content, Certificates.
+Your certificate should appear in the Personal list. Click Advanced to
+see additional information.
+<p>
+<FORM METHOD=GET ACTION="/[application]/public-cgi/camain.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Home page">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</RETRIEVECONTENT>
+<RETURNCERT>
+%%returnbrowsercert[browsertype]%%
+</RETURNCERT>
+</TEMPLATE>
+#
+#
+# =====================================================================
+#
+# Template Name - 5-Year PKI SSL Server Certificate
+#
+# Function - Creates a 5-year Server certificate. If approved, the
+#            certificate becomes valid after it's requested.
+#            (You may delay the valid date by specifying a non zero
+#             number for the value of 'NotBefore',
+#             eg. NotBefore=5. That means if the request is approved,
+#             the certificate will become valid 5 days after it's
+#             requested.)
+#
+#            These certificates will be stored in LDAP if The O= and
+#            OU= suffixes have already been created
+#
+# Other than the user input fields, all other information is hard coded.
+#
+# User input fields:
+#  Mail - optional
+#  CommonName - optional
+#  OrgUnit - optional
+#  Org - optional
+#  Street  - optional
+#  Locality  - optional
+#  StateProv  - optional
+#  PostalCode - optional
+#  Country - optional
+#  AltEmail  - optional
+#  AltDomain  - optional
+#  AltURI  - optional
+#  AltIPAddr  - optional
+#  PassPhrase - required
+#  PublicKey - required (This is the PKCS#10 request)
+#  NotifyEmail - optional
+#
+#  RACF userid/password authentication : not required
+#  Administrator approval              : required
+#
+#
+# =====================================================================
+#
+<TEMPLATE NAME=5-Year PKI SSL Server Certificate>
+<TEMPLATE NAME=PKI Server Certificate>
+<NICKNAME=5YSSSL>
+#<AUTORENEW=Y>
+<CONTENT>
+<HTML><HEAD>
+<TITLE> Web Based PKIX Certificate Generation Application Pg 2</TITLE>
+%%-copyright%%
+</HEAD>
+<BODY>
+<H1> 5-Year PKI SSL Server Certificate</H1>
+<p>
+<H2>Choose one of the following:</H2>
+<p>
+<ul>
+<h3><li>Request a New Certificate</h3>
+# This ACTION forces userid/pw authentication and runs the task under
+# the client's ID
+#<FORM NAME=serverform METHOD=POST ACTION=
+#                "/[application]/ssl-cgi-bin/auth/careq.rexx" onSubmit=
+
+# This ACTION forces userid/pw authentication but runs the task under
+# the surrogate ID
+#<FORM NAME=serverform METHOD=POST ACTION=
+#              "/[application]/ssl-cgi-bin/surrogateauth/careq.rexx" onSubmit=
+
+# This ACTION is for non z/OS clients. The task runs under the
+# surrogate ID
+ <FORM NAME=serverform METHOD=POST ACTION=
+               "/[application]/ssl-cgi-bin/careq.rexx" onSubmit=
+     "return ValidateEntry(this)">
+
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+  if (ValidRequestor(frm) &&
+   ValidMail(frm) &&
+   ValidCommonName(frm) &&
+   ValidOrgUnit(frm) &&
+   ValidOrgUnit2(frm) &&
+   ValidOrg(frm) &&
+   ValidStreet(frm) &&
+   ValidLocality(frm) &&
+   ValidStateProv(frm) &&
+   ValidPostalCode(frm) &&
+   ValidCountry(frm) &&
+   ValidAltEmail(frm) &&
+   ValidAltDomain(frm) &&
+   ValidAltURI(frm) &&
+   ValidAltIPAddr(frm) &&
+   ValidNotifyEmail(frm) &&
+   ValidPassPhrase(frm) &&
+   ValidPublicKey(frm)){
+# Add your validation Javascript here if needed ---
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%Requestor (Optional)%%
+ %%NotifyEmail (Optional)%%
+ %%PassPhrase%%
+ %%Mail (Optional)%%
+ %%CommonName (Optional)%%
+ %%OrgUnit (Optional)%%
+ %%OrgUnit2 (Optional)%%
+ %%Org (Optional)%%
+ %%Street (Optional)%%
+ %%Locality (Optional)%%
+ %%StateProv (Optional)%%
+ %%PostalCode (Optional)%%
+ %%Country (Optional)%%
+ %%AltEmail (Optional)%%
+ %%AltDomain (Optional)%%
+ %%AltURI (Optional)%%
+ %%AltIPAddr (Optional)%%
+ %%PublicKey%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Submit certificate request">
+<INPUT TYPE="reset" VALUE="Clear">
+</FORM>
+<p>
+<H3><li>Pick Up a Previously Issued Certificate</H3>
+
+<FORM METHOD=GET ACTION="/[application]/ssl-cgi/caretrieve.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Retrieve your certificate">
+</FORM>
+</ul>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</CONTENT>
+<CONSTANT>
+ %%KeyUsage=handshake%%
+ %%ExtKeyUsage=serverauth%%
+ %%NotBefore=0%%
+ %%NotAfter=1825%%
+ %%SignWith=PKI:%%
+</CONSTANT>
+<ADMINAPPROVE>
+ %%CommonName (Optional)%%
+ %%OrgUnit (Optional)%%
+ %%OrgUnit (Optional)%%
+ %%Org (Optional)%%
+ %%Locality (Optional)%%
+ %%StateProv (Optional)%%
+ %%Country (Optional)%%
+ %%KeyUsage (Optional)%%
+ %%AltEmail (Optional)%%
+ %%AltDomain (Optional)%%
+ %%AltURI (Optional)%%
+ %%AltIPAddr (Optional)%%
+ %%NotBefore (optional)%%
+ %%NotAfter (Optional)%%
+</ADMINAPPROVE>
+<SUCCESSCONTENT>
+ %%-requestok%%
+</SUCCESSCONTENT>
+<FAILURECONTENT>
+ %%-requestbad%%
+</FAILURECONTENT>
+
+<RETRIEVECONTENT>
+<HTML><HEAD>
+<TITLE> Web Based PKIX Certificate Generation Application Pg 3</TITLE>
+%%-copyright%%
+</HEAD>
+
+<BODY>
+<H1> Retrieve Your [tmplname]</H1>
+<H3>Please bookmark this page</h3>
+<p>Since your certificate may not have been issued yet, we recommend
+that you create a bookmark to this location so that when you return to
+this bookmark, the browser will display your transaction ID.
+This is the easiest way to check your status.
+
+# This ACTION forces userid/pw authentication and runs the task
+# under the client's ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/auth/cagetcert.rexx" onSubmit=
+#
+# This ACTION forces userid/pw authentication but runs the task
+# under the surrogate ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/surrogateauth/cagetcert.rexx" onSubmit=
+#
+# This ACTION is for non z/OS clients. The task runs under surrogate ID
+ <FORM NAME=retrieveform METHOD=POST ACTION=
+       "/[application]/ssl-cgi-bin/cagetcert.rexx" onSubmit=
+      "return ValidateEntry(this)">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidTransactionId(frm) &&
+    ValidChallengePassPhrase(frm)) {
+# Add your own Javascript here if needed
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%-TransactionId%%
+ %%ChallengePassPhrase (optional)%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Continue">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</RETRIEVECONTENT>
+<RETURNCERT>
+%%-returnpkcs10cert%%
+</RETURNCERT>
+</TEMPLATE>
+
+#
+# =====================================================================
+#
+# Template Name - 5-Year PKI IPSEC Server (Firewall) Certificate
+#
+# Function - Creates a 5-year Server certificate. If approved, the
+#            certificate becomes valid after it's requested.
+#            (You may delay the valid date by specifying a non zero
+#             number for the value of 'NotBefore',
+#             eg. NotBefore=5. That means if the request is approved,
+#             the certificate will become valid 5 days after it's
+#             requested.)
+#
+#            These certificates will be stored in LDAP if The O= and
+#            OU= suffixes have already been created
+#
+#
+# Other than the user input fields, all other information is hard coded.
+#
+# User input fields:
+#  Mail - optional
+#  CommonName - optional
+#  OrgUnit - optional
+#  Org - optional
+#  Street  - optional
+#  Locality  - optional
+#  StateProv  - optional
+#  PostalCode - optional
+#  Country - optional
+#  AltEmail  - optional
+#  AltDomain  - optional
+#  AltURI  - optional
+#  AltIPAddr  - optional
+#  PassPhrase - required
+#  PublicKey - required (This is the PKCS#10 request)
+#  NotifyEmail - optional
+#
+#  RACF userid/password authentication : not required
+#  Administrator approval              : required
+#
+#
+# =====================================================================
+#
+<TEMPLATE NAME=5-Year PKI IPSEC Server (Firewall) Certificate>
+<TEMPLATE NAME=PKI Server Certificate>
+<NICKNAME=5YSIPS>
+#<AUTORENEW=Y>
+<CONTENT>
+<HTML><HEAD>
+<TITLE> Web Based PKIX Certificate Generation Application Pg 2</TITLE>
+%%-copyright%%
+</HEAD>
+<BODY>
+<H1> 5-Year PKI IPSEC Server (Firewall) Certificate</H1>
+<p>
+<H2>Choose one of the following:</H2>
+<p>
+<ul>
+<h3><li>Request a New Certificate</h3>
+# This ACTION forces userid/pw authentication and runs the task under
+# the client's ID
+#<FORM NAME=serverform METHOD=POST ACTION=
+#                "/[application]/ssl-cgi-bin/auth/careq.rexx" onSubmit=
+
+# This ACTION forces userid/pw authentication but runs the task under
+# the surrogate ID
+#<FORM NAME=serverform METHOD=POST ACTION=
+#              "/[application]/ssl-cgi-bin/surrogateauth/careq.rexx" onSubmit=
+
+# This ACTION is for non z/OS clients. The task runs under the
+# surrogate ID
+ <FORM NAME=serverform METHOD=POST ACTION=
+               "/[application]/ssl-cgi-bin/careq.rexx" onSubmit=
+     "return ValidateEntry(this)">
+
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+  if (ValidRequestor(frm) &&
+   ValidMail(frm) &&
+   ValidCommonName(frm) &&
+   ValidOrgUnit(frm) &&
+   ValidOrgUnit2(frm) &&
+   ValidOrg(frm) &&
+   ValidStreet(frm) &&
+   ValidLocality(frm) &&
+   ValidStateProv(frm) &&
+   ValidPostalCode(frm) &&
+   ValidCountry(frm) &&
+   ValidAltEmail(frm) &&
+   ValidAltDomain(frm) &&
+   ValidAltURI(frm) &&
+   ValidAltIPAddr(frm) &&
+   ValidNotifyEmail(frm) &&
+   ValidPassPhrase(frm) &&
+   ValidPublicKey(frm)){
+# Add your validation Javascript here if needed ---
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%Requestor (Optional)%%
+ %%NotifyEmail (Optional)%%
+ %%PassPhrase%%
+ %%Mail (Optional)%%
+ %%CommonName (Optional)%%
+ %%OrgUnit (Optional)%%
+ %%OrgUnit2 (Optional)%%
+ %%Org (Optional)%%
+ %%Street (Optional)%%
+ %%Locality (Optional)%%
+ %%StateProv (Optional)%%
+ %%PostalCode (Optional)%%
+ %%Country (Optional)%%
+ %%AltEmail (Optional)%%
+ %%AltDomain (Optional)%%
+ %%AltURI (Optional)%%
+ %%AltIPAddr (Optional)%%
+ %%PublicKey%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Submit certificate request">
+<INPUT TYPE="reset" VALUE="Clear">
+</FORM>
+<p>
+<H3><li>Pick Up a Previously Issued Certificate</H3>
+
+<FORM METHOD=GET ACTION="/[application]/ssl-cgi/caretrieve.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Retrieve your certificate">
+</FORM>
+</ul>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</CONTENT>
+<CONSTANT>
+ %%KeyUsage=handshake%%
+ %%KeyUsage=dataencrypt%%
+ %%NotBefore=0%%
+ %%NotAfter=1825%%
+ %%SignWith=PKI:%%
+</CONSTANT>
+<ADMINAPPROVE>
+ %%CommonName (Optional)%%
+ %%OrgUnit (Optional)%%
+ %%OrgUnit (Optional)%%
+ %%Org (Optional)%%
+ %%Locality (Optional)%%
+ %%StateProv (Optional)%%
+ %%Country (Optional)%%
+ %%KeyUsage (Optional)%%
+ %%AltEmail (Optional)%%
+ %%AltDomain (Optional)%%
+ %%AltURI (Optional)%%
+ %%AltIPAddr (Optional)%%
+ %%NotBefore (optional)%%
+ %%NotAfter (Optional)%%
+</ADMINAPPROVE>
+<SUCCESSCONTENT>
+ %%-requestok%%
+</SUCCESSCONTENT>
+<FAILURECONTENT>
+ %%-requestbad%%
+</FAILURECONTENT>
+
+<RETRIEVECONTENT>
+<HTML><HEAD>
+<TITLE> Web Based PKIX Certificate Generation Application Pg 3</TITLE>
+%%-copyright%%
+</HEAD>
+
+<BODY>
+<H1> Retrieve Your [tmplname]</H1>
+<H3>Please bookmark this page</h3>
+<p>Since your certificate may not have been issued yet, we recommend
+that you create a bookmark to this location so that when you return to
+this bookmark, the browser will display your transaction ID.
+This is the easiest way to check your status.
+
+# This ACTION forces userid/pw authentication and runs the task
+# under the client's ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/auth/cagetcert.rexx" onSubmit=
+#
+# This ACTION forces userid/pw authentication but runs the task
+# under the surrogate ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/surrogateauth/cagetcert.rexx" onSubmit=
+#
+# This ACTION is for non z/OS clients. The task runs under surrogate ID
+ <FORM NAME=retrieveform METHOD=POST ACTION=
+       "/[application]/ssl-cgi-bin/cagetcert.rexx" onSubmit=
+      "return ValidateEntry(this)">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidTransactionId(frm) &&
+    ValidChallengePassPhrase(frm)) {
+# Add your own Javascript here if needed
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%-TransactionId%%
+ %%ChallengePassPhrase (optional)%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Continue">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</RETRIEVECONTENT>
+<RETURNCERT>
+%%-returnpkcs10cert%%
+</RETURNCERT>
+</TEMPLATE>
+
+#
+# =====================================================================
+#
+# Template Name - 5-Year PKI Intermediate CA Certificate
+#
+# Function - Creates a 5-year CA certificate. If approved, the
+#            certificate becomes valid after it's requested.
+#            (You may delay the valid date by specifying a non zero
+#             number for the value of 'NotBefore',
+#             eg. NotBefore=5. That means if the request is approved,
+#             the certificate will become valid 5 days after it's
+#             requested.)
+#
+#            These certificates will be stored in LDAP if The O= and
+#            OU= suffixes have already been created
+#
+#
+# Other than the user input fields, all other information is hard coded.
+#
+# User input fields:
+#  Mail - optional
+#  CommonName - optional
+#  OrgUnit - optional
+#  Org - optional
+#  Street  - optional
+#  Locality  - optional
+#  StateProv  - optional
+#  PostalCode - optional
+#  Country - optional
+#  AltEmail  - optional
+#  AltDomain  - optional
+#  AltURI  - optional
+#  AltIPAddr  - optional
+#  PassPhrase - required
+#  PublicKey - required (This is the PKCS#10 request)
+#  NotifyEmail - optional
+#
+#  RACF userid/password authentication : required
+#  Administrator approval              : not required
+#
+#
+# =====================================================================
+#
+<TEMPLATE NAME=5-Year PKI Intermediate CA Certificate>
+<TEMPLATE NAME=PKI Server Certificate>
+<NICKNAME=5YSCA>
+#<AUTORENEW=Y>
+<CONTENT>
+<HTML><HEAD>
+<TITLE> Web Based PKIX Certificate Generation Application Pg 2</TITLE>
+%%-copyright%%
+</HEAD>
+<BODY>
+<H1> 5-Year PKI Intermediate CA Certificate</H1>
+<p>
+<H2>Choose one of the following:</H2>
+<p>
+<ul>
+<h3><li>Request a New Certificate</h3>
+# This ACTION forces userid/pw authentication and runs the task under
+# the client's ID
+ <FORM NAME=serverform METHOD=POST ACTION=
+                 "/[application]/ssl-cgi-bin/auth/careq.rexx" onSubmit=
+
+# This ACTION forces userid/pw authentication but runs the task under
+# the surrogate ID
+#<FORM NAME=serverform METHOD=POST ACTION=
+#              "/[application]/ssl-cgi-bin/surrogateauth/careq.rexx" onSubmit=
+
+# This ACTION is for non z/OS clients. The task runs under the
+# surrogate ID
+#<FORM NAME=serverform METHOD=POST ACTION=
+#              "/[application]/ssl-cgi-bin/careq.rexx" onSubmit=
+     "return ValidateEntry(this)">
+
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+  if (ValidRequestor(frm) &&
+   ValidMail(frm) &&
+   ValidCommonName(frm) &&
+   ValidOrgUnit(frm) &&
+   ValidOrgUnit2(frm) &&
+   ValidOrg(frm) &&
+   ValidStreet(frm) &&
+   ValidLocality(frm) &&
+   ValidStateProv(frm) &&
+   ValidPostalCode(frm) &&
+   ValidCountry(frm) &&
+   ValidAltEmail(frm) &&
+   ValidAltDomain(frm) &&
+   ValidAltURI(frm) &&
+   ValidAltIPAddr(frm) &&
+   ValidNotifyEmail(frm) &&
+   ValidPassPhrase(frm) &&
+   ValidPublicKey(frm)){
+# Add your validation Javascript here if needed ---
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%Requestor (Optional)%%
+ %%NotifyEmail (Optional)%%
+ %%PassPhrase%%
+ %%Mail (Optional)%%
+ %%CommonName (Optional)%%
+ %%OrgUnit (Optional)%%
+ %%OrgUnit2 (Optional)%%
+ %%Org (Optional)%%
+ %%Street (Optional)%%
+ %%Locality (Optional)%%
+ %%StateProv (Optional)%%
+ %%PostalCode (Optional)%%
+ %%Country (Optional)%%
+ %%AltEmail (Optional)%%
+ %%AltDomain (Optional)%%
+ %%AltURI (Optional)%%
+ %%AltIPAddr (Optional)%%
+ %%PublicKey%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Submit certificate request">
+<INPUT TYPE="reset" VALUE="Clear">
+</FORM>
+<p>
+<H3><li>Pick Up a Previously Issued Certificate</H3>
+
+<FORM METHOD=GET ACTION="/[application]/ssl-cgi/caretrieve.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Retrieve your certificate">
+</FORM>
+</ul>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</CONTENT>
+<APPL>
+ %%UserId%%
+</APPL>
+<CONSTANT>
+ %%KeyUsage=certsign%%
+ %%NotBefore=0%%
+ %%NotAfter=1825%%
+ %%SignWith=PKI:%%
+</CONSTANT>
+<SUCCESSCONTENT>
+ %%-requestok%%
+</SUCCESSCONTENT>
+<FAILURECONTENT>
+ %%-requestbad%%
+</FAILURECONTENT>
+
+<RETRIEVECONTENT>
+<HTML><HEAD>
+<TITLE> Web Based PKIX Certificate Generation Application Pg 3</TITLE>
+%%-copyright%%
+</HEAD>
+
+<BODY>
+<H1> Retrieve Your [tmplname]</H1>
+<H3>Please bookmark this page</h3>
+<p>Since your certificate may not have been issued yet, we recommend
+that you create a bookmark to this location so that when you return to
+this bookmark, the browser will display your transaction ID.
+This is the easiest way to check your status.
+
+# This ACTION forces userid/pw authentication and runs the task
+# under the client's ID
+ <FORM NAME=retrieveform METHOD=POST ACTION=
+       "/[application]/ssl-cgi-bin/auth/cagetcert.rexx" onSubmit=
+#
+# This ACTION forces userid/pw authentication but runs the task
+# under the surrogate ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/surrogateauth/cagetcert.rexx" onSubmit=
+#
+# This ACTION is for non z/OS clients. The task runs under surrogate ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/cagetcert.rexx" onSubmit=
+      "return ValidateEntry(this)">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidTransactionId(frm) &&
+    ValidChallengePassPhrase(frm)) {
+# Add your own Javascript here if needed
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%-TransactionId%%
+ %%ChallengePassPhrase (optional)%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Continue">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</RETRIEVECONTENT>
+<RETURNCERT>
+%%-returnpkcs10cert%%
+</RETURNCERT>
+</TEMPLATE>
+
+#
+#
+# =====================================================================
+#
+# Template Name - 2-Year PKI Authenticode - Code Signing Certificate
+#
+# Function - This certificate is used to sign software which will be
+#            downloaded across an untrusted medium. It also demonstrates
+#            how to define extensions for template specific certificate
+#            policies and third party provided OCSP.
+#
+# Other than the user input fields, all other information is hard coded.
+#
+# User input fields:
+#  Requestor   - optional
+#  OrgUnit     - optional
+#  AltEmail    - required
+#  NotifyEmail - required
+#  PassPhrase - required
+#  PublicKey - required (This is the PKCS#10 request)
+#
+#  RACF userid/password authentication : not required
+#  Administrator approval              : required
+#
+#
+# =====================================================================
+#
+<TEMPLATE NAME=2-Year PKI Authenticode - Code Signing Certificate>
+<TEMPLATE NAME=PKI Server Certificate>
+<NICKNAME=2YIACS>
+#<AUTORENEW=Y>
+<CONTENT>
+<HTML><HEAD>
+<TITLE> Web Based PKIX Certificate Generation Application Pg 2</TITLE>
+%%-copyright%%
+</HEAD>
+<BODY>
+<H1>2-Year PKI Authenticode - Code Signing Certificate</H1>
+<p>
+<H2>Choose one of the following:</H2>
+<p>
+<ul>
+<h3><li>Request a New Certificate</h3>
+# This ACTION forces userid/pw authentication and runs the task under
+# the client's ID
+#<FORM NAME=serverform METHOD=POST ACTION=
+#                "/[application]/ssl-cgi-bin/auth/careq.rexx" onSubmit=
+
+# This ACTION forces userid/pw authentication but runs the task under
+# the surrogate ID
+#<FORM NAME=serverform METHOD=POST ACTION=
+#              "/[application]/ssl-cgi-bin/surrogateauth/careq.rexx" onSubmit=
+
+# This ACTION is for non z/OS clients. The task runs under the
+# surrogate ID
+ <FORM NAME=serverform METHOD=POST ACTION=
+               "/[application]/ssl-cgi-bin/careq.rexx" onSubmit=
+     "return ValidateEntry(this)">
+
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+  if (ValidRequestor(frm) &&
+   ValidOrgUnit(frm) &&
+   ValidAltEmail(frm) &&
+   ValidNotifyEmail(frm) &&
+   ValidPassPhrase(frm) &&
+   ValidPublicKey(frm)){
+# Add your validation Javascript here if needed ---
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%Requestor (Optional)%%
+ %%NotifyEmail%%
+ %%PassPhrase%%
+ %%OrgUnit (Optional)%%
+ %%AltEmail%%
+ %%PublicKey%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Submit certificate request">
+<INPUT TYPE="reset" VALUE="Clear">
+</FORM>
+<p>
+<H3><li>Pick Up a Previously Issued Certificate</H3>
+
+<FORM METHOD=GET ACTION="/[application]/ssl-cgi/caretrieve.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Retrieve your certificate">
+</FORM>
+</ul>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</CONTENT>
+<CONSTANT>
+ %%CommonName=My Company Code Signing Certificate%%
+ %%Org=The Firm%%
+ %%KeyUsage=digitalsig%%
+ %%KeyUsage=docsign%%
+ %%ExtKeyUsage=codesigning%%
+ %%Critical=ExtKeyUsage%%
+ %%CertPolicies=1%%
+ %%AuthInfoAcc=OCSP,URL=https://ocsp.vendor.com%%
+ %%NotBefore=0%%
+ %%NotAfter=730%%
+ %%SignWith=PKI:%%
+</CONSTANT>
+<ADMINAPPROVE>
+ %%OrgUnit (Optional)%%
+ %%OrgUnit (Optional)%%
+</ADMINAPPROVE>
+<SUCCESSCONTENT>
+ %%-requestok%%
+</SUCCESSCONTENT>
+<FAILURECONTENT>
+ %%-requestbad%%
+</FAILURECONTENT>
+
+<RETRIEVECONTENT>
+<HTML><HEAD>
+<TITLE> Web Based PKIX Certificate Generation Application Pg 3</TITLE>
+%%-copyright%%
+</HEAD>
+
+<BODY>
+<H1> Retrieve Your [tmplname]</H1>
+<H3>Please bookmark this page</h3>
+<p>Since your certificate may not have been issued yet, we recommend
+that you create a bookmark to this location so that when you return to
+this bookmark, the browser will display your transaction ID.
+This is the easiest way to check your status.
+
+# This ACTION forces userid/pw authentication and runs the task
+# under the client's ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/auth/cagetcert.rexx" onSubmit=
+#
+# This ACTION forces userid/pw authentication but runs the task
+# under the surrogate ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/surrogateauth/cagetcert.rexx" onSubmit=
+#
+# This ACTION is for non z/OS clients. The task runs under surrogate ID
+ <FORM NAME=retrieveform METHOD=POST ACTION=
+       "/[application]/ssl-cgi-bin/cagetcert.rexx" onSubmit=
+      "return ValidateEntry(this)">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidTransactionId(frm) &&
+    ValidChallengePassPhrase(frm)) {
+# Add your own Javascript here if needed
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%-TransactionId%%
+ %%ChallengePassPhrase (optional)%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Continue">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</RETRIEVECONTENT>
+<RETURNCERT>
+%%-returnpkcs10cert%%
+</RETURNCERT>
+</TEMPLATE>
+
+
+#
+#
+# =====================================================================
+#
+# Template Name - n-Year PKI Certificate for Extensions Demonstration
+#
+# Function - Creates a certificate that has most of its information
+#            provided by the user instead of controlled by the
+#            administrator. This certificate will contain all the
+#            supported extensions.
+#
+# Other than the user input fields, all other information is hard coded.
+#
+# User input fields:
+#  Requestor   -optional
+#  NotifyEmail -required
+#  SerialNumber-optional
+#  UnstructAddr-optional
+#  UnstructName-optional
+#  EmailAddr   -optional
+#  Mail        -optional
+#  CommonName  -optional
+#  Title       -optional
+#  OrgUnit     -required
+#  OrgUnit2    -optional
+#  Org         -optional
+#  Street      -optional
+#  Locality    -optional
+#  StateProv   -optional
+#  PostalCode  -optional
+#  Country     -optional
+#  KeyUsage    -required
+#  ExtKeyUsage -optional
+#  HostIdMap   -required
+#  HostIdMap2  -optional
+#  AltEmail    -optional
+#  AltDomain   -optional
+#  AltURI      -optional
+#  AltIPAddr   -optional
+#  AltOther_1_2_3_4_5     -required
+#  AltOther_1_2_3_4_6     -optional
+#  NotBefore   -optional
+#  NotAfter    -optional
+#  PassPhrase  -required
+#  PublicKey   -required (Provided by the browser itself)
+#
+# Constant fields:
+#  CertPolicies
+#  AuthInfoAcc
+#
+#  RACF userid/password authentication : not required
+#  Administrator approval              : required
+#
+#
+# =====================================================================
+#
+<TEMPLATE NAME=n-Year PKI Certificate for Extensions Demonstration>
+<TEMPLATE NAME=PKI Browser Certificate>
+<NICKNAME=SAMPLB>
+<AUTORENEW=Y>
+<CONTENT>
+<HTML><HEAD>
+<TITLE> Web Based PKIX Certificate Generation Application Pg 2</TITLE>
+%%-copyright%%
+%%-AdditionalHead[browsertype]%%
+</HEAD>
+
+<BODY>
+<H1>n-Year PKI Certificate for Extensions Demonstration</H1>
+<p>
+<H2>Choose one of the following:</H2>
+<p>
+<ul>
+<h3><li>Request a New Certificate</h3>
+# This ACTION forces userid/pw authentication and runs the task under
+# the client's ID
+#<FORM NAME="CertReq" METHOD=POST ACTION=
+#                "/[application]/ssl-cgi-bin/auth/careq.rexx" onSubmit=
+
+# This ACTION forces userid/pw authentication but runs the task under
+# the surrogate ID
+#<FORM NAME="CertReq" METHOD=POST ACTION=
+#              "/[application]/ssl-cgi-bin/surrogateauth/careq.rexx" onSubmit=
+
+# This ACTION is for non z/OS clients. The task runs under the
+# surrogate ID
+ <FORM NAME="CertReq" METHOD=POST ACTION=
+               "/[application]/ssl-cgi-bin/careq.rexx" onSubmit=
+    "return ValidateEntry(this)">
+
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<p> Enter values for the following field(s)
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidRequestor(frm) &&
+    ValidNotifyEmail(frm) &&
+    ValidSerialNumber(frm) &&
+    ValidUnstructAddr(frm) &&
+    ValidUnstructName(frm) &&
+    ValidEmailAddr(frm) &&
+    ValidCommonName(frm) &&
+    ValidTitle(frm) &&
+    ValidMail(frm) &&
+    ValidOrgUnit(frm) &&
+    ValidOrgUnit2(frm) &&
+    ValidOrg(frm) &&
+    ValidStreet(frm) &&
+    ValidLocality(frm) &&
+    ValidStateProv(frm) &&
+    ValidPostalCode(frm) &&
+    ValidCountry(frm) &&
+    ValidAltEmail(frm) &&
+    ValidAltDomain(frm) &&
+    ValidAltURI(frm) &&
+    ValidAltIPAddr(frm) &&
+    ValidAltOther_1_2_3_4_5(frm) &&
+    ValidAltOther_1_2_3_4_6(frm) &&
+    ValidNotBefore(frm) &&
+    ValidNotAfter(frm) &&
+    ValidKeyUsage(frm) &&
+    ValidExtKeyUsage(frm) &&
+    ValidHostIdMap(frm) &&
+    ValidHostIdMap2(frm) &&
+    ValidPassPhrase(frm) &&
+    ValidPublicKey(frm)) {
+# Add your validation Javascript here if needed ---
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+<H3><LI>Information on the request:</LI></H3>
+ %%Requestor (optional)%%
+ %%NotifyEmail%%
+ %%PassPhrase%%
+<H3><LI>Subject Distinguished Name:</LI></H3>
+ %%SerialNumber (optional)%%
+ %%UnstructAddr (optional)%%
+ %%UnstructName (optional)%%
+ %%EmailAddr (optional)%%
+ %%Mail (optional)%%
+ %%CommonName (optional)%%
+ %%Title (optional)%%
+ %%OrgUnit%%
+ %%OrgUnit2 (optional)%%
+ %%Org (optional)%%
+ %%Street (optional)%%
+ %%Locality (optional)%%
+ %%StateProv (optional)%%
+ %%PostalCode (optional)%%
+ %%Country (optional)%%
+ %%KeyUsage%%
+ %%ExtKeyUsage (optional)%%
+ %%HostIdMap%%
+ %%HostIdMap2 (optional)%%
+ %%AltEmail (optional)%%
+ %%AltDomain (optional)%%
+ %%AltURI (optional)%%
+ %%AltIPAddr (optional)%%
+ %%AltOther_1_2_3_4_5%%
+ %%AltOther_1_2_3_4_6 (optional)%%
+<H3><LI>Validity Period:</LI></H3>
+ %%NotBefore (optional)%%
+ %%NotAfter (optional)%%
+<H3><LI>Key:</LI></H3>
+ %%PublicKey[browsertype]%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="Submit" VALUE="Submit certificate request">
+<INPUT TYPE="reset" VALUE="Clear">
+</FORM>
+<p>
+<H3><li>Pick Up a Previously Issued Certificate</H3>
+<FORM METHOD=GET ACTION="/[application]/ssl-cgi/caretrieve.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Retrieve your certificate">
+</FORM>
+</ul>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</CONTENT>
+<CONSTANT>
+ %%AuthInfoAcc=OCSP,URL=https://IV.OCSP.BankXYZ.com%%
+ %%CertPolicies=1%%
+ %%SignWith=PKI:%%
+</CONSTANT>
+<ADMINAPPROVE>
+ %%CommonName (Optional)%%
+ %%OrgUnit%%
+ %%OrgUnit (Optional)%%
+ %%Org (Optional)%%
+ %%KeyUsage%%
+ %%ExtKeyUsage (Optional)%%
+ %%HostIdMap%%
+ %%HostIdMap (Optional)%%
+ %%AltOther_1_2_3_4_5%%
+ %%AltOther_1_2_3_4_6 (Optional)%%
+ %%NotBefore (Optional)%%
+ %%NotAfter (Optional)%%
+</ADMINAPPROVE>
+<SUCCESSCONTENT>
+ %%-requestok%%
+</SUCCESSCONTENT>
+<FAILURECONTENT>
+ %%-requestbad%%
+</FAILURECONTENT>
+
+<RETRIEVECONTENT>
+<HTML><HEAD>
+%%-copyright%%
+<TITLE> Web Based PKIX Certificate Generation Application Pg 3</TITLE>
+</HEAD>
+
+<BODY>
+<H1> Retrieve Your [tmplname]</H1>
+<H3>Please bookmark this page</h3>
+<p>Since your certificate may not have been issued yet, we recommend
+that you create a bookmark to this location so that when you return to
+this bookmark, the browser will display your transaction ID.
+This is the easiest way to check your status.
+
+# This ACTION forces userid/pw authentication and runs the task
+# under the client's ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#     "/[application]/ssl-cgi-bin/auth/cagetcert.rexx" onSubmit=
+#
+# This ACTION forces userid/pw authentication but runs the task
+# under the surrogate ID
+#<FORM NAME=retrieveform METHOD=POST ACTION=
+#      "/[application]/ssl-cgi-bin/surrogateauth/cagetcert.rexx" onSubmit=
+#
+# This ACTION is for non z/OS clients. The task runs under surrogate ID
+<FORM NAME=retrieveform METHOD=POST ACTION=
+       "/[application]/ssl-cgi-bin/cagetcert.rexx" onSubmit=
+      "return ValidateEntry(this)">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidTransactionId(frm) &&
+    ValidChallengePassPhrase(frm)) {
+# Add your own Javascript here if needed
+ return true;
+}
+else
+ return false;
+}
+//-->
+</SCRIPT>
+ %%-TransactionId%%
+ %%ChallengePassPhrase (optional)%%
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="submit" VALUE="Retrieve and Install Certificate">
+</FORM>
+<p>
+<H2>To check that your certificate installed properly, follow the
+procedure below:</h2>
+<p><B>Netscape V6</B> - Click Edit->Preferences, then Privacy and Security->
+Certificates. Click the Manage Certificates button to start the Certificate Manager.
+Your new certificate should appear in the Your Certificates list.
+Select it then click View to see more information.
+<p><B>Netscape V4</B> - Click the Security button, then Certificates->
+Yours. Your certificate should appear in the list.  Select it then
+click Verify.
+<p><B>Internet Explorer V5</B> - Click Tools->Internet Options, then
+Content, Certificates.
+Your certificate should appear in the Personal list. Click Advanced to
+see additional information.
+<p>
+<FORM METHOD=GET ACTION="/[application]/public-cgi/camain.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Home page">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</RETRIEVECONTENT>
+<RETURNCERT>
+%%returnbrowsercert[browsertype]%%
+</RETURNCERT>
+</TEMPLATE>
+
+#
+# ====================================================================
+#
+# Template Name - 5-Year SCEP Certificate - Preregistration
+#
+# Function - Preregisters a user or device for a SCEP certificate
+#
+# User input fields:
+#  ClientName
+#  PassPhrase
+#  SerialNumber -optional
+#  UnstructAddr -optional
+#
+#  RACF userid/password authentication : required
+#
+#
+# ====================================================================
+#
+<TEMPLATE NAME=5-Year SCEP Certificate - Preregistration>
+<NICKNAME=5YSCEPP>
+<CONTENT>
+<HTML><HEAD>
+<TITLE> Web Based PKIX Certificate Generation Application Pg 2</TITLE>
+%%-copyright%%
+%%-AdditionalHead[browsertype]%%
+</HEAD>
+<BODY>
+<H1>5-Year SCEP Certificate - Preregistration</H1>
+<p>
+# This ACTION forces userid/pw authentication and runs the task under
+# the user's ID. (Must be a PKI administrator.)
+<FORM NAME="CertReq" METHOD=POST ACTION=
+"/[application]/ssl-cgi-bin/auth/careq.rexx" onSubmit=
+"return ValidateEntry(this)">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+#-- User input fields and validation Javascript ---------------
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidateEntry(frm){
+if (ValidClientName(frm) &&
+ValidPassPhrase(frm) &&
+ValidUnstructAddr(frm) &&
+ValidSerialNumber(frm)) {
+# Add your validation Javascript here if needed ---
+return true;
+}
+else
+return false;
+}
+//-->
+</SCRIPT>
+<ul>
+<h3><li>Enter values the client must provide to authenticate</h3>
+# ClientName is the only required field to preregister. ClientName
+# combined with PassPhrase are the minimum required to authenticate
+# the client. Any other subject name field (except UnstructName
+# and CommonName) or alternate name field (except AltOther)may be
+# specified as additional authenticating information.
+%%ClientName%%
+%%PassPhrase%%
+%%SerialNumber (Optional)%%
+%%UnstructAddr (Optional)%%
+</ul>
+#-- End user input fields and validation Javascript -----------
+<p>
+<INPUT TYPE="Submit" VALUE="Submit preregistration request">
+<INPUT TYPE="reset" VALUE="Clear">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</CONTENT>
+<CONSTANT>
+%%NotBefore=0%%
+%%NotAfter=1825%%
+%%SignWith=PKI:%%
+# Any subject name or alternate name fields provided as constants will
+# be treated as values the client must provide to authenticate
+# UnstructName, CommonName, and AltOther are not allowed.
+#%%Org=The Firm%%
+</CONSTANT>
+<SUCCESSCONTENT>
+%%-preregok%%
+</SUCCESSCONTENT>
+<FAILURECONTENT>
+%%-requestbad%%
+</FAILURECONTENT>
+<PREREGISTER>
+AuthenticatedClient=AutoApprove
+SemiauthenticatedClient=AdminApprove
+UnauthenticatedClient=Reject
+SubsequentRequest=AutoApprove
+RenewalRequest=AutoApprove
+</PREREGISTER>
+</TEMPLATE>
+
+
+#
+# =====================================================================
+#
+# Sample INSERTS
+#
+# =====================================================================
+#  @D3C
+<INSERT NAME=-AdditionalHeadIE>
+<OBJECT
+  classid="clsid:127698e4-e730-4e5c-a2b1-21490a70c8a1"
+  CODEBASE="xenroll.cab#Version=5,131,3659,0"
+  id="certmgr"
+>
+</OBJECT>
+#-- Create g_objWCF object for CertEnroll process                  6@LBA
+<OBJECT
+  classid="clsid:884e2049-217d-11da-b2a4-000e7bbb2b09"
+  id="g_objWCF"
+>
+</OBJECT>
+</INSERT>
+
+<INSERT NAME=-requestok>
+<HTML><HEAD>
+<TITLE> Web Based Certificate Generation Success</TITLE>
+</HEAD>
+<BODY>
+<H1> Request submitted successfully</H1>
+[errorinfo]
+<p> Here's your transaction ID. You will need it to retrieve your
+certificate.  Press 'Continue' to retrieve the certificate.
+<p> <TABLE BORDER><TR><TD>[transactionid]</TD></TR></TABLE>
+<FORM METHOD=GET ACTION="/[application]/ssl-cgi/caretrieve.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT NAME="TransactionId" TYPE="hidden" VALUE="[transactionid]">
+<INPUT TYPE="submit" VALUE="Continue">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</INSERT>
+
+<INSERT NAME=-requestbad>
+<HTML><HEAD>
+<TITLE> Web Based Certificate Generation Failure</TITLE>
+</HEAD>
+<BODY>
+<H1> Request was not successful</H1>
+<p> Please correct the problem or report the error to your Web admin
+person<br>
+<PRE>
+[errorinfo]
+</PRE>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</INSERT>
+
+<INSERT NAME=-renewrevokeok>
+<HTML><HEAD>
+<TITLE> Web Based Certificate Renew/Revoke Success</TITLE>
+</HEAD>
+<BODY>
+<H1> Request submitted successfully</H1>
+<FORM METHOD=GET ACTION="/[application]/public-cgi/camain.rexx">
+<INPUT TYPE="submit" VALUE="Home Page">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</INSERT>
+
+<INSERT NAME=-renewrevokebad>
+<HTML><HEAD>
+<TITLE> Web Based Certificate Renew/Revoke Failure</TITLE>
+</HEAD>
+<BODY>
+<H1> Request was not successful</H1>
+<p> Please correct the problem or report the error to your Web admin
+person<br>
+<PRE>
+[errorinfo]
+</PRE>
+<FORM METHOD=GET ACTION="/[application]/public-cgi/camain.rexx">
+<INPUT TYPE="submit" VALUE="Home Page">
+</FORM>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</INSERT>
+
+<INSERT NAME=-preregok>
+<HTML><HEAD>
+<TITLE> Certificate Preregistration Success</TITLE>
+</HEAD>
+<BODY>
+<H1> Preregistration successful</H1>
+[errorinfo]
+<p> Here's the temporary transaction ID so you may locate the
+preregistration record:
+<B>[transactionid]</B>
+<FORM METHOD=GET ACTION="/[application]/ssl-cgi/auth/admpendtid.rexx">
+<INPUT NAME="domain" TYPE="hidden" VALUE="[cadomain]">
+<INPUT NAME="transactionid" TYPE="hidden" VALUE="[transactionid]">
+<INPUT TYPE="submit" VALUE="Examine Preregistration Record">
+</FORM>
+<p>
+<h3>Press 'Preregister' to preregister another client
+using the same template.</h3>
+<FORM METHOD=GET ACTION="/[application]/ssl-cgi/catmpl.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Preregister">
+</FORM>
+<FORM METHOD=GET ACTION="admmain.rexx">
+<center>
+<INPUT TYPE="submit" VALUE="Administration Home Page">
+</FORM>
+</center>
+<FORM METHOD=GET ACTION="/[application]/public-cgi/camain.rexx">
+<center>
+<INPUT TYPE="submit" VALUE="Home Page">
+</FORM>
+</center>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</INSERT>
+
+<INSERT NAME=-returnpkcs10cert>
+<HTML><HEAD>
+<TITLE> Web Based Certificate Generation Application Pg 4</TITLE>
+</HEAD>
+<BODY>
+<H1> Here's your Certificate. Cut and paste it to a file</H1>
+<TABLE BORDER><TR><TD>
+<PRE>
+[base64cert]
+</PRE>
+</TD></TR></TABLE>
+<p>%%-pagefooter%%
+</BODY>
+</HTML>
+</INSERT>
+
+<INSERT NAME=returnbrowsercertNS>
+[base64cert]
+</INSERT>
+
+<INSERT NAME=returnbrowsercertIE>
+<HTML>
+<HEAD>
+<TITLE>MSIE Certificate Install</TITLE>
+<OBJECT
+  classid="clsid:127698e4-e730-4e5c-a2b1-21490a70c8a1"
+  CODEBASE="xenroll.cab#Version=5,131,3659,0"
+  id="certmgr"
+>
+</OBJECT>
+#-- Create g_objWCF object for CertEnroll process                  6@LBA
+<OBJECT
+  classid="clsid:884e2049-217d-11da-b2a4-000e7bbb2b09"
+  id="g_objWCF"
+>
+</OBJECT>
+</HEAD>
+<BODY>
+<SCRIPT LANGUAGE="VBScript">
+<!--
+  Sub INSTALL_OnClick
+    Dim pkcs7data, errmsg, rc
+    ' Added for CertEnroll API processing.                         2@LBA
+    Dim objEnroll
+    On Error Resume Next
+    pkcs7data = "[iecert]"                                        ' @LBM
+    ' CertEnroll.dll API additions follow.                        22@LDA
+    Set objEnroll = g_objWCF.CreateObject("X509Enrollment.CX509Enrollment")
+    If IsObject(objEnroll) Then
+      ' Vista path, use CertEnroll APIs
+      err.clear
+      objEnroll.initialize(1)  ' ContextUser
+      If err.number <> 0 Then
+        errmsg = "Error Initializing Enrollment object. " & _
+                 err.Description
+        Call MsgBox(errmsg, 48, "Error Initializing Enrollment object")
+        Exit Sub
+      Else
+        err.clear
+        Call objEnroll.InstallResponse(0, pkcs7data, 1, "")
+        If err.number <> 0 Then
+          errmsg = "Error Installing Response. " & err.Description
+          Call MsgBox(errmsg, 48, "Error Installing Response")
+          Exit Sub
+        End If
+      End If
+    Else
+      ' Pre-Vista path, use Xenroll APIs 
+      certmgr.DeleteRequestCert = false
+      err.clear
+      certmgr.WriteCertToCSP = true
+      certmgr.acceptPKCS7(pkcs7data)
+      if err.number <> 0 then
+        certmgr.WriteCertToCSP = false
+        err.clear
+        certmgr.acceptPKCS7(pkcs7data)
+      end if
+    ' Added during CertEnroll API processing modification.         2@LBA
+    End If
+    if err.number <> 0 then
+      'Updated errmsg with CAPICOM information @01C
+      errmsg = "Your new certificate failed to install. " & _
+      "Please ensure that you are using the same browser " & _
+      "that you used when making the certificate request. " & _
+      "Also ensure that Microsoft CAPICOM is installed. "
+      rc = MsgBox (errmsg, 48, "Certificate Installation")
+    else
+      errmsg = "Your new certificate installed successfully."
+      rc = MsgBox (errmsg, 64, "Certificate Installation")
+    end if
+  End Sub
+// -->
+</SCRIPT>
+<h1>Internet Explorer certificate install</h1>
+<p> Click &quot;Install Certificate&quot; to store your new
+certificate into your browser
+<TABLE>
+<TR> <br>
+<TD><INPUT TYPE="BUTTON" VALUE="Install Certificate" NAME="INSTALL" >
+<FORM METHOD=GET ACTION="/[application]/public-cgi/camain.rexx">
+<INPUT NAME="Template" TYPE="hidden" VALUE="[tmplname]">
+<INPUT TYPE="submit" VALUE="Home page">
+</FORM>
+</TD>
+</TR>
+</TABLE>
+</BODY>
+</HTML>
+</INSERT>
+#
+# =====================================================================
+#
+# X.509 fields (INSERTs) valid for certificate requests
+#
+# =====================================================================
+#
+<INSERT NAME=KeyUsage>
+<p> Indicate the key usage for the certificate [optfield] <BR>
+<SELECT NAME="KeyUsage" MULTIPLE>
+ <OPTION VALUE="handshake">Protocol handshaking e.g., SSL (digitalSignature,keyEncipherment)
+ <OPTION VALUE="certsign">Certificate and CRL signing (keyCertSign, cRLSign)
+ <OPTION VALUE="docsign">Document signing (nonRepudiation)
+ <OPTION VALUE="dataencrypt">Data encryption (dataEncipherment)
+ <OPTION VALUE="digitalsig">Authentication (digitalSignature)
+ <OPTION VALUE="keyencrypt">Key Transport (keyEncipherment)
+ <OPTION VALUE="keyagree">Key agreement (keyAgreement)
+ <OPTION VALUE="keycertsign">Certificate signing (keyCertSign)
+ <OPTION VALUE="crlsign">CRL signing (cRLSign)
+</SELECT>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidKeyUsage(frm){
+ if ("[optfield]" == "" && frm.KeyUsage.value == "") {
+  alert("Enter required field."); frm.KeyUsage.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=ExtKeyUsage>
+<p> Indicate the extended key usage for the certificate [optfield] <BR>
+<SELECT NAME="ExtKeyUsage" MULTIPLE>
+ <OPTION VALUE="serverauth">Server side authentication (serverAuth)
+ <OPTION VALUE="clientauth">Client side authentication (clientAuth)
+ <OPTION VALUE="codesigning">Code signing (codeSigning)
+ <OPTION VALUE="emailprotection">Email protection (emailProtection)
+ <OPTION VALUE="timestamping">Digital time stamping (timeStamping)
+ <OPTION VALUE="ocspsigning">OCSP response signing (OCSPSigning)
+ <OPTION VALUE="mssmartcardlogon">Microsoft Smart Card Logon (msSmartCardLogon)
+</SELECT>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidExtKeyUsage(frm){
+ if ("[optfield]" == "" && frm.ExtKeyUsage.value == "") {
+  alert("Enter required field."); frm.ExtKeyUsage.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+
+
+<INSERT NAME=NotBefore>
+<p> Number of days after today before the certificate becomes current
+ [optfield] <BR>
+<SELECT NAME="NotBefore">
+ <OPTION> 0
+ <OPTION> 30
+</SELECT>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidNotBefore(frm){
+ if ("[optfield]" == "" && frm.NotBefore.value == "") {
+  alert("Enter required field."); frm.NotBefore.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=NotAfter>
+<p> Length of time that the certificate is current [optfield] <BR>
+<SELECT NAME="NotAfter">
+ <OPTION value="365">1 Year
+ <OPTION value="730">2 Years
+</SELECT>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidNotAfter(frm){
+ if ("[optfield]" == "" && frm.NotAfter.value == "") {
+  alert("Enter required field."); frm.NotAfter.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=Country>
+<p> Country [optfield] <BR>
+<INPUT NAME="Country" TYPE="text" SIZE=2 maxlength="2">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidCountry(frm){
+ if ("[optfield]" == "" && frm.Country.value == "") {
+  alert("Enter required field."); frm.Country.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=Org>
+<p> Organization [optfield] <BR>
+<INPUT NAME="Org" TYPE="text" SIZE=64  maxlength="64">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidOrg(frm){
+ if ("[optfield]" == "" && frm.Org.value == "") {
+  alert("Enter required field."); frm.Org.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+# OrgUnit is a repeatable field. If more than one is needed, a
+# separate INSERT, which can be modelled from this one, is needed.
+# See INSERT NAME=OrgUnit2 for an example.
+<INSERT NAME=OrgUnit>
+<p> Organizational Unit [optfield] <BR>
+<INPUT NAME="OrgUnit" TYPE="text" SIZE=64  maxlength="64">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidOrgUnit(frm){
+ if ("[optfield]" == "" && frm.OrgUnit.value == "") {
+  alert("Enter required field."); frm.OrgUnit.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=OrgUnit2>
+<p> Organizational Unit [optfield] <BR>
+<INPUT NAME="OrgUnit2" TYPE="text" SIZE=64  maxlength="64">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidOrgUnit2(frm){
+ if ("[optfield]" == "" && frm.OrgUnit2.value == "") {
+  alert("Enter required field."); frm.OrgUnit2.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=Locality>
+<p> Locality [optfield] <BR>
+<INPUT NAME="Locality" TYPE="text" SIZE=64  maxlength="64">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidLocality(frm){
+ if ("[optfield]" == "" && frm.Locality.value == "") {
+  alert("Enter required field."); frm.Locality.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=StateProv>
+<p> State or Province [optfield] <BR>
+<INPUT NAME="StateProv" TYPE="text" SIZE=64  maxlength="64">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidStateProv(frm){
+ if ("[optfield]" == "" && frm.StateProv.value == "") {
+  alert("Enter required field."); frm.StateProv.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=CommonName>
+<p> Common Name [optfield] <BR>
+<INPUT NAME="CommonName" TYPE="text" SIZE=64  maxlength="64">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidCommonName(frm){
+ if ("[optfield]" == "" && frm.CommonName.value == "") {
+  alert("Enter required field."); frm.CommonName.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=Title>
+<p> Title [optfield] <BR>
+<INPUT NAME="Title" TYPE="text" SIZE=64  maxlength="64">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidTitle(frm){
+ if ("[optfield]" == "" && frm.Title.value == "") {
+  alert("Enter required field."); frm.Title.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=AltIPAddr>
+<p> IP address for alternate name in dotted decimal form [optfield] <BR>
+<INPUT NAME="AltIPAddr" TYPE="text" SIZE=15  maxlength="15">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidAltIPAddr(frm){
+ if ("[optfield]" == "" && frm.AltIPAddr.value == "") {
+  alert("Enter required field."); frm.AltIPAddr.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=AltEmail>
+<p> Email address for alternate name [optfield] <BR>
+<INPUT NAME="AltEmail" TYPE="text" SIZE=100  maxlength="100">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidAltEmail(frm){
+ if ("[optfield]" == "" && frm.AltEmail.value == "") {
+  alert("Enter required field."); frm.AltEmail.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=AltURI>
+<p> Uniform Resource Identifier for alternate name [optfield] <BR>
+<INPUT NAME="AltURI" TYPE="text" SIZE=100  maxlength="255">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidAltURI(frm){
+ if ("[optfield]" == "" && frm.AltURI.value == "") {
+  alert("Enter required field."); frm.AltURI.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=AltDomain>
+<p> Domain name for alternate name [optfield] <BR>
+<INPUT NAME="AltDomain" TYPE="text" SIZE=100  maxlength="100">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidAltDomain(frm){
+ if ("[optfield]" == "" && frm.AltDomain.value == "") {
+  alert("Enter required field."); frm.AltDomain.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=Street>
+<p> Street address [optfield] <BR>
+<INPUT NAME="Street" TYPE="text" MAXLENGTH=64 SIZE=64>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidStreet(frm){
+ if ("[optfield]" == "" && frm.Street.value == "") {
+  alert("Enter required field."); frm.Street.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=PostalCode>
+<p> Zipcode or postal code [optfield] <BR>
+<INPUT NAME="PostalCode" TYPE="text" MAXLENGTH=64 SIZE=64>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidPostalCode(frm){
+ if ("[optfield]" == "" && frm.PostalCode.value == "") {
+  alert("Enter required field."); frm.PostalCode.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=Email>
+<p> Email address for distinguished name MAIL= attribute [optfield] <BR>
+# Deprecated, use the MAIL INSERT instead
+<INPUT NAME="Email" TYPE="text" MAXLENGTH=64 SIZE=64>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidEmail(frm){
+ if ("[optfield]" == "" && frm.Email.value == "") {
+  alert("Enter required field."); frm.Email.focus();
+  return false;
+ }
+ if (frm.Email.value != "") {
+  for (i=0;i<frm.length;i++) {
+   var fld= frm.elements[i];
+   if (fld.name == "NotifyEmail")
+    if (fld.value != "" && fld.value != frm.Email.value) {
+     alert("Notification email cannot differ from distinguished name email.");
+     frm.NotifyEmail.focus();
+     return false;
+    }
+  }
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=Mail>
+<p> Email address for distinguished name MAIL= attribute [optfield] <BR>
+# attribute defined in RFC2798, OID 0.9.2342.19200300.100.1.3
+<INPUT NAME="Mail" TYPE="text" MAXLENGTH=64 SIZE=64>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidMail(frm){
+ if ("[optfield]" == "" && frm.Mail.value == "") {
+  alert("Enter required field."); frm.Mail.focus();
+  return false;
+ }
+ if (frm.Mail.value != "") {
+  for (i=0;i<frm.length;i++) {
+   var fld= frm.elements[i];
+   if (fld.name == "NotifyEmail")
+    if (fld.value != "" && fld.value != frm.Mail.value) {
+     alert("Notification email cannot differ from distinguished name MAIL=attribute.");
+     frm.NotifyEmail.focus();
+     return false;
+    }
+  }
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=EmailAddr>
+<p> Email address for distinguished name EMAIL= attribute [optfield] <BR>
+# attribute defined in RFC2798, OID 1.2.840.113549.1.9.1
+<INPUT NAME="EmailAddr" TYPE="text" MAXLENGTH=64 SIZE=64>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidEmailAddr(frm){
+ if ("[optfield]" == "" && frm.EmailAddr.value == "") {
+  alert("Enter required field."); frm.EmailAddr.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=SignWith>
+<p> Component:/key-Label used to sign this certificate [optfield] <BR>
+<p> e.g., "SAF:CERTAUTH/Local CA Cert" sign by CERTAUTH certificate
+ "Local CA Cert"
+<INPUT NAME="SignWith" TYPE="text" SIZE=45  maxlength="45">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidSignWith(frm){
+ if ("[optfield]" == "" && frm.SignWith.value == "") {
+  alert("Enter required field."); frm.SignWith.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=PublicKey>
+<p> Base64 encoded PKCS#10 certificate request [optfield] <BR>
+<TEXTAREA NAME="PublicKey"
+  COLS="70"
+  ROWS="12"
+  WRAP="OFF">
+</TEXTAREA>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidPublicKey(frm){
+ if ("[optfield]" == "" && frm.PublicKey.value == "") {
+  alert("Enter required field."); frm.PublicKey.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+
+<INSERT NAME=PublicKeyNS>
+<p> Select a key size
+<KEYGEN NAME="PublicKey">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidPublicKey(frm){
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=PublicKeyIE>
+<SCRIPT LANGUAGE="VBScript">
+<!--
+Sub SendReq
+
+ On Error Resume Next
+ Dim pkcs10data,DN,i,Message,CommonName                           ' @LBC
+ Dim objEnroll                                                    ' @LBA
+
+ DN= ""
+ CommonName= "Unspecified Distinguished Name"
+ DN= "CN=" + CommonName + ";"
+ pkcs10data = ""                                                  ' @LBM
+
+ ' CertEnroll APIs for enrollment processing.                    111@LBA
+ Set objEnroll = g_objWCF.CreateObject("X509Enrollment.CX509Enrollment")
+ If IsObject(objEnroll) Then
+   Dim objPrivateKey
+   Dim objRequest
+   Dim provider
+   Dim selectedCSP
+   Dim objCSPs
+
+   Set objPrivateKey = g_objWCF.CreateObject("X509Enrollment.CX509PrivateKey")
+   If IsObject(objPrivateKey) = FALSE Then
+     Message = "Error creating Private Key object: " & vbNewline & _
+               Err.Description
+     Call MsgBox(Message ,48,"Error creating Private Key object")
+     Exit Sub
+   End If
+
+   Set objRequest = g_objWCF.CreateObject("X509Enrollment.CX509CertificateRequestPkcs10")
+   If IsObject(objRequest) = FALSE Then
+     Message = "Error creating Request object: " & vbNewline & _
+               Err.Description
+     Call MsgBox(Message ,48,"Error creating Certificate Request object")
+     Exit Sub
+   End If
+
+   ' Setup Private key properties based on the selected provider
+   i = document.all.CSP.options.selectedIndex
+   provider = LCase(document.all.CSP.options(i).text)
+   If InStr(1, provider, "smart", 1) > 0 _
+   Or InStr(1, provider, "card", 1) > 0 Then
+     ' For Smart Card Providers, retrieve the index of the selected CSP
+     ' and set the Private key name, type, and KeySpec
+     objPrivateKey.ProviderName = document.all.CSP.options(i).text
+     objPrivateKey.ProviderType = document.all.CSP.options(i).value
+     objPrivateKey.KeySpec      = 1 ' XCN_AT_KEYEXCHANGE
+   Else
+     Set selectedCSP = g_objWCF.CreateObject("X509Enrollment.CCspInformation")
+     If IsObject(selectedCSP) = FALSE Then
+       Message = "Error creating the a CSP Information object: " & _
+                 vbNewline & Err.Description
+       Call MsgBox(Message ,48,"Error creating CSPInformation object")
+       Exit Sub
+     End If
+
+     Set objCSPs = g_objWCF.CreateObject("X509Enrollment.CCspInformations")
+     If IsObject(objCSPs) = FALSE Then
+       Message = "Error creating the CSP Informations object: " & _
+                 vbNewline & Err.Description
+       Call MsgBox(Message ,48,"Error creating CSPInformations object")
+       Exit Sub
+     End If
+
+     ' Retrieve the index of the selected CSP and initialize the
+     ' CSPInformation object using the provider name
+     selectedCSP.InitializeFromName( document.all.CSP.options(i).text )
+
+     ' Add the CSPInformation object to the CSPInformations object
+     objCSPs.add( selectedCSP )
+
+     ' Set the PrivateKey objects CspInformations to our object
+     objPrivateKey.CspInformations = objCSPs
+
+     ' Set intended usage of private key for KeyExchange purposes
+     objPrivateKey.KeySpec = 1 ' XCN_AT_KEYEXCHANGE
+
+     ' Set KeyProtection based on user input
+     If document.CertReq.KeyProt.value = 1 Then
+       objPrivateKey.KeyProtection = 2
+       ' XCN_NCRYPT_UI_FORCE_HIGH_PROTECTION_FLAG
+     Else
+       objPrivateKey.KeyProtection = 0
+       ' XCN_NCRYPT_UI_NO_PROTECTION_FLAG @DxC
+     End If
+
+     '==================================================================
+     ' The ExportPolicy is set to allow the private key to be exported,
+     ' other options allow the private key to be exported only once for
+     ' archival in a variety of formats, or prevents export of the
+     ' private key.
+     '   ExportPolicy = 0 = XCN_NCRYPT_ALLOW_EXPORT_NONE
+     '   ExportPolicy = 1 = XCN_NCRYPT_ALLOW_EXPORT_FLAG
+     '   ExportPolicy = 2 = XCN_NCRYPT_ALLOW_PLAINTEXT_EXPORT_FLAG
+     '   ExportPolicy = 4 = XCN_NCRYPT_ALLOW_ARCHIVING_FLAG
+     '   ExportPolicy = 8 = XCN_NCRYPT_ALLOW_PLAINTEXT_ARCHIVING_FLAG
+     '==================================================================
+     objPrivateKey.ExportPolicy = 1 ' XCN_NCRYPT_ALLOW_EXPORT_FLAG
+   End If
+
+   Err.clear
+   objRequest.InitializeFromPrivateKey 1, objPrivateKey, ""
+   If Err.Number <> 0 Then
+     Message = "Error initializing request from private key " & _
+               vbNewline & Err.Description
+     Call MsgBox(Message ,48,"Error initializing Certificate Request object")
+     Exit Sub
+   End If
+
+   objRequest.Subject = DN
+
+   Err.clear
+   objEnroll.InitializeFromRequest( objRequest )
+   If Err.Number <> 0 Then
+     Message = "Error initializing Enrollment object from request: " & _
+               vbNewline & Err.Description
+     Call MsgBox(Message ,48,"Error initializing Enrollment object")
+     Exit Sub
+   End If
+
+   pkcs10data = objEnroll.CreateRequest(1) ' XCN_CRYPT_STRING_BASE64
+
+ Else
+   ' XEnroll APIs for enrollment processing
+   certmgr.KeySpec = 1
+   KeyUsage = "1.3.6.1.5.5.7.3.2"
+   i = document.all.CSP.options.selectedIndex
+   certmgr.providerName = document.all.CSP.options(i).text
+   certmgr.providerType = document.all.CSP.options(i).value
+   If document.CertReq.KeyProt.value = 1 Then
+    certmgr.GenKeyFlags = 3
+   Else
+    certmgr.GenKeyFlags = 1
+   End If
+
+   pkcs10data = certmgr.CreatePKCS10(DN, KeyUsage)
+ ' -- added during CertEnroll update.                              2@LBA
+ End If
+ document.CertReq.PublicKey.value = pkcs10data
+
+ If Len(pkcs10data) <= 0 Then
+  call MsgBox ("PKCS10 Creation Failed",48,"Certificate request")
+ End If
+
+End Sub
+// -->
+</SCRIPT>
+
+<p> Select the following key information
+<p> Cryptographic Service Provider
+<select name="CSP">
+<script language="VBScript">
+ On Error Resume Next
+ Dim i, csp, sv
+
+ ' Modifications for CertEnroll API enrollment process.           20@LBA
+ Dim objCSPs
+ Dim oOption
+ Dim errmsg
+
+ Set objCSPs = g_objWCF.CreateObject("X509Enrollment.CCspInformations")
+ If IsObject(objCSPs) Then
+   ' Vista path, use CertEnroll APIs
+   objCSPs.AddAvailableCsps
+   For i = 0 to objCSPs.Count-1
+     ' Only include Legacy(Crypto API) providers at this time
+     If (objCSPs.ItemByIndex(i).LegacyCsp) Then
+       Set oOption   = document.createElement("OPTION")
+       oOption.text  = objCSPs.ItemByIndex(i).Name
+       oOption.value = objCSPs.ItemByIndex(i).Type
+       Document.all.CSP.add(oOption)
+     End If
+   Next
+ Else
+   ' Pre-Vista path, use Xenroll APIs
+   certmgr.providerType = 1
+   i = 0
+   csp = ""
+   csp = certmgr.enumProviders(i,0)
+   sv = "SELECTED"
+   If Len(csp) = 0 Then
+    errmsg = "Your PC needs a Windows upgrade before certificates " & _
+     "can be requested. Click the 'Tools' option on the browser " & _
+     "menu then 'Windows Update' to retrieve the upgrade. "
+    Call MsgBox(errmsg,8,"Security Warning")
+   End If
+   While Len(csp) <> 0
+    document.write("<OPTION VALUE=1 " & sv & ">" & csp & "</OPTION>")
+    i = i + 1
+    csp = ""
+    csp = certmgr.enumProviders(i,0)
+    sv = ""
+   Wend
+ ' -- added during CertEnroll update.                              2@LBA
+ End If
+</script>
+</select>
+
+<p> Enable strong private key protection?
+<select name="KeyProt">
+ <option value="1">Yes</option>
+ <option value="0" selected>No</option>
+</select>
+<input type="hidden" name="PublicKey" value="">
+<p>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidPublicKey(frm){
+ SendReq()
+ if (document.CertReq.PublicKey.value == "")
+  return false;
+ else
+  return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+#
+#-- Added new RenewKeySetNS insert which implements the
+#-- ValidRenewKeySet function for Netscape/Mozilla based
+#-- browsers. Just returns true                                    @01A
+#
+<INSERT NAME=-RenewKeySetNS>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidRenewKeySet(frm){
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+#
+#-- Added new RenewKeySetIE insert which implements the
+#-- ValidRenewKeySet function for MSIE browsers.                   @01A
+#
+<INSERT NAME=-RenewKeySetIE>
+<SCRIPT LANGUAGE="VBScript">
+<!--
+Function RenewKeySet()
+
+ On Error Resume Next
+ Dim pkcs10data, SelectedCert, CertStore, Cert
+ ' Added for CertEnroll API process.                               2@LBA
+ Dim Enroll
+ 'Store Options
+ Const CAPICOM_MEMORY_STORE = 0
+ Const CAPICOM_LOCAL_MACHINE_STORE = 1
+ Const CAPICOM_CURRENT_USER_STORE = 2
+ Const CAPICOM_MY_STORE = "My"
+ Const CAPICOM_STORE_OPEN_READ_ONLY = 0
+ RenewKeySet = 0
+ document.renform.PublicKey.value = ""
+ 'Create SelectedCert
+ B64cert = "[iecert]"
+ Set SelectedCert = CreateObject("CAPICOM.Certificate")
+ SelectedCert.Import(B64cert)
+
+ 'Create Cert Store
+ Set CertStore = CreateObject("CAPICOM.Store")
+ CertStore.Open CAPICOM_CURRENT_USER_STORE, CAPICOM_MY_STORE, CAPICOM_STORE_OPEN_READ_ONLY
+ 'CAPICOM not installed
+ If Err.Number > 0 Then
+   WarnMsg = "Microsoft CAPICOM is not installed or disabled. " &  _
+             "You may not be able to install the renewed " & _
+             "certificate. Do you want to continue anyway? "
+   Result = MsgBox(WarnMsg, 52, "Warning")
+   'User chooses Yes
+   If Result = 6 Then
+     RenewKeySet = 1
+   'User chooses No
+   Else
+     RenewKeySet = 2
+   End If
+ 'CAPICOM present, but user chooses not allowing access to it
+ ElseIf Err.Number < 0 Then
+   RenewKeySet = 2
+ Else
+   'CAPICOM present, keep on processing
+   'Find selected certificate in the store
+   Set Cert = CreateObject("CAPICOM.Certificate")
+   For i = 1 to CertStore.Certificates.Count
+     If CertStore.Certificates(i).Thumbprint = SelectedCert.Thumbprint Then
+       Set Cert = CertStore.Certificates(i)
+       Exit For
+     End If
+   Next
+
+   ' CertEnroll API processing.                                   55@LBA
+   pkcs10data = ""                                                ' @LBM
+   Set Enroll = g_objWCF.CreateObject("X509Enrollment.CX509Enrollment")
+   If IsObject(Enroll) Then
+     ' Vista version uses CertEnroll
+     Dim Request
+     Dim PrivateKey
+     Dim b64cert
+     Dim msg
+
+     Set Request = g_objWCF.CreateObject("X509Enrollment.CX509CertificateRequestPkcs10")
+     If IsObject(Request) = FALSE Then
+       msg = "Error creating the Request object: " & Err.Description
+       Call MsgBox(msg ,48,"Error creating Certificate Request object")
+       Exit Function
+     End If
+
+     Set PrivateKey = g_objWCF.CreateObject("X509Enrollment.CX509PrivateKey")
+     If IsObject(PrivateKey) = FALSE Then
+       msg = "Error creating the PrivateKey object: " & Err.Description
+       Call MsgBox(msg ,48,"Error creating Private Key object")
+       Exit Function
+     End If
+
+     PrivateKey.Existing = True
+     PrivateKey.ContainerName = Cert.PrivateKey.UniqueContainerName
+     PrivateKey.ProviderName  = Cert.PrivateKey.ProviderName
+     PrivateKey.ProviderType  = Cert.PrivateKey.ProviderType
+
+     Err.clear
+     Request.InitializeFromPrivateKey 1, PrivateKey, ""
+     If Err.Number <> 0 Then
+       msg = "Error initializing request from existing private key " & _
+             Err.Description
+       Call MsgBox(msg ,48,"Error initing Certificate Request object")
+       Exit Function
+     End If
+
+     Err.clear
+     Enroll.InitializeFromRequest( Request )
+     If Err.Number <> 0 Then
+       msg = "Error initializing enroll object from request: " & Err.Description
+       Call MsgBox(msg ,48,"Error initializing enroll object")
+       Exit Function
+     End If
+
+     Err.clear
+     pkcs10data = Enroll.CreateRequest(1) ' XCN_CRYPT_STRING_BASE64
+     If Err.Number <> 0 Then
+       msg = "Error creating the renewal request: " & Err.Description
+       Call MsgBox(msg ,48 , "Error creating renewal request")
+       Exit Function
+     End If
+
+   Else
+     ' Non-Vista version uses xenroll
+     KeyUsage = "1.3.6.1.5.5.7.3.2"
+     certmgr.UseExistingKeySet = True
+     'Set fields to be reused from the selected cert
+     certmgr.ContainerName = Cert.PrivateKey.ContainerName
+     certmgr.ProviderName = Cert.PrivateKey.ProviderName
+     certmgr.ContainerName = Cert.PrivateKey.ContainerName
+     certmgr.ProviderType = Cert.PrivateKey.ProviderType
+     certmgr.KeySpec = Cert.PrivateKey.KeySpec
+
+     pkcs10data = certmgr.CreatePKCS10(Cert.subjectName, KeyUsage)
+   ' Added during CertEnroll addition.                             2@LBA
+   End If
+   document.renform.PublicKey.value = pkcs10data
+ End If
+End Function
+// -->
+</SCRIPT>
+<input type="hidden" name="PublicKey" value="">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidRenewKeySet(frm){
+//
+//-- Added ValidRenewKeySet function for MS IE browsers to
+//-- call the RenewKeySet function above and handle the
+//-- different results based on the user's responses and
+//-- capabilities of the user's machine.                           @01A
+//
+  // Invoke the RenewKeySet function and save result
+  goahead = RenewKeySet()
+  if (goahead == 0)
+    // CAPICOM is present
+    if (document.renform.PublicKey.value != "")
+      // Original certificate was found and a request was built, proceed
+      return true;
+    else
+      // Original cert was not found or request could not be created,
+      // fail the renew request
+      return false;
+  else
+    if (goahead == 1)
+      // CAPICOM is absent, but proceed anyway
+      return true;
+    else
+      // The user stopped the renew process
+      return false;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+# =====================================================================
+#
+# X.509 fields (INSERTs) that require customization before being used
+#
+# =====================================================================
+# =====================================================================
+# INSERT NAME=AltOther_<OID>
+# Here it shows two 'AltOther' INSERTs. You may add as many as you need.
+# The name of this INSERT is built with the string 'AltOther_',
+# concatenated with an underscore(_) separated OID that you need.
+# You may have more than one input fields. But the total length of the
+# fields together with the length of the OID and the comma can not exceed
+# 255.
+# The result AltOther field is built by concatenating the dot(.) separated
+# OID, which matches this INSERT name, a comma, and the value(s) of the
+# input field(s).
+# Eg., in AltOther_1_2_3_4_5, the AltOther field is:
+# 1.2.3.4.5,<value of Other1a>
+# Eg., in AltOther_1_2_3_4_6, the AltOther field is:
+# 1.2.3.4.6,<value of Other2a><value of Other2b>
+#
+# Structure:
+# 1) INSERT NAME - 'AltOther_' + <n1_n2_n3_n4_n5>
+# 2) a hidden INPUT field with the same name as the INSERT NAME. It
+#    is used to hold the AltOther field value to be included in the
+#    certificate.
+# 3) input field(s), with substitution variables [optfield] and [readonly].
+#    [optfield] is used to control whether the field is an optional field.
+#    [readonly] is used to control the display mode of the field: if the
+#    field is on a web page requesting input, it will be assigned with
+#    NULL, if it is on a web page for displaying request/certificate AltOther
+#    information, it will be assigned with the HTML attribute 'READONLY'.
+# 4) a hidden INPUT field with name 'altrawstring_' + <n1_n2_n3_n4_n5>.
+#    Its value is a substitution variable [altrawvalue] which
+#    is used to hold the result of the returned value of the AltOther,
+#    excluding the OID and the comma. This is used for displaying the
+#    AltOther information in a request or a certificate after it is
+#    generated.
+# 5) a JavaScript which will be called at load time. It contains the
+#    parsing logic to parse the result obtained in 4) back into
+#    individual input field(s) when the AltOther information
+#    is displayed. Make sure the parsing logic matches the input
+#    field(s) format.
+# 6) a JavaScript function with the name built with a string
+#    'ValidAltOther_' + <n1_n2_n3_n4_n5>. The name must be of this format.
+#    Unlike the other validate functions in the other INSERTs which validate
+#    user input(s) only, it also sets the variable specified in 2) above.
+#    It concatenates the OID(n1.n2.n3.n4.n5) and value(s) of all the input
+#    field(s).
+#    You may customize different validation logic needed to validate
+#    the input field(s).
+#    The validation logic shown in the samples include:
+#    - validate the required field(s) is/are filled
+#    - validate the length of the input(s)
+#    - pad the optional field(s) with preset value(s), if there is more
+#      than one input field
+# =====================================================================
+#
+# =====================================================================
+# Sample AltOther INSERT with one input field
+# =====================================================================
+<INSERT NAME=AltOther_1_2_3_4_5>
+<INPUT NAME="AltOther_1_2_3_4_5" TYPE="hidden" maxlength="255">
+
+<p> Other Name for alternate name: <BR>
+<p> Customer's account number (11 digits) [optfield] <BR>
+<INPUT NAME="Other1a" TYPE="text" SIZE=11 maxlength="11" [readonly]>
+
+<INPUT NAME="altrawstring_1_2_3_4_5" TYPE="hidden" VALUE="[altrawvalue]">
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+//This is the script that will be called at load time.
+var form=document.forms[0]
+if (form.altrawstring_1_2_3_4_5.value.length > 0) {
+  //The name 'Otherx' needs to match with the above INPUT NAME.
+  //Substr(start position, length)
+  form.Other1a.value=form.altrawstring_1_2_3_4_5.value.substr(0,11)
+}
+//-->
+</SCRIPT>
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+//This is the validation script
+function ValidAltOther_1_2_3_4_5(frm){
+ if (("[optfield]" == "" && frm.Other1a.value.length != 11) ||
+     ("[optfield]" !="" && frm.Other1a.value != "" && frm.Other1a.value.length != 11)) {
+  alert("Enter 11 digit account number.");
+  frm.Other1a.focus();
+  return false;
+ }
+
+ //Build the entire AltOther field.
+ if (frm.Other1a.value != "")
+  frm.AltOther_1_2_3_4_5.value = "1.2.3.4.5," + frm.Other1a.value ;
+ else
+  frm.AltOther_1_2_3_4_5.value = "";
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+# =====================================================================
+# Sample AltOther INSERT with two input fields
+# =====================================================================
+<INSERT NAME=AltOther_1_2_3_4_6>
+<INPUT NAME="AltOther_1_2_3_4_6" TYPE="hidden" maxlength="255">
+
+<p> Other Name for alternate name: <BR>
+<p> Customer's driver license number (9 digits) [optfield] <BR>
+<INPUT NAME="Other2a" TYPE="text" SIZE=9 maxlength="9" [readonly]>
+<p> Customer's driver license expiration date (yyyymmdd) [optfield] <BR>
+<INPUT NAME="Other2b" TYPE="text" SIZE=8 maxlength="8" [readonly]>
+
+<INPUT NAME="altrawstring_1_2_3_4_6" TYPE="hidden" VALUE="[altrawvalue]">
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+//This is the script that will be called at load time.
+var form=document.forms[0]
+if (form.altrawstring_1_2_3_4_6.value.length > 0) {
+  //The name 'Otherx' needs to match with the above INPUT NAME.
+  //Substr(start position, length)
+  form.Other2a.value=form.altrawstring_1_2_3_4_6.value.substr(0,9)
+  form.Other2b.value=form.altrawstring_1_2_3_4_6.value.substr(9,8)
+}
+//-->
+</SCRIPT>
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+//This is the validation script
+function ValidAltOther_1_2_3_4_6(frm){
+ if (("[optfield]" == "" && frm.Other2a.value.length != 9) ||
+     ("[optfield]" !="" && frm.Other2a.value != "" && frm.Other2a.value.length != 9)) {
+  alert("Enter 9 digit license number.");
+  frm.Other2a.focus();
+  return false;
+ }
+ if (("[optfield]" == "" && frm.Other2b.value.length != 8) ||
+     ("[optfield]" !="" && frm.Other2b.value != "" && frm.Other2b.value.length != 8)) {
+  alert("Enter date format yyyymmdd.");
+  frm.Other2b.focus();
+  return false;
+ }
+ if ("[optfield]" =="" && frm.Other2a.value == "" &&
+      frm.Other2b.value == "") {
+  alert("You must input at least one of the fields.");
+  frm.Other2a.focus();
+  return false;
+ }
+
+ //Pad the empty field with desired value for optional fields
+ if ("[optfield]" !="") {
+   if (frm.Other2a.value == "" && frm.Other2b.value != "") {
+       frm.Other2a.value = "000000000";
+   }
+   else if (frm.Other2b.value == "" && frm.Other2a.value != "") {
+       frm.Other2b.value = "00000000";
+   }
+ }
+
+ //Build the entire AltOther field.
+ if (frm.Other2a.value != "" && frm.Other2b.value != "")
+  frm.AltOther_1_2_3_4_6.value = "1.2.3.4.6," + frm.Other2a.value +
+                       frm.Other2b.value;
+ else
+  frm.AltOther_1_2_3_4_6.value = "";
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+
+<INSERT NAME=UnstructName>
+<p> Unstructured device name [optfield] <BR>
+<INPUT NAME="UnstructName" TYPE="text" SIZE=64 maxlength="64">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidUnstructName(frm){
+if ("[optfield]" == "" && frm.UnstructName.value == "") {
+alert("Enter required field."); frm.UnstructName.focus();
+return false;
+}
+return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=UnstructAddr>
+<p> Unstructured device address [optfield] <BR>
+<INPUT NAME="UnstructAddr" TYPE="text" SIZE=64 maxlength="64">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidUnstructAddr(frm){
+if ("[optfield]" == "" && frm.UnstructAddr.value == "") {
+alert("Enter required field."); frm.UnstructAddr.focus();
+return false;
+}
+return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+
+<INSERT NAME=SerialNumber>
+<p> Device serial number [optfield] <BR>
+<INPUT NAME="SerialNumber" TYPE="text" SIZE=64 maxlength="64">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidSerialNumber(frm){
+if ("[optfield]" == "" && frm.SerialNumber.value == "") {
+alert("Enter required field."); frm.SerialNumber.focus();
+return false;
+}
+return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+# =====================================================================
+# Sample AltOther INSERT for Windows Logon
+# =====================================================================
+<INSERT NAME=AltOther_1_3_6_1_4_1_311_20_2_3>
+<INPUT NAME="AltOther_1_3_6_1_4_1_311_20_2_3" TYPE="hidden" maxlength="255">
+
+<p> Other Name for alternate name: <BR>
+<p> User Principal Name (max 50 chars) [optfield] <BR>
+<INPUT NAME="Other3a" TYPE="text" SIZE=50 maxlength="50" [readonly]>
+
+<INPUT NAME="altrawstring_1_3_6_1_4_1_311_20_2_3" TYPE="hidden"
+       VALUE="[altrawvalue]">
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+//This is the script that will be called at load time.
+var form=document.forms[0]
+if (form.altrawstring_1_3_6_1_4_1_311_20_2_3.value.length > 0) {
+  //The name 'Otherx' needs to match with the above INPUT NAME.
+  //Substr(start position, length)
+  form.Other3a.value=form.altrawstring_1_3_6_1_4_1_311_20_2_3.value
+}
+//-->
+</SCRIPT>
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+//This is the validation script
+function ValidAltOther_1_3_6_1_4_1_311_20_2_3(frm){
+ if ("[optfield]" == "" && frm.Other3a.value == "") {
+  alert("Enter User Principal Name.");
+  frm.Other3a.focus();
+  return false;
+ }
+
+ if (frm.Other3a.value != "") {
+   // Verify the UPN has an atsign('@'), and that it is not
+   // in either the first or last character position.
+   if ((frm.Other3a.value.indexOf("@") <= 0)
+    || (frm.Other3a.value.indexOf("@") == frm.Other3a.value.length-1)
+      ) {
+     alert("Enter User Principal Name in the form of id@domain.");
+     frm.Other3a.focus();
+     return false;
+   }
+ }
+
+ //Build the entire AltOther field.
+ if (frm.Other3a.value != "")
+  frm.AltOther_1_3_6_1_4_1_311_20_2_3.value = "1.3.6.1.4.1.311.20.2.3,"
+                                            + frm.Other3a.value;
+ else
+  frm.AltOther_1_3_6_1_4_1_311_20_2_3.value = "";
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+
+# =====================================================================
+#
+# non-X.509 certificate request fields (INSERTs)
+#
+# =====================================================================
+#
+<INSERT NAME=UserId>
+<p> Owning SAF User ID [optfield] <BR>
+<INPUT NAME="UserId" TYPE="text" SIZE=8 maxlength="8">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidUserId(frm){
+ if ("[optfield]" == "" && frm.UserId.value == "") {
+  alert("Enter required field."); frm.UserId.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=Label>
+<p> Label assigned to certificate being requested [optfield] <BR>
+<INPUT NAME="Label" TYPE="text" SIZE=32 maxlength="32">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidLabel(frm){
+ if ("[optfield]" == "" && frm.Label.value == "") {
+  alert("Enter required field."); frm.Label.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=Requestor>
+<p> Your name for tracking this request [optfield] <BR>
+<INPUT NAME="Requestor" TYPE="text" SIZE=32 maxlength="32">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidRequestor(frm){
+ if ("[optfield]" == "" && frm.Requestor.value == "") {
+  alert("Enter required field."); frm.Requestor.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=PassPhrase>
+<p> Pass phrase for securing this request. You will need to supply
+this value when retrieving your certificate [optfield] <BR>
+<INPUT NAME="PassPhrase" TYPE="password" SIZE=32 maxlength="32"> <BR>
+<p> Reenter your pass phrase to confirm <BR>
+<INPUT NAME="ConfirmPassPhrase" TYPE="password" SIZE=32
+ maxlength="32">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidPassPhrase(frm){
+ if ("[optfield]" == "" && frm.PassPhrase.value == "") {
+  alert("Enter required field."); frm.PassPhrase.focus();
+  return false;
+ }
+ if ("[optfield]" == "" && frm.ConfirmPassPhrase.value == "") {
+  alert("Reenter the pass phrase."); frm.ConfirmPassPhrase.focus();
+  return false;
+ }
+ if (frm.PassPhrase.value != frm.ConfirmPassPhrase.value) {
+  alert("Passwords don't match. Reenter."); frm.PassPhrase.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=ChallengePassPhrase>
+<p> If you specified a pass phrase when submitting the certificate
+request, type it here, exactly as you typed it on the
+request form <BR>
+<INPUT NAME="ChallengePassPhrase" TYPE="password" SIZE=32
+maxlength="32">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidChallengePassPhrase(frm){
+ if ("[optfield]" == "" && frm.ChallengePassPhrase.value == "") {
+  alert("Enter required field."); frm.ChallengePassPhrase.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+# HostIdMap is a repeatable field. If more than one is needed, a
+# separate INSERT, which can be modelled from this one, is needed.
+# See INSERT NAME=HostIdMap2 for an example.
+<INSERT NAME=HostIdMap>
+<p> HostIdMapping Extension value in subject-id@host-name form
+    [optfield] <BR>
+<INPUT NAME="HostIdMap" TYPE="text" SIZE=100 maxlength="100">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidHostIdMap(frm){
+ if ("[optfield]" == "" && frm.HostIdMap.value == "") {
+  alert("Enter required field."); frm.HostIdMap.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=HostIdMap2>
+<p> HostIdMapping Extension value in subject-id@host-name form
+    [optfield] <BR>
+<INPUT NAME="HostIdMap2" TYPE="text" SIZE=100 maxlength="100">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidHostIdMap2(frm){
+ if ("[optfield]" == "" && frm.HostIdMap2.value == "") {
+  alert("Enter required field."); frm.HostIdMap2.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=-TransactionId>
+<p> Enter the assigned transaction ID [optfield] <BR>
+<INPUT NAME="TransactionId" TYPE="text" SIZE=56 maxlength="56"
+VALUE="[transactionid]">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidTransactionId(frm){
+ if ("[optfield]" == "" && frm.TransactionId.value == "") {
+  alert("Enter required field."); frm.TransactionId.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=NotifyEmail>
+<p> Email address for notification purposes [optfield] <BR>
+<INPUT NAME="NotifyEmail" TYPE="text" SIZE=64 MAXLENGTH="64">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidNotifyEmail(frm){
+ if ("[optfield]" == "" && frm.NotifyEmail.value == "") {
+  alert("Enter required field."); frm.NotifyEmail.focus();
+  return false;
+ }
+ return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+<INSERT NAME=SelectCADomain>
+<p> Select the CA domain to work with
+<SELECT NAME="domain">
+# rename and replicate the following line for every CA domain and
+# determine which one should be SELECTED by default, if any
+<OPTION VALUE="Customers" SELECTED>Customers
+</SELECT>
+</INSERT>
+
+# Changed name of insert from SmartCardNS to PublicKey2NS to match
+# CGI scripts                                                       @LBA
+<INSERT NAME=PublicKey2NS>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidSmartcard(frm){
+ alert("Cannot use a Mozilla based browser for this certificate type");
+ return false;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+# Changed name of insert from SmartCardIE to PublicKey2IE to match
+# CGI scripts                                                       @LBA
+<INSERT NAME=PublicKey2IE>
+<SCRIPT LANGUAGE="VBScript">
+<!--
+Sub SendReq
+
+ On Error Resume Next
+ ' Modified for CertEnroll API processing                           @LBA
+ Dim pkcs10data,DN,i,Message,CommonName                           ' @LBC
+ Dim objEnroll                                                    ' @LBA
+
+ DN= ""
+ CommonName= "Unspecified Distinguished Name"
+ DN= "CN=" + CommonName + ";"
+
+ ' Additions for CertEnroll API processing.                       50@LBA
+ pkcs10data = ""                                                  ' @LBM
+ Set objEnroll = g_objWCF.CreateObject("X509Enrollment.CX509Enrollment")
+ If IsObject(objEnroll) Then
+   ' This is the Vista path which uses CertEnroll APIs
+   Dim objPrivateKey
+   Dim objRequest
+ 
+   Set objPrivateKey = g_objWCF.CreateObject("X509Enrollment.CX509PrivateKey")
+   If IsObject(objPrivateKey) = FALSE Then
+     Message = "Error creating X509PrivateKey object: " & Err.Description
+     Call MsgBox(Message ,48,"Error creating Private Key object")
+     Exit Sub
+   End If
+ 
+   Set objRequest = g_objWCF.CreateObject("X509Enrollment.CX509CertificateRequestPkcs10")
+   If IsObject(objRequest) = FALSE Then
+     Message = "Error creating PKCS10 Request object: " & Err.Description
+     Call MsgBox(Message ,48,"Error creating Certificate Request object")
+     Exit Sub
+   End If
+ 
+   i = document.all.CSP.options.selectedIndex
+   objPrivateKey.ProviderName = document.all.CSP.options(i).text
+   objPrivateKey.ProviderType = document.all.CSP.options(i).value
+   objPrivateKey.KeySpec      = 1 ' XCN_AT_KEYEXCHANGE
+ 
+   Err.clear
+   Call objRequest.InitializeFromPrivateKey(1, objPrivateKey, "")
+   If Err.Number <> 0 Then
+     Message = "Error initializing the Request from private key: " & _
+               vbNewline & Err.Description
+     Call MsgBox(Message ,48,"Error initializing request")
+     Exit Sub
+   End If
+ 
+   objRequest.Subject = DN
+ 
+   Err.clear
+   objEnroll.InitializeFromRequest( objRequest )
+   If Err.Number <> 0 Then
+     Message = "Error initializing Enrollment object from request: " & _
+               vbNewline & Err.Description
+     Call MsgBox(Message ,48,"Error initializing Enrollment object")
+     Exit Sub
+   End If
+ 
+   pkcs10data = objEnroll.CreateRequest(1) ' XCN_CRYPT_STRING_BASE64
+ 
+ Else
+   ' This is the non-Vista path which uses Xenroll APIs
+   certmgr.KeySpec = 1
+   KeyUsage = "1.3.6.1.5.5.7.3.2"
+   i = document.all.CSP.options.selectedIndex
+   certmgr.providerName = document.all.CSP.options(i).text
+   certmgr.providerType = getProviderType(certmgr.providerName)
+   certmgr.GenKeyFlags = 0
+
+   pkcs10data = certmgr.CreatePKCS10(DN, KeyUsage)
+ ' Added during CertEnroll API processing addition.                2@LBA
+ End If
+
+ document.CertReq.PublicKey.value = pkcs10data
+
+ If Len(pkcs10data) <= 0 Then
+  call MsgBox ("PKCS10 Creation Failed",48,"Certificate request")
+ End If
+
+End Sub
+// -->
+</SCRIPT>
+
+<p> Select from the following installed smartcard providers <br>
+<select name="CSP">
+<script language="VBScript">
+ On Error Resume Next
+ Dim i, csp, sv
+
+ ' CertEnroll API processing additions.                           24@LBA
+ Dim objCSPs
+ Dim oOption
+ Dim provider
+ Dim msg
+  
+ Set objCSPs = g_objWCF.CreateObject("X509Enrollment.CCspInformations")
+ If IsObject(objCSPs) Then
+   ' This is the Vista version which uses CertEnroll APIs
+   objCSPs.AddAvailableCsps
+   For i = 0 to objCSPs.Count-1
+     If (objCSPs.ItemByIndex(i).LegacyCsp) Then
+       provider = LCase(objCSPs.ItemByIndex(i).Name)
+       If InStr(1, provider, "smart", 1) > 1 _
+       Or InStr(1, provider, "card", 1) > 1 Then
+         Set oOption   = document.createElement("OPTION")
+         oOption.text  = objCSPs.ItemByIndex(i).Name
+         oOption.value = objCSPs.ItemByIndex(i).Type
+         Document.all.CSP.add(oOption)
+       End If
+     End If
+   Next
+ Else
+   ' This is the non-Vista version which uses Xenroll APIs
+   certmgr.providerType = 1
+   i = 0
+   csp = ""
+   csp = certmgr.enumProviders(i,0)
+   sv = "SELECTED"
+   If Len(csp) = 0 Then
+    errmsg = "Your PC needs a Windows upgrade before certificates " & _
+     "can be requested. Click the 'Tools' option on the browser " & _
+     "menu then 'Windows Update' to retrieve the upgrade. "
+    Call MsgBox(errmsg,8,"Security Warning")
+   End If
+   While Len(csp) <> 0
+    '=======================================================
+    '
+    ' Edit this If statement to add or remove smartcard
+    ' providers as desired
+    '
+    '=======================================================
+    If Mid(csp,1,7) = "Datakey" _
+    Or Mid(csp,1,7) = "Gemplus" _
+    Or Mid(csp,1,16) = "Infineon SICRYPT" _
+    Or Mid(csp,1,12) = "Schlumberger" Then
+     document.write("<OPTION VALUE=" & """" & csp & """" & sv & ">" & csp & "</OPTION>")
+    End If
+    i = i + 1
+    csp = ""
+    csp = certmgr.enumProviders(i,0)
+    sv = ""
+   Wend
+ ' Added for CertEnroll API processing additions.                  2@LBA
+ End If
+</script>
+</select>
+
+<input type="hidden" name="PublicKey" value="">
+<p>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidSmartcard(frm){
+ SendReq()
+ if (document.CertReq.PublicKey.value == "")
+  return false;
+ else
+  return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+#####################################################################
+#
+# This INSERT is for preregistration only
+#
+#####################################################################
+<INSERT NAME=ClientName>
+<p> The name of the person or device that the certificate represents <BR>
+<INPUT NAME="ClientName" TYPE="text" SIZE=64 maxlength="64">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+function ValidClientName(frm){
+if (frm.ClientName.value == "") {
+alert("Enter required field."); frm.ClientName.focus();
+return false;
+}
+return true;
+}
+//-->
+</SCRIPT>
+</INSERT>
+
+####################################################################
+#                                                                  #
+#                   Additional section                             #
+#                                                                  #
+####################################################################
+
+<INSERT NAME=-copyright>
+<!--
+/********************************************************************/
+/*                                                                  */
+/* Licensed Materials - Property of IBM                             */
+/* 5694-A01                                                         */
+/* Copyright IBM Corp. 2001, 2007                                   */
+/*                                                                  */
+/********************************************************************/
+-->
+<META HTTP-EQUIV="Content Type" content="text/html; charset=ISO-8859-1">
+</INSERT>
+
+<INSERT NAME=-pagefooter>
+<A HREF="mailto:webmaster@your-company">
+email: webmaster@your-company.com</A>
+</INSERT>
+
+

@@ -1,0 +1,788 @@
+/* Rexx                                                              */         
+/**********************************************************************         
+ Licensed Materials - Property of IBM                                           
+ 5650-ZOS                                                                       
+ Copyright IBM Corp. 2020                                                       
+                                                                                
+ Name:    ORLIST                                                                
+                                                                                
+ Author: Bruce Wells - brwells@us.ibm.com                                       
+                                                                                
+ Purpose: Display security information for a Unix file or directory             
+          using a syntax and output format similar to the RACF                  
+          RLIST command                                                         
+                                                                                
+ Input:   An absolute path name                                                 
+                                                                                
+ NOTE!!! This exec is dependent upon the following "Syntax:" line and           
+         the "End-Syntax" line below in order to display the syntax             
+         when the exec is invoked without keyword parameters.                   
+                                                                                
+         Feel free to add/change examples to show things that are               
+         frequently done in your orgnization. But please preserve               
+         these surrounding lines.                                               
+                                                                                
+ Syntax:                                                                        
+   All keywords are optional:                                                   
+          FSSEC                (positional)                                     
+          absolute-path-name   (positional)                                     
+          AUTH                                                                  
+                                                                                
+ Examples:                                                                      
+                                                                                
+  1) Display all security information:                                          
+                                                                                
+     ORLIST FSSEC /u/brwells/myfile                                             
+                                                                                
+  2) Display all security information omitting the optional class name:         
+                                                                                
+     ORLIST /u/brwells/myfile                                                   
+                                                                                
+  3) Display only the attributes used in a POSIX access decision:               
+                                                                                
+     ORLIST /u/brwells/myfile AUTH                                              
+                                                                                
+ End-Syntax                                                                     
+                                                                                
+**********************************************************************/         
+/*******************************************************************/           
+/*                                                                 */           
+/* This program contains code made available by IBM Corporation    */           
+/* on an AS IS basis. Any one receiving this program is            */           
+/* considered to be licensed under IBM copyrights to use the       */           
+/* IBM-provided source code in any way he or she deems fit,        */           
+/* including copying it, compiling it, modifying it, and           */           
+/* redistributing it, with or without modifications, except that   */           
+/* it may be neither sold nor incorporated within a product that   */           
+/* is sold.  No license under any IBM patents or patent            */           
+/* applications is to be implied from this copyright license.      */           
+/*                                                                 */           
+/* The software is provided "as-is", and IBM disclaims all         */           
+/* warranties, express or implied, including but not limited to    */           
+/* implied warranties of merchantibility or fitness for a          */           
+/* particular purpose.  IBM shall not be liable for any direct,    */           
+/* indirect, incidental, special or consequential damages arising  */           
+/* out of this agreement or the use or operation of the software.  */           
+/*                                                                 */           
+/* A user of this program should understand that IBM cannot        */           
+/* provide technical support for the program and will not be       */           
+/* responsible for any consequences of use of the program.         */           
+/*                                                                 */           
+/*******************************************************************/           
+parse arg keywords                                                              
+                                                                                
+/*********************************************************************/         
+/* Define/initialize command keyword names and values.               */         
+/*********************************************************************/         
+AUTHkwd      = "AUTH"        ; authVal      = 0                                 
+                                                                                
+/*********************************************************************/         
+/* -----------------   Start of Mainline     ----------------------- */         
+/*********************************************************************/         
+                                                                                
+/*********************************************************************/         
+/* Display syntax if no arguments are supplied.                      */         
+/*********************************************************************/         
+If Length(keywords) = 0 Then Do                                                 
+  Display = "no"                                                                
+  If sourceline() > 0 Then Do                                                   
+    Do i = 1 to sourceline()                                                    
+     If Word(sourceline(i),1) = "Syntax:" Then                                  
+       Display = "yes"                                                          
+     If Word(sourceline(i),1) = "End-Syntax" Then                               
+       Leave                                                                    
+     If Display = "yes" Then                                                    
+       say Substr(sourceline(i),1,72)                                           
+    End                                                                         
+  End                                                                           
+  Signal GETOUT                                                                 
+End                                                                             
+                                                                                
+call syscalls('ON')                                                             
+address syscall                                                                 
+                                                                                
+/*********************************************************************/         
+/* Get positional path name argument.  We will tolerate 'FSSEC'      */         
+/* as the first keyword, in case the user wants ORLIST to look       */         
+/* just like the RLIST command, in which the 1st positional          */         
+/* keyword is the class name.                                        */         
+/*********************************************************************/         
+temp = Word(keywords,1)          /* Get 1st keyword                  */         
+Upper temp                                                                      
+If temp = 'FSSEC' Then                                                          
+  keywords = Subword(keywords,2) /* Remove class from keyword string */         
+path = Word(keywords,1)          /* 1st keyword is the path name     */         
+call syscalls('ON')                                                             
+address syscall                                                                 
+                                                                                
+"stat (path) fstem."                                                            
+                                                                                
+/* Check for success.                                               */          
+If retval = -1 then Do                                                          
+ Select /* errno */                                                             
+  When errno = ENOENT Then                                                      
+    say 'The specified path does not exist'                                     
+  When errno = EACCES Then Do                                                   
+    Say "You are not authorized to reach" path                                  
+                                                                                
+    /*****************************************************************/         
+    /* Now, for extra credit, we will check for search access to     */         
+    /* the directory components of the path name, since that is a    */         
+    /* common cause of error, and display the first such directory   */         
+    /* to which the user is not authorized. (There is no sense in    */         
+    /* continuing beyond that point because they will all yield a    */         
+    /* failure even if search access is present.)                    */         
+    /*****************************************************************/         
+    checkpath = ''      /* The path to check */                                 
+    workpath = path     /* A working copy of the input path */                  
+    Do Forever                                                                  
+      idx = Pos('/',workpath)                                                   
+      If idx = 0 Then    /* no more slashes means we are finished    */         
+        leave                                                                   
+      checkpath = checkpath || Substr(workpath,1,idx)                           
+      workpath = Substr(workpath,idx+1) /* Lop off head */                      
+                                                                                
+      "access (checkpath)" X_OK                                                 
+                                                                                
+      if retval = -1 then do                                                    
+        say "You do not have search access to" checkpath                        
+        Leave                                                                   
+      End                                                                       
+    End                                                                         
+  End    /* EACCES */                                                           
+  Otherwise Do                                                                  
+    say "Error locating target object.",                                        
+        " Stat() retval =" retval "errno =" ,                                   
+         errno "errnojr =" errnojr                                              
+  End                                                                           
+ End     /* Select errno*/                                                      
+ Signal GETOUT  /* Exit on error */                                             
+End /* retval = -1 */                                                           
+                                                                                
+/*********************************************************************/         
+/* Remove path from keyword string for subsequent processing.        */         
+/*********************************************************************/         
+keywords = Subword(keywords,2)  /* Remove path from keyword string   */         
+                                                                                
+/*********************************************************************/         
+/* Parse the keywords and values from the keyword string.            */         
+/*********************************************************************/         
+listRc = 0                                                                      
+listRc = parseKeywords()                                                        
+If listRc /= 0 Then                                                             
+  Signal GETOUT                                                                 
+                                                                                
+If authVal = 0 Then Do           /* Don't display if AUTH specified  */         
+  /*******************************************************************/         
+  /* Echo the 'class' and path name, as RLIST does for profiles.     */         
+  /*******************************************************************/         
+  say "CLASS            NAME"                                                   
+  say "-----            ----"                                                   
+  say Left('FSSEC',16) path                                                     
+  say " "                                                                       
+                                                                                
+  /*******************************************************************/         
+  /* We have file information.  Now get mount entry information      */         
+  /* by calling getmntent with the device number just returned by    */         
+  /* stat().                                                         */         
+  /*******************************************************************/         
+  "getmntent mnt." x2d(fstem.ST_DEV)                                            
+  say "FILE SYSTEM CONTAINER ATTRIBUTES"                                        
+  say "--------------------------------"                                        
+  fsn = Strip(mnt.MNTE_FSNAME.1)                                                
+  say Left("NAME =" fsn,44) "TYPE =" mnt.MNTE_FSTYPE.1                          
+  say "MOUNT POINT =" mnt.MNTE_PATH.1                                           
+                                                                                
+  /*******************************************************************/         
+  /* Display various mount mode options.                             */         
+  /* I haven't tested nosecurity/setuid    TBD                       */         
+  /*******************************************************************/         
+  mntmode = d2x(mnt.MNTE_MODE.1,8)                                              
+  mntmode=substr(mntmode,8)                                                     
+                                                                                
+  nosecurity = 0                                                                
+  mode = ""                                                                     
+  modebit = bitand(mntmode,'01'x)='01'x                                         
+  If modebit = 1 then                                                           
+    mode = mode || "READ-ONLY "                                                 
+  Else                                                                          
+    mode = mode || "READ/WRITE "                                                
+                                                                                
+  modebit = bitand(mntmode,'08'x)='08'x                                         
+  If modebit = 1 then Do                                                        
+    mode = mode || "NOSECURITY "                                                
+    nosecurity = 1                                                              
+  End                                                                           
+                                                                                
+  modebit = bitand(mntmode,'02'x)='02'x                                         
+  If modebit = 1 then                                                           
+    mode = mode || "NOSETUID "                                                  
+                                                                                
+  say "Mount mode =" mode                                                       
+                                                                                
+  /*******************************************************************/         
+  /* Obtain the devno of the root directory for use in the           */         
+  /* FSACCESS processing below.  Since we have already passed the    */         
+  /* checking on the stat for the specified path, we assume it       */         
+  /* will work for the root.                                         */         
+  /*******************************************************************/         
+  "stat / rstem."                                                               
+                                                                                
+  /*******************************************************************/         
+  /* Indicate if containing file system is covered by an FSACCESS    */         
+  /* profile.                                                        */         
+  /* - FSACCESS is supported only for zFS                            */         
+  /*   - but not for the root or when mounted with NOSECURITY        */         
+  /*******************************************************************/         
+  If mnt.MNTE_FSTYPE.1 = 'ZFS' & nosecurity = 0 &,                              
+     fstem.ST_DEV /= rstem.ST_DEV Then Do                                       
+    myrc = IRRXUTIL("EXTRACT","FSACCESS",fsn,"RES",,"TRUE")                     
+    Select                                                                      
+      When myrc = "0 0 0 0 0" Then                                              
+        say "Covered in FSACCESS class by" RES.PROFILE                          
+      When myrc = "12 12 4 4 4" Then                                            
+        say "Not protected by an FSACCESS class profile"                        
+      When myrc = "12 12 4 4 16" Then                                           
+        say "Not protected by an FSACCESS class profile"                        
+      When myrc = "12 12 8 8 24" Then                                           
+        say 'Unable to report on FSACCESS coverage due to lack of',             
+            'R_admin authorization'                                             
+      Otherwise                                                                 
+        say 'Unable to report on FSACCESS coverage due to IRRXUTIL',            
+            'error' myrc                                                        
+    End /* Select */                                                            
+  End                                                                           
+                                                                                
+  /*******************************************************************/         
+  /* Indicate if containing file system is covered by an FSEXEC      */         
+  /* profile.                                                        */         
+  /* - FSEXEC is supported only for zFS and TFS                      */         
+  /*******************************************************************/         
+  /* We cannot tell for sure if a file is an executable, but we will */         
+  /* only make the check for a regular file with at least one        */         
+  /* execute bit on (ignoring the acl).                              */         
+  /*******************************************************************/         
+  up = getperms(Substr(fstem.ST_MODE,1,1))                                      
+  gp = getperms(Substr(fstem.ST_MODE,2,1))                                      
+  op = getperms(Substr(fstem.ST_MODE,3,1))                                      
+                                                                                
+  If (mnt.MNTE_FSTYPE.1 = 'ZFS' | mnt.MNTE_FSTYPE.1 = 'TFS') &,                 
+     nosecurity = 0 & fstem.ST_TYPE = S_ISREG &,                                
+     (Substr(up,3,1)='x' | Substr(gp,3,1)='x' | Substr(op,3,1)='x'),            
+  Then Do                                                                       
+    myrc = IRRXUTIL("EXTRACT","FSEXEC",fsn,"RES",,"TRUE")                       
+    Select                                                                      
+      When myrc = "0 0 0 0 0" Then                                              
+        say "Covered in FSEXEC class by" RES.PROFILE                            
+      When myrc = "12 12 4 4 4" Then                                            
+        say "Not protected by an FSEXEC class profile"                          
+      When myrc = "12 12 4 4 16" Then                                           
+        say "Not protected by an FSEXEC class profile"                          
+      When myrc = "12 12 8 8 24" Then                                           
+        say 'Unable to report on FSEXEC coverage due to lack of',               
+            'R_admin authorization'                                             
+      Otherwise                                                                 
+        say 'Unable to report on FSEXEC coverage due to IRRXUTIL',              
+            'error' myrc                                                        
+    End /* Select */                                                            
+  End                                                                           
+  say " "                                                                       
+                                                                                
+  /*******************************************************************/         
+  /* Display file information                                        */         
+  /*******************************************************************/         
+                                                                                
+                                                                                
+  /*******************************************************************/         
+  /* Display file type                                               */         
+  /*******************************************************************/         
+  say "FILE TYPE"                                                               
+  say "----------------------"                                                  
+  Select                                                                        
+    When fstem.ST_TYPE = S_ISREG Then                                           
+      type = "Regular file"                                                     
+    When fstem.ST_TYPE = S_ISDIR Then                                           
+      type = "Directory"                                                        
+    When fstem.ST_TYPE = S_ISCHR Then                                           
+      type = "Character special file"                                           
+    When fstem.ST_TYPE = S_ISFIFO Then                                          
+      type = "FIFO special file"                                                
+    /* Apparently, this will never return S_ISSYM because it will    */         
+    /* follow the link instead. I'd have to incorporate lstat.       */         
+    When fstem.ST_TYPE = S_ISSYM Then                                           
+      type = "Symbolic link"                                                    
+    Otherwise                                                                   
+      type = "Unknown"                                                          
+  End                                                                           
+  say type                                                                      
+  say " "                                                                       
+End                              /* Don't display if AUTH specified  */         
+                                                                                
+  /*******************************************************************/         
+  /* Map the returned UID to a user ID.  If that fails, we will      */         
+  /* just display the UID.                                           */         
+  /*******************************************************************/         
+  "getpwuid (fstem.ST_UID) pw."                                                 
+  If retval <= 0 Then                                                           
+    user = fstem.ST_UID                                                         
+  Else                                                                          
+    user = pw.PW_NAME                                                           
+                                                                                
+  /*******************************************************************/         
+  /* Map the returned GID to a group.  If that fails, we will        */         
+  /* just display the GID.                                           */         
+  /*******************************************************************/         
+  "getgrgid (fstem.ST_GID) gr."                                                 
+  If retval <= 0 Then                                                           
+    group = fstem.ST_GID                                                        
+  Else                                                                          
+    group = gr.GR_NAME                                                          
+                                                                                
+  /*******************************************************************/         
+  /* Display owning user and group, the 'other' bits as UACC, and    */         
+  /* 'YOUR ACCESS'.                                                  */         
+  /*******************************************************************/         
+  op = getperms(Substr(fstem.ST_MODE,3,1)) /* Get 'other' bits       */         
+                                                                                
+  "access (path)" R_OK                                                          
+  If retval = -1 Then                                                           
+    uacc = "-"                                                                  
+  Else                                                                          
+    uacc = "r"                                                                  
+  "access (path)" W_OK                                                          
+  If retval = -1 Then                                                           
+    uacc = uacc||"-"                                                            
+  Else                                                                          
+    uacc = uacc||"w"                                                            
+  "access (path)" X_OK                                                          
+  If retval = -1 Then                                                           
+    uacc = uacc||"-"                                                            
+  Else                                                                          
+    uacc = uacc||"x"                                                            
+                                                                                
+  say "OWNER        GROUP OWNER  UNIVERSAL ACCESS  YOUR ACCESS"                 
+  say "----------   -----------  ----------------  -----------"                 
+  say Left(user,12) Left(group,12) Left(op,18) uacc                             
+  say " "                                                                       
+                                                                                
+If authVal = 0 Then Do           /* Don't display if AUTH specified  */         
+  /*******************************************************************/         
+  /* Display the security label                                      */         
+  /*******************************************************************/         
+  say "SECLABEL"                                                                
+  say "--------"                                                                
+  If Length(fstem.ST_SECLABEL) = 0 Then                                         
+    secl = "NO SECLABEL"                                                        
+  Else                                                                          
+    secl = fstem.ST_SECLABEL                                                    
+  say secl                                                                      
+  say " "                                                                       
+                                                                                
+  /*******************************************************************/         
+  /* Display owner audit options                                     */         
+  /*******************************************************************/         
+  say "AUDITING"                                                                
+  say "--------"                                                                
+  ra = Substr(d2x(fstem.ST_UAUDIT,8),1,2)                                       
+  Select                                                                        
+    When ra = 0 Then                                                            
+      rat = "NONE(READ)"                                                        
+    When ra = 1 Then                                                            
+      rat = "SUCCESSES(READ)"                                                   
+    When ra = 2 Then                                                            
+      rat = "FAILURES(READ)"                                                    
+    When ra = 3 Then                                                            
+      rat = "ALL(READ)"                                                         
+    Otherwise                                                                   
+  End                                                                           
+  wa = Substr(d2x(fstem.ST_UAUDIT,8),3,2)                                       
+  Select                                                                        
+    When wa = 0 Then                                                            
+      wat = "NONE(UPDATE)"                                                      
+    When wa = 1 Then                                                            
+      wat = "SUCCESSES(UPDATE)"                                                 
+    When wa = 2 Then                                                            
+      wat = "FAILURES(UPDATE)"                                                  
+    When wa = 3 Then                                                            
+      wat = "ALL(UPDATE)"                                                       
+    Otherwise                                                                   
+  End                                                                           
+  xa = Substr(d2x(fstem.ST_UAUDIT,8),5,2)                                       
+  Select                                                                        
+    When xa = 0 Then                                                            
+      xat = "NONE(EXECUTE)"                                                     
+    When xa = 1 Then                                                            
+      xat = "SUCCESSES(EXECUTE)"                                                
+    When xa = 2 Then                                                            
+      xat = "FAILURES(EXECUTE)"                                                 
+    When xa = 3 Then                                                            
+      xat = "ALL(EXECUTE)"                                                      
+    Otherwise                                                                   
+  End                                                                           
+  say rat","wat","xat                                                           
+  say " "                                                                       
+                                                                                
+  /*******************************************************************/         
+  /* Display auditor audit options                                   */         
+  /*******************************************************************/         
+                                                                                
+  say "GLOBALAUDIT"                                                             
+  say "-----------"                                                             
+  ra = Substr(d2x(fstem.ST_AAUDIT,8),1,2)                                       
+  Select                                                                        
+    When ra = 0 Then                                                            
+      rat = "NONE(READ)"                                                        
+    When ra = 1 Then                                                            
+      rat = "SUCCESSES(READ)"                                                   
+    When ra = 2 Then                                                            
+      rat = "FAILURES(READ)"                                                    
+    When ra = 3 Then                                                            
+      rat = "ALL(READ)"                                                         
+    Otherwise                                                                   
+  End                                                                           
+  wa = Substr(d2x(fstem.ST_AAUDIT,8),3,2)                                       
+  Select                                                                        
+    When wa = 0 Then                                                            
+      wat = "NONE(UPDATE)"                                                      
+    When wa = 1 Then                                                            
+      wat = "SUCCESSES(UPDATE)"                                                 
+    When wa = 2 Then                                                            
+      wat = "FAILURES(UPDATE)"                                                  
+    When wa = 3 Then                                                            
+      wat = "ALL(UPDATE)"                                                       
+    Otherwise                                                                   
+  End                                                                           
+  xa = Substr(d2x(fstem.ST_AAUDIT,8),5,2)                                       
+  Select                                                                        
+    When xa = 0 Then                                                            
+      xat = "NONE(EXECUTE)"                                                     
+    When xa = 1 Then                                                            
+      xat = "SUCCESSES(EXECUTE)"                                                
+    When xa = 2 Then                                                            
+      xat = "FAILURES(EXECUTE)"                                                 
+    When xa = 3 Then                                                            
+      xat = "ALL(EXECUTE)"                                                      
+    Otherwise                                                                   
+  End                                                                           
+  say rat","wat","xat                                                           
+  say " "                                                                       
+                                                                                
+  /*******************************************************************/         
+  /* Mimic the following RLIST output:                               */         
+  /*                                                                 */         
+  /* CREATION DATE  LAST REFERENCE DATE  LAST CHANGE DATE            */         
+  /*  (DAY) (YEAR)       (DAY) (YEAR)      (DAY) (YEAR)              */         
+  /* -------------  -------------------  ----------------            */         
+  /*   133    19          133    19         133    19                */         
+  /*                                                                 */         
+  /* using:                                                          */         
+  /* ST_CRTIME File creation time                                    */         
+  /* ST_ATIME  Time of last access                                   */         
+  /* ST_CTIME  Time of last file status change                       */         
+  /*                                                                 */         
+  /* Other time values available in stat():                          */         
+  /* ST_MTIME Time of last data modification                         */         
+  /* ST_RTIME File backup time stamp (reference time)                */         
+  /*******************************************************************/         
+  say "CREATION DATE  LAST REFERENCE DATE  LAST STATUS CHANGE DATE"             
+  say "-------------  -------------------  -----------------------"             
+  say Left(gtime(fstem.ST_CRTIME),14),                                          
+                      Left(gtime(fstem.ST_ATIME),20),                           
+                                         Left(gtime(fstem.ST_CTIME),15)         
+  say " "                                                                       
+                                                                                
+  /*******************************************************************/         
+  /* Display extended attributes.  Only applicable to regular files. */         
+  /*                                                                 */         
+  /* See the BPXYSTAT macro for a layout of the Genvalue bits.       */         
+  /*******************************************************************/         
+                                                                                
+  if fstem.ST_TYPE = S_ISREG Then Do                                            
+    say "EXTENDED ATTRIBUTES"                                                   
+    say "-------------------"                                                   
+    genval=substr(fstem.ST_GENVALUE,4)                                          
+                                                                                
+    extattra= bitand(genval,'04'x)='04'x                                        
+    If extattra = 1 then                                                        
+      say "APF authorized"                                                      
+                                                                                
+    extattrp= bitand(genval,'02'x)='02'x                                        
+    If extattrp = 1 then                                                        
+      say "Program controlled"                                                  
+                                                                                
+    extattrs= bitand(genval,'08'x)='00'x /* reverse bit */                      
+    If extattrs = 1 then                                                        
+      say "SHAREAS"                                                             
+                                                                                
+    extattrl= bitand(genval,'10'x)='10'x                                        
+    If extattrl = 1 then                                                        
+      say "Loaded from the shared library region"                               
+    say " "                                                                     
+  end                                                                           
+                                                                                
+  /*******************************************************************/         
+  /* Display the non-permission file mode bits.                      */         
+  /*******************************************************************/         
+  say "FILE MODE BITS"                                                          
+  say "--------------"                                                          
+  say "Sticky  bit is:" fstem.ST_STICKY                                         
+  say "Set-uid bit is:" fstem.ST_SETUID                                         
+  say "Set-gid bit is:" fstem.ST_SETGID                                         
+  say " "                                                                       
+End                              /* Don't display if AUTH specified  */         
+                                                                                
+  /*******************************************************************/         
+  /* Display the permission bits.                                    */         
+  /*******************************************************************/         
+  say "FILE PERMISSIONS"                                                        
+  say "----------------"                                                        
+  say " "                                                                       
+  say "  OWNER GROUP OTHER"                                                     
+  say "  ----- ----- -----"                                                     
+  octalPerms = Substr(fstem.ST_MODE,1,1)Substr(fstem.ST_MODE,2,1)||,            
+               Substr(fstem.ST_MODE,3,1)                                        
+  up = getperms(Substr(fstem.ST_MODE,1,1))                                      
+  gp = getperms(Substr(fstem.ST_MODE,2,1))                                      
+  op = getperms(Substr(fstem.ST_MODE,3,1))                                      
+  say "  "up"   "gp"   "op"           ("octalPerms "in octal notation)"         
+  say " "                                                                       
+                                                                                
+  /*******************************************************************/         
+  /* Display the extended access control list (acl) if one exists.   */         
+  /*******************************************************************/         
+                                                                                
+  If fstem.ST_ACCESSACL = 1 Then Do                                             
+    call getacl(path ACL_TYPE_ACCESS)                                           
+  End                                                                           
+  Else                                                                          
+    say "NO ACCESS LIST"                                                        
+  say " "                                                                       
+                                                                                
+If authVal = 0 Then Do           /* Don't display if AUTH specified  */         
+  /*******************************************************************/         
+  /* If the path name is a directory, look for model ACLs.           */         
+  /*******************************************************************/         
+  If fstem.ST_TYPE = S_ISDIR Then Do                                            
+                                                                                
+    /*****************************************************************/         
+    /* Display the directory model acl if one exists.                */         
+    /*****************************************************************/         
+                                                                                
+    If fstem.ST_DMODELACL = 1 Then Do                                           
+      say "A directory model ACL exists:"                                       
+      say " "                                                                   
+      call getacl(path ACL_TYPE_DIRDEFAULT)                                     
+    End                                                                         
+    Else                                                                        
+      say "There is no directory model acl."                                    
+    say " "                                                                     
+                                                                                
+    /*****************************************************************/         
+    /* Display the file model acl if one exists.                     */         
+    /*****************************************************************/         
+                                                                                
+    If fstem.ST_FMODELACL = 1 Then Do                                           
+      say "A file model ACL exists:"                                            
+      say " "                                                                   
+      call getacl(path ACL_TYPE_FILEDEFAULT)                                    
+    End                                                                         
+    Else                                                                        
+      say "There is no file model acl."                                         
+                                                                                
+  End  /* Path is a directory  */                                               
+End                              /* Don't display if AUTH specified  */         
+                                                                                
+GETOUT:                                                                         
+Exit                                                                            
+                                                                                
+/*********************************************************************/         
+/* function: getacl                                                  */         
+/*                                                                   */         
+/* input:  - The path of the file/directory to process               */         
+/*         - The type of acl requested (access, file model, or       */         
+/*           directory model)                                        */         
+/*                                                                   */         
+/* returns:  Nothing. But displays the acl contents (or a message    */         
+/*           indicating that an acl does not exist)                  */         
+/*                                                                   */         
+/* notes:                                                            */         
+/* - Use the aclget syscall. I found an example in the USS Rexx pub. */         
+/*                                                                   */         
+/*********************************************************************/         
+getacl: procedure                                                               
+  parse arg path acltype                                                        
+  call syscalls('ON')    /* Need to re-establish predefined vars     */         
+    say "ID          TYPE   ACCESS"                                             
+    say "--          ----   ------"                                             
+    'aclinit acl'                   /* init variable ACL to hold acl */         
+    'aclget acl (path)' acltype         /* get the acl               */         
+    Do i=1 by 1                         /* get each acl entry        */         
+      'aclgetentry acl acl.' i                                                  
+      if rc < 0 | retval = -1 then                                              
+        leave                           /* error, assume no more     */         
+      parse value '- - -' with pr pw px                                         
+      if acl.acl_read=1 then                                                    
+        pr='R'                          /* set rwx permissions       */         
+      if acl.acl_write=1 then                                                   
+        pw='W'                                                                  
+      if acl.acl_execute=1 then                                                 
+        px='X'                                                                  
+      perms = pr||pw||px                                                        
+                                                                                
+      aclid=acl.acl_id                  /* get uid or gid            */         
+                                                                                
+      /* determine acl entry type */                                            
+      if acl.acl_entry_type=acl_entry_user then Do                              
+        type='USER'                                                             
+        "getpwuid (aclid) pw."                                                  
+        If retval > 0 Then                                                      
+          aclid = pw.PW_NAME                                                    
+      End                                                                       
+      else                                                                      
+        if acl.acl_entry_type=acl_entry_group then Do                           
+          type='GROUP'                                                          
+          "getgrgid (aclid) gr."                                                
+          If retval > 0 Then                                                    
+            aclid = gr.GR_NAME                                                  
+        End                                                                     
+        else                                                                    
+          type ="???"                                                           
+      say Left(aclid,11) Left(type,6) Left(perms,5)                             
+    End                                                                         
+  'aclfree acl' /* must free acl buffer */                                      
+return                                                                          
+                                                                                
+/*********************************************************************/         
+/* function: getperms                                                */         
+/*                                                                   */         
+/* input:    an octal number represeting a set of permissions        */         
+/*                                                                   */         
+/* returns:  a string representing the permissions                   */         
+/*                                                                   */         
+/*           E.G. rwx, r-x, ---, etc                                 */         
+/*                                                                   */         
+/*********************************************************************/         
+getperms: procedure                                                             
+  arg octal                                                                     
+  Select                                                                        
+    When octal=7 Then                                                           
+      perms = 'rwx'                                                             
+    When octal=6 Then                                                           
+      perms = 'rw-'                                                             
+    When octal=5 Then                                                           
+      perms = 'r-x'                                                             
+    When octal=4 Then                                                           
+      perms = 'r--'                                                             
+    When octal=3 Then                                                           
+      perms = '-wx'                                                             
+    When octal=2 Then                                                           
+      perms = '-w-'                                                             
+    When octal=1 Then                                                           
+      perms = '--x'                                                             
+    When octal=0 Then                                                           
+      perms = '---'                                                             
+    Otherwise                                                                   
+  End                                                                           
+return perms                                                                    
+                                                                                
+/**********************************************************************/        
+/* Name:    gtime                                                     */        
+/* Purpose: get gm time from epoch time                               */        
+/**********************************************************************/        
+gtime:                                                                          
+   arg tm                                                                       
+   numeric digits 10                                                            
+   if tm=0 | datatype(tm,'W')<>1 then                                           
+      return ''                                                                 
+   if tm=-1 then return ''   /* @DHA */                                         
+   numeric digits                                                               
+   "gmtime (tm) tm."                                                            
+   if retval=-1 then return ''                                                  
+   return right(tm.tm_year,4,0)'-' ||,                                          
+          right(tm.tm_mon,2,0)'-'right(tm.tm_mday,2,0)                          
+                                                                                
+parseKeywords:                                                                  
+/*********************************************************************/         
+/* Examine input to identify keywords and values. We process the     */         
+/* keyword string as a set of words.                                 */         
+/*********************************************************************/         
+parseRc = 0                                                                     
+Do i = 1 to Words(keywords) Until Length(keywords)=0 /* Parse kwds   */         
+                                                                                
+  nextWord = Word(keywords,1)    /* Get next word                    */         
+                                                                                
+  /*******************************************************************/         
+  /* Isolate the next keyword and its value.                         */         
+  /*******************************************************************/         
+  openParen = Pos("(",nextWord)  /* Expect "(" to be part of word    */         
+  closeParen = Pos(")",keywords) /* But must look for ")" in the     */         
+  closeDoubleParen = Pos("))",keywords) /* entire cmd remainder      */         
+                                                                                
+  /*******************************************************************/         
+  /* If there is no open paren in the word, then this is a keyword   */         
+  /* without a value (e.g. AUTH).                                    */         
+  /*******************************************************************/         
+  If openParen = 0 Then                                                         
+    Do                                                                          
+      nextKwd = nextWord                                                        
+      nextVal = ''                                                              
+      endKwd = Length(nextWord)+1                                               
+    End                                                                         
+  /*******************************************************************/         
+  /* If there is an open paren in the word, then this is a keyword   */         
+  /* with a value.                                                   */         
+  /*******************************************************************/         
+  Else                                                                          
+    Do                                                                          
+      nextKwd = Substr(nextWord,1,openParen-1)                                  
+      valLength = closeParen - openParen - 1                                    
+      nextVal = Substr(keywords,openParen+1,valLength)                          
+      endKwd = Pos(")",keywords)+1                                              
+    End                                                                         
+  Upper nextKwd                                                                 
+                                                                                
+  /*******************************************************************/         
+  /* Uncomment the following to help debug command parsing.          */         
+  /*******************************************************************/         
+  /*                                                                            
+  say "Command image remainder is" keywords                                     
+  say "Keyword is" nextKwd                                                      
+  say "Value is" nextVal                                                        
+  /* The following will be not quite accurate for "))" keywords.     */         
+  say "First position after current keyword/value is" endKwd                    
+  say ''                                                                        
+  */                                                                            
+                                                                                
+  /*******************************************************************/         
+  /* Set the value for each specified keyword.                       */         
+  /*******************************************************************/         
+  Select                        /* Identify keyword                  */         
+    When nextKwd = AUTHkwd Then                                                 
+      Do                                                                        
+        authVal = 1                                                             
+      End                                                                       
+    Otherwise                                                                   
+      If Length(nextKwd) /= 0 Then Do                                           
+        say "Invalid keyword:" nextKwd                                          
+        parseRc = 4                                                             
+      End                                                                       
+  End                           /* Identify keyword                  */         
+                                                                                
+  /*******************************************************************/         
+  /* Make sure the next keyword is blank-separated from current.     */         
+  /*******************************************************************/         
+  if Substr(keywords,endKwd,1) <> " " Then Do                                   
+    say "Missing blank after" nextKwd "keyword."                                
+    Exit 4                                                                      
+  End                                                                           
+                                                                                
+  /*******************************************************************/         
+  /* Remove this keyword from the input string, for the next         */         
+  /* iteration.                                                      */         
+  /*******************************************************************/         
+  keywords = Substr(keywords,endKwd)     /* Remove processed keyword */         
+  keywords = Strip(keywords,Leading," ")                                        
+                                                                                
+End                             /* Parse keywords                    */         
+                                                                                
+Return parseRc                                                                  

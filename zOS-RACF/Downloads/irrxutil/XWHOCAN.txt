@@ -1,0 +1,256 @@
+/* REXX */                                                                      
+/**********************************************************************         
+ Licensed Materials - Property of IBM                                           
+ 5694-A01                                                                       
+ Copyright IBM Corp. 2010                                                       
+                                                                                
+ Name:    XWHOCAN                                                               
+                                                                                
+ Author: Bruce Wells - brwells@us.ibm.com                                       
+                                                                                
+ Purpose: Displays the non-system SPECIAL/AUDITOR users who can                 
+          manage a given profile.                                               
+                                                                                
+ Input:   A RACF class and profile name                                         
+                                                                                
+ Example: ex 'MYHLQ.RACF.CLISTS(XWHOCAN)' 'USER BRUCE'                          
+                                                                                
+ Authorization required:                                                        
+          - READ access to IRR.RADMIN.LISTGRP in FACILITY plus                  
+            authority to list the group profile for a given owner               
+          - READ access to IRR.RADMIN.LISTUSER in FACILITY plus                 
+            authority to list the user profile for a given owner                
+          - If the input profile is a general resource then                     
+            READ access to IRR.RADMIN.RLIST in FACILITY plus                    
+            authority to list the input profile                                 
+          - READ access to IRR.RADMIN.SETROPTS.LIST in FACILITY plus            
+            authority to list the SETROPTS options                              
+                                                                                
+ Notes: - The definition of "manage" is somewhat ambiguous. Here, it            
+          means the ability to modify something important in the                
+          BASE segment.  We look for the following conditions:                  
+          - For any profile type:                                               
+            - OWNER - The owner of a profile can manage it                      
+            - group-SPECIAL - for any group in the group scope above            
+              a given profile, a user with group-SPECIAL can manage             
+              the profile. See the Security Administrator's Guide for           
+              details on group scope.                                           
+            - group-AUDITOR - for any group in the group scope above            
+              a given profile, a user with group-AUDITOR can manage             
+              audit options within the profile (not applicable to               
+              group profiles).                                                  
+          - For discrete general resource profiles:                             
+            - ALTER access - a user with ALTER access can manage the            
+              profile. ALTER can be granted by virtue of a group                
+              connection.  We will report the group entry, but do               
+              not expand it into its members.  If the UACC is ALTER             
+              or if ID(*) has ALTER authority, this will also be                
+              reported.                                                         
+          - For group profiles:                                                 
+            - The SPECIAL attribute - on a group connection allows a            
+              user to manage that group.                                        
+            - CONNECT authority - within the group allows you to                
+              connect other users to (only) that group.                         
+            - JOIN authority - includes CONNECT authority, and in               
+              addition, allows you to add subgroups and assign                  
+              group authorities to new members within that group.               
+                                                                                
+        - This exec is not all-encompassing. It is meant to illustrate          
+          the group tree rules, and throws in a little extra. It does           
+          not take into account things like IRR.LISTUSER, FIELD access,         
+          IRR.PASSWORD.RESET (and related resources), seclabels, etc.,          
+          and it assumes SETROPTS GRPLIST is in effect. The ultimate            
+          authority (no pun intended) on the ability to perform a               
+          given operation is the "Authorization required" section               
+          under each command in the Command Language Reference.                 
+                                                                                
+ *********************************************************************/         
+parse arg type profile                                                          
+Upper type                                                                      
+if type="" then type="USER"                                                     
+if profile="" then profile="IBMUSER"                                            
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Use IRRXUTIL to extract the profile into the stem named "PROF".   */         
+/*-------------------------------------------------------------------*/         
+myrc=IRRXUTIL("EXTRACT",type,profile,"PROF")                                    
+say ""                                                                          
+say ""                                                                          
+say ""                                                                          
+if (word(myrc,1)<>0) then do                                                    
+   say "MYRC="myrc                                                              
+   say "An error occurred "                                                     
+   exit 1                                                                       
+end                                                                             
+                                                                                
+/* First, process authorities granted by virtue of an attribute                 
+   within the profile being queried.                                 */         
+Select                                                                          
+  /* There are no non-OWNER attributes of a USER profile which                  
+     confer management rights.                                       */         
+  When(type = "USER") then                                                      
+    do                                                                          
+      say "For the user ID" profile":"                                          
+    end                                                                         
+  /* The SPECIAL attribute and JOIN and CONNECT authority within a              
+     group confer certain management rights.                         */         
+  When(type = "GROUP") then                                                     
+    do                                                                          
+      say "For the group" profile":"                                            
+      Call ProcessGroup("BASE")      /* Display users with grp attrs */         
+    end                                                                         
+                                                                                
+  /* If it's not a user or group, then it's a general resource profile.         
+     For discrete profiles, ALTER access confers management rights.             
+     Also, in the case of general resources, if the owner is a user,            
+     then group scope extends up to the group owner of that user. So,           
+     after processing the resource, reset the current profile to the            
+     owning user and continue into common group-scope processing.               
+                                                                     */         
+                                                                                
+  Otherwise                                    /* A general resource */         
+    do                                                                          
+      If PROF.GENERIC = "TRUE" then                                             
+        ptype = "generic"                                                       
+      else                                                                      
+        ptype = "discrete"                                                      
+      say "For the" ptype "profile named" profile "in the" type,                
+          "class:"                                                              
+      If PROF.GENERIC = "FALSE" then                                            
+        Call ProcessAcl                                                         
+      otype = ProfType(PROF.BASE.OWNER.1)    /* Determine OWNER type */         
+      If otype = "USER" then do                                                 
+        say "Owner of" PROF.PROFILE "is the" otype PROF.BASE.OWNER.1"."         
+        myrc=IRRXUTIL("EXTRACT",USER,PROF.BASE.OWNER.1,"PROF")                  
+      end                                                                       
+    end                                                                         
+end                                                                             
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Now perform the processing that is common to all profile types.   */         
+/* If the owner is a user ID, then that user can manage the profile. */         
+/* If the owner is a group, then we work our way up the group tree   */         
+/* looking for users connected with the SPECIAL attribute. With      */         
+/* each step up the tree, we display the owner and whether it is     */         
+/* a user or group. When it is a user, then group scope is broken    */         
+/* and the user ID is displayed.  This user's management rights do   */         
+/* not extend below the group which it owns.                         */         
+/*-------------------------------------------------------------------*/         
+otype = ProfType(PROF.BASE.OWNER.1)          /* Determine OWNER type */         
+If otype <> "GROUP" then                                                        
+  tail = " and group scope ends here."                                          
+else                                                                            
+  tail = "."                                                                    
+say "Owner of" PROF.PROFILE "is the" otype PROF.BASE.OWNER.1||tail              
+                                                                                
+If (otype = "GROUP") then                                                       
+  Do Until(otype <> "GROUP")                                                    
+    myrc=IRRXUTIL("EXTRACT","GROUP",PROF.BASE.OWNER.1,"PROF")                   
+    if (word(myrc,1)=0) then do                                                 
+      Call ProcessGroup("TREE")             /* only SPECIAL matters */          
+      otype = ProfType(PROF.BASE.OWNER.1)   /* Determine OWNER type */          
+      If otype <> "GROUP" then                                                  
+        tail = " and group scope ends here."                                    
+      else                                                                      
+        tail = "."                                                              
+      say "Owner of" PROF.PROFILE "is the" otype PROF.BASE.OWNER.1,             
+          ||tail                                                                
+    end                                                                         
+    else                                                                        
+      otype = "UNKNOWN"                                                         
+  end                                                                           
+                                                                                
+say                                                                             
+say "retval="||myrc                                                             
+exit                                                                            
+                                                                                
+/*********************************************************************/         
+/* This routine takes a name and determines whether it is a user,    */         
+/* a group, or an orphan.                                            */         
+/*                                                                   */         
+/* Exercise for the reader: Beef up the return code checking.        */         
+/* Note that we explicitly check for 'profile not found' return      */         
+/* codes prior to checking the next possibility, but we do not       */         
+/* analyse and other non-zero return code (e.g. not authorized to    */         
+/* profile).  For other error conditions, we simply return a type    */         
+/* of UNKNOWN.                                                       */         
+/*********************************************************************/         
+ProfType:                                                                       
+PARSE ARG name                                                                  
+Mytype = "UNKNOWN"                                                              
+myrc=IRRXUTIL("EXTRACT","USER",name,"TEST")                                     
+if (word(myrc,1)=0) then                                                        
+  Mytype = "USER"                                                               
+else if (myrc = '12 12 4 4 4') then do       /* If user not found */            
+  myrc=IRRXUTIL("EXTRACT","GROUP",name,"TEST")                                  
+  if (word(myrc,1)=0) then                                                      
+    Mytype = "GROUP"                                                            
+  else if (myrc = '12 12 4 4 4') then       /* If group not found */            
+    Mytype = "ORPHAN"                                                           
+end                                                                             
+return Mytype                                                                   
+                                                                                
+/*********************************************************************/         
+/* This routine scans a group's connections looking for entries      */         
+/* with SPECIAL and with CONNECT or JOIN authority and displays      */         
+/* them.                                                             */         
+/*                                                                   */         
+/* Exercise for the reader: Sort the entries and beautify the        */         
+/* output. See the XLISTGRP exec for guidance. Also note that it     */         
+/* possible for a user to have SPECIAL *and* CONNECT or JOIN         */         
+/* authority, but this only reports on SPECIAL.                      */         
+/*********************************************************************/         
+ProcessGroup:                                                                   
+parse arg mode                                                                  
+If PROF.BASE.CONNECTS.REPEATCOUNT <> '' then do                                 
+  gusers. = ''                                                                  
+  gusers.0 = 0                                                                  
+  do i = 1 to PROF.BASE.CONNECTS.REPEATCOUNT                                    
+    ConnProf = PROF.BASE.GUSERID.i||"."||PROF.PROFILE                           
+    myrc=IRRXUTIL("EXTRACT","CONNECT",ConnProf,"CONN")                          
+    If (CONN.BASE.SPECIAL.1 = "TRUE") Then                                      
+      do                                                                        
+        say PROF.BASE.GUSERID.i "has group-SPECIAL in group",                   
+            PROF.PROFILE"."                                                     
+      end                                                                       
+    If (CONN.BASE.AUDITOR.1 = "TRUE") &,                                        
+       (type <> "GROUP") Then        /* No audit settings for groups */         
+      do                                                                        
+        say PROF.BASE.GUSERID.i "has group-AUDITOR in group",                   
+            PROF.PROFILE "and can change audit settings."                       
+      end                                                                       
+    If (CONN.BASE.AUTH.1 = "CONNECT") |,                                        
+       (CONN.BASE.AUTH.1 = "JOIN") Then                                         
+      do                                                                        
+        If mode = "BASE" then                                                   
+          say PROF.BASE.GUSERID.i "has" CONN.BASE.AUTH.1 "authority",           
+              "in group" PROF.PROFILE"."                                        
+      end                                                                       
+  end                                                                           
+end                                                                             
+return                                                                          
+                                                                                
+/*********************************************************************/         
+/* This routine scans a general resource profile standard access     */         
+/* list for entries with ALTER access and displays them.             */         
+/*                                                                   */         
+/* Exercise for the reader: Sort the entries and beautify the        */         
+/* output. See the XRLIST exec for guidance.  Expand each group      */         
+/* entry also. See the XLISTGRP exec for guidance.                   */         
+/*********************************************************************/         
+ProcessAcl:                                                                     
+If PROF.BASE.UACC.1 = "ALTER" then                                              
+  say "The UACC is ALTER, so anybody can manage this profile."                  
+If PROF.BASE.ACLCNT.REPEATCOUNT <> '' then                                      
+  do i = 1 to PROF.BASE.ACLCNT.REPEATCOUNT                                      
+    If PROF.BASE.ACLACS.i = "ALTER" then do                                     
+      If PROF.BASE.ACLID.i = "*" then                                           
+        say "ID(*) is on the access list with ALTER access, so any",            
+            "RACF-defined user can manage this profile."                        
+      Else                                                                      
+        say ProfType(PROF.BASE.ACLID.i) PROF.BASE.ACLID.i,                      
+            "is on the access list with ALTER access."                          
+      /* Exercise for reader: explode each group entry  */                      
+    end                                                                         
+  end                                                                           
+return                                                                          

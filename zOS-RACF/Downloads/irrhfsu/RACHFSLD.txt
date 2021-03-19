@@ -1,0 +1,101 @@
+LOAD DATA                                                                       
+   INDDN IRRHFSU                                                                
+   RESUME YES                                                                   
+   LOG    NO                                                                    
+   INTO TABLE USER01.HFS_BD                                                     
+   WHEN(1:4)='0900' (                                                           
+      HFSBD_NAME           POSITION(006:1028)  CHAR(1023),                      
+      HFSBD_INODE          POSITION(1030:1039) INTEGER EXTERNAL(10),            
+      HFSBD_FILE_TYPE      POSITION(1041:1048) CHAR(8),                         
+      HFSBD_OWN_UID        POSITION(1050:1059) INTEGER EXTERNAL(10),            
+      HFSBD_OWN_UNAME      POSITION(1061:1068) CHAR(8),                         
+      HFSBD_OWN_GID        POSITION(1070:1079) INTEGER EXTERNAL(10),            
+      HFSBD_OWN_GNAME      POSITION(1081:1088) CHAR(8),                         
+      HFSBD_S_ISUID        POSITION(1090:1090) CHAR(1),                         
+      HFSBD_S_ISGID        POSITION(1095:1095) CHAR(1),                         
+      HFSBD_S_ISVTX        POSITION(1100:1100) CHAR(1),                         
+      HFSBD_OWN_READ       POSITION(1105:1105) CHAR(1),                         
+      HFSBD_OWN_WRITE      POSITION(1110:1110) CHAR(1),                         
+      HFSBD_OWN_EXEC       POSITION(1115:1115) CHAR(1),                         
+      HFSBD_GRP_READ       POSITION(1120:1120) CHAR(1),                         
+      HFSBD_GRP_WRITE      POSITION(1125:1125) CHAR(1),                         
+      HFSBD_GRP_EXEC       POSITION(1130:1130) CHAR(1),                         
+      HFSBD_OTH_READ       POSITION(1135:1135) CHAR(1),                         
+      HFSBD_OTH_WRITE      POSITION(1140:1140) CHAR(1),                         
+      HFSBD_OTH_EXEC       POSITION(1145:1145) CHAR(1),                         
+      HFSBD_APF            POSITION(1150:1150) CHAR(1),                         
+      HFSBD_PROGRAM        POSITION(1155:1155) CHAR(1),                         
+      HFSBD_SHAREAS        POSITION(1160:1160) CHAR(1),                         
+      HFSBD_AAUD_READ      POSITION(1165:1172) CHAR(8),                         
+      HFSBD_AAUD_WRITE     POSITION(1174:1181) CHAR(8),                         
+      HFSBD_AAUD_EXEC      POSITION(1183:1190) CHAR(8),                         
+      HFSBD_UAUD_READ      POSITION(1192:1199) CHAR(8),                         
+      HFSBD_UAUD_WRITE     POSITION(1201:1208) CHAR(8),                         
+      HFSBD_UAUD_EXEC      POSITION(1210:1217) CHAR(8),                         
+      HFSBD_AUDITID        POSITION(1219:1250) CHAR(32),                        
+      HFSBD_FID            POSITION(1252:1267) CHAR(16),                        
+      HFSBD_CREATE_DATE    POSITION(1269:1278) DATE EXTERNAL(10),               
+      HFSBD_CREATE_TIME    POSITION(1280:1287) TIME EXTERNAL(8),                
+      HFSBD_LASTREF_DATE   POSITION(1289:1298) DATE EXTERNAL(10),               
+      HFSBD_LASTREF_TIME   POSITION(1300:1307) TIME EXTERNAL(8),                
+      HFSBD_LASTCHG_DATE   POSITION(1309:1318) DATE EXTERNAL(10),               
+      HFSBD_LASTCHG_TIME   POSITION(1320:1327) TIME EXTERNAL(8),                
+      HFSBD_LASTDAT_DATE   POSITION(1329:1338) DATE EXTERNAL(10),               
+      HFSBD_LASTDAT_TIME   POSITION(1340:1347) TIME EXTERNAL(8),                
+      HFSBD_NUMBER_LINKS   POSITION(1349:1358) INTEGER EXTERNAL(10),            
+      HFSBD_SHARELIB       POSITION(1360:1360) CHAR(1),                         
+      HFSBD_ACCESS_ACL     POSITION(1365:1365) CHAR(1),                         
+      HFSBD_FILEMOD_ACL    POSITION(1370:1370) CHAR(1),                         
+      HFSBD_DIRMOD_ACL     POSITION(1375:1375) CHAR(1),                         
+      HFSBD_SECLABEL       POSITION(1380:1387) CHAR(8),                         
+      HFSBD_DSNAME         POSITION(1389:1432) CHAR(44),                        
+      HFSBD_LINK           POSITION(1434:2456) CHAR(1023)                       
+      )                                                                         
+                                                                                
+   INTO TABLE USER01.HFS_AC                                                     
+   WHEN(1:4)='0901' (                                                           
+      HFACC_NAME           POSITION(006:1028)  CHAR(1023),                      
+      HFACC_INODE          POSITION(1030:1039) INTEGER EXTERNAL(10),            
+      HFACC_TYPE           POSITION(1041:1048) CHAR(8),                         
+      HFACC_UNIXID         POSITION(1050:1059) INTEGER EXTERNAL(10),            
+      HFACC_ID_NAME        POSITION(1061:1068) CHAR(8),                         
+      HFACC_READ           POSITION(1070:1070) CHAR(1),                         
+      HFACC_WRITE          POSITION(1075:1075) CHAR(1),                         
+      HFACC_EXEC           POSITION(1080:1080) CHAR(1)                          
+      )                                                                         
+                                                                                
+   INTO TABLE USER01.HFS_AF                                                     
+   WHEN(1:4)='0902' (                                                           
+      HFACF_NAME           POSITION(006:1028)  CHAR(1023),                      
+      HFACF_INODE          POSITION(1030:1039) INTEGER EXTERNAL(10),            
+      HFACF_TYPE           POSITION(1041:1048) CHAR(8),                         
+      HFACF_UNIXID         POSITION(1050:1059) INTEGER EXTERNAL(10),            
+      HFACF_ID_NAME        POSITION(1061:1068) CHAR(8),                         
+      HFACF_READ           POSITION(1070:1070) CHAR(1),                         
+      HFACF_WRITE          POSITION(1075:1075) CHAR(1),                         
+      HFACF_EXEC           POSITION(1080:1080) CHAR(1)                          
+      )                                                                         
+                                                                                
+   INTO TABLE USER01.HFS_AD                                                     
+   WHEN(1:4)='0903' (                                                           
+      HFACD_NAME           POSITION(006:1028)  CHAR(1023),                      
+      HFACD_INODE          POSITION(1030:1039) INTEGER EXTERNAL(10),            
+      HFACD_TYPE           POSITION(1041:1048) CHAR(8),                         
+      HFACD_UNIXID         POSITION(1050:1059) INTEGER EXTERNAL(10),            
+      HFACD_ID_NAME        POSITION(1061:1068) CHAR(8),                         
+      HFACD_READ           POSITION(1070:1070) CHAR(1),                         
+      HFACD_WRITE          POSITION(1075:1075) CHAR(1),                         
+      HFACD_EXEC           POSITION(1080:1080) CHAR(1)                          
+      )                                                                         
+                                                                                
+   INTO TABLE USER01.HFS_FS                                                     
+   WHEN(1:4)='0904' (                                                           
+      HFMFS_DSNAME         POSITION(006:049)   CHAR(64),                        
+      HFMFS_TYPE           POSITION(051:058)   CHAR(8),                         
+      HFMFS_MODE           POSITION(060:069)   CHAR(10),                        
+      HFMFS_SECURITY       POSITION(071:080)   CHAR(10),                        
+      HFMFS_SETUID         POSITION(082:091)   CHAR(10),                        
+      HFMFS_MUID           POSITION(093:102)   INTEGER EXTERNAL(10),            
+      HFMFS_MUSER          POSITION(104:111)   CHAR(8),                         
+      HFMFS_MOUNTPOINT     POSITION(0113:1135) CHAR(1023)                       
+      )                                                                         

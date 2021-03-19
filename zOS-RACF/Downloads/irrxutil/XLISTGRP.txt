@@ -1,0 +1,116 @@
+/* REXX */                                                                      
+/**********************************************************************         
+ Licensed Materials - Property of IBM                                           
+ 5694-A01                                                                       
+ Copyright IBM Corp. 2010                                                       
+                                                                                
+ Name:    XLISTGRP                                                              
+                                                                                
+ Author: Bruce Wells - brwells@us.ibm.com                                       
+                                                                                
+ Purpose: Takes a group name and displays the list of connected                 
+          users in alphabetic order, with each user's name and                  
+          group authority. If no group name is supplied, SYS1 is                
+          used as the default.                                                  
+                                                                                
+ Input:   A RACF group name                                                     
+                                                                                
+ Example: ex 'MYHLQ.RACF.CLISTS(XLISTGRP)' 'Group'                              
+                                                                                
+ Authorization required:                                                        
+          - READ access to IRR.RADMIN.LISTGRP in FACILITY plus                  
+            authority to list the group profile for a given acl entry           
+          - READ access to IRR.RADMIN.LISTUSER in FACILITY plus                 
+            authority to list the user profile for a connected user             
+                                                                                
+          Users for which you are not authorized will not have their            
+          names included in the output.                                         
+                                                                                
+ Notes: - Due to its use of ISPF tables, this exec must be                      
+          executed from an ISPF environment.                                    
+                                                                                
+**********************************************************************/         
+parse arg profile                                                               
+if profile="" then profile="SYS1"                                               
+/*-------------------------------------------------------------------*/         
+/* Use IRRXUTIL to extract the group into the stem named "GRP".      */         
+/* connection list.                                                  */         
+/*-------------------------------------------------------------------*/         
+myrc=IRRXUTIL("EXTRACT","GROUP",profile,"GRP")                                  
+say ""                                                                          
+say ""                                                                          
+say ""                                                                          
+if (word(myrc,1)<>0) then do                                                    
+   say "MYRC="myrc                                                              
+   say "An error occurred "                                                     
+   exit 1                                                                       
+end                                                                             
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* If there are no connected users for this group, then there        */         
+/* is no point in going any further. In this case, the variable      */         
+/* containing the count simply will not have been created.           */         
+/*-------------------------------------------------------------------*/         
+If GRP.BASE.CONNECTS.REPEATCOUNT = '' then do                                   
+   say "There are no users connected to group" profile                          
+   exit 0                                                                       
+end                                                                             
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Create an ISPF table to store the user IDs contained within the   */         
+/* connection list.                                                  */         
+/*-------------------------------------------------------------------*/         
+TBCMD="TBCREATE        "||,  /* Create command                       */         
+    "ACLUSERS"||,            /* Table name.                          */         
+    " KEYS(ACUSERID) "||,    /* Key (db key) is user ID              */         
+    "NAMES(ACNAME, "||,      /* User name                            */         
+    "ACLVL) "||,             /* Authority                            */         
+    "NOWRITE "||,            /* temporary in-storage only table      */         
+    "REPLACE "               /* Replace if already exists            */         
+ADDRESS ISPEXEC TBCMD                                                           
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Set up sorting for the table by User ID.                          */         
+/*-------------------------------------------------------------------*/         
+TBCMD="TBSORT ACLUSERS FIELDS(ACUSERID,C,A)"                                    
+ADDRESS ISPEXEC TBCMD                                                           
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* For each connected user, extract the user's name using IRRXUTIL   */         
+/* and add an entry to our ISPF table.                               */         
+/*-------------------------------------------------------------------*/         
+ucnt = GRP.BASE.CONNECTS.REPEATCOUNT                                            
+do i = 1 to ucnt                                                                
+  ACUSERID = GRP.BASE.GUSERID.i                                                 
+  ACLVL = GRP.BASE.GAUTH.i                                                      
+  /* -------------------------------------------------------------- */          
+  /* Call IRRXUTIL to get the user's name. You could also add an    */          
+  /* extract for the user/group connection to get the rest of the   */          
+  /* connection info.                                               */          
+  /* -------------------------------------------------------------- */          
+  myrc=IRRXUTIL("EXTRACT","USER",ACUSERID,"TEST")                               
+  if (word(myrc,1)=0) then                                                      
+    ACNAME = TEST.BASE.NAME.1                                                   
+  TBCMD="TBADD ACLUSERS ORDER"                                                  
+  ADDRESS ISPEXEC TBCMD                                                         
+end                                                                             
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Now display the user information from our sorted user table.      */         
+/*-------------------------------------------------------------------*/         
+say "The Group contains the following user IDs:"                                
+say                                                                             
+say " User ID    Name                  Authority"                               
+say " ========   ====================  ========="                               
+address ISPEXEC "TBTOP ACLUSERS"                                                
+do i = 1 to ucnt                                                                
+  TBCMD = "TBSKIP ACLUSERS"                                                     
+  ADDRESS ISPEXEC TBCMD                                                         
+  if rc = 0 then                                                                
+    say " "Left(ACUSERID,10) Left(ACNAME,21) ACLVL                              
+end                                                                             
+                                                                                
+address ISPEXEC "TBEND ACLUSERS"        /* Delete the tables         */         
+                                                                                
+say                                                                             
+say "retval="||myrc                                                             

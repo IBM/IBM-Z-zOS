@@ -1,0 +1,365 @@
+ TITLE 'TRUNCATE/EXTEND PASSWORD HISTORY FOR ALL/SELECTED USERS' FIX002
+***********************************************************************
+***********************************************************************
+***                                                                 ***
+***      COPYRIGHT IBM CORP, 1997, 2000.                            ***
+***      ALL RIGHTS RESERVED.                                       ***
+***                                                                 ***
+***      THIS CODE HAS NOT BEEN SUBMITTED TO ANY FORMAL IBM TEST    ***
+***      AND IS DISTRIBUTED ON AN "AS IS" BASIS WITHOUT ANY         ***
+***      WARRANTY EITHER EXPRESS OR IMPLIED. THE IMPLEMENTATION     ***
+***      OF ANY OF THE TECHNIQUES DESCRIBED OR USED HEREIN IS A     ***
+***      CUSTOMER RESPONSIBILITY AND DEPENDS ON THE CUSTOMER'S      ***
+***      OPERATIONAL ENVIRONMENT. WHILE EACH ITEM MAY HAVE BEEN     ***
+***      REVIEWED FOR ACCURACY IN A SPECIFIC SITUATION AND MAY      ***
+***      RUN IN A SPECIFIC ENVIRONMENT, THERE IS NO GUARANTEE       ***
+***      THAT THE SAME OR SIMILAR RESULTS WILL BE OBTAINED ELSE-    ***
+***      WHERE. CUSTOMERS ATTEMPTING TO ADAPT THESE TECHNIQUES TO   ***
+***      THEIR OWN ENVIRONMENTS DO SO AT THEIR OWN RISK.            ***
+***                                                                 ***
+***      931010 CREATED BY FINN THUNBO CHRISTENSEN, IBM DENMARK     ***
+***             USING ADVICE FROM WALT FARRELL, RACF DEVELOPMENT    ***
+***      970515 CORRECTING VARIOUS BUGS OBSERVED WHILE ADAPTING  FIX001
+***             TO RACF/VM.                                         ***
+***      991013 ALLOW DUMMY EXTENSION                            FIX002
+***             ALLOW SPECIFIC USERS                                ***
+***    20000713 CORRECT FORMAT OF OUTPUT MESSAGES                FIX003
+***    20000718 CORRECT RACF RC/RE CHECKING WHEN SPECIFIC USERS  FIX004
+***    20000901 ALLOW EXECUTION WHEN FACILITY CHECK RETURNS 4    FIX005
+***    20000922 FIX FREEMAIN LV= REGISTER                        FIX006
+***                                                                 ***
+***********************************************************************
+***********************************************************************
+CUTPWHIS AMODE 24
+CUTPWHIS RMODE 24
+CUTPWHIS CSECT
+*   THIS PROGRAM HAS TO RUN APF AUTHORIZED IN ORDER TO WORK
+         PRINT   GEN               * SUPPRESS MACRO EXPANSIONS
+         SAVE  (14,12)             * STANDARD
+         LR    R12,R15             *
+         USING CUTPWHIS,R12,R10    * PROGRAM
+         B     AROUND
+         DC    C'COPYRIGHT IBM CORP. 1997, 2000. '               FIX003
+         DC    C'ALL RIGHTS RESERVED. '                          FIX002
+         DC    C'CUTPWHIS C=22.09.2000 A=&SYSDATE T=&SYSTIME '   FIX005
+         DS    0H
+AROUND   ST    R13,SAVEAREA+4      *
+         LR    R15,R13             * LINKAGE
+         LA    R13,SAVEAREA        *
+         ST    R13,8(R15)          * ROUTINE
+*
+         LA    R10,4095(R12)       * SETUP SECONDARY BASE REGISETR
+         LA    R10,1(R10)          * FINALIZE IT
+*
+*  OBTAIN DEFAULT VALUE FROM SETROPTS PASSWORD(HISTORY(..))
+         LA    R15,4               * INDICATE NO RCVT
+         L     R2,FLCCVT-PSA       * A(CVT)
+         ICM   R2,15,CVTRAC-CVT(R2) * A(RCVT)
+         BZ    RETURN00            * RETURN WHEN NO RCVT
+         XR    R3,R3               * CLEAR REG 3                 FIX001
+         IC    R3,RCVTHIST-RCVT(R2)  DEFAULT VALUE FROM RCVT (SETROPTS)
+*  CHECK FOR NON-DEFAULT VALUE FROM PARM FIELD
+*  (THIS ROUTINE ORIGINALLY READS A VARIABLE NO OF COLUMN INTERVALS)
+*  (BUT HERE WE JUST EXPECT ONE INTEGER IN THE PARM FIELD)
+         L     R6,0(,R1)           R6=A(FIRST_PARAMETER)
+         LH    R5,0(R6)            PARAMETER LENGTH
+         LTR   R5,R5               ZERO (NO PARAMETER) ?
+         BZ    NOPARM              SKIP WHEN SO
+         LA    R2,2(R6)            FIRST COL DEF
+         LA    R5,0(R5,R2)         A(FIRST BYTE AFTER PARM)
+         BCTR  R5,0                A(LAST BYTE OF PARM)
+COLLOOP  EQU   *
+         LR    R15,R2              CURRENT POSITION
+         XR    R1,R1               COUNT NO OF POSITIONS
+BLKLOOP  CLI   0(R15),C' '         END OF NUMBER?
+         BE    BLANKOK
+         LA    R15,1(R15)          BUMP POINTER
+         LA    R1,1(R1)            BUMP NO OF POSITIONS
+         CR    R15,R5              MAXIMUM?
+         BH    BLANKOK
+         B     BLKLOOP
+PACK     PACK  DW(8),0(*-*,R2)     PACK COLUMN
+BLANKOK  EQU   *
+         BCTR  R1,0                DECREMENT FOR EXECUTE
+         EX    R1,PACK
+         OI    DW+7,X'0F'          SET ZONED SIGN
+         CVB   R3,DW
+NOPARM   EQU   *
+         C     R3,=A(0)            VALUE REASONABLE ?
+         BL    RETURNOK            NOTHING TO TRUNCATE
+         STC   R3,CUTVALUE         STORE INTENDED HISTORY LENGTH
+        OPEN   (SYSPRINT,(OUTPUT))
+* CHECK VALUE IN PARM FIELD AGAINST GLOBAL MAX
+         L     R1,FLCCVT-PSA
+         L     R1,CVTRAC-CVT(,R1)
+         CLM   R3,B'0001',RCVTHIST-RCVT(R1)   GLOBAL HISTORY SMALLER?
+         BNH   PARMOK
+        PUT    SYSPRINT,=CL133' PARM VALUE GREATER THAN GLOBAL MAX VALUX
+               E'
+         LA    R15,12
+         B     RETURN
+PARMOK   DS    0H
+        PUT    SYSPRINT,HEADER1
+        TESTAUTH STATE=YES,KEY=YES,FCTN=1,RBLEVEL=1
+         LTR   R15,R15
+         BZ    AUTHOK
+        PUT    SYSPRINT,=CL133' NOT RUNNING AUTHORIZED - STOPPING'
+         LA    R15,4
+         B     RETURN
+AUTHOK   EQU   *
+         L     R1,FLCCVT-PSA(R0)   * A(CVT)
+         L     R1,CVTRAC-CVT(R1)   * A(RCVT)
+         USING RCVT,R1
+         CLI   RCVTVERS,X'08'      * RACF RELEASE 1.8.0
+         BNL   RACF18
+      PUT SYSPRINT,=CL133' RACF 1.8.0 IS MINIMUM RACF LEVEL - STOPPING'
+         LA    R15,8
+         B     RETURN
+RACF18   EQU   *                   * MINIMUM RACF LEVEL OK
+* CHECK INVOKERS AUTHORITY TO RUN 'CUTPWHIS'
+         LA    R2,ENTITYEX         * EXPORT ENTITY
+        RACROUTE ENTITY=((2)),CLASS='FACILITY',WORKA=RACWORK,          X
+               REQUEST=AUTH,ATTR=UPDATE,RACFIND=YES
+         CL    R15,=A(8)           * ACCESS OK?
+         BL    EXPOK
+      PUT SYSPRINT,=CL133' NOT AUTHORIZED BY RACF ADMINISTRATOR TO TRUNX
+               CATE ALL USERS WITH OVERSIZE PASSWORD HISTORY   '
+         LA    R15,12
+         B     RETURN
+EXPOK    EQU   *
+        PUT    SYSPRINT,WARNMSG
+* CHECK FOR "STARTUSR" DDNAME WITH USERID IN FIRST RECORD
+        RDJFCB STARTUSR         * ALLOCATED AT ALL ?
+         LTR   R15,R15          * LOOK AT RC
+         BNZ   NO_INITIAL_USER  * NOT ALLOCATED - SKIP SPECIFICS
+        OPEN   (STARTUSR,(INPUT))
+        GET    STARTUSR,USERID
+        CLOSE  (STARTUSR)
+NO_INITIAL_USER DS 0H
+* CHECK FOR "USERIDS" DDNAME WITH USERIDS IN FIRST 8 POSITIONS
+        RDJFCB USERIDS          * ALLOCATED AT ALL ?
+         ST    R15,SPECIFIC     * SAVE RETURN CODE, WHATEVER IT IS
+         LTR   R15,R15          * LOOK AT RC
+         BNZ   NEXTUSER         * NOT ALLOCATED - SKIP SPECIFICS
+        OPEN   (USERID2,(INPUT))
+NEXTUSER EQU   *  LOOP OVER ALL USERIDS EXTRACTING THEIR OLDPWD HISTORY
+         CLC   SPECIFIC,ZEROES  * DO WE HAVE A SPECIFIC USERID?
+         BNE   RACRC
+         LA    R11,RACRC2+4                                      FIX004
+        GET    USERID2,USERID
+RACRC2  RACROUTE REQUEST=EXTRACT,RELEASE=1.8,TYPE=EXTRACT,       FIX004X
+               GENERIC=ASIS,ENTITY=USERID,WORKA=RACWORK,               X
+               FIELDS=FLDLIST,SUBPOOL=229
+         B     CHECKRC
+*
+RACRC    LA    R11,RACRC3+4                                      FIX004
+RACRC3  RACROUTE REQUEST=EXTRACT,RELEASE=1.8,TYPE=EXTRACTN,      FIX004X
+               GENERIC=ASIS,ENTITY=USERID,WORKA=RACWORK,               X
+               FIELDS=FLDLIST,SUBPOOL=229
+CHECKRC  LTR   R15,R15
+         BZ    SKIP00
+* CHECK FOR RETURN/REASON INDICATING "NO MORE USERIDS"
+         CLI   3(R11),X'08'        * RETURN CODE = 8 ?           FIX004
+         BNE   DUMP00              * NO - PROBLEMS
+         CLI   7(R11),X'00'        * REASON CODE = 0 ?           FIX004
+         BE    RETURNOK            * YES OK - NO MORE USERS - RETURN
+         B     DUMP00              * NO - PROBLEMS
+SKIP00   EQU   *
+         USING EXTWKEA,R3          * BASE FOR RETURNED AREA
+         LR    R3,R1               * INIT BASE REGISTER
+         AH    R3,EXTWOFF          * ADD OFFSET TO VARIABLE DATA
+         DROP  R3                  * BASE REG NOW OFF ORIGIN
+         MVC   PWDGEN,4(R3)        * USERS CURRENT PASSWORD GENERATION
+         A     R3,0(R3)            * BUMP LENGTH OF PWDGEN (1)
+         LA    R3,4(R3)            * BUMP LENGTH OF LENGTH FIELD
+         MVC   PWDCNT,4(R3)        * USERS HISTORY LENGTH
+         A     R3,0(R3)            * BUMP LENGTH OF PWDCNT (4)
+         LA    R3,4(R3)            * BUMP LENGTH OF LENGTH FIELD
+         LA    R3,4(R3)            * BUMP TOTAL LENGTH OF OLDPWD
+* CALCULATE LENGTH OF EXTRACTED USERID
+         LA    R15,USERID+7         * A(LAST POSSIBLE BYTE IN USERID)
+         LA    R14,USERID-1         * R15-R14 = 8 = MAXLENGTH(USERID)
+LOP      CLI   0(R15),C' '          * IS CURRENT LAST CHAR BLANK?
+         BNE   ELOP                 * NO - MUST BE LAST CHARACTER
+         CR    R15,R14              * OUT OF RANGE ?
+         BNH   DUMP00               * YES - GO TAKE DUMP
+         BCT   R15,LOP              * GO TEST PREVIOUS CHARACTER=BLANK
+ELOP     EQU   *                    * LAST CHARACTER IN USERID FOUND
+         SR    R15,R14              * R15 = LENGTH OF USERID
+         STC   R15,USERID-1         * USERID LENGTH
+         ST    R1,EXTAREA         * KEEP A(EXTRACTED_DATA) FOR FREEMAIN
+         BAL   R9,AR30              * GO PROCESS THE DATA
+* ENSURE NO TRAILING ZEROES AND LOOP TO NEXT USER
+         TR    USERID(8),ZEROBLAN   * CHANGE ZERO TO BLANK
+         L     R3,EXTAREA           * COPY ADDRESS
+         XR    R2,R2                * CLEAR REG 2                FIX006
+         ICM   R2,B'0111',1(R3)     * INSERT 3 BYTE LENGTH       FIX006
+        FREEMAIN R,LV=(R2),A=(R3),SP=229 * FREE EXTRACTED DATA   FIX006
+         LTR   R15,R15              * OK ?
+         BZ    NEXTUSER             * YES - GO FIND NEXT USERID
+        ABEND  4,DUMP               * FREEMAIN FAILURE - TAKE DUMP
+AR30     EQU   *                    * PROCESS A HISTORY
+         XR    R15,R15              * CLEAR REG 15
+         IC    R15,CUTVALUE         * INTENDED HISTORY LENGTH
+         L     R14,PWDCNT           * USERS COUNT
+         SR    R14,R15              * MINUS INTENDED COUNT
+* WHEN ACTUAL HISTORY HAS INTENDED LENGTH - SKIP UPDATING IT     FIX002
+         BZR   R9                   * GO FREEMAIN CURRENT & LOOP FIX002
+         MVI   USERID+200,X'00'     * INIT ICHEACTN DATA AREA
+         MVC   USERID+201(255),USERID+200 * RIPPLE BINARY ZERO
+         LR    R15,R14              * COPY TO R15
+         SLL   R14,3                * 8 X SKIP_COUNT
+         SLL   R15,2                * 4 X SKIP_COUNT
+         LA    R14,0(R14,R15)       * 12XCOUNT_OF_SKIPPED_OLD_PWD
+         LA    R3,0(R3,R14)         * BUMP REG 3; POINT AT KEPT HISTORY
+         XR    R14,R14              * CLEAR GR14
+         IC    R14,CUTVALUE         * INTENDED LENGTH
+         LR    R15,R14              * COPY TO GR15
+         SLL   R14,4                * MULTIPLY WITH 16
+         SLL   R15,2                * MULTIPLY WITH  4
+         LA    R5,0(R14,R15)        * R5=20X INTENDED HISTORY LENGTH
+         XR    R15,R15              * CLEAR R15
+         IC    R15,CUTVALUE         * INTENDED HISTORY LENGTH
+         LA    R5,0(R5,R15)         * 21 X KEPT HISTORY COUNT
+* SET SIZE OF INPUT DATA FOR HISTORY INTO ICHEACTN LIST FORM.
+* THIS LENGTH WILL BE THE SAME FOR ALL USERIDS, BUT WHEN THE EXTRACTED
+* HISTORY IS SHORTER, CUTPWHIS WILL NOT WRITE A HISTORY BACK.
+        ICHEACTN MF=(E,APWDCNT),FLDATA=((R5)),RELEASE=1.8
+         XR    R15,R15              * CLEAR GR15
+         ICM   R15,B'0001',CUTVALUE * INIT LOOP CONTROL REGISTER
+         BZ    EMPTYHIS             * SET EMPTY HISTORY
+         LR    R5,R15               * COPY TO GR5 = LOOPCOUNT
+         LA    R14,USERID+200       * A(PASSWORD HISTORY)
+LOOPHIST EQU   *                    * BUILD HISTORY ENTRIES
+         LR    R6,R5                * INTENDED HISTORY LENGTH
+         SR    R6,R15               * CURRENT GENERATION NO (0,1,2,...)
+         MVC   00(4,R14),=AL4(17)   * L'L'REPEAT_FIELD
+         MVC   04(4,R14),=AL4(1)    * L'L'GENNO
+         STC   R6,08(R14)           * THIS OLD PWD GEN NO
+         MVC   09(4,R14),=AL4(8)    * L'L'OLDPWD
+* HAVE WE COPIED ALL THE ACTUAL HISTORY?                         FIX002
+         L     R11,PWDCNT           * ACTUAL HISTORY LENGTH      FIX002
+         SR    R11,R6               * MINUS PREVIOUSLY USED GENERATIONS
+         BP    STILL_MORE           * WE HAVE MORE INPUT         FIX002
+         MVC   13(8,R14),ZEROES     * DUMMY VALUE = BINARY ZERO  FIX002
+         B     USE_DUMMY_VALUE     * SKIP AROUND COPY ACTUAL GEN FIX002
+STILL_MORE DS  0H                                                FIX002
+         MVC   13(8,R14),4(R3)      * THIS OLD PWD
+USE_DUMMY_VALUE DS 0H                                            FIX002
+         LA    R3,12(,R3)           * BUMP TO NEXT OLD PWD INPUT
+         LA    R14,21(R14)          * BUMP TO NEXT OLD PWD OUTPUT
+         BCT   R15,LOOPHIST         * LOOP OVER HISTORY ENTRIES
+* SHORT PASSWORD HISTORY NOW REBUILT IN ICHEINTY FORMAT - WRITE BACK
+EMPTYHIS EQU   *                    * ENTRY FOR EMPTY HISTORY
+        ICHEINTY ALTER,TYPE='USR',ENTRY=USERID-1,ACTIONS=(APWDGEN,     X
+               APWDCNT),DATAMAP=NEW,RELEASE=1.8
+         LTR   R15,R15              * WRITE BACK SUCCESSFUL?
+         BNZ   DUMP00               * NO - GO TAKE DUMP
+         CNOP  0,4                  * BOUNDARY ALIGNMENT
+         MVC   OBUF(8),USERID       * COPY USERID TO MSG
+        PUT    SYSPRINT,OBUF-1    * MSG 'USER HISTORY TRUNCATED' FIX003
+         BR    R9                   * RETURN TO LOOP OVER USERIDS
+APWDGEN ICHEACTN MF=L,FIELD=PWDGEN,FLDATA=(1,GENZERO),                 X
+               RELEASE=1.8
+APWDCNT ICHEACTN MF=L,FIELD=PWDCNT,GROUP=YES,FLDATA=(*-*,USERID+200),  X
+               RELEASE=1.8,ENCRYPT=NO
+EODAD    DS    0H
+        CLOSE  (USERID2)
+RETURNOK EQU   *
+         LA    R15,0                * SET RETURN CODE ZERO
+RETURN   EQU   *                    * RETURN USING GR 15
+         ST    R15,RETCODE
+        CLOSE  (SYSPRINT)           * CLOSE SYSPRINT
+RETURN00 EQU   *                    * RETURN USING GR 15
+         L     R13,4(R13)           * SWAP OLD SAVEAREA IN
+         L     R15,RETCODE          * SETUP RETURN CODE
+         RETURN (14,12),RC=(15)     * AND RETURN
+*
+DUMP00   EQU   *
+         ABEND 1,DUMP
+* CONSTANTS
+ENTITYEX DC    CL39'RACF.PASSWORD.MAINTENANCE.HISTORY.LNGTH'
+SAVEAREA DC    18F'0'              * LINKAGE REGISTER SAVEAREA
+RETCODE  DC    F'0'
+F0       DC    F'0'
+F3       DC    F'3'
+F8       DC    F'8'
+ZEROES   DC    D'0'  * DUMMY ENCRYPTED PASSWORD FOR EXTENSION    FIX002
+EXTAREA  DC    AL4(0)              * CURRENT PW GENERATION = 0
+GENZERO  DC    AL1(0)              * CURRENT PW GENERATION = 0
+PWDGEN   DC    AL1(0)
+PWDCNT   DC    A(0)
+USER     DS    CL8
+FLDLIST  DC    A((EFLDLIST-FLDLIST)/8)
+         DC    CL8'PWDGEN  '   CURRENT PASSWORD GENERATION NO
+         DC    CL8'PWDCNT  '   PASSWORD HISTORY LENGTH
+         DC    CL8'OLDPWD  '   GROUPED FIELD: OLD PASSWORD ENCRYPTED
+EFLDLIST EQU   *
+WARNMSG  DC    CL133' THIS PROGRAM MAY PLACE HEAVY LOAD ON YOUR RACF DAX
+               TABASE AND SHOULD NOT RUN DURING PEAK LOAD HOURS'
+HEADER1  DC    CL133'        MODIFY LENGTH OF ALL OR SELECTED USERS PASX
+               SWORD HISTORY                            '
+ZEROBLAN DS    0F                   TRANSLATE TABLE
+         DC    X'400102030405060708090A0B0C0D0E0F'
+         DC    X'101112131415161718191A1B1C1D1E1F'
+         DC    X'202122232425262728292A2B2C2D2E2F'
+         DC    X'303132333435363738393A3B3C3D3E3F'
+         DC    X'404142434445464748494A4B4C4D4E4F'
+         DC    X'505152535455565758595A5B5C5D5E5F'
+         DC    X'606162636465666768696A6B6C6D6E6F'
+         DC    X'707172737475767778797A7B7C7D7E7F'
+         DC    X'808182838485868788898A8B8C8D8E8F'
+         DC    X'909192939495969798999A9B9C9D9E9F'
+         DC    X'A0A1A2A3A4A5A6A7A8A9AAABACADAEAF'
+         DC    X'B0B1B2B3B4B5B6B7B8B9BABBBCBDBEBF'
+         DC    X'C0C1C2C3C4C5C6C7C8C9CACBCCCDCECF'
+         DC    X'D0D1D2D3D4D5D6D7D8D9DADBDCDDDEDF'
+         DC    X'E0E1E2E3E4E5E6E7E8E9EAEBECEDEEEF'
+         DC    X'F0F1F2F3F4F5F6F7F8F9FAFBFCFDFEFF'
+SYSPRINT DCB   DDNAME=SYSPRINT,DSORG=PS,MACRF=(PM),                    *
+               RECFM=FBA,BLKSIZE=1330,LRECL=133
+SPECIFIC DC    F'0'
+CUTVALUE DC    AL1(*-*)        MAX HISTORY LENGTH FOR ANY USERID
+RACWORK  DS    CL512
+DW       DS    D
+USERINT  DS    CL1
+         LTORG
+         DC    CL1' '                                            FIX003
+OBUF     DC    CL133'         PASSWORD HISTORY LENGTH MODIFIED'
+USERID   DC    CL133'         PASSWORD HISTORY TRUNCATED'
+         ORG   USERID+2000
+         PRINT NOGEN
+USERID2  DCB   DDNAME=USERIDS,DSORG=PS,MACRF=GM,EODAD=EODAD
+USERIDS  DCB   DDNAME=USERIDS,DSORG=PS,MACRF=GM,EXLST=EXLST
+STARTUSR DCB   DDNAME=STARTUSR,DSORG=PS,MACRF=GM,EXLST=EXLST
+EXLST    DC    X'07'
+         DC    AL3(JFCBAREA)
+JFCBAREA DS    0F,CL176
+*   DSECTS
+         DCBD  DEVD=DA,DSORG=PS
+         CVT   DSECT=YES
+         IHAPSA
+         ICHPRCVT
+         IRRPRXTW
+*---------------------------------------------------------------------*
+*        REGISTER EQUATES                                             *
+*---------------------------------------------------------------------*
+R0       EQU   0
+R1       EQU   1
+R2       EQU   2
+R3       EQU   3
+R4       EQU   4
+R5       EQU   5
+R6       EQU   6
+R7       EQU   7
+R8       EQU   8
+R9       EQU   9
+R10      EQU   10
+R11      EQU   11
+R12      EQU   12
+R13      EQU   13
+R14      EQU   14
+R15      EQU   15
+*
+         END   CUTPWHIS            * END OF PROGRAM
+
