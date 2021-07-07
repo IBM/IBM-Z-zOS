@@ -1,0 +1,176 @@
+/* REXX */                                                                      
+/*********************************************************************          
+ Licensed Materials - Property of IBM                                           
+ 5694-A01                                                                       
+ Copyright IBM Corp. 2010                                                       
+                                                                                
+ Name:   XDUPACL                                                                
+                                                                                
+ Author: Mike Onghena Dec 2009                                                  
+                                                                                
+ Purpose:                                                                       
+  This program examines a general resource profile and determines if            
+    the access list contains redundant USER entries.  If a USER id is           
+    on the access list directly, and also appears by virtue of                  
+    group membership, it is considered redundant.  We only check the            
+    standard access list, not the conditional access list.                      
+                                                                                
+  This program demonstrates a use for specfying a 'dot in the stem'             
+    name as a way to build a single stem with data from multiple                
+    profiles.  In this case we store data from multiple RACF users              
+    into a single stem variable, indexed by group name.                         
+                                                                                
+ Input: - Class name and list of one or more profile names                      
+                                                                                
+ Example:                                                                       
+     ex 'pds(XDUPACL)' 'class profile çprofile...Ÿ'                             
+         'class'   is a general resource class                                  
+         'profile' is the profile in the class to examine.  Multiple            
+                   profiles may be specified.                                   
+ Authorization required:                                                        
+  You must have the authority to use the R_ADMIN extract callable               
+     service (See RACF Callable services guide for more information).           
+  You must also be allowed to view the profiles being extracted.                
+                                                                                
+ Operation:                                                                     
+    For each profile specified.                                                 
+    - Extract the desired resource.                                             
+    - For each item in the Access List                                          
+      - If the ID is not already known (to this program)                        
+        as a USER or GROUP or ORPHAN:                                           
+        - Extract the item as a user into the 'USERS' stem.  The                
+          USERS stem holds multiple users.                                      
+        - If the extract fails due to 'not found', attempt to extract           
+          the item as a group.  If successful, track the group in               
+          the GROUPS stem.  There is no reason to save the extracted            
+          group data, so we do not waste the memory space.                      
+        - If the extract fails again, save the ID as an ORPHAN.                 
+    - For each item in the Access list                                          
+      - If the item is a GROUP, ignore it                                       
+      - If the item is a USER, run thru the USER's group membership             
+        and if any of their groups is on the ACL, flag it.                      
+      - If the item is an ORPHAN, note that an orphan was found.                
+                                                                                
+ Notes:                                                                         
+  -Note that it is not possible to check for redundant users who                
+    have access via GROUP membership only as Universal groups                   
+    do not contain user membership lists.  The only true source                 
+    of Group<-->User membership is in User profiles.                            
+  -No parameter validation or error checking is performed in this               
+    example.                                                                    
+*********************************************************************/          
+parse arg class profiles                                                        
+                                                                                
+/* Simple parm check */                                                         
+if profiles="" then do                                                          
+   say "Usage: class profile çprofile..Ÿ"                                       
+   say "  class: RACF class name, not DATASET, USER or GROUP"                   
+   say "  profiles: One or more profiles to check for redundant "||,            
+       "User ACL"                                                               
+   exit 8                                                                       
+end                                                                             
+                                                                                
+/* Clean up */                                                                  
+RACF.=""                                                                        
+USERS.=""                                                                       
+GROUPS.=""                                                                      
+ORPHANS.=""                                                                     
+                                                                                
+/* Run through specified profiles */                                            
+do p=1 to words(profiles)                                                       
+  profile=word(profiles,p)                      /* Get next profile */          
+  ACL.=0                /* Clear list of ACL items for this profile */          
+                                                                                
+  say "Checking ACL of profile "||profile                                       
+  /* Extract profile and check result.  Use prefix of R_ */                     
+  myrc=IRRXUTIL("EXTRACT",class,profile,"RACF","R_","TRUE")                     
+  if (word(myrc,1)<>0) then do                                                  
+    say "Error extracting "profile" IRRXUTIL return code ="myrc                 
+    iterate                                     /* try next profile */          
+  end                                                                           
+                                                                                
+  /* Does this resource have an ACCESS LIST? */                                 
+  if (RACF.R_BASE.R_ACLCNT.R_REPEATCOUNT<>"") then do                           
+    /* Run through the standard access list, store inportant info */            
+    do a=1 to RACF.R_BASE.R_ACLCNT.R_REPEATCOUNT                                
+       id=RACF.R_BASE.R_ACLID.a                  /* Get ID from ACL */          
+                                                                                
+       /* Index the ID from ACL */                                              
+       call indexID(id)                                                         
+                                                                                
+       /* Add to simple ACL table for this profile.   */                        
+       ACL.id=RACF.R_BASE.R_ACLACS.a         /* Get access from ACL */          
+                                                                                
+    end /* a */                                                                 
+                                                                                
+    /* Now, run through the ACL again, and if the item is a user,   */          
+    /*  check to see if any of the groups to which the user is      */          
+    /*  connected appear in the access list.                        */          
+    do a=1 to RACF.R_BASE.R_ACLCNT.R_REPEATCOUNT                                
+       id=RACF.R_BASE.R_ACLID.a                  /* Get ID from ACL */          
+                                                                                
+       /* Is this item a user? */                                               
+       if (USERS.id.R_CLASS="USER") then do                                     
+          /* iterate through this users groups */                               
+          do g=1 to USERS.id.R_BASE.R_CONNECTS.R_REPEATCOUNT                    
+            groupID=USERS.id.R_BASE.R_CGROUP.g                                  
+            if (ACL.groupID<>0) then do                                         
+               say "User "id||" on ACL with "||,                                
+                   RACF.R_BASE.R_ACLACS.a||,                                    
+                   " and has "||,                                               
+                   ACL.groupID" via "||,                                        
+                   "connection to group "||groupID                              
+            end                                                                 
+          end /* g */                                                           
+       end /* If user */                                                        
+       else if (ORPHANS.id=1) then do                                           
+          say id||" appears on the access list and is an orphan"                
+       end                                                                      
+                                                                                
+       /* Add to simple ACL table for this profile.   */                        
+       ACL.id=RACF.R_BASE.R_ACLID.a          /* Get access from ACL */          
+                                                                                
+    end /* a */                                                                 
+  end /* Do we have access list */                                              
+end /* p */                                                                     
+return                                                                          
+                                                                                
+/*********************************************************************/         
+/* Given an ID, this routine classifies it as a USER, GROUP or ORPHAN*/         
+/*                                                                   */         
+/*  If it is a user it is extracted and save in the USER. stem,      */         
+/*    indexed by id.  (USERS.id.etc...)                              */         
+/*                                                                   */         
+/*  If it is a GROUP, it is indexed in stem GROUP., indexed by       */         
+/*    GROUPS.id.  Orphans are indexed as ORPHANS.id                  */         
+/*                                                                   */         
+/*  All of the data extracted for USERS is saved in the USERS. stem. */         
+/*    Data extracted from groups is discarded.  We don't need to save*/         
+/*    the group data, just mark that something is a group.           */         
+/*                                                                   */         
+/*********************************************************************/         
+indexID: procedure expose USERS. GROUPS. ORPHANS.                               
+arg id                                                                          
+                                                                                
+ /* if ID is already known, return */                                           
+ if (USERS.id.R_PROFILE=id) then return                                         
+ if (GROUPS.id=1)  then return                                                  
+ if (ORPHANS.id=1) then return                                                  
+                                                                                
+ /* Attempt to extract ID as a USER (ID can be user or group,                   
+    we don't know which).  Extract this into the "USERS" stem indexed           
+    by the ID.  We use the '.' in stem technique.                    */         
+ myrc=IRRXUTIL("EXTRACT","USER",id,"USERS."||id,"R_",)                          
+ if (word(myrc,1)>2) then do                                                    
+    /* If it failed, attempt to extract as a group.  No need to                 
+       save the group data.  We just need to know if it exists */               
+    myrc=IRRXUTIL("EXTRACT","GROUP",id,"junk","R_",)                            
+    if (word(myrc,1)=0) then do                                                 
+      GROUPS.id=1                        /* mark existence of group */          
+    end;                                                                        
+    else do;                                                                    
+      ORPHANS.id=1                      /* mark existence of orphan */          
+    end                                                                         
+ end                                                                            
+return                                                                          
+                                                                                

@@ -1,0 +1,46 @@
+//DPFTCTST JOB (9999,CC7),FTC,CLASS=A,MSGCLASS=X                                
+//*                                                                             
+//* UNCONDITIONALLY DELETE OF RACF PROFILES.                                    
+//*                                                                             
+//* REQUIRES UPDATE ACCESS TO FACILITY RACKILL RESOURCE.                        
+//*                                                                             
+//* INPUT RECORDS WILL BE LOGGED IN GENERAL SMF RECORDS; EVQUAL=97.             
+//* SMF RECORD TYPE IS 80. CAN BE LISTED BY RACFRW.                             
+//*                                                                             
+//* PROFILES ARE IDENTIFIED BY CLASS, PROFILENAME AND POSSIBLY VOLUME           
+//* FOR DISCRETE DATASET PROFILES. SET VOLUME TO BLANKS WHEN NO PROPER          
+//* VALUE EXIST.                                                                
+//*                                                                             
+//* TO ENABLE DELETE OF FULLY QUALIFIED GENERICS IN                             
+//* GENERAL RESOURCE CLASSES (WHICH ARE NOT OFFICIALLY SUPPORTED) SET           
+//* AN 'U' INSTEAD OF THE BLANK BEFORE THE PROFILENAME.                         
+//*                                                                             
+//* TO DELETE                                                                   
+//* DISCRETE PROFILES, ACCIDENTALLY CREATED WITH GENERIC CHARACTERS,            
+//* BUT BEFORE DOING SETROPTS GENCMD(CLASS), SET A 'D' BEFORE THE               
+//* PROFILE NAME.                                                               
+//*                                                                             
+//* TO DELETE A SINGLE VOLUME FROM A SET OF TAPEVOLUMES HAVE A BLANK            
+//* BEFORE THE PROFILENAME. TO DELETE THE WHOLE SET OF TAPEVOLUMES,             
+//* SET A 'A' BEFORE THE PROFILE NAME.                                          
+//*                                                                             
+//GO  EXEC PGM=RACKILL                                                          
+//STEPLIB  DD DISP=SHR,DSN=MVSGRP.TEST.APFLIB  <- UPDATE YOUR APF LIB           
+//SYSPRINT DD SYSOUT=*,DCB=BLKSIZE=133                                          
+//FORMAT DD *             SAMPLES OF INPUT RECORDS ON SYSUT1:                   
+DATASET  VOLUME DSNAME.POSSIBLY.GENERIC                                         
+DATASET         DSNAME.FULLY.QUALI.FIED                                         
+FACILITY PROFILENAME                                                            
+CLASS   UGENERIC.PROFILENAME.WITHOUT.GENERIC.CHARACTERS                         
+CLASS   DDISCRETE.PROFILENAME.THAT.ACCIDENTALLY.HAS.IMBEDDED.GENERICS           
+TAPEVOL  H00019      DELETE H00019 VOLUME FROM DFHSM9 SET (MULTI VOLUME)        
+TAPEVOL  H00029      DELETE H00029 TAPEVOL PROFILE (SINGLE VOLUME)              
+TAPEVOL ADFHSM9 ALSO DELETE ALTERNATE INDEX ENTRIES (ALL VOLUMES IN SET)        
+TAPEVOL IXXXXXX      DELETE INDEX ENTRY ONLY FROM MULTIVOLUME SET               
+USER     USERID                                                                 
+GROUP    GROUPID                                                                
+CONNECT  USERID/GROUPID                                                         
+//SYSUT1   DD *,DCB=BLKSIZE=80      REAL INPUT                                  
+DATASET         DPFTC.FULLY.QUAL                                                
+FACILITY IRRKILLER*                                                             
+DASNAMESUFULLY.QUALIFIED.GENERIC                                                

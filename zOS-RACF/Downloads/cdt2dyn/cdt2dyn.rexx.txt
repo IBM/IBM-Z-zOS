@@ -1,0 +1,778 @@
+/* CDT2DYN:  REXX exec to help change installation-defined           */
+/* RACF classes into dynamic classes.                                */
+/**********************************************************************/
+/* CDT2DYN Revision 1.0.01                                       @P1A*/
+/**********************************************************************/
+/*                                                                   */
+/*%Copyright Copyright IBM Corporation, 2004                         */
+/*                                                                   */
+/* Author: Laurie Ward   LWard@us.ibm.com                            */
+/*                       or Laurie Ward/Poughkeepsie/IBM@IBMUS   @P1A*/
+/*                                                                   */
+/* Purpose of this program:                                          */
+/*  This program will examine the contents of the current classes    */
+/*  in the RACF static class descriptor table.  (Any                 */
+/*  existing dynamic classes will be ignored.)  For all static       */
+/*  installation-defined classes, it will create the commands        */
+/*  necessary to put those installation-defined classes into the     */
+/*  dynamic CDT (BUILDCMD parameter).  It can then execute the       */
+/*  commands which were built (RUNCMD parameter), which will define  */
+/*  the dynamic classes in the CDT general resource class.           */
+/*                                                                   */
+/* DISCLAIMERS:                                                      */
+/*  This program contains code made available by IBM Corporation on  */
+/*  an AS IS basis.  Anyone receiving this program is considered     */
+/*  to be licensed under IBM copyrights to use the IBM-provided      */
+/*  source code in any way he or she deems fit, including copying    */
+/*  it, compiling it, modifying it, and redistributing it with or    */
+/*  without modifications, except that it may be neither sold nor    */
+/*  incorporated within a product that is sold.  No license under    */
+/*  any IBM patents or patent applications is to be implied from     */
+/*  this copyright license.                                          */
+/*                                                                   */
+/*  The software is provided "as-is", and IBM disclaims all          */
+/*  warranties, express or implied, including but not limited to     */
+/*  implied warranties of merchantibility or fitness for a           */
+/*  particular purpose.  IBM shall not be liable for any direct,     */
+/*  indirect, incidental, special or consequential damages arising   */
+/*  out of this agreement or the use or operation of the software.   */
+/*                                                                   */
+/*  A user of this program should understand that IBM cannot provide */
+/*  technical support for the program and will not be responsible    */
+/*  for any consequences of use of the program.                      */
+/*                                                                   */
+/*  The program's author will attempt to provide informal support    */
+/*  and assistance, if she has the time to do so.  If you have       */
+/*  questions about using this program, or suggestions for           */
+/*  enhancements, please communicate them via the RACF-L mailing     */
+/*  list.  To subscribe to RACF-L, you should send a note to:        */
+/*    listserv@listserv.uga.edu                                      */
+/*  and include the following line in the body of the note,          */
+/*  substituting your first name and last name as indicated:         */
+/*    subscribe racf-l first_name last_name                          */
+/*  To post messages to RACF-L, send them to racf-l@listserv.uga.edu */
+/*  and include a relevant Subject: line.                            */
+/*                                                                   */
+/*  The program's author can also be reached directly via email to   */
+/*     LWard@us.ibm.com                                              */
+/*      or Laurie Ward/Poughkeepsie/IBM@IBMUS                    @P1A*/
+/*  However, she would strongly prefer that all contact regarding    */
+/*  this program be via the mechanisms indicated above.              */
+/*                                                                   */
+/* HOW TO INVOKE THIS UTILITY:                                       */
+/*   From the TSO command line, execute the REXX EXEC from the       */
+/*   dataset in which it resides.  For example:                      */
+/*                                                                   */
+/*   EXEC 'data.set.name(CDT2DYN)'                                   */
+/*          - or -                                                   */
+/*   EXEC 'prefix.CDT2DYN.EXEC'                                      */
+/*                                                                   */
+/*   Optional Parameters:                                            */
+/*           BUILDCMD | NOBUILDCMD  Default is BUILDCMD              */
+/*             Specify BUILDCMD if you want to build commands        */
+/*               to define dynamic classes from your current         */
+/*               installation classes in the CDT.                    */
+/*             Specify NOBUILDCMD if you do not want to build        */
+/*               the commands.  You can specify this with the        */
+/*               RUNCMD parameter if you have already built your     */
+/*               commands, optionally edited the commands, and       */
+/*               now you want to run them.                           */
+/*           RUNCMD   | NORUNCMD    Default is NORUNCMD              */
+/*             Specify RUNCMD to run the commands built by this      */
+/*               utility.                                            */
+/*             Specify NORUNCMD if you do not want to run the        */
+/*               commands built by this utility.  You may want to    */
+/*               edit or examine the commands before they are        */
+/*               executed.                                           */
+/*                                                                   */
+/* OUTPUT OF THIS UTILITY:                                           */
+/*   The dataset 'prefix.DYNCLAS.EXEC' is created and optionally     */
+/*   executed.  If this dataset already exists, it will be           */
+/*   overwritten.  The existing dataset must have RECFM=V or         */
+/*   RECFM=F and LRECL=255 for the utility to run properly.          */
+/*                                                                   */
+/* RESTRICTIONS:                                                     */
+/*   This utility must be run on a z/OS Version 1 Release 6 system   */
+/*   or later with a TSO/E environment available.                @P1C*/
+/*   If the commands built by this utility are run                   */
+/*   on a prior z/OS system, the commands will fail as the CDT       */
+/*   class and the CDTINFO keyword are new in z/OS V1R6.             */
+/*                                                                   */
+/* TYPICAL USAGE SCENARIO:                                           */
+/*     1) Build commands to define the dynamic classes:              */
+/*          EXEC 'prefix.REXX.EXEC(CDT2DYN)'                         */
+/*        Note: With no parameters, this will build the commands     */
+/*        and put them into dataset prefix.DYNCLAS.EXEC but will     */
+/*        not run them.                                              */
+/*     2) Examine commands in prefix.DYNCLAS.EXEC produced by the    */
+/*        CDT2DYN utility.  Normally no changes are necessary        */
+/*        for these commands.  Your installation may require         */
+/*        changes to them, such as adding an OWNER keyword.          */
+/*     3) Run the commands to define the dynamic classes:            */
+/*           EXEC 'prefix.REXX.EXEC(CDT2DYN)' 'NOBUILDCMD RUNCMD'    */
+/*        Note: This will run the commands built in Step 1).         */
+/*              It must be run by a user with one of the following   */
+/*              authorities:                                         */
+/*              a) RACF SPECIAL authority                            */
+/*               - or -                                              */
+/*              b) CLAUTH authority to the CDT class and             */
+/*                 (if the FIELD class is active and RACLISTed)      */
+/*                 FIELD class access to the CDTINFO segment         */
+/*                 fields (see the RACF Security Administrator's     */
+/*                 Guide for more information).                      */
+/*     4) Put the dynamic classes into the CDT:                      */
+/*           SETROPTS CLASSACT(CDT) RACLIST(CDT)                     */
+/*               - or -                                              */
+/*           SETROPTS RACLIST(CDT) REFRESH                           */
+/*        Note: These commands must be run by a user with            */
+/*              appropriate authority, as documented in the          */
+/*              RACF Command Language Reference.                     */
+/*                                                                   */
+/* Change Activity:                                                  */
+/*                                                                   */
+/* $L0=CDT2DYN HRF7709 040526 PDLAW1: First general release      @L0A*/
+/* $P1=CDT2DYN HRF7709 040922 PDLAW1: Revision 1.0.01            @P1A*/
+/*                                                                   */
+/* Change Description:                                               */
+/*                                                                   */
+/* A000000-999999  First general release, with special thanks to @L0A*/
+/*                 Walt Farrell for the initial code and         @L0A*/
+/*                 collaboration.                                @L0A*/
+/* C - Revision 1.0.01:                                          @P1A*/
+/*     Fix ALLOCATE statements by adding 'address TSO' and       @P1A*/
+/*     fix multi-line command.                                   @P1A*/
+/*     Add start message and parameter messages.                 @P1A*/
+/*     Add logic to handle NOBUILDCMD NORUNCMD.                  @P1A*/
+/*     Add logic to handle case where no commands are built.     @P1A*/
+/*     Skip classes that are already duplicated by a dynamic one.@P1A*/
+/**********************************************************************/
+/* The following statements may be changed to tailor this exec to     */
+/* work at your installation.                                         */
+/**********************************************************************/
+output_dataset = "DYNCLAS.EXEC"
+                                      /* Change this if you want to
+                                         use a different dataset
+                                         name for the output file.
+                                         Note: The name will be
+                                         prefixed with your TSO prefix,
+                                         unless you provide a string
+                                         enclosed in single quotes.   */
+dataset_attributes = 'SPACE(1,1)'
+                                      /* Change this if you want to
+                                         use different parameters on
+                                         the ALLOCATE command for the
+                                         output file.  Do not include
+                                         or change RECFM, BLKSIZE, or
+                                         LRECL                        */
+/**********************************************************************/
+/* The following statements should not be changed by the user of      */
+/* this exec                                                          */
+/*                                                                    */
+/**********************************************************************/
+parse upper arg arg1 arg2
+trace 'o'
+signal on halt
+signal on novalue
+signal on syntax
+address TSO                          /* Set environment to TSO    @P1A*/
+numeric digits 10                    /* set precision to allow
+                                        big numbers and addresses     */
+call Initvars
+ 
+/*  Get input parameters to utility  */
+build_cmds = 'yes'                   /* Default is BUILDCMD           */
+run_cmds = 'no'                      /* Default is NORUNCMD           */
+if arg1 = '?' | arg2 = '?' then
+  Signal Show_help
+if arg1 = 'NOBUILDCMD' | arg2 = 'NOBUILDCMD' then
+  build_cmds = 'no'
+if arg1 = 'RUNCMD' | arg2 = 'RUNCMD' then
+  run_cmds = 'yes'
+ 
+Say '>>> Start of processing for' myname         /* Start message @P1A*/
+Say '>>> Parameters are:'                        /* Parameter msg @P1A*/
+If build_cmds = 'yes' then                 /* Check BUILDCMD parm @P1A*/
+  Say '>>>   BUILDCMD'                           /*               @P1A*/
+Else                                             /*               @P1A*/
+  Say '>>>   NOBUILDCMD'                         /*               @P1A*/
+If run_cmds = 'yes' then                   /* Check RUNCMD parm   @P1A*/
+  Say '>>>   RUNCMD'                             /*               @P1A*/
+Else                                             /*               @P1A*/
+  Say '>>>   NORUNCMD'                           /*               @P1A*/
+/* Build the commands if requested to do so */
+if build_cmds = 'yes' then
+ Do                                                    /*         @P1A*/
+  Call Buildem
+  If classcount = 0 then run_cmds = 'no' /* If no classes were
+                                            processed, then there are
+                                            no RDEFINE commands to
+                                            be run                @P1A*/
+ End                                                   /*         @P1A*/
+Else                                                   /*         @P1A*/
+  Say 'No commands were built.'                        /*         @P1A*/
+ 
+/* Now run the commands which were built if requested to do so */
+If run_cmds = 'yes' then do
+  say '>>> '
+  say '>>> Starting to run commands to define dynamic classes'
+  say '>>> from' output_dataset
+  'EXEC' output_dataset 'EXEC'
+  run_cmd_rc = rc
+  say '>>> '
+  say '>>> Return code from' output_dataset 'is' run_cmd_rc '<<<'
+                /* moved SETROPTS message into DYNCLAS EXEC     6@P1D*/
+  end
+Else                                               /* NORUNCMD   @P1C*/
+ if build_cmds = 'yes' & ,             /* BUILDCMD?              @P1A*/
+    classcount > 0 then do             /* Commands to run?       @P1A*/
+  say '>>> '
+  Say '>>> Examine commands in' output_dataset 'for accuracy'
+  Say '>>> and edit them as needed. '
+  Say '>>> Then run the commands to define the Dynamic Classes'
+  Say '>>> by invoking this utility with parameters'
+  Say '>>> NOBUILDCMD and RUNCMD.'
+  end
+ Else                                 /* NOBUILDCMD and NORUNCMD @P1A*/
+   Say 'No commands were run.'        /* Give msg                @P1A*/
+say '>>> '
+say '>>> End of processing for' myname
+exit 0
+ 
+/********************************************************************/
+/* Initvars:                                                        */
+/* initialize some variables                                        */
+/********************************************************************/
+InitVars:
+maxlen = 210   /* maximum amount of command data on a line of output */
+today = date('S') /* today's date in yyyymmdd form                   */
+MyName = 'CDT2DYN Revision 1.0.01'  /* Program name/revision     @P1C*/
+cnstname = ' '                      /* Class being processed         */
+classcount = 0                      /* Number of classes processed   */
+ 
+return
+ 
+/**********************************************************************/
+/* Buildem:   Build commands to define dynamic classes                */
+/*                                                                    */
+/**********************************************************************/
+Buildem:
+dmy1 = listdsi(output_dataset) /* See if output file exists        */
+if dmy1 = 0 then do              /* If it exists, try to re-use it   */
+  old_lrecl = SYSLRECL           /* Get lrecl of existing dataset    */
+  if old_lrecl <> 255 then do    /* If lrecl not 255, error          */
+    Say '>>> 'output_dataset' exists, but cannot be reused.'
+    Say '>>> The record length must be 255, but is' SYSLRECL
+    Say '>>>' myname 'terminating.'
+    exit 16
+  end                            /* End: lrecl not 255               */
+  old_recfm = SYSRECFM           /* Get record format of dataset     */
+  if pos('V',old_recfm)=0 & ,
+     pos('F',old_recfm)=0  then do   /* If recfm not V or F, error   */
+    Say '>>> 'output_dataset' exists, but cannot be reused.'
+    Say '>>> The record format must be V or F but is' SYSRECFM
+    Say '>>>' myname 'terminating.'
+    exit 16
+  end                            /* End: recfm not fixed or variable */
+  'ALLOCATE DA('output_dataset') F(DYNCLAS) OLD REUSE '
+  if rc <> 0 then do             /* Allocate failed, error           */
+    Say '>>> 'output_dataset' exists, but could not be re-allocated.'
+    Say '>>> Error code from allocate: ' rc
+    Say '>>>' myname 'terminating.'
+    exit 16
+  end                            /* End: allocate failed             */
+end                              /* End: write over old dataset      */
+else do                          /* Create new dataset               */
+  'ALLOCATE DA('output_dataset') F(DYNCLAS) NEW REUSE ',
+      'RECFM(v,b) LRECL(255) BLKSIZE(6120)' dataset_attributes /*@P1C*/
+  if rc <> 0 then do             /* Allocate failed, error           */
+    Say '>>> Could not allocate' output_dataset
+    Say '>>> Error code from allocate: ' rc
+    Say '>>>' myname 'terminating.'
+    exit 16
+  end
+end                              /* End: create new dataset          */
+/**********************************************/
+/* Got this far, so we have an output file.   */
+/* Now write header to output file.           */
+/**********************************************/
+ocmd.1 = '/*REXX exec                                              */'
+ocmd.2 = '/*Created on' date() 'at' time() '*/'
+ocmd.3 = '/*by' myname ' */'
+ocmd.4 = '/*Output file:' output_dataset '*/'
+ocmd.5 = 'rc=0;maxrc=0;cmdsrun=0;allrc=0'
+ocmd.6 = 'signal on halt'
+ocmd.7 = 'x = outtrap("cmdout.",,"NOCONCAT")'
+ocmd.8 = 'address TSO "PROFILE"'
+ocmd.9 = 'tso_msgid = ''MSGID''  '
+ocmd.10= 'do i = 1 to cmdout.0  '
+ocmd.11= ' if pos(''NOMSGID'',cmdout.i) <> 0 then do '
+ocmd.12= '   address TSO "PROFILE MSGID"         '
+ocmd.13= '   tso_msgid = ''NOMSGID''               '
+ocmd.14= '   end       '
+ocmd.15= 'end           '
+ocmd.16= 'drop cmdout.  '
+ocmd.17= '/*  WARNING:                                             */'
+ocmd.18= '/*  If you need to modify the commands in this exec,     */'
+ocmd.19= '/*  only modify the RDEFINE commands, and not the        */'
+ocmd.20= '/*  REXX statements before and after the RDEFINE         */'
+ocmd.21= '/*  commands.  Otherwise, results are unpredictable.     */'
+"execio * diskw DYNCLAS (stem ocmd."
+if rc <> 0 then call execio_err1,   /* terminate if execio error     */
+  output_dataset
+drop ocmd.
+/*********************************************************************/
+/*                                                                   */
+/*  Process the static Class Descriptor Table                        */
+/*                                                                   */
+/*********************************************************************/
+say '>>> Starting to build the commands.....'
+cnstptr = cdt()
+cnst = Storage(X2x(Cnstptr,0),28)
+cnstlgt = C2x(substr(cnst,1,2))
+cnstlgt10 = X2d(cnstlgt)
+ 
+do until cnstlgt10 = 0    /* Process each class in the static CDT  */
+ 
+  cnstmflg = substr(cnst,24,1)
+  cnstcnsx = C2X(substr(cnst,25,4))     /* find CNSX            @P1M*/
+  cnsx = Storage(X2x(Cnstcnsx,0),152)   /*                      @P1M*/
+  cnstname = substr(cnst,4,8)           /* get class name       @P1M*/
+  cnstflg1 = substr(cnsx,141,1)         /* Set CNSTFLG1         @P1A*/
+  if checkflag(cnstflg1,'40'x,) then    /* Check CNSTDDUP bit   @P1A*/
+    say '>>> Skipping class' word(cnstname,1) 'because it is',
+        'already dynamic.'                 /* Give msg          @P1A*/
+  else do                               /* Not already dynamic  @P1A*/
+   if checkflag(cnstmflg,'01'x,) then do /* customer class?         */
+    Call Buildcmd                       /* Go build the command  */
+    say '>>> Processing class' cnstname /* Show progress         */
+    call writecmd               /* go write the cmd          */
+    classcount = classcount+1   /* Count processed classes   */
+    end                         /* Process customer class    */
+  end                           /* Process non-dynamic class    @P1A*/
+ 
+  cnstptr = X2X(cnstptr,cnstlgt)    /* Bump pointer to next entry */
+  cnst = Storage(X2x(Cnstptr,0),28) /* Get next CDT entry         */
+  cnstlgt = C2x(substr(cnst,1,2))
+  cnstlgt10 = X2d(cnstlgt)
+  end                              /*  End:  Do until   */
+/*********************************************************************/
+/* Done building commands, now do some diagnostics and write         */
+/* the trailer to the output file.                                   */
+/*********************************************************************/
+say '>>> '
+say '>>> Installation-defined Classes for which commands were built:',
+  classcount
+/* Write trailer to output file and close it  */
+ocmd.1 = "Finishup:"
+ocmd.2 = "say '>>>'"
+ocmd.3 = "say '>>> Commands run: 'cmdsrun '<<<'"
+ocmd.4 = "say '>>>';say '>>> Maximum command return code: 'maxrc '<<<'"
+ocmd.5 = "if cmdsrun>0 then do"                               /* @P1A*/
+ocmd.6 = "say '>>>'"                                          /* @P1A*/
+ocmd.7 = " say '>>> To place your dynamic classes into the'"  /* @P1A*/
+ocmd.8 = " say '>>> Class Descriptor Table, you must issue'"  /* @P1A*/
+ocmd.9 = " say '>>> one of the following commands:'"          /* @P1A*/
+ocmd.10= " say '>>>     SETROPTS CLASSACT(CDT) RACLIST(CDT)'" /* @P1A*/
+ocmd.11= " say '>>>           --OR--' "                       /* @P1A*/
+ocmd.12= " say '>>>     SETROPTS RACLIST(CDT) REFRESH' "      /* @P1A*/
+ocmd.13= "end"                                                /* @P1A*/
+ocmd.14= 'address TSO "PROFILE" tso_msgid '
+ocmd.15= "exit max(maxrc,allrc)"
+ocmd.16= "Issue: Procedure expose maxrc cmdsrun allrc tso_msgid"
+ocmd.17= "parse arg cmdx"
+ocmd.18= "drop cmdout."
+ocmd.19= "Say '>>>';Say '>>> Issuing command:' cmdx ' <<<'"
+ocmd.20= "address TSO cmdx"
+ocmd.21= "cmdrc = rc"
+ocmd.22= "if cmdrc = -1 then do"
+ocmd.23= "  say '>>> Command processing interrupted.'"
+ocmd.24= "  say '>>> Enter YES to terminate or anything else to continue.'"
+ocmd.25= "  parse upper pull answer ."
+ocmd.26= "  if answer = 'YES' then do "
+ocmd.27= "    allrc = 99 "
+ocmd.28= "    signal Finishup "
+ocmd.29= "    end "
+ocmd.30= "  else do "
+ocmd.31= "    Say '>>> Processing continues with the next command...'"
+ocmd.32= "    end "
+ocmd.33= "end "
+ocmd.34= "cmdsrun = cmdsrun+1"
+ocmd.35= "do i = 1 to cmdout.0"
+ocmd.36= " parse var cmdout.i msgid ."
+ocmd.37= " if msgid<>'IRR52197I' & msgid<>'ICH10006I' then /* hide normal msgs*/"
+ocmd.38= "   do"
+ocmd.39= "     say '>>> Investigate the following command message. <<<'"
+ocmd.40= "     say cmdout.i    /* show it */"
+ocmd.41= "   end"
+ocmd.42= "end"
+ocmd.43= "if cmdrc <> 0 then say '>>> Command failed RC = 'cmdrc '<<<'"
+ocmd.44= "maxrc=max(maxrc,cmdrc)"
+ocmd.45= "return"
+ocmd.46= "halt:"
+ocmd.47= "  say '>>> Program interrupted at line 'sigl"
+ocmd.48= "  if sourceline() <> 0 then                  "
+ocmd.49= "    say '>>> Source line is: 'sourceline(sigl)"
+ocmd.50= "  allrc = 99                                  "
+ocmd.51= "  signal finishup                             "
+"execio * diskw DYNCLAS (stem ocmd. finis "
+if rc <> 0 then call execio_err1,   /* terminate if execio error   */
+ output_dataset
+drop ocmd.
+Return
+/**********************************************************************/
+/* Buildcmd:  Build a command to define a dynamic class with          */
+/* the same attributes as an existing installation-defined class      */
+/* in the static CDT.                                                 */
+/**********************************************************************/
+Buildcmd:
+/* First get the fields from the CDT entry  */
+    cnstxref = substr(cnst,12,8)
+    cnstmaxl = C2d(substr(cnst,20,1))
+    cnstfrst = substr(cnst,21,1)
+    cnstremn = substr(cnst,22,1)
+    cnstuacc = substr(cnst,23,1)
+    cnstvmsk = substr(cnsx,1,128)
+    cnstdfrc = C2d(substr(cnsx,137,1))
+    cnstflg0 = substr(cnsx,138,1)
+    cnstkeyq = C2d(substr(cnsx,139,1))
+    cnstorml = C2d(substr(cnsx,140,1))
+ 
+/* Now build the command to create the dynamic class           */
+    cmd = 'RDEFINE CDT 'cnstname /* start building command     */
+    cmd = cmd 'CDTINFO('         /* start cdtinfo segment      */
+ 
+    if checkflag(cnstflg0,'04'x) then /* Case ASIS/UPPER       */
+      cmd = cmd 'CASE(ASIS)'
+    else cmd = cmd 'CASE(UPPER)'
+ 
+    cmd = cmd 'DEFAULTRC( 'cnstdfrc' )' /* Default return code */
+ 
+    cmd = cmd 'DEFAULTUACC('              /* Default UACC        */
+    cmd = cmd uacc() ')'
+ 
+    cmd = cmd 'FIRST('                /* First character     */
+    cmd = cmd Profile_Syntax(cnstfrst) ')'
+ 
+    cmd = cmd 'GENLIST('              /* GENLIST             */
+    if checkflag(cnstmflg,'08'x) then
+      cmd = cmd 'ALLOWED'
+    else cmd = cmd 'DISALLOWED'
+    cmd = cmd  ')'
+ 
+    if cnstxref <> ' ' then do        /* Group info:         */
+    if checkflag(cnstmflg,'80'x) = 0 then /*  Member class?  */
+      cmd = cmd 'GROUP(' cnstxref ')' /* yes, add group      */
+    end
+ 
+    cmd = cmd 'KEYQUALIFIERS(' cnstkeyq ')' /* Keyqualifiers       */
+ 
+    cmd = cmd 'MACPROCESSING('        /* MACPROCESSING       */
+    if checkflag(cnstflg0,'10'x) then
+      cmd = cmd 'REVERSE'
+    else if checkflag(cnstflg0,'02'x) then
+      cmd = cmd 'EQUAL'
+    else cmd = cmd 'NORMAL'
+    cmd = cmd  ')'
+ 
+    cmd = cmd 'MAXLENX( 'cnstmaxl ')'   /* MAXLENX             */
+ 
+    cmd = cmd 'MAXLENGTH( 'cnstorml ')' /* MAXLENGTH           */
+ 
+    if cnstxref <> ' ' then do        /* Member info:        */
+    if checkflag(cnstmflg,'80'x) then /*  Grouping class?    */
+      cmd = cmd 'MEMBER(' cnstxref ')'/* yes, add member     */
+    end
+ 
+    cmd = cmd 'OPERATIONS('                 /* OPERATIONS       */
+    if checkflag(cnstmflg,'20'x) then
+      cmd = cmd 'YES'
+    else cmd = cmd 'NO'
+    cmd = cmd  ')'
+ 
+    cmd = cmd 'OTHER('                /* Other characters    */
+    cmd = cmd Profile_Syntax(cnstremn) ')'
+ 
+    cmd = cmd 'POSIT('                /* POSIT               */
+    cmd = cmd findbit(cnstvmsk) ')'
+ 
+    cmd = cmd 'PROFILESALLOWED('          /* PROFILESALLOWED     */
+    if checkflag(cnstflg0,'40'x) then
+      cmd = cmd 'NO'
+    else cmd = cmd 'YES'
+    cmd = cmd  ')'
+ 
+    cmd = cmd 'RACLIST('              /* RACLIST             */
+    if checkflag(cnstflg0,'80'x) then
+      cmd = cmd 'REQUIRED'
+    else if checkflag(cnstmflg,'10'x) then
+      cmd = cmd 'ALLOWED'
+    else cmd = cmd 'DISALLOWED'
+    cmd = cmd  ')'
+ 
+    cmd = cmd 'SIGNAL('               /* SIGNAL              */
+    if checkflag(cnstflg0,'01'x) then
+      cmd = cmd 'YES'
+    else cmd = cmd 'NO'
+    cmd = cmd  ')'
+ 
+    cmd = cmd 'SECLABELSREQUIRED('      /* SECLABELSREQUIRED      */
+    if checkflag(cnstflg0,'20'x) then
+      cmd = cmd 'YES'
+    else cmd = cmd 'NO'
+    cmd = cmd  ')'
+ 
+    cmd = cmd ')'               /* finish cdtinfo segment    */
+Return
+/**********************************************************************/
+/* Writecmd:  Write a command                                         */
+/*                                                                    */
+/* This routine will take the command that has been created and       */
+/* write it to the output file.                                       */
+/**********************************************************************/
+writecmd:
+drop ocmd.
+ocmd.1 = "call issue , /* Class" cnstname "*/" /* write subroutine
+                                       call to issue command          */
+"execio * diskw DYNCLAS (stem ocmd."
+if rc <> 0 then call execio_err1,   /* terminate if execio error     */
+  output_dataset
+drop ocmd.
+call splitcmd                            /* split the command        */
+"execio * diskw DYNCLAS (stem split_cmd." /* write them to file */
+if rc <> 0 then                /* terminate if execio error     */
+   call execio_err1 output_dataset
+drop split_cmd.                      /* delete the output lines  */
+return
+/**********************************************************************/
+/* Split a command:                                                   */
+/*                                                                    */
+/* This routine will take the command that has been created and       */
+/* reformat it for inclusion in a REXX exec.  The command will        */
+/* be placed into a set of double quotes.                             */
+/*                                                                    */
+/* The command will also be split into pieces no                      */
+/* larger than 210 bytes to ensure that the resulting REXX exec can   */
+/* be edited by PDF Edit.                                             */
+/**********************************************************************/
+splitcmd:
+  cmdx = cmd                              /* save copy of command     */
+  splitcnt = 0                            /* init line count          */
+  splitblanks = ''                        /* set no indent for first
+                                             line                     */
+  cmd = '"'cmd                            /* add header to cmd */
+  do while length(cmd) > 0                /* loop until done with cmd */
+    splitcnt = splitcnt + 1               /* bump the line count      */
+    if length(cmd) > maxlen then do       /* if command is too long   */
+      blankpos = lastpos(' ',substr(cmd,1,min(maxlen,length(cmd))))/*
+                                             find last blank in first
+                                             part of command so we can
+                                             try to split at a blank  */
+      if blankpos = 0 then                /* if no blanks found, split*/
+        blankpos = maxlen                 /* at position "maxlen"     */
+      end                                 /* end if command too long  */
+    else
+      blankpos = length(cmd)              /* else (cmd not too long) so
+                                             use entire command       */
+ 
+    if blankpos < length(cmd) then        /* if more to do,           */
+      ls = '"||,'                         /* prepare for split lines  */
+    else
+      ls = '"'                            /* else prepare to end cmd  */
+    if splitcnt = 1 then                  /* if processing the first
+                                             line for this command    */
+        split_cmd.1 = substr(cmd,1,blankpos)ls /* create 1st split    */
+    else                                  /* else
+                                             outputting to stem or
+                                             additional line for cmd
+                                             indent command if needed */
+      split_cmd.splitcnt = splitblanks'"'substr(cmd,1,blankpos)ls
+ 
+    if blankpos < length(cmd) then        /* if more to do,           */
+      cmd = substr(cmd,blankpos+1)        /* delete first part of cmd */
+    else                                  /* else done with cmd, so   */
+      cmd = ''                            /* nullify it to end loop   */
+    splitblanks = '  '                    /* set indent for next line */
+    end                                   /* end loop until done      */
+  cmd = cmdx                              /* restore command in case
+                                             caller needs it          */
+  split_cmd.0 = splitcnt                  /* indicate how many stems
+                                             were used                */
+  return
+ 
+/*********************************************************************/
+/* Profile_Syntax:                                                   */
+/* For FIRST and OTHER keywords:  translate the byte from the        */
+/* CDT entry into subkeywords ALPHA, NATIONAL, NUMERIC, and          */
+/* SPECIAL.                                                          */
+/*                                                                   */
+/*********************************************************************/
+Profile_Syntax:
+  parse arg byte
+  if byte = 'C0'x then return 'ALPHA NATIONAL'
+  else if byte = '20'x then return 'NUMERIC'
+  else if byte = 'E0'x then return 'ALPHA NATIONAL NUMERIC'
+  else if byte = 'F0'x then return 'ALPHA NATIONAL NUMERIC SPECIAL'
+  else if byte = '80'x then return 'ALPHA'
+  else if byte = 'A0'x then return 'ALPHA NUMERIC'
+  else return '?'C2x(byte)'?'
+ 
+/*********************************************************************/
+/* Checkflag:                                                        */
+/* Check whether one specified bit within a byte is on or off.       */
+/* This function always returns 1 or 0, where the builtin            */
+/* bitand function returns a bit string.                             */
+/*********************************************************************/
+Checkflag:
+  parse arg byte,mask
+  if bitand(byte,mask) <> '00'x then return 1
+  else return 0
+ 
+/*********************************************************************/
+/* Findbit:                                                          */
+/* For POSIT: find the first bit which is 'on' in a bitstring.       */
+/*                                                                   */
+/*********************************************************************/
+Findbit:
+  parse arg bitstring
+  loc = pos('1',' 'x2b(c2x(bitstring)))    /* Add a blank at the
+                                              beginning so it doesn't
+                                              treat as number string */
+  if loc > 0 then return loc-2
+  else return 0   /* technically, an error */
+ 
+/*********************************************************************/
+/* Uacc:                                                             */
+/* For DEFAULTUACC: Examine settings in the CDT entry and set        */
+/* the appropriate keyword for ALTER, CONTROL, UPDATE, READ, NONE,   */
+/* or ACEE.                                                          */
+/*                                                                   */
+/*********************************************************************/
+Uacc:
+  if cnstuacc = '80'x then return 'ALTER'
+  else if cnstuacc = '40'x then return 'CONTROL'
+  else if cnstuacc = '20'x then return 'UPDATE'
+  else if cnstuacc = '10'x then return 'READ'
+  else if cnstuacc = '01'x then return 'NONE'
+  else if checkflag(cnstmflg,'40'x) then return 'ACEE'
+  else return '????????'
+ 
+ 
+/*********************************************************************/
+/* PSA:  CVT:  RCVT:   CDT:                                          */
+/* Find storage locations to get addressability to the RACF          */
+/* class descriptor table.                                           */
+/*                                                                   */
+/* DISCLAIMER and WARNING:                                           */
+/* Accessing the in-storage CDT in this method for this program      */
+/* does NOT make this method a programming interface----it remains   */
+/* an UNINTENDED programming interface. It works, for now, but there */
+/* is no guarantee it will work in the future.  In fact, this method */
+/* will not process any dynamic classes, only static classes.        */
+/*                                                                   */
+/*********************************************************************/
+PSA:   ; Return                      '00'
+CVT:   ; Return     C2x(Storage(X2x(Psa(),  '10'),4))
+RCVT:  ; Return     C2x(Storage(X2x(Cvt(), '3E0'),4))
+CDT:   ; Return     C2x(Storage(X2x(Rcvt(), 'BC'),4))
+ 
+/*********************************************************************/
+/* X2X:                                                              */
+/* Add 2 hex numbers together.                                       */
+/*                                                                   */
+/*********************************************************************/
+X2X:   ; Return D2x(X2d(Arg(1))+X2d(Arg(2)))
+ 
+/*********************************************************************/
+/* Show_help:                                                        */
+/* Display information for running this EXEC and exit.               */
+/*                                                                   */
+/*********************************************************************/
+Show_help:
+Say ' CDT2DYN: REXX exec to help change installation-defined    '
+Say ' RACF classes into dynamic classes.                        '
+Say '                                                           '
+Say ' How to Invoke this program:                               '
+Say ' From the TSO command line, execute the REXX EXEC from the '
+Say ' dataset in which it resides. For example:                 '
+Say '                                                           '
+Say " EXEC 'data.set.name(CDT2DYN)'                             "
+Say '       - or -                                              '
+Say " EXEC 'prefix.CDT2DYN.EXEC'                                "
+Say '                                                           '
+Say ' Optional Parameters:                                      '
+Say '        BUILDCMD | NOBUILDCMD  Default is BUILDCMD         '
+Say '          Specify BUILDCMD if you want to build commands   '
+Say '            to define dynamic classes from your current    '
+Say '            installation classes in the CDT.               '
+Say '          Specify NOBUILDCMD if you do not want to build   '
+Say '            the commands.  You can specify this with the   '
+Say '            RUNCMD parameter if you have already built your'
+Say '            commands, optionally edited the commands, and  '
+Say '            now you want to run them.                      '
+Say '        RUNCMD   | NORUNCMD    Default is NORUNCMD         '
+Say '          Specify RUNCMD to run the commands built by this '
+Say '            utility.                                       '
+Say '          Specify NORUNCMD if you do not want to run the   '
+Say '            commands built by this utility.  You may want to'
+Say '            edit or examine the commands before they are    '
+Say '            executed.                                       '
+ 
+Exit 4
+/**********************************************************************/
+/* Handle execio output errors:                                       */
+/*   Issue error message and signal errdone to close files            */
+/**********************************************************************/
+execio_err1:
+  say '>>> Failure occurred writing to output file 'arg(1)
+  signal errdone
+ 
+/**********************************************************************/
+/* Handle SYNTAX error condition:                                     */
+/*   Issue error message and close files                              */
+/**********************************************************************/
+halt: say '>>> Program interrupted at line 'sigl
+  if sourceline() <> 0 then
+    say '>>> Source line is: 'sourceline(sigl)
+  signal errdone
+ 
+/**********************************************************************/
+/* Handle SYNTAX error condition:                                     */
+/*   Issue error message and close files                              */
+/**********************************************************************/
+syntax: say '>>> SYNTAX raised at line 'sigl
+  if sourceline() <> 0 then
+    say '>>> Source line is: 'sourceline(sigl)
+  signal errdone
+ 
+/*********************************************************************/
+/* Novalue:                                                          */
+/* Put out the error line and close file.                            */
+/*                                                                   */
+/*********************************************************************/
+Novalue: say '>>> NOVALUE raised at line 'sigl
+  parse version . langlevel .
+  if langlevel > 3.45 then
+    say '>>> Field in error is: 'condition('D')
+  if sourceline() <> 0 then
+    say '>>> Source line is: 'sourceline(sigl)
+  signal errdone
+ 
+/*********************************************************************/
+/* Errdone:                                                          */
+/* Something bad has happened.  Note how far we got and close        */
+/* the output file.                                                  */
+/*********************************************************************/
+errdone:
+  say ' '
+  say '>>> Class being processed: 'cnstname
+  say '>>> Classes completed: 'classcount
+  say '>>> '
+  say '>>> Processing did NOT complete successfully'
+  /********************************************************/
+  /* Try to force out whatever we can to the output file  */
+  /********************************************************/
+  "execio * diskw DYNCLAS (stem ocmd. finis"
+  if rc <> 0 then
+    say '>>> Failure occurred writing to output file' output_dataset
+  say '>>>' myname 'terminating.'
+exit 8

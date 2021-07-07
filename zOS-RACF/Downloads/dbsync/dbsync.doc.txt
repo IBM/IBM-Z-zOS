@@ -1,0 +1,742 @@
+Documentation for DBSYNC
+--------------------------------------------------------------------------------
+  This file contains the following sections:
+    DISCLAIMERS, ETC
+    ABOUT DBSYNC
+    PERFORMANCE NOTE
+    PROCESSING NOTES
+    SAMPLE JCL (with and without DBSECLV)
+--------------------------------------------------------------------------------
+DISCLAIMERS, ETC:
+
+This program contains code made available by IBM Corporation on an AS IS
+basis. Any one receiving this program is considered to be licensed under
+IBM copyrights to use the IBM-provided source code in any way he or she
+deems fit, including copying it, compiling it, modifying it, and
+redistributing it, with or without modifications, except that it may be
+neither sold nor incorporated within a product that is sold.  No license
+under any IBM patents or patent applications is to be implied from this
+copyright license.
+
+The software is provided "as-is", and IBM disclaims all warranties,
+express or implied, including but not limited to implied warranties of
+merchantibility or fitness for a particular purpose.  IBM shall not be
+liable for any direct, indirect, incidental, special or consequential
+damages arising out of this agreement or the use or operation of the
+software.
+
+A user of this program should understand that IBM cannot provide
+technical support for the program and will not be responsible for any
+consequences of use of the program.
+
+The program's author will attempt to provide informal support and
+assistance, if he has the time to do so.  If you have questions about
+using this program, or suggestions for enhancements, please communicate
+them via the RACF-L mailing list.  To subscribe to RACF-L, you should
+send a note to 
+   listserv@listserv.uga.edu and include the following line
+in the body of the note, substituting your first name and last
+name as indicated:
+   subscribe racf-l first_name last_name
+
+To post messages to RACF-L, send them to racf-l@listserv.uga.edu
+and include a relevant Subject: line.
+
+The program's author can also be reached directly via email to
+   wfarrell@us.ibm.com
+However, he would strongly prefer that all contact regarding this
+program be via the mechanisms indicated above.
+
+--------------------------------------------------------------------------------
+ABOUT DBSYNC:
+
+DBSYNC is a REXX exec that will process two unloaded RACF databases,
+determine the differences between the databases, and generate REXX execs
+containing commands to correct those differences, where possible.
+Execution of the commands will, in effect, synchronize the databases to
+have the same content.  Alternatively, DBSYNC may be run with a single
+input database and will create commands that can be used either to
+recreate profiles in the database or to delete profiles from the
+database.
+
+DBSYNC may be used in a mode where it will process all profiles in the
+database, or in a mode where it will process only specified classes of
+profiles.
+
+--------------------------------------------------------------------------------
+PERFORMANCE NOTE:
+                    For best performance, especially with large
+  databases, you should compile this exec using the REXX compiler.
+  However, the exec will run interpreted, though it will be much slower
+  and take much more CPU time.  If you choose to compile it, you should
+  specify options SL and CEXEC when you invoke the compiler.
+
+--------------------------------------------------------------------------------
+PROCESSING NOTES:
+
+  DBSYNC will process two unloaded input databases (INDD1 and INDD2) and
+  a control file (OPTIONS).  The control file may be used to override
+  some DBSYNC defaults, and to control which RACF profile classes DBSYNC
+  processes.
+
+  When comparing profiles, DBSYNC will not consider some differences
+  significant. These differences include items such as profile creation
+  dates, last access dates and times for users, access counts in access
+  lists, etc.
+
+  In addition, DBSYNC will by default skip any DATASET profiles whose
+  names begin with the string "HSM.BACK." on the assumption that they
+  represent discrete profiles for data sets that have been backed up by
+  DFHSM, and are thus volatile and probably not worth keeping
+  synchronized.  This behavior can be eliminated modified by a SET
+  HSMBACK control statement in the OPTIONS file, if you wish.  Or, for a
+  permanent change to the HSMBACK processing you may change the hsmback
+  variable at the beginning of the code in the DBSYNC exec.
+
+Seclevels and Categories:
+|  If you use seclevels, categories, or seclabels in your profiles, you
+   will need to use the DBSECLV exec to pre-process each of the input 
+   unloaded database files before you run the DBSYNC exec.  Normally the
+   unloaded profiles will contain only the internal numbers that RACF uses 
+   to represent seclevels and categories.  DBSECLV will add the external 
+   names to the unloaded profiles, too.  DBSYNC (which ignores the 
+   internal values except when processing SECDATA profiles) will make use 
+   of the external seclevel and category names when comparing the profiles 
+   in the database.
+
+Data which DBSYNC cannot process:
+|  (1) User ID passwords and phrases are not unloaded by IRRDBU00, and so
+|      passwords and phrases cannot be synchronized by using DBSYNC.  
+       However, when generating commands to add users, DBSYNC will leave a
+       place in the command for you to use in manually editing the commands.
+|      DBSYNC will also leave a place for you to specify a password phrase
+|      if the user has one, and will do that when adding or altering users
+|      who have phrases.
+
+  (2) TVTOC data currently cannot be corrected, but inconsistencies
+      will be flagged via messages in the SYSTSPRT output from DBSYNC.
+
+  (3) If the same discrete DATASET profile exists on both databases
+      (i.e. the profile has the same name and volume serial) but the
+      profile is non-vsam on one, and tape/model/etc. on the other, then
+      DBSYNC will build commands to correct any other discrepancy, but
+      cannot change the profile type.
+
+  (4) DBSYNC has only limited support for digital certificates at this time.
+      The support it has may increase over time, but some functions will
+      remain unsupported, such as copying certificate info from one database
+      to another.  DBSYNC will issue messages when it encounters
+      digital certificate information that it cannot handle.
+
+Return Codes:
+  0 -- DBSYNC did not find any differences between the two databases in
+       the selected records
+
+  4 -- DBSYNC found differences and generated commands to fix them.
+
+  8 -- DBSYNC found differences and generated commands to fix them,
+       however some differences couldn't be fixed.  Examine the
+       SYSTSPRT output for messages indicating problems.
+
+ 12 -- An error was detected in the OPTIONS input.  No processing is
+       performed in this case.
+
+ 16 -- An error in the DBSYNC exec was detected by the REXX processor.
+       The input files may have been partially processed, but the
+       output is probably incomplete.
+
+Basic processing steps:
+  (1) First, you run IRRDBU00 to produce a flat file representation of
+      each database that you want DBSYNC to process.  If you have split
+      your database then you have to decide how to process the split
+      portions of the database:
+        (a) The safest method is to pretend you haven't split the
+            database, and treat each database as though it had only
+            one piece.  To do that, for each database: first unload
+            each split, then concatenate all the unloaded pieces
+            as input to DFSORT in step 2, so that you get one sorted
+            output file.  This will give you two sorted files (one
+            per database) which you can process with DBSECLV and/or
+            DBSYNC.
+        (b) You may also find that you can process each split of your
+           databases as though it was a separate database.  That is,
+           if you have database 1, split into pieces 1A and 1B, and
+           database 2, split into pieces 2A and 2B, where you used the
+           same range table for both databases 1 and 2, you may be able
+           to do two DBSYNC runs.  The first run would process the
+           unloaded, sorted, versions of 1A and 2A, and the second run
+           would process the unloaded, sorted, versions of 1B and 2B.
+
+           However, you may also find that this won't work, as the
+           commands generated by DBSYNC need to run in a certain order
+           to work properly, and this may not be possible when you
+           generate them in two sets.  So, I would recommend method
+           (a) in most cases.
+  (2) Next, you sort each input database using DFSORT or another sort
+      package, specifying that the records are to be sorted in ascending
+|     character order on the first 549 columns of data.  This sorting
+      puts the records into an order that will allow the generated
+      commands to run properly (e.g., it ensures that a profile will be
+      added before the profile's access list is updated.
+
+|     Note that an alternate collating sequence must be specified on
+|     the sort in order to properly handle IRRDBU00 record types that
+|     contain non-numeric values.  See the sample JCL below.
+
+  (3) You assign the sorted, unloaded databases to DD names INDD1 and
+      INDD2 for processing by DBSYNC.  If you wish to process just a
+      single database,| Note: SORT FIELDS statement has changed in both SORT steps. you may specify either INDD1 or INDD2 as DD
+      DUMMY.
+
+  (4) If you wish, you provide a control file (DD name OPTIONS) to
+      tailor the processing of DBSYNC.  Options you may specify are:
+         SET HSMBACK value1
+         SET DUMMYGROUP value2
+         SET SET_NOSET value3
+         SET DASD_UNIT value4
+         SET TAPE_UNIT value5
+|        SET DD1FMID fmid1
+|        SET DD2FMID fmid2
+         INCLUDE classname
+         EXCLUDE classname
+       where:
+         value1 is a dsname prefix which identifies the RACF discrete
+           profiles created by DFHSM as data sets with discrete profiles
+           are backed up, or *NONE to indicate that DBSYNC should
+           process all DATASET profiles.  (Note: options may be entered
+           in either upper-, lower-, or mixed-case.)
+
+         value2 is a group that doesn't exist, or *NONE to bypass the
+           dummygroup processing.  When defining users or groups, DBSYNC
+           generates commands to create (and, at the end, to delete) 
+           dummy groups that will be used temporarily as an owner and
+           superior group to ensure that the other commands can run
+           properly. (For example, if DBSYNC needs to define user A
+           and Z in that order, but Z will own A, it cannot just
+           generate   ADDUSER A OWNER(Z)
+                      ADDUSER Z
+           Instead, DBSYNC would generate  ADDUSER A OWNER(dummy)
+                                           ADDUSER Z
+                                           ALTUSER A OWNER(Z)
+           DBSYNC will truncate your supplied dummy group name to 7
+           characters if you supply a longer one, and will generate
+           multiple dummy groups if needed (e.g., dummy0, dummy1, ...)
+
+           Specifying value2 larger than 5957 will cause DBSYNC to create just one
+           dummy group, with the UNIVERSAL attribute. 
+
+         value3 is the word SET (default) or the word NOSET.  When DBSYNC
+           generates a command to create a discrete profile or to change
+           the volume serial list of a discrete profile it will use this
+           value on the ADDSD or ALTDSD command.
+
+         value4 is the default UNIT value to use on ADDSD commands for
+           discrete DASD DATASET profiles.  Default is SYSALLDA.
+
+         value5 is the default UNIT value to use on ADDSD commands for
+           discrete TAPE DATASET profiles.  Default is TAPE.
+
+|        fmid1 is the RACF FMID for the system where you will run the
+|          commands contained in the output DD statements whose DD
+|          names end in "1".  The default is HRF7750, representing the
+|          level of RACF shipped with z/OS V1R10.
+
+|        fmid2 is the RACF FMID for the system where you will run the
+|          commands contained in the output DD statements whose DD
+|          names end in "2".  The default is HRF7750, representing the
+|          level of RACF shipped with z/OS V1R10.
+
+|        Note: If both unloaded databases came from the same level of
+|          z/OS then you should not need to specify the FMID values.
+|          However, if the two input files come from different levels of
+|          z/OS then you may need to specify the FMID values so DBSYNC
+|          will generate commands that the lower level system will handle
+|          properly.        
+
+         classname is USER, GROUP, DATASET, or a class from the CDT.
+
+       Note: If no INCLUDE or EXCLUDE options are specified the entire
+         input file(s) will be processed.  If INCLUDEs are specified,
+         but EXCLUDEs are not specified, only records matching the
+         INCLUDE criteria will be processed.  If EXCLUDEs are specified,
+         but INCLUDEs are not specified, only records not matching the
+         EXCLUDE criteria will be processed.  If both INCLUDEs and
+         EXCLUDEs are specified, then only records matching the INCLUDE
+         criteria and not matching the EXCLUDE criteria will be
+         processed.
+
+  (5) DBSYNC will create two sets of output files, with each set
+      containing six (6) files.
+
+      The first set (OUTREM1, OUTDEL1, OUTSCD1, OUTADD1, OUTALT1, and OUTCLN1)
+      can be executed (in that order) to turn the database associated with 
+      file INDD1 into a copy of the database associated with INDD2, to the
+      extent possible with this exec.
+
+      The second set (OUTREM2, OUTDEL2, OUTSCD2, OUTADD2, OUTALT2, and OUTCLN2)
+      can be executed (in that order) to turn the database associated with 
+      file INDD2 into a copy of the database associated with INDD1, to the
+      extent possible with this exec.
+
+      If you run DBSYNC with only one input file produced by IRRDBU00
+      and a DD DUMMY for the other input file, one set of output files
+      will be the commands to almost completely recreate the input file.
+      The other set of output files will be commands to delete all the
+      selected records from the input file.
+
+  Notes:
+    (1)  The commands created are not designed to be pretty, nor are
+         they designed to make it simple to tell exactly what is
+         different between matching records in the two input files.
+         When records are created you will know that something is
+         different.  To tell exactly what is different you may need to
+         manually compare the two matching input records.
+
+    (2)  The commands for general resource profiles will be generated in
+         alphabetical order based first on the profile name, and then on
+         the class name.
+
+    (3)  It may not be obvious to the casual observer why I chose the output
+         file for each command that I chose.  Again, it was not done to make
+         it easy for the user to examine the output, but was done to make it
+         possible to run the commands (in the order documented above) and
+         have them work.  Example: A user must be defined (ADDUSER) before you
+         can use that user ID as the owner of a profile, or as the first
+         qualifier data set profile.
+ 
+         In some cases they could be generated to a different file, and that
+         may occur in future maintenance.
+
+   OUTREMn will contain these kinds of commands:
+     (1) ADDGROUP commands to add the dummy groups, unless
+         SET DUMMYGROUP *NONE was specified in the OPTIONS file.
+     (2) ALTGROUP commands to change a subgroup's superior group to the
+         dummy group when the superior group is being deleted.  This
+         will ensure that the superior group has no subgroups before
+         the DELGROUP command in OUTDELn is processed.
+         This is skipped if SET DUMMYGROUP *NONE was specified in the
+         OPTIONS file.
+     (3) CONNECT commands to connect users to the dummy group before
+         removing them from another group, and ALTUSER commands to make
+         the dummy group the user's default group.
+         This is skipped if SET DUMMYGROUP *NONE was specified in the
+         OPTIONS file.
+     (4) REMOVE commands to remove users from a group that is being
+         deleted.  This will ensure that the group has no members before
+         the DELGROUP command in OUTDELn is processed.
+     (5) REMOVE commands to remove users from groups before the users
+         are deleted.  That will allow a new owner (the group) to be
+         assigned for group-related data set profiles owned by the
+         users.
+     (6) RACLINK commands to delete associations
+     (7) DELDSD commands to delete data set profiles.
+
+
+   OUTDELn will contain these kinds of commands:
+     (1) DELGROUP commands to delete groups.
+     (2) DELUSER commands to delete users.
+
+   OUTSCDn will contain these kinds of commands:
+     (1) RALTER and RDEFINE commands for SECLABELs and SECDATA profiles.
+
+   OUTADDn will contain these kinds of commands:
+     (1) ADDGROUP commands to define groups.  The ADDGROUP will specify
+         a dummy group as the owner and superior group, to avoid
+         problems with commands failing if the real owner and superior
+         group aren't defined previously.
+         The real owner and superior group are used if SET DUMMYGROUP
+         *NONE was specified in the OPTIONS file.  If a dummy group is
+         used, commands are generated later to supply the real owner
+         and superior group name in OUTALTn.
+     (2) ADDUSER commands to define users. The ADDUSER will specify a
+         dummy group as the owner and default group, to avoid problems
+         with commands failing if the real owner and default group
+         aren't defined previously.
+         The real owner and default group are used if SET DUMMYGROUP
+         *NONE was specified in the OPTIONS file.  If a dummy group is
+         used, commands are generated later to supply the real owner
+         and default group name in OUTALTn.
+     (3) PASSWORD commands to set newly-defined users password intervals.
+         A separate command is used because ADDUSER can't specify an
+         interval.
+     (4) RALTER and (some) RDEFINE commands to define SECLABEL and 
+         SECDATA profiles.
+     (5) RDEFINE commands for the CDT class, and RALTER commands for
+         CDTINFO segments 
+|    (6) RDEFINE commands for the CFIELD class, and RALTER commands 
+|        CFDEF segments.
+|    (7) SETROPTS commands to activate, RACLIST, and RACLIST REFRESH
+|        the CDT and SECLABEL classes if profiles for those
+|        classes exist in the input files.
+|    (8) Commands to allocate SYS1.SAMPLIB(IRRDPSDS) and to run
+|        IRRDPI00 to refresh the CFIELD data if any CFIELD profiles are
+|        present in the input files.
+
+
+   OUTALTn will contain these kinds of commands:
+     (1) ALTUSER commands to reset a user's default group when it was
+         set to the dummy group by previous processing,
+         and to set the user's seclevel.
+     (2) ALTGROUP commands to set a group's owner and superior group
+         when they were set to the dummy group during previous define
+         processing.
+     (3) ALTGROUP commands to change a group's attributes when they are
+         different between INDD1 and INDD2.
+     (4) CONNECT commands to connect a user to a group or to change the
+         user's connect authorities in the group when they are different
+         between INDD1 and INDD2.
+     (5) ALTGROUP commands to add, change, or delete DFP segment
+         information for a group.
+     (6) ALTGROUP commands to add, change, or delete OMVS segment
+         information for a group.
+     (7) ALTUSER commands to change a user's attributes when
+         they are different between INDD1 and INDD2.
+     (8) ALTUSER commands to change a user's UAUDIT, REVOKE,
+         OWNER, and DFLTGRP information.
+     (9) REMOVE commands to remove a user from the dummy group.
+    (10) ALTUSER commands to change a user's password interval.
+    (11) ALTUSER commands to change a user's CLAUTH for a class.
+    (12) CONNECT commands to change a user's connect authorities in
+         a group or to connect a user to a group.
+    (13) ALTUSER commands to add, change, or delete DFP segment
+         information for a user.
+    (14) ALTUSER commands to add, change, or delete TSO segment
+         information for a user.
+    (15) ALTUSER commands to add, change, or delete CICS segment
+         information for a user.
+    (16) ALTUSER commands to add or delete CICS segment operator- class
+         information for a user.
+    (17) ALTUSER commands to add, change, or delete LANGUAGE segment
+         information for a user.
+    (18) ALTUSER commands to add, change, or delete OPERPARM segment
+         information for a user.
+    (19) ALTUSER commands to add or delete OPERPARM segment scope
+         information for a user.
+    (20) ALTUSER commands to add, change, or delete WORKATTR segment
+         information for a user.
+    (21) ALTUSER commands to add, change, or delete OMVS segment
+         information for a user.
+    (21.5) ALTUSER commands to add, change, or delete NETVIEW segment
+         information for a user.
+    (21.6) RACLINK commands to add or change user associations.
+    (21.7) ALTUSER commands to add, change, or delete DCE segment
+           information for a user.
+    (22) ADDSD, ALTDSD, or DELDSD commands to add, change, or delete
+         DATASET profiles.  These are written to OUTALTn rather than
+         OUTADDn as they may affect TAPEVOL profiles, and thus need to
+         be processed after the TAPEVOL profiles are processed in the
+         OUTDELn and OUTADDn files.
+    (23) ALTDSD commands to define globalaudit info for DATASET
+         profiles.  A separate command is used  (rather than ADDSD) as
+         ADDSD can't set globalaudit.
+    (24) PERMIT commands for DATASET profiles, to add, change or delete
+         access list and conditional access list entries.
+    (25) ALTDSD commands to add or delete volumes from discrete DASD
+         DATASET profiles.
+    (26) ALTDSD commands to add, change, or delete DFP segment
+         information for DATASET profiles.
+    (27) RALTER commands to change general resource profile information
+         and RDELETE commands to delete general resource profiles.
+    (28) RALTER commands to add or delete general resource profile
+         members.
+    (29) RALTER commands to add or delete volumes from general resource
+         profiles (TAPEVOL).
+    (30) PERMIT commands for general resource profiles, to add, change,
+         or delete access list and conditional access list entries.
+    (31) RALTER commands to add, delete, or change SESSION segment
+         information.  A separate RALTER command will be used for the
+         session interval to minimize the failures that occur if the
+         profile has a larger value than SETROPTS specifies.
+    (32) RALTER commands to add, delete, or change DLFDATA segment
+         information.
+    (33) RALTER commands to add or delete DLFDATA segment jobname
+         information.
+    (34) RALTER commands to add, change, or delete STDATA segment
+         information.
+    (34.1) RALTER commands to add, change, or delete SVFMR segment
+           information.
+    (35) ALTUSER commands to revoke or resume a user during processing
+         of revoke/resume date information.
+    (36) CONNECT commands to revoke or resume a user's connection during
+         processing of revoke/resume date information.
+
+   OUTCLNn will contain these kinds of commands:
+     (1) REMOVE commands to remove users from the dummy groups, unless
+         SET DUMMYGROUP *NONE was specified in the OPTIONS file.
+     (2) DELGROUP commands to delete the dummy groups, unless SET
+         DUMMYGROUP *NONE was specified in the OPTIONS file.
+
+
+
+
+   All the output files should have RECFM=VB, LRECL=255.
+
+   In the command output files, each command generated 
+   will be prefixed with a comment containing
+   three numbers in the format x:y:z where:
+      x is the command set number (one command set is generated for
+        each record or pair of records where differences are found);
+      y is the record number being processed from INDD1; and
+      z is the record number being processed from INDD2.
+
+   Note that DBSYNC does not use all the record types present in the
+   input files.  For example, it does not need the 0203 records as it
+   can obtain the needed information from other records.  Thus, you
+   may notice cases where some input record doesn't appear to generate
+   any output (thus, you wouldn't see it in the y or z fields documented
+   in the preceding paragraph).  Additional records where you may
+   notice this include 0403 (used by DBSYNC only for multi-volume
+   discrete profiles) and 0101 (used by DBSYNC only when deleting a
+   group profile).
+
+   Each command output file is a REXX exec.  After running DBSYNC you
+   may examine each file to ensure it contains the commands you want to
+   run.  After this examination, you must execute the REXX exec.
+   Sample JCL to execute the execs is shown below, after the other
+   sample JCL.
+--------------------------------------------------------------------------------
+SAMPLE JCL (If not using DBSECLV)
+
+| Note: SORT FIELDS statement has changed in both SORT steps.
+
+//jobname JOB  your job statement info here
+//SORT1   EXEC PGM=SORT
+//SYSOUT    DD SYSOUT=*
+//SORTIN    DD DISP=SHR,DSN=your.first.dbu00.output.file
+//SORTOUT   DD DISP=SHR,DSN=your.first.dbu00.output.file
+//SYSIN   DD *
+   SORT FIELDS=(5,2,CH,A,7,1,AQ,A,8,549,CH,A)                     
+   ALTSEQ CODE=(F080,F181,F282,F383,F484,F585,F686,F787,F888,F989,
+     C191,C292,C393,C494,C595,C696,C797,C898,C999,                 
+     D1A1,D2A2,D3A3,D4A4,D5A5,D6A6,D7A7,D8A8,D9A9,                 
+     E2B2,E3B3,E4B4,E5B5,E6B6,E7B7,E8B8,E9B9)                      
+    OPTION   VLSHRT,DYNALLOC=(SYSDA,3)
+//SORT2   EXEC PGM=SORT
+//SYSOUT    DD SYSOUT=*
+//SORTIN    DD DISP=SHR,DSN=your.second.dbu00.output.file
+//SORTOUT   DD DISP=SHR,DSN=your.second.dbu00.output.file
+//SYSIN   DD *
+   SORT FIELDS=(5,2,CH,A,7,1,AQ,A,8,549,CH,A)                     
+   ALTSEQ CODE=(F080,F181,F282,F383,F484,F585,F686,F787,F888,F989,
+     C191,C292,C393,C494,C595,C696,C797,C898,C999,                 
+     D1A1,D2A2,D3A3,D4A4,D5A5,D6A6,D7A7,D8A8,D9A9,                 
+     E2B2,E3B3,E4B4,E5B5,E6B6,E7B7,E8B8,E9B9)                      
+    OPTION   VLSHRT,DYNALLOC=(SYSDA,3)
+//DBSYNC EXEC PGM=IKJEFT01,REGION=5000K,DYNAMNBR=50,PARM='%DBSYNC'
+//SYSPRINT DD SYSOUT=*
+//SYSTSPRT DD SYSOUT=*
+//SYSTSIN  DD DUMMY
+//SYSEXEC  DD DISP=SHR,DSN=your.sysexec.file (preferrably compiled)
+//OPTIONS  DD *
+ your options here
+//INDD1    DD DISP=SHR,DSN=your.first.dbu00.output.file
+//INDD2    DD DISP=SHR,DSN=your.second.dbu00.output.file
+//OUTADD1  DD DSN=your.dsname.for.addfile1,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTADD2  DD DSN=your.dsname.for.addfile2,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTALT1  DD DSN=your.dsname.for.altfile1,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTALT2  DD DSN=your.dsname.for.altfile2,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTDEL1  DD DSN=your.dsname.for.outdel1,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTDEL2  DD DSN=your.dsname.for.outdel2,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTREM1  DD DSN=your.dsname.for.outrem1,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTREM2  DD DSN=your.dsname.for.outrem2,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTSCD1  DD DSN=your.dsname.for.outscd1,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTSCD2  DD DSN=your.dsname.for.outscd2,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTCLN1  DD DSN=your.dsname.for.outcln1,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTCLN2  DD DSN=your.dsname.for.outcln2,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//
+--------------------------------------------------------------------------------
+SAMPLE JCL (If using DBSECLV)
+
+| Note: SORT FIELDS statement has changed in steps SORT1 and
+|       SORT2.
+
+//jobname JOB  your job statement info here
+//SORT1   EXEC PGM=SORT
+//SYSOUT    DD SYSOUT=*
+//SORTIN    DD DISP=SHR,DSN=your.first.dbu00.output.file
+//SORTOUT   DD DISP=SHR,DSN=your.first.dbu00.output.file
+//SYSIN   DD *
+   SORT FIELDS=(5,2,CH,A,7,1,AQ,A,8,549,CH,A)                     
+   ALTSEQ CODE=(F080,F181,F282,F383,F484,F585,F686,F787,F888,F989,
+     C191,C292,C393,C494,C595,C696,C797,C898,C999,                 
+     D1A1,D2A2,D3A3,D4A4,D5A5,D6A6,D7A7,D8A8,D9A9,                 
+     E2B2,E3B3,E4B4,E5B5,E6B6,E7B7,E8B8,E9B9)                      
+    OPTION   VLSHRT,DYNALLOC=(SYSDA,3)
+//SORT2   EXEC PGM=SORT
+//SYSOUT    DD SYSOUT=*
+//SORTIN    DD DISP=SHR,DSN=your.second.dbu00.output.file
+//SORTOUT   DD DISP=SHR,DSN=your.second.dbu00.output.file
+//SYSIN   DD *
+   SORT FIELDS=(5,2,CH,A,7,1,AQ,A,8,549,CH,A)                     
+   ALTSEQ CODE=(F080,F181,F282,F383,F484,F585,F686,F787,F888,F989,
+     C191,C292,C393,C494,C595,C696,C797,C898,C999,                 
+     D1A1,D2A2,D3A3,D4A4,D5A5,D6A6,D7A7,D8A8,D9A9,                 
+     E2B2,E3B3,E4B4,E5B5,E6B6,E7B7,E8B8,E9B9)                      
+    OPTION   VLSHRT,DYNALLOC=(SYSDA,3)
+//SUBSET1 EXEC PGM=SORT
+//SYSOUT    DD SYSOUT=*
+//SORTIN    DD DISP=SHR,DSN=your.first.dbu00.output.file
+//SORTOUT   DD DISP=(,PASS),DSN=&&TEMP1,
+//  UNIT=SYSDA,SPACE=(TRK,(5,5),RLSE),
+//  DCB=your.first.dbu00.output.file
+//SYSIN   DD *
+ INCLUDE COND=(5,4,EQ,C'0503',AND,257,8,EQ,C'SECDATA '),FORMAT=CH
+ OPTION  COPY,VLSHRT
+//SUBSET2 EXEC PGM=SORT
+//SYSOUT    DD SYSOUT=*
+//SORTIN    DD DISP=SHR,DSN=your.second.dbu00.output.file
+//SORTOUT   DD DISP=(,PASS),DSN=&&TEMP2,
+//  UNIT=SYSDA,SPACE=(TRK,(5,5),RLSE),
+//  DCB=your.second.dbu00.output.file
+//SYSIN   DD *
+ INCLUDE COND=(5,4,EQ,C'0503',AND,257,8,EQ,C'SECDATA '),FORMAT=CH
+ OPTION  COPY,VLSHRT
+//DBSECLV1 EXEC PGM=IKJEFT01,REGION=5000K,DYNAMNBR=50,PARM='%DBSECLV'
+//SYSPRINT DD SYSOUT=*
+//SYSTSPRT DD SYSOUT=*
+//SYSTSIN  DD DUMMY
+//SYSEXEC  DD DISP=SHR,DSN=your.sysexec.file (preferraby compiled)
+//INDD1    DD DISP=SHR,DSN=your.first.dbu00.output.file
+//INDD2    DD DISP=(OLD,DELETE),DSN=&&TEMP1
+//OUTDD1   DD DSN=your.modified.first.dbu00.file,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=your.first.dbu00.output.file
+//DBSECLV2 EXEC PGM=IKJEFT01,REGION=5000K,DYNAMNBR=50,PARM='%DBSECLV'
+//SYSPRINT DD SYSOUT=*
+//SYSTSPRT DD SYSOUT=*
+//SYSTSIN  DD DUMMY
+//SYSEXEC  DD DISP=SHR,DSN=your.sysexec.file (preferrably compiled)
+//INDD1    DD DISP=SHR,DSN=your.second.dbu00.output.file
+//INDD2    DD DISP=(OLD,DELETE),DSN=&&TEMP2
+//OUTDD1   DD DSN=your.modified.second.dbu00.file,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=your.second.dbu00.output.file
+//DBSYNC EXEC PGM=IKJEFT01,REGION=5000K,DYNAMNBR=50,PARM='%DBSYNC'
+//SYSPRINT DD SYSOUT=*
+//SYSTSPRT DD SYSOUT=*
+//SYSTSIN  DD DUMMY
+//SYSEXEC  DD DISP=SHR,DSN=your.sysexec.file (preferrably compiled)
+//OPTIONS  DD *
+ your options here
+//INDD1    DD DISP=SHR,DSN=your.modified.first.dbu00.file
+//INDD2    DD DISP=SHR,DSN=your.modified.second.dbu00.file
+//OUTADD1  DD DSN=your.dsname.for.addfile1,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTADD2  DD DSN=your.dsname.for.addfile2,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTALT1  DD DSN=your.dsname.for.altfile1,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTALT2  DD DSN=your.dsname.for.altfile2,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTDEL1  DD DSN=your.dsname.for.outdel1,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTDEL2  DD DSN=your.dsname.for.outdel2,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTREM1  DD DSN=your.dsname.for.outrem1,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTREM2  DD DSN=your.dsname.for.outrem2,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTSCD1  DD DSN=your.dsname.for.outscd1,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTSCD2  DD DSN=your.dsname.for.outscd2,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTCLN1  DD DSN=your.dsname.for.outcln1,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//OUTCLN2  DD DSN=your.dsname.for.outcln2,
+//            DISP=(NEW,CATLG),
+//            UNIT=SYSDA,SPACE=(CYL,(25,25),RLSE),
+//            DCB=(RECFM=VB,LRECL=255,BLKSIZE=6400)
+//
+--------------------------------------------------------------------------------
+SAMPLE JCL TO EXECUTE THE GENERATED REXX EXECS
+
+  Remember to examine the commands first to make sure they seem
+  reasonable.  
+
+Run this JCL on the system which uses the database from INDD1 above:
+//jobname JOB  your job statement info here
+//RUNCMDS1 EXEC PGM=IKJEFT01,REGION=5000K,DYNAMNBR=50
+//SYSPRINT DD SYSOUT=*
+//SYSTSPRT DD SYSOUT=*
+//SYSTSIN  DD *
+  exec 'your.dsname.for.outrem1' list
+  exec 'your.dsname.for.outdel1' list
+  exec 'your.dsname.for.outscd1' list
+  exec 'your.dsname.for.outadd1' list
+  exec 'your.dsname.for.outalt1' list
+  exec 'your.dsname.for.outcln1' list
+//
+
+Run this JCL on the system which uses the database from INDD2 above:
+//jobname JOB  your job statement info here
+//RUNCMDS1 EXEC PGM=IKJEFT01,REGION=5000K,DYNAMNBR=50
+//SYSPRINT DD SYSOUT=*
+//SYSTSPRT DD SYSOUT=*
+//SYSTSIN  DD *
+  exec 'your.dsname.for.outrem2' list
+  exec 'your.dsname.for.outdel2' list
+  exec 'your.dsname.for.outscd2' list
+  exec 'your.dsname.for.outadd2' list
+  exec 'your.dsname.for.outalt2' list
+  exec 'your.dsname.for.outcln2' list
+//

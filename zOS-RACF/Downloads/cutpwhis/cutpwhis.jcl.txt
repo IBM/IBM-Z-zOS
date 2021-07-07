@@ -1,0 +1,89 @@
+//DPFTCCUT JOB (9999,CC7),'CUT/EXTEND HISTORY',
+//            CLASS=A,MSGCLASS=X
+//*********************************************************************
+//*                                                                   *
+//* THIS UTILITY SOLVES THE "ORPHANED PASSWORD" PROBLEM IN RACF. THIS *
+//* PROBLEM STEMS FROM THE FACT THAT WHEN REDUCING SETROPTS PASSWORD( *
+//* HISTORY(..)) USERS MAY BE LEFT WITH OVERSIZE HISTORIES OF OLD     *
+//* PASSWORDS, AND A FEW PASSWORDS WILL STAY IN THE HISTORY FOR EVER  *
+//* AND CAN NEVER BE REUSED.                                          *
+//*                                                                   *
+//* CUTPWHIS TRUNCATES THE OLD PASSWORD HISTORY OF SUCH USERS.        *
+//*                                                                   *
+//* CUTPWHIS MAY ALSO BE USED TO ARTIFICIALLY EXTEND PASSWORD         *
+//* HISTORIES WITH ENCRYPTED PASSWORDS THAT ARE BINARY ZEROES.        *
+//* THIS MAY E.G. BE USEFUL WHEN MIGRATING TO RACF, AND A LARGE       *
+//* SETROPTS PASSWORD(HISTORY(..)) VALUE WILL CAUSE USERIDS TO        *
+//* EXTEND OVER MULTIPLE 256 BYTE CHUNKS AFTER SOME PASSWORD          *
+//* INTERVAL PERIODS HAVE GONE. SUDDENLY ALMOST ALL USERIDS WILL      *
+//* EXPAND INTO MULTIPLE CHUNKS, AND THAT IS BAD FOR PERFORMANCE.     *
+//* IT IS BETTER TO EXTEND ALL USERS HISTORY WITH DUMMY ENTRIES       *
+//* FROM THE BEGINNING.                                               *
+//*                                                                   *
+//* CUTPWHIS DOES NOT ALLOW MODIFYING HISTORIES TO A LENGTH ABOVE     *
+//* CURRENT SETROPTS PASSWORD(HISTORY(..)) VALUE.                     *
+//*                                                                   *
+//* DDNAME USERIDS MAY BE USED TO LIMIT CUTPWHIS TO SELECTED USERIDS. *
+//* EACH USERID MUST APPEAR AS FIRST 8 BYTES OF A RECORD.             *
+//*                                                                   *
+//*********************************************************************
+//*                                                                   *
+//* TO RUN THIS UTILITY, YOU MUST HAVE UPDATE ACCESS TO ENTITY        *
+//* RACF.PASSWORD.MAINTENANCE.HISTORY.LNGTH IN CLASS FACILITY.        *
+//*                                                                   *
+//* THE UTILITY MUST RESIDE IN AN APF AUTHORIZED LIBRARY.             *
+//*                                                                   *
+//*********************************************************************
+//*                                                                   *
+//* SET PARM FIELD TO NO OF OLD PASSWORDS TO BE KEPT.                 *
+//*                                                                   *
+//* THE VALUE TO BE SPECIFIED IN PARM FIELD IS THE SAME AS USED IN    *
+//* SETROPTS PASSWORD(HISTORY(..)).                                   *
+//*                                                                   *
+//* WHEN NO VALUE IS SET VIA THE PARM FIELD, CUTPWHIS TAKES IT DEFAULT*
+//* FROM THE SETROPTS VALUES IN FORCE AT THE TIME OF EXECUTION.       *
+//*                                                                   *
+//*********************************************************************
+//*EXAMPLE:  PASSWORD HISTORY VALUE IS 5.  NEW USER STARTS CHANGING   *
+//*PASSWORDS USING A, B, C, ...                                       *
+//*                                                                   *
+//*    CURRENT PW    NEW GENERATION  HISTORY ELEMENTS                 *
+//*                    (PWDGEN)OLDPWDNM/OLDPWD                        *
+//*    -----------   --------------  -----------------                *
+//*     INITIAL          255 OR 0    EMPTY                            *
+//*       A                1         0/INITIAL                        *
+//*       B                2         0/INITIAL, 1/A                   *
+//*       C                3         0/INITIAL, 1/A, 2/B              *
+//*       D                4         0/INITIAL, 1/A, 2/B, 3/C         *
+//*       E                0         0/INITIAL, 1/A, 2/B, 3/C, 4/D    *
+//*       F                1         1/A, 2/B, 3/C, 4/D, 0/E          *
+//*       G                2         2/B, 3/C, 4/D, 0/E, 1/F          *
+//*                                                                   *
+//*PASSWORD HISTORY IS DECREASED TO 3.  THE PASSWORDS YOU NEED TO KEEP*
+//*ARE THE LAST 3 IN THE LIST (D, E, F), AS THEY ARE THE MOST RECENT  *
+//*3.                                                                 *
+//*                                                                   *
+//*HOWEVER, THEY NEED TO BE RENUMBERED. IF THE CHANGE HAPPENS AFTER   *
+//*ROW G, AND YOU KEEP D, E, AND F, THEY CLEARLY CAN'T BE 4, 0, AND 1 *
+//*AS NUMBERS ABOVE 2 ARE NOT LOGICAL. YOU COULD RENUMBER THEM        *
+//*2, 0, 1, GIVING 2/D, 0/E, 1/F AND LEAVE PWDGEN UNCHANGED.          *
+//*                                                                   *
+//*BUT IT'S PROBABLY EASIER TO SET PWDGEN TO 0, AND RENUMBER THEM AS  *
+//*0/E, 1/E, AND 2/F.                                                 *
+//*                                                                   *
+//*SO, IN GENERAL, KEEP THE LAST MIN(RCVTHIST, PWDCNT) ENTRIES. SET   *
+//*PWDGEN AND NUMBER THE ENTRIES THAT YOU KEEP 0, 1, ..., N-1.        *
+//*                                                                   *
+//*AND THAT IS WHAT CUTPWHIS DOES (EXCEPT THAT RCVTHIST MAY BE OVER-  *
+//*RULED BY THE PARM FIELD).                                          *
+//*                                                                   *
+//*********************************************************************
+//CUTPWHIS EXEC PGM=CUTPWHIS       PARM=20
+//STEPLIB  DD DISP=SHR,DSN=MVSGRP.TEST.APFLIB   <--- YOUR APF LIBRARY
+//SYSPRINT DD SYSOUT=*
+//*USERIDS  DD *,DCB=BLKSIZE=80      OPTIONALLY SELECTED USERIDS
+USERID1
+USERID2
+//*STARTUSR DD *,DCB=BLKSIZE=80      OPTIONALLY USERID TO START FROM
+USERID
+

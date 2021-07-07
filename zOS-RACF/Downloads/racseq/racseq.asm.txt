@@ -1,0 +1,1610 @@
+RACSEQ TITLE 'RACSEQ - USE R_ADMIN TO EXTRACT RACF PROFILE'                     
+***********************************************************************         
+***********************************************************************         
+***                                                                 ***         
+***  MODULE - RACSEQ                                                ***         
+***                                                                 ***         
+***      This TSO command invokes the extract function of R_admin   ***         
+***      (IRRSEQ00) and displays every profile field to the         ***         
+***      display using PUTLINE.                                     ***         
+***                                                                 ***         
+***      It is invoked from the TSO command line like:              ***         
+***        RACSEQ CLASS(classname) PROFILE(profilename)         @L1C***         
+***      Or                                                     @L1A***         
+***        RACSEQ SETROPTS                                      @L1A***         
+***                                                                 ***         
+***      The following optional parameters apply to both        @L1A***         
+***      profile-extract and SETROPTS extract:                  @L1A***         
+***                                                                 ***         
+***      SUPERVISOR, USER(userid), SUBPOOL(value),              @L1A***         
+***      NO/CMDAUTH, FACILITYAUTH                               @L1A***         
+***                                                                 ***         
+***      The following optional parameters apply only to        @L1A***         
+***      profile-extract:                                       @L1A***         
+***                                                                 ***         
+***      ALL, BASEONLY, NAMEONLY, UPPERCASE, GENERIC            @L1A***         
+***                                                                 ***         
+***      The RACSEQ keywords are described below:               @L1A***         
+***                                                                 ***         
+***      The SETROPTS option displays SETROPTS settings. When   @L1A***         
+***      SETROPTS is specified, any keywords relative  only to  @L1A***         
+***      profile-extract are ignored                            @L1A***         
+***                                                                 ***         
+***      The supported classes are USER, GROUP, CONNECT, and    @L1C***         
+***      any general resource class defined in the Class        @L1A***         
+***      Descriptor Table (CDT).  DATASET is not supported.     @L1A***         
+***      If not specified, CLASS defaults to USER. All values for   ***         
+***      CLASS will be folded to upper case by TSO parse services.  ***         
+***      The class name cannot be abbreviated.                  @L1A***         
+***                                                                 ***         
+***      The PROFILE field is a user ID or group name for USER      ***         
+***      and GROUP, respectively. For CONNECT, it is the user ID    ***         
+***      followed by a period followed by the group name. E.G.      ***         
+***      IBMUSER.SYS1.  Otherwise, it is a general resource.    @L1C***         
+***                                                                 ***         
+***      NOTE: "profilename" is case-sensitive! This means you can  ***         
+***            display lower case user IDs such as irrcerta, but    ***         
+***            it also means you must remember to upper-case the    ***         
+***            user ID for most cases.  If you forget, you will     ***         
+***            receive a 4/4/4 return code combination! You can @L1C***         
+***            specify the UPPERCASE keyword to have R_admin    @L1A***         
+***            upper-case the name where appropriate.           @L1A***         
+***                                                                 ***         
+***      ALL will display every profile within a class, start-  @L1A***         
+***      ing with the first profile that alphabetically follows @L1A***         
+***      the name specified in PROFILE.  If ALL is specified    @L1A***         
+***      without PROFILE, than all profiles in the class are    @L1A***         
+***      displayed. ALL is ignored for the CONNECT class.       @L1A***         
+***                                                                 ***         
+***      SUBPOOL is the subpool in which you want your output   @L1A***         
+***      storage returned.                                      @L1A***         
+***                                                                 ***         
+***      BASEONLY, NAMEONLY, UPPERCASE  and GENERIC simply turn @L1A***         
+***      the corresponding option bit of the flag word in the   @L1A***         
+***      input parameter list. These only apply to profile-     @L1A***         
+***      extract. Note that the NAMEONLY function is provided   @L1A***         
+***      in RACF APAR OA41162.                                  @L1A***         
+***                                                                 ***         
+***      SUPERVISOR causes RACSEQ to MODESET into supervisor    @L1A***         
+***      state before the IRRSEQ00 call, and back to problem    @L1A***         
+***      state after- wards.  RACSEQ must come from an          @L1A***         
+***      authorized library to use this option (or be in the    @L1A***         
+***      authorized TSO command list).                          @L1A***         
+***                                                                 ***         
+***      USER is the user ID under whose authority you want the @L1A***         
+***      request to execute.  If SUPERVISOR is not also         @L1A***         
+***      specified, R_admin will ignore this option.            @L1A***         
+***                                                                 ***         
+***      FACILITYAUTH requests that the FACILITY class          @L1A***         
+***      check be performed when in supervisor state.  By       @L1A***         
+***      default, it is not performed for supervisor state      @L1A***         
+***      callers.  If SUPERVISOR is not also specified,         @L1A***         
+***      this option has no effect, since the FACILITY check    @L1A***         
+***      is always performed for problem-state callers.         @L1A***         
+***                                                                 ***         
+***      CMDAUTH requests that the command authorization rules  @L1A***         
+***      be enforced. This is the default behavior for profile  @L1A***         
+***      extract in either problem or supervisor state, and     @L1A***         
+***      for SETROPTS in problem state. However, CMDAUTH must   @L1A***         
+***      be specified with SETROPTS when SUPERVISOR is also     @L1A***         
+***      specified in order to enforce the SETROPTS LIST rules. @L1A***         
+***      NOCMDAUTH requests that the command authorization      @L1A***         
+***      rules be bypassed. If SUPERVISOR is not also specified,@L1A***         
+***      R_admin will ignore this option.                       @L1A***         
+***                                                                 ***         
+***  Authorization Required:                                    @L1A***         
+***                                                                 ***         
+***   -----------------------------------------------------------   ***         
+***  |For class | Ability to   | At least READ authority to      |  ***         
+***  |          |   issue      |      FACILITY resource          |  ***         
+***  |-----------------------------------------------------------   ***         
+***  | USER     | LISTUSER     | IRR.RADMIN.LISTUSER             |  ***         
+***  |-----------------------------------------------------------   ***         
+***  | GROUP    | LISTGRP      | IRR.RADMIN.LISTGRP              |  ***         
+***  |-----------------------------------------------------------   ***         
+***  | CONNECT  | LISTUSER     | IRR.RADMIN.LISTUSER             |  ***         
+***  |-----------------------------------------------------------   ***         
+***  | General  | RLIST        | IRR.RADMIN.RLIST                |  ***         
+***  | resource |              |                                 |  ***         
+***  |-----------------------------------------------------------   ***         
+***  | SETROPTS | SETROPTS     | IRR.RADMIN.SETROPTS.LIST        |  ***         
+***  | option   | LIST         |                                 |  ***         
+***   -----------------------------------------------------------   ***         
+***                                                                 ***         
+***  INPUT: R1 points to the address of the CPPL                    ***         
+***                                                                 ***         
+***  RETURN CODES:                                                  ***         
+***     0 - This sample always returns 0 unless altered.            ***         
+***  non0 - Parse rc or SAF rc from R_admin                         ***         
+***         - See Callable Services for R_admin return codes    @L1A***         
+***                                                                 ***         
+***  Register usage:                                                ***         
+***   R11 - Autodata base register                                  ***         
+***   R12 - Base register                                           ***         
+***   R13 - Savearea address                                        ***         
+***  Further register usage is documented in the code below.        ***         
+***                                                                 ***         
+***  Change Activity:                                               ***         
+***   11/15/2007 - Updated to support general resource classes, @L1A***         
+***                SETROPTS, and the ability to display all     @L1A***         
+***                profiles (to which you are authorized) in a  @L1A***         
+***                class, with an optional starting point.      @L1A***         
+***   01/08/2013 - Dusted it off and fixed some bugs.  Added    @L1A***         
+***                a ton more parameter options.                @L1A***         
+***                                                                 ***         
+***********************************************************************         
+***********************************************************************         
+         EJECT                                                                  
+***********************************************************************         
+***********************************************************************         
+***                                                                 ***         
+***      COPYRIGHT IBM CORPORATION, 2006, 2013                      ***         
+***                                                                 ***         
+***      THIS CODE HAS NOT BEEN SUBMITTED TO ANY FORMAL IBM TEST    ***         
+***      AND IS DISTRIBUTED ON AN "AS IS" BASIS WITHOUT ANY         ***         
+***      WARRANTY EITHER EXPRESS OR IMPLIED. THE IMPLEMENTATION     ***         
+***      OF ANY OF THE TECHNIQUES DESCRIBED OR USED HEREIN IS A     ***         
+***      CUSTOMER RESPONSIBILITY AND DEPENDS ON THE CUSTOMER'S      ***         
+***      OPERATIONAL ENVIRONMENT. WHILE EACH ITEM MAY HAVE BEEN     ***         
+***      REVIEWED FOR ACCURACY IN A SPECIFIC SITUATION AND MAY      ***         
+***      RUN IN A SPECIFIC ENVIRONMENT, THERE IS NO GUARANTEE       ***         
+***      THAT THE SAME OR SIMILAR RESULTS WILL BE OBTAINED ELSE-    ***         
+***      WHERE. CUSTOMERS ATTEMPTING TO ADAPT THESE TECHNIQUES TO   ***         
+***      THEIR OWN ENVIRONMENTS DO SO AT THEIR OWN RISK.            ***         
+***                                                                 ***         
+***********************************************************************         
+***********************************************************************         
+         EJECT                                                                  
+RACSEQ   CSECT ,                   An R_admin sample routine                    
+RACSEQ   AMODE 31                                                               
+RACSEQ   RMODE 31                                                               
+RACSEQ   CSECT                                                                  
+         SAVE  (14,12),,RACSEQ-&SYSDATE-&SYSTIME                                
+         LR    R12,R15             program addressability                       
+         USING RACSEQ,R12          set base register                            
+         LR    R10,R1              save input CPPL address                      
+*                                                                               
+* Get dynamic storage                                                           
+*                                                                               
+         L     R0,DYNSIZE          dynamic area size to R0                      
+         GETMAIN RU,LV=(0)         getmain dynamic area                         
+*              LV=(0),SP=229                                                    
+         LR    R11,R1              dynamic area addressability                  
+         LR    R11,R1              Dynamic area addressability     @L1A         
+         LR    R2,R1               Dynamic address to R2 for MVCL  @L1A         
+         L     R3,DYNSIZE          Get length to initialize        @L1A         
+         LA    R4,0                Source                          @L1A         
+         LA    R5,0                Source len of 0 + pad byte of 0 @L1A         
+         MVCL  R2,R4               Clear the dynamic area storage  @L1A         
+         USING DATD,R11            base                                         
+         ST    R13,SAVEAREA+4      save caller's savearea address               
+         ST    R11,8(R13)          save our savearea address                    
+         LR    R13,R11             our savearea address to R13                  
+         ST    R10,CPPLPTR         save saved input CPPL address                
+         EJECT                                                                  
+*                                                                               
+* Initialize PUTLINE Output Line Descriptor (OLD) segment pointers              
+* for use throughout this program. The pointers to the segments (i.e.           
+* message line and inserts) remain constant; each message will set the          
+* number of segments and the actual length/data.                                
+* Register usage                                                                
+*  R2 = CPPLUPT for PUTLINE                                                     
+*  R3 = CPPLECT for PUTLINE                                                     
+*  R5 = Disposable work reg                                                     
+*  R10 = Disposable work reg                                                    
+*                                                                               
+         LA    R10,SEG1LEN                                                      
+         ST    R10,OLDSEGA1                                                     
+         LA    R10,SEG2LEN                                                      
+         ST    R10,OLDSEGA2                                                     
+         LA    R10,SEG3LEN                                                      
+         ST    R10,OLDSEGA3                                                     
+         LA    R10,SEG4LEN                                                      
+         ST    R10,OLDSEGA4                                                     
+*                                                                               
+* Initialize parse stuff and parse the input command image.                     
+*                                                                               
+         L     R1,CPPLPTR           Get address of CPPL                         
+         USING CPPL,R1              And establish addressability                
+         LA    R6,DYNPPL            GET ADDRESS OF PPL                          
+         USING PPL,R6               AND ESTABLISH ADDRESSABILITY                
+         MVC   PPLUPT,CPPLUPT       PUT IN THE UPT ADDRESS FROM CPPL            
+         L     R2,CPPLUPT           And keep it around in R2                    
+         ST    R2,UPT@              And save it for extract-next   @L1A         
+         MVC   PPLECT,CPPLECT       PUT IN THE ECT ADDRESS FROM CPPL            
+         L     R3,CPPLECT           And keep it around in R3                    
+         ST    R3,ECT@              And save it for extract-next   @L1A         
+         MVC   PPLCBUF,CPPLCBUF     PUT IN THE COMMAND BUFFER ADDRESS           
+         L     R5,=A(RACPDE)        Get address of parse macros (PCL)           
+         ST    R5,PPLPCL            STORE IT IN THE PPL                         
+         LA    R5,PDLPTR            Get address of parse result anchor          
+         ST    R5,PPLANS            STORE IT IN THE PPL                         
+         CALLTSSR EP=IKJPARS,MF=(E,PPL)   INVOKE PARSE                          
+         LTR   R15,R15              IF PARSE RETURN CODE IS ZERO                
+         BZ    GETANS               Go process results                          
+         DROP  R1                                                               
+*                                                                               
+* Unexpected parse error.  Print return code and bail.                          
+*                                                                               
+         ST    R15,SAFRC            Store rc                                    
+         LA    R10,2                                               @L1A         
+         ST    R10,OLDNUM           Two message segments           @L1C         
+         LA    R10,L'MSG9+4                                                     
+         STH   R10,SEG1LEN                                                      
+         XC    SEG1OFF,SEG1OFF                                                  
+         MVC   SEG1DATA,MSG9                                                    
+         LA    R10,6                2-digit rc + header                         
+         STH   R10,SEG2LEN                                                      
+         LA    R10,L'MSG9           Insert position of rc (eol)                 
+         STH   R10,SEG2OFF                                                      
+         CVD   R15,PACKDEC1         Convert 2 digits of parse rc                
+         LA    R10,PACKDEC1                                                     
+         UNPK  0(2,R10),6(2,R10)                                                
+         OI    1(R10),X'F0'         Fix the sign nibble                         
+         MVC   SEG2DATA(2),PACKDEC1 Move 2-char parse rc                        
+         BAL   R10,ISSUEMSG         Go issue PUTLINE               @L1C         
+         B     GETOUT               Get out of Dodge                            
+*                                                                               
+* Successful parse.  Get output PDL so we can see what has been                 
+* specified.                                                                    
+*                                                                               
+GETANS   DS    0H                                                               
+         L     R1,PPLANS            Get the PDL anchor address                  
+         L     R1,0(R1)             Get the PDL address itself                  
+         ST    R1,PDLPTR            Save it for later                           
+         DROP  R6                                                               
+         USING SEQPDL,R1            Get addressability to PDL                   
+         EJECT                                                                  
+*                                                                               
+* Initialize IRRSEQ00 parameters                                                
+*                                                                               
+         XC    ALET,ALET            Use zero ALET                  @L1M         
+         XC    SAFRC,SAFRC          Initialize return/reason codes @L1M         
+         XC    RACFRC,RACFRC                                       @L1M         
+         XC    RACFRS,RACFRS                                       @L1M         
+         XC    ACEE,ACEE            Not supplying "run-as" ACEE    @L1M         
+         XC    OUTMSG,OUTMSG        Clear output message pointer   @L1M         
+         LA    R10,RADPLIST         Point to input p-list          @L1A         
+         ST    R10,PLIST@           Save it                        @L1A         
+*                                                                               
+* Grab the user ID from the USER keyword, if specified                          
+*                                                                               
+         XC    USERLEN,USERLEN      No "run-as" user by default    @L1M         
+         LH    R10,USERKLEN         Load USER keyword length       @L1A         
+         LTR   R10,R10              User specified?                @L1A         
+         BZ    NOUSER               Nope                           @L1A         
+         STC   R10,USERLEN          Yes, save length               @L1A         
+         L     R14,USERKPTR         Get address of user ID         @L1A         
+         LA    R15,USERID           Target: user ID parameter      @L1A         
+         BCTR  R10,0                Decrement length for move      @L1A         
+         EX    R10,MOVESTR          Move class name                @L1A         
+NOUSER   DS    0H                                                  @L1A         
+*                                                                               
+* Grab the subpool from the SUBPOOL keyword, if specified. Note                 
+* there is no validation on the value, other than the 3-character               
+* limit enforced by Parse. If the user entered a value greater                  
+* than 255, we will ignore it and use the default of 127.                       
+*                                                                               
+         MVI   SUBPOOL,127          Use subpool 127 by default     @L1M         
+         LH    R10,SUBPLEN          Load SUBPOOL keyword length    @L1A         
+         LTR   R10,R10              Subpool specified?             @L1A         
+         BZ    NOSUBP               Nope                           @L1A         
+         L     R14,SUBPPTR          Get address of subpool         @L1A         
+         L     R14,0(R14)           Get fullword subpool value     @L1A         
+         C     R14,=AL4(255)        Greater than max subpool?      @L1A         
+         BH    NOSUBP               Yes, just use default          @L1A         
+         STC   R14,SUBPOOL          Store 1-byte value             @L1A         
+NOSUBP   DS    0H                                                  @L1A         
+*                                                                               
+* Set appropriate function code                                    @L1A         
+*                                                                               
+         MVI   FUNCODE,ADMN_XTR_SETR Assume SETROPTS extract       @L1A         
+         OC    PDLSETR,PDLSETR       SETROPTS specified?           @L1A         
+         BZ    NOTSETR               No                            @L1A         
+         LA    R6,SETPLIST           Point to input p-list         @L1A         
+         USING ADMN_XTRSETR_MAP,R6   Addressability to SETR p-list @L1A         
+         ST    R6,PLIST@             Save it                       @L1A         
+         LA    R14,0                 Prime flag word with 0s       @L1A         
+         CLC   PDLCMD,=AL2(1)        CMDAUTH specified?            @L1A         
+         BNE   NOCMDATH              Nope                          @L1A         
+         A     R14,=AL4(ADMN_XTRSETR_DOCMDAUTH)  Yes, set bit on   @L1A         
+NOCMDATH DS    0H                                                  @L1A         
+         OC    PDLFACIL,PDLFACIL     Perform FACILITY auth?        @L1A         
+         BZ    NOFACS                Nope                          @L1A         
+         A     R14,=AL4(ADMN_XTRSETR_DOFACILITY) Yes, set bit on   @L1A         
+NOFACS   DS    0H                                                  @L1A         
+         ST    R14,ADMN_XTRSETR_FLAG Set the flag word             @L1A         
+         B     CALLSEQ               Go make the call              @L1A         
+         DROP  R6                    Drop SETR p-list              @L1A         
+NOTSETR  DS    0H                                                  @L1A         
+*                                                                               
+* Get the class name from parse output. The class name will                     
+* determine the R_Admin function code to use, which we set here.                
+* Note the following code which checks class names will not work   @L1A         
+* if a dynamic class has been added which is a superstring of the  @L1A         
+* classes being checked (e.g. "GROUPIE").  However, since customer @L1A         
+* classes are supposed to start with a non-alphabetic character,   @L1A         
+* we will be lazy here.                                            @L1A         
+*                                                                               
+         MVI   FUNCODE,ADMN_XTR_USER Assume USER class for now                  
+         OC    PDLCLASS,PDLCLASS    CLASS specified?                            
+         BZ    ITSUSER              No, defaults to USER           @L1C         
+         L     R10,CLSPTR           Get class name ptr                          
+         CLC   USERCLS(4),0(R10)    USER class?                    @L1M         
+         BNE   CHKGRP               No                             @L1M         
+ITSUSER  DS    0H                                                  @L1A         
+         OC    PDLALL,PDLALL        All profiles requested?        @L1A         
+         BZ    MOREPRMS             No                             @L1A         
+         MVI   FUNCODE,ADMN_XTR_NEXT_USER   Get all users          @L1A         
+         OI    MYFLAGS,NEXTREQ      Indicate a "next" request      @L1A         
+         B     MOREPRMS                                            @L1A         
+CHKGRP   DS    0H                                                  @L1A         
+         CLC   GRPCLS(5),0(R10)     GROUP class?                                
+         BNE   CHKCON               Nope                                        
+         OC    PDLALL,PDLALL        All profiles requested?        @L1A         
+         BNZ   ALLGRP               Yes                            @L1A         
+         MVI   FUNCODE,ADMN_XTR_GROUP  No, just the one            @L1C         
+         B     MOREPRMS             Continue with R_admin parms    @L1A         
+ALLGRP   DS    0H                                                  @L1A         
+         MVI   FUNCODE,ADMN_XTR_NEXT_GROUP  Get all groups         @L1A         
+         OI    MYFLAGS,NEXTREQ      Indicate a "next" request      @L1A         
+         B     MOREPRMS             Continue with R_admin parms                 
+CHKCON   DS    0H                                                               
+         CLC   CONCLS(7),0(R10)     CONNECT class?                              
+         BNE   CHKDS                Nope                           @L1C         
+         MVI   FUNCODE,ADMN_XTR_CONNECT Yup                                     
+         B     MOREPRMS             Continue with R_admin parms                 
+CHKDS    DS    0H                                                  @L1C         
+         CLC   DATCLS(7),0(R10)     DATASET class?                 @L1A         
+         BE    BADCLASS             Yup, error                     @L1A         
+*                                                                               
+* We treat anything else as a general resource class, and leave it @L1A         
+* to R_admin to validate the class.                                @L1A         
+*                                                                               
+         OC    PDLALL,PDLALL        All profiles requested?        @L1A         
+         BNZ   ALLRES               Yes                            @L1A         
+         MVI   FUNCODE,ADMN_XTR_RESOURCE General resource class    @L1A         
+         B     MOREPRMS             Continue                       @L1A         
+ALLRES   DS    0H                                                  @L1A         
+         MVI   FUNCODE,ADMN_XTR_NEXT_RESOURCE  Get all resources   @L1A         
+         OI    MYFLAGS,NEXTREQ      Indicate a "next" request      @L1A         
+         B     MOREPRMS             Continue                       @L1A         
+         DROP  R1                                                               
+*                                                                               
+*        Error - unsupported class. Issue a message.                            
+*                                                                               
+BADCLASS DS    0H                                                  @L1A         
+         MVC   OLDNUM,=A(1)         One message segment                         
+         LA    R10,L'MSG7+4                                                     
+         STH   R10,SEG1LEN                                                      
+         XC    SEG1OFF,SEG1OFF                                                  
+         MVC   SEG1DATA,MSG7                                                    
+         BAL   R10,ISSUEMSG         Go issue PUTLINE               @L1C         
+         B     GETOUT               Get out of dodge                            
+         USING SEQPDL,R1            Get addressability to PDL                   
+*                                                                               
+* In the Parm_list area, fill in the version and the class name.                
+*                                                                               
+MOREPRMS DS    0H                                                               
+         LA    R6,RADPLIST                                                      
+         USING ADMN_PROF_MAP,R6                                                 
+         MVI   ADMN_PROF_VERSION,0                                              
+         MVC   ADMN_PROF_CLSNAME,=CL8'USER    ' Default to USER    @L1A         
+         LH    R10,CLSLEN                 Reload class length      @L1A         
+         LTR   R10,R10                    Class specified?                      
+         BZ    NOCLASS                    Nope                                  
+         L     R14,CLSPTR                 Get address of class     @L1A         
+         LA    R15,ADMN_PROF_CLSNAME      Target: class in p-list  @L1A         
+         BCTR  R10,0                Decrement length for move      @L1A         
+         EX    R10,MOVESTR          Move class name                @L1A         
+NOCLASS  DS    0H                                                  @L1A         
+*                                                                               
+* Now set the flag bits based on the keywords specified. We do not @L1A         
+* judge applicability of any of these options. We simply pass them @L1A         
+* on to R_admin.                                                   @L1A         
+*                                                                               
+         LA    R14,0                Prime flag word with 0s        @L1A         
+* Check for BASEONLY keyword                                                    
+         OC    PDLBASE,PDLBASE      Base-only requested?           @L1A         
+         BZ    NOBASE               Nope                           @L1A         
+         A     R14,=AL4(ADMN_PROF_BASEONLY) Yes, set bit on        @L1A         
+NOBASE   DS    0H                                                  @L1A         
+* Check for NAMEONLY keyword                                                    
+         OC    PDLNAME,PDLNAME      Name-only requested?           @L1A         
+         BZ    NONAME               Nope                           @L1A         
+         A     R14,=AL4(ADMN_PROF_NAMEONLY) Yes, set bit on        @L1A         
+NONAME   DS    0H                                                  @L1A         
+* Check for UPPERCASE keyword                                                   
+         OC    PDLUPPER,PDLUPPER    Upper-case name requested?     @L1A         
+         BZ    NOUPPER              Nope                           @L1A         
+         A     R14,=AL4(ADMN_PROF_UPPERCASE) Yes, set bit on       @L1A         
+NOUPPER  DS    0H                                                  @L1A         
+* Check for NOCMDAUTH keyword                                                   
+         CLC   PDLCMD,=AL2(2)       NOCMDAUTH specified?           @L1A         
+         BNE   NOSKIP               Nope                           @L1A         
+         A     R14,=AL4(ADMN_PROF_SKIPAUTH) Yes, set bit on        @L1A         
+NOSKIP   DS    0H                                                  @L1A         
+* Check for FACILITYAUTH keyword                                                
+         OC    PDLFACIL,PDLFACIL    Perform FACILITY auth?         @L1A         
+         BZ    NOFAC                Nope                           @L1A         
+         A     R14,=AL4(ADMN_PROF_DOAUTH) Yes, set bit on          @L1A         
+NOFAC    DS    0H                                                  @L1A         
+*                                                                               
+* Save the flag-word options in a local variable so we can propagate            
+* them on subsequent iterations in case ALL was specified. R_amin               
+* does not propagate flag-bits to the output block. R_admin does,               
+* however, maintain and propagate the generic bit, and we should not            
+* touch it, so our local save is intentionally done before we set the           
+* generic bit.                                                                  
+*                                                                               
+         ST    R14,SAVEFLAG         Save options locally           @L1A         
+*                                                                               
+* Now check for GENERIC keyword                                                 
+         OC    PDLGEN,PDLGEN        Generic requested?             @L1A         
+         BZ    NOGEN                Nope                           @L1A         
+         A     R14,=AL4(ADMN_PROF_GENERIC) Yes, set bit on         @L1A         
+NOGEN    DS    0H                                                  @L1A         
+         ST    R14,ADMN_PROF_FLAG   Set the flag word              @L1A         
+*                                                                               
+* PROFILE must be specified unless this is a "next" request. In    @L1A         
+* this case, we set a single blank as the profile name, which      @L1A         
+* starts at the very beginning of the class. The profile name      @L1A         
+* is  copy the input profile name to the contiguous storage after               
+* the Parm_list storage.                                                        
+*                                                                               
+         OC    PDLPROF,PDLPROF      PROFILE specified?                          
+         BNZ   GETPROF                                                          
+         TM    MYFLAGS,NEXTREQ      Is this a "next" request?      @L1A         
+         BZ    PROFERR              Non-next must specify profile  @L1A         
+         LA    R8,1                 Use length of 1                @L1A         
+         ST    R8,ADMN_PROF_NAMELEN Save length in plist header    @L1A         
+         MVI   EXTPROF,X'40'        Profile name is single blank   @L1A         
+         B     CALLSEQ              Go call R_admin                @L1A         
+*                                                                               
+*        Error.  No profile.  Issue syntax message.                             
+*                                                                               
+PROFERR  DS    0H                                                  @L1A         
+         MVC   OLDNUM,=A(1)         One message segment                         
+         LA    R10,L'MSG8+4                                                     
+         STH   R10,SEG1LEN                                                      
+         XC    SEG1OFF,SEG1OFF                                                  
+         MVC   SEG1DATA,MSG8                                                    
+         DROP  R1                                                               
+         BAL   R10,ISSUEMSG         Go issue PUTLINE               @L1C         
+         B     GETOUT               Get out of Dodge                            
+*                                                                               
+* Move the input profile name to the contiguous storage after the               
+* Parm_list storage.                                                            
+*                                                                               
+GETPROF  DS    0H                                                               
+         USING SEQPDL,R1            Get addressability to PDL                   
+         LH    R8,PROFLEN           Get profile length                          
+         ST    R8,ADMN_PROF_NAMELEN Save length in plist header                 
+         L     R14,PROFPTR          Get address of profile name    @L1C         
+         LA    R15,EXTPROF          Target: profile name area      @L1A         
+         BCTR  R8,0                 Decrement length for move      @L1A         
+         EX    R8,MOVESTR           Move profile name to p-list    @L1A         
+         DROP  R1                                                               
+         DROP  R6                                                               
+         EJECT                                                                  
+*                                                                               
+* Initialize IRRSEQ00 call parameter list.  That is, a list of                  
+* addresses to the individual parameters set up above. If this is  @L1C         
+* our first or only call, we use the input parameter list we set   @L1A         
+* up in our dynamic area. Otherwise, we use the output buffer from @L1A         
+* the previous call. In either case, the correct address has been  @L1A         
+* stored in R3.                                                    @L1A         
+*                                                                               
+CALLSEQ  DS    0H                                                  @L1A         
+         LA    R1,WORKAREA                                                      
+         ST    R1,WORKAREA@                                                     
+         LA    R1,ALET                                                          
+         ST    R1,ALET1@                                                        
+         ST    R1,ALET2@                                                        
+         ST    R1,ALET3@                                                        
+         LA    R1,SAFRC                                                         
+         ST    R1,SAFRC@                                                        
+         LA    R1,RACFRC                                                        
+         ST    R1,RACFRC@                                                       
+         LA    R1,RACFRS                                                        
+         ST    R1,RACFRS@                                                       
+         LA    R1,FUNCODE                                                       
+         ST    R1,FUNCODE@                                                      
+         L     R1,PLIST@                                           @L1C         
+         ST    R1,RADPLIST@                                        @L1C         
+         LA    R1,USER                                                          
+         ST    R1,USER@                                                         
+         LA    R1,ACEE                                                          
+         ST    R1,ACEE@                                                         
+         LA    R1,SUBPOOL                                                       
+         ST    R1,SUBPOOL@                                                      
+         LA    R1,OUTMSG                                                        
+         ST    R1,OUTMSG@                                                       
+         OC    OUTMSG@,=X'80000000'       Turn on VL bit in last parm           
+*                                                                               
+* Call R_admin.  We've manually built the plist which would correspond          
+* to the following CALL statement (continuation characters omitted).            
+*                                                                               
+*        CALL  IRRSEQ00,                                                        
+*              (WORKAREA,                                                       
+*              ALET,SAFRC,                                                      
+*              ALET,RACFRC,                                                     
+*              ALET,RACFRS,                                                     
+*              FUNCODE,                                                         
+*              PLIST,                                              @L1C         
+*              0,0,              Not passing "run-as" user or ACEE              
+*              SUBPOOL,                                                         
+*              OUTMSG),VL                                                       
+         L     R6,PDLPTR            Get PDL address                @L1A         
+         USING SEQPDL,R6            Get addressability to PDL      @L1A         
+         OC    PDLSUPER,PDLSUPER    Supervisor state requested?    @L1A         
+         BZ    NOSUPER1             Nope                           @L1A         
+         MODESET MODE=SUP           Switch to supervisor state     @L1A         
+NOSUPER1 DS    0H                                                  @L1A         
+         LA    R1,WORKAREA@      Get list of addrs in R1                        
+         L     R15,=V(IRRSEQ00)                                                 
+         BALR  R14,R15                                                          
+*                                                                               
+         OC    PDLSUPER,PDLSUPER    Supervisor state requested?    @L1A         
+         BZ    NOSUPER2             Nope                           @L1A         
+         MODESET MODE=PROB          Switch back to problem state   @L1A         
+NOSUPER2 DS    0H                                                  @L1A         
+         DROP  R6                   Drop PDL                       @L1A         
+*                                                                               
+* For extract-next, we are now finished with the previous output   @L1A         
+* buffer, which we used as the input p-list for this R_admin       @L1A         
+* call.  Free its storage now.                                     @L1A         
+*                                                                               
+         CLI   FUNCODE,ADMN_XTR_SETR SETROPTS extract?             @L1A         
+         BE    CHECKRC             Plist is in autodata. Leave it. @L1A         
+         LA    R1,RADPLIST         Get address of first p-list     @L1A         
+         L     R10,PLIST@          Get address of previous p-list  @L1A         
+         CR    R1,R10              Was input plist the first one?  @L1A         
+         BE    CHECKRC             Yes, don't free autodata field! @L1A         
+         USING ADMN_PROF_MAP,R10   Get addressability to previous  @L1C         
+         L     R0,ADMN_PROF_OUTLEN Output area size to R0          @L1A         
+         XR    R2,R2               Clear for insert                @L1A         
+         IC    R2,ADMN_PROF_SPID   Get subpool from p-list header  @L1A         
+         DROP  R10                                                 @L1A         
+         FREEMAIN RU,SP=(2),       Freemain                        @L1C*        
+               LV=(0),              dynamic                            *        
+               A=(10)                area                          @L1A         
+*                                                                               
+* Test return code and issue an error message if non-zero                       
+*                                                                               
+CHECKRC  DS    0H                                                  @L1A         
+         ICM   R5,B'1111',SAFRC     Get SAF return code                         
+         BZ    GOODSEQ                                                          
+*                                                                               
+* Let's also quietly ignore a "not found" condition for extract    @L1A         
+* next if we've returned at least one profile.                     @L1A         
+*                                                                               
+         TM    MYFLAGS,NEXTREQ+FOUND1  A fruitful "next" request?  @L1A         
+         BNO   BADSEQ               No, issue the message          @L1A         
+         LA    R10,4                Get "not found" rc             @L1A         
+         CR    R10,R5               SAF "not found" rc?            @L1A         
+         BNE   BADSEQ               No, truly an error             @L1A         
+         C     R10,RACFRC           RACF "not found" rc?           @L1A         
+         BNE   BADSEQ               No, truly an error             @L1A         
+         C     R10,RACFRS           RACF "not found" reason?       @L1A         
+         BE    GETOUT               Yes, bypass message            @L1A         
+*                                                                               
+* Convert the return/reason codes for message inserts                           
+*                                                                               
+BADSEQ   DS    0H                                                  @L1A         
+         CVD   R5,PACKDEC1          Convert binary to packed decimal            
+         LA    R5,PACKDEC1          Going to use 8 byte field for both          
+         UNPK  0(2,R5),6(2,R5)      Then to zoned decimal                       
+         OI    1(R5),X'F0'          Fix the sign nibble                         
+         L     R5,RACFRC            Convert the RACF rc too                     
+         CVD   R5,PACKDEC2                                                      
+         LA    R5,PACKDEC2                                                      
+         UNPK  0(2,R5),6(2,R5)                                                  
+         OI    1(R5),X'F0'                                                      
+         L     R5,RACFRS            Convert the RACF reason code too            
+         CVD   R5,PACKDEC3                                                      
+         LA    R5,PACKDEC3                                                      
+         UNPK  0(2,R5),6(2,R5)                                                  
+         OI    1(R5),X'F0'                                                      
+         MVC   OLDNUM,=A(4)         Four message segments                       
+         LA    R5,L'MSG6+4                                                      
+         STH   R5,SEG1LEN                                                       
+         XC    SEG1OFF,SEG1OFF                                                  
+         MVC   SEG1DATA,MSG6                                                    
+         LA    R5,6                 All inserts will be 2 chars + hdr           
+         STH   R5,SEG2LEN                                                       
+         STH   R5,SEG3LEN                                                       
+         STH   R5,SEG4LEN                                                       
+         LA    R5,22                Insert position of SAF rc                   
+         STH   R5,SEG2OFF                                                       
+         MVC   SEG2DATA(2),PACKDEC1 Move 2-char SAF rc                          
+         LA    R5,32                Insert position of RACF rc                  
+         STH   R5,SEG3OFF                                                       
+         MVC   SEG3DATA(2),PACKDEC2 Move 2-char RACF rc                         
+         LA    R5,L'MSG6            Insert position of RACF rc (eol)            
+         STH   R5,SEG4OFF                                                       
+         MVC   SEG4DATA(2),PACKDEC3 Move 2-char RACF rc                         
+         BAL   R10,ISSUEMSG         Go issue PUTLINE               @L1C         
+*                                                                               
+* If we encountered a ghost generic (4/4/20), then the offending   @L1A         
+* profile name is returned in the output block, and it would be    @L1A         
+* useful to display it, so we shall.                               @L1A         
+*                                                                               
+         ICM   R5,B'1111',SAFRC     Get SAF return code                         
+         LA    R10,4                Get "not found" rc             @L1A         
+         CR    R10,R5               SAF "not found" rc?            @L1A         
+         BNE   NOGHOST              No, truly an error             @L1A         
+         C     R10,RACFRC           RACF "not found" rc?           @L1A         
+         BNE   NOGHOST              No, truly an error             @L1A         
+         LA    R10,20               Get "ghost" rc                 @L1A         
+         C     R10,RACFRS           RACF "ghost" reason?           @L1A         
+         BNE   NOGHOST              No, some other error           @L1A         
+         OI    MYFLAGS,SPOOKY       Yes, remember we saw a ghost   @L1A         
+         B     GOODSEQ              Go let the name be displayed   @L1A         
+NOGHOST  DS    0H                                                  @L1A         
+         B     GETOUT                                                           
+         EJECT                                                                  
+*                                                                               
+* R_admin worked! We'll start the command output by simply echoing              
+* the class and profile name, just to reassure the user. Also say               
+* how many segments there are.                                                  
+*                                                                               
+GOODSEQ  DS    0H                   Issue warm and fuzzy message                
+         CLI   FUNCODE,ADMN_XTR_SETR SETROPTS extract?             @L1A         
+         BNE   PROFXTR              No, normal profile extract     @L1A         
+         BAL   R15,DOSETR           Go process SETROPTS stuff      @L1A         
+         B     FREEOUT              Clean up and get out           @L1A         
+PROFXTR  DS    0H                                                  @L1A         
+         MVC   OLDNUM,=A(4)         Four message segments                       
+         LA    R5,L'MSG1+4                                                      
+         STH   R5,SEG1LEN                                                       
+         XC    SEG1OFF,SEG1OFF                                                  
+         MVC   SEG1DATA,MSG1                                                    
+         USING ADMN_PROF_MAP,R1     Get class/profile from output  @L1C         
+         L     R1,OUTMSG            Get output address in R1       @L1C         
+         L     R5,ADMN_PROF_NAMELEN Get profile name length        @L1C         
+         LA    R5,4(R5)             Add 4 for header (length/offset)            
+         STH   R5,SEG2LEN                                                       
+         LA    R5,20                Offset of first insert                      
+         STH   R5,SEG2OFF                                                       
+         LA    R14,ADMN_PROF_PROFNAME Source: output profile name  @L1C         
+         LA    R15,SEG2DATA         Target: segment data                        
+         LH    R5,SEG2LEN           Get profile length back                     
+         BCTR  R5,0                 Decrement for execute                       
+         EX    R5,MOVESTR           Move profile name to msg data               
+*                                                                               
+         LA    R5,30                Offset of second insert                     
+         STH   R5,SEG3OFF                                                       
+         LA    R9,ADMN_PROF_CLSNAME Get class name from output     @L1C         
+         LA    R5,8                 Get class name length          @L1C         
+         LA    R5,4(R5)             Add 4 for header (len/offset)               
+         STH   R5,SEG3LEN                                                       
+         MVC   SEG3DATA(8),0(R9)    Move class name to msg data    @L1C         
+         DROP  R1                                                               
+         LA    R5,6                 Max 2-digit #segments                       
+         STH   R5,SEG4LEN                                                       
+         LA    R5,L'MSG1            Offset of third insert (eol)                
+         STH   R5,SEG4OFF                                                       
+         USING ADMN_PROF_MAP,R1                                                 
+         L     R1,OUTMSG            Get output address in R1                    
+         L     R5,ADMN_PROF_NUMSEG  Number of segment descriptors               
+         CVD   R5,PACKDEC1          Convert binary to packed decimal            
+         LA    R5,PACKDEC1          Going to use 8 byte field for both          
+         UNPK  0(2,R5),6(2,R5)      Then to zoned decimal                       
+         OI    1(R5),X'F0'          Fix the sign nibble                         
+         MVC   SEG4DATA(2),PACKDEC1 Move 2-char number of segments              
+         DROP  R1                                                               
+         BAL   R10,ISSUEMSG         Go issue PUTLINE               @L1C         
+         EJECT                                                                  
+***********************************************************************         
+*                                                                               
+* Now process the output.  For each segment descriptor, print a message         
+* indicating the segment name.  For each of its field descriptors,              
+* print the field name and its data.                                            
+*  - For boolean field, print TRUE or FALSE                                     
+*  - For repeat fields, print each of its constituent fields                    
+*                                                                               
+* Register usage                                                                
+*  R1 = R_admin output buffer (OUTMSG)                                          
+*  R2 = Number of segment descriptors to process                                
+*  R3 = Address of current segment descriptor                                   
+*  R4 = Number of field descriptors to process                                  
+*  R5 = Address of current field descriptor                                     
+*                                                                               
+***********************************************************************         
+         USING ADMN_PROF_MAP,R1                                                 
+         L     R1,OUTMSG             Get output address in R1                   
+         L     R2,ADMN_PROF_NUMSEG   Number of segment descriptors              
+         LTR   R2,R2                 Are there any segment?        @L2A         
+         BZ    DONESEGS              No, bail out                  @L2A         
+         LA    R3,ADMN_PROF_PROFNAME Get addr of profile name                   
+         A     R3,ADMN_PROF_NAMELEN  Add length of profile name to get *        
+                                     addr of 1st segment descriptor             
+         USING ADMN_PROF_SEGDESC,R3  Basing for segment descriptor              
+*                                                                               
+         L     R5,ADMN_PROF_FIELDOFFSET Get offset to 1st field desc.           
+         AR    R5,R1                 Add to base to get address                 
+         USING ADMN_PROF_FIELDDESC,R5 Basing for field descriptor               
+*                                                                               
+DOSEGS   DS    0H                    For each segment descriptor                
+         L     R4,ADMN_PROF_NUMFIELDS Number of field descriptors for  *        
+                                     this segment                               
+         LA    R8,ADMN_PROF_SEGNAME  Address of segment name       @L1A         
+         BAL   R14,SEGMSG            Issue segment message                      
+*                                                                               
+DOFIELDS DS    0H                    For each field descriptor                  
+         XR    R9,R9                 Clear R9 for insert                        
+         ICM   R9,B'0011',ADMN_PROF_FIELDTYPE   Get type of field               
+         L     R8,=A(ADMN_PROF_RPTHDR) Is it a repeat field header?             
+         CR    R9,R8                                                            
+         BE    REPEAT                Yes, repeat field                          
+* Boolean fields and normal character fields land here. Go print them.          
+         STH   R9,FMTYPE             Set field type in FMPLIST     @L1A         
+         LA    R14,ADMN_PROF_FIELDNAME Get addr of field name      @L1A         
+         ST    R14,FMNAME@             Store in FMPLIST            @L1A         
+         MVC   FMDATLEN,ADMN_PROF_FIELDLEN Store data length       @L1A         
+         LR    R14,R1                Get R_admin output buffer @   @L1A         
+         A     R14,ADMN_PROF_DATA_OFFSET Add data offset           @L1A         
+         ST    R14,FMDATA@           Store data addr in p-list     @L1A         
+         TM    ADMN_PROF_FIELDFLAG,FMBOOLV Is boolean value TRUE?  @L1A         
+         BZ    DOMSG2                No                            @L1A         
+         OI    FMFLAG,FMBOOLV        Yes, set value on in p-list   @L1A         
+DOMSG2   DS    0H                                                  @L1A         
+         BAL   R14,FLDMSG            Display field name and value               
+         B     NEXTFLD               Get next field                             
+REPEAT   DS    0H                                                               
+         BAL   R15,DOREPEAT          Go process repeat field. R5 will  *        
+                                     point to next FD on return                 
+         B     NEXTFLD2              Continue with main fields                  
+*                                                                               
+* Set basing for next field descriptor. Decrement count of fields               
+* to see if we are finished.                                                    
+*                                                                               
+NEXTFLD  DS    0H                                                               
+         LA    R5,ADMN_PROF_NEXTFIELD Get next FD address                       
+NEXTFLD2 DS    0H                                                               
+         BCT   R4,DOFIELDS           Decrement number of fields                 
+         B     NEXTSEG               Done with fields. Check next seg           
+*                                                                               
+* Set basing for next segment descriptor. Decrement count of segments           
+* to see if we are finished. Note that R5 is already pointing to the            
+* first field descriptor in the next segment.                                   
+*                                                                               
+NEXTSEG  DS    0H                                                               
+         LA    R3,ADMN_PROF_NEXTSEG  Get next SD address                        
+         BCT   R2,DOSEGS             Decrement number of segments               
+*                                                                               
+* Done with segments, and hence with this profile. If ALL profiles @L1A         
+* were requested, loop back up to another R_admin call.            @L1A         
+*                                                                               
+DONESEGS DS    0H                                                  @L1A         
+         TM    MYFLAGS,NEXTREQ       Is this a next request?       @L1A         
+         BZ    FREEOUT               Done with segments, finish up @L1C         
+*                                                                               
+* If we encountered a ghost generic during extract-next, we need to             
+* stop looping. We do have an output block containing the profile               
+* name, so we need to free it.                                                  
+*                                                                               
+         TM    MYFLAGS,SPOOKY        Paranormal encounter?         @L1A         
+         BO    FREEOUT               Yes, free output and bail out @L1C         
+*                                                                               
+* We use the output p-list as the input p-list for the next iteration.          
+* R_admin will maintain the generic bit for us, but we need to keep             
+* setting the name-only bit on each iteration, because R_admin does             
+* not propagate that one.                                                       
+*                                                                               
+         L     R2,ADMN_PROF_FLAG     Get output flags              @L1C         
+         A     R2,SAVEFLAG           Add back specified options    @L1A         
+         ST    R2,ADMN_PROF_FLAG     Save updated flag word        @L1A         
+*                                                                               
+         MVC   PLIST@,OUTMSG         Save output buffer for input  @L1A         
+         L     R2,UPT@               Restore UPT for PUTLINEs      @L1A         
+         L     R3,ECT@               Restore ECT for PUTLINEs      @L1A         
+         OI    MYFLAGS,FOUND1                                                   
+         B     CALLSEQ               Yes, go get next              @L1A         
+         EJECT                                                                  
+*                                                                               
+* Free the R_admin output storage.  For SETROPTS, the subpool is   @L1C         
+* not contained in the output buffer, so we use the value we       @L1A         
+* passed as input. Note that although we use the profile-extract   @L1A         
+* output mapping to get the block size, it just so happens to have @L1A         
+* the same offset as the length field (ADMN_XTRUNL_OUTLEN) in the  @L1A         
+* SETROPTS output block (ADMN_XTRUNL_MAP), so we get away with it. @L1A         
+*                                                                               
+FREEOUT  DS    0H                                                               
+         L     R0,ADMN_PROF_OUTLEN Output area size to R0                       
+         XR    R2,R2               Clear for insert                @L1A         
+         IC    R2,SUBPOOL          Get specified subpool           @L1A         
+         CLC   FUNCODE,=AL1(ADMN_XTR_SETR) Setropts?               @L1A         
+         BE    FREEIT              Yes                             @L1A         
+         IC    R2,ADMN_PROF_SPID   Get subpool from p-list header  @L1A         
+FREEIT   DS    0H                                                  @L1A         
+         FREEMAIN RU,SP=(2),       freemain                        @L1C*        
+               LV=(0),             dynamic                             *        
+               A=(1)               area                                         
+         DROP  R1                                                               
+*                                                                               
+* free the parse PDL and our dynamic storage and return...                      
+*                                                                               
+GETOUT   DS    0H                                                               
+         LA    R1,PDLPTR           Point to the PDL pointer                     
+         IKJRLSA (R1)              Free storage that parse allocated            
+         L     R0,DYNSIZE          Dynamic area size to R0                      
+         L     R13,SAVEAREA+4      Restore R13                                  
+         LR    R1,R11              Dynamic data address to R1                   
+         FREEMAIN RU,LV=(0),A=(1)  Freemain dynamic area                        
+         LA    R15,0               Unconditional 0 return code                  
+         RETURN (14,12),T,RC=(15)  Restore registers and return                 
+MOVESTR  MVC   0(*-*,R15),0(R14)                                                
+         EJECT                                                                  
+*---------------------------------------------------------------------*         
+* DOREPEAT:                                                           *         
+*                                                                     *         
+* For repeat fields, cycle through each subfield for each occurrence. *         
+*                                                                     *         
+* Register input:  R5  = address of repeat field header descriptor    *         
+*                  R14 = return address                               *         
+*                                                                     *         
+* Register output: R5  = address of the next field descriptor after   *         
+*                        the entire repeat field just processed       *         
+*                                                                     *         
+* Register usage:                                                     *         
+*  R6 - Number of occurrences of repeat field                         *         
+*  R7 - Number of subfields within each occurrence                    *         
+*  R8 - Address of subfield descriptor                                *         
+*  R9 - Work register                                                 *         
+*---------------------------------------------------------------------*         
+DOREPEAT DS    0H                                                               
+         LA    R14,ADMN_PROF_FIELDNAME Get addr of field name      @L1A         
+         ST    R14,FMNAME@             Store in FMPLIST            @L1A         
+         MVC   FMDIM,ADMN_PROF_FIELDDIM  Store rpt field dimension @L1A         
+         MVC   FMNUMOCC,ADMN_PROF_RPTNUM And number of occurrences @L1A         
+         BAL   R14,RPTMSG            Go print header field                      
+         L     R6,ADMN_PROF_RPTNUM   Number of occurrences                      
+         LA    R8,ADMN_PROF_NEXTFIELD Get next FD address                       
+RPTOCC   DS    0H                    Process occurrence                         
+         L     R7,ADMN_PROF_FIELDDIM Number of subfields per occurrence         
+         DROP  R5                                                               
+         USING ADMN_PROF_FIELDDESC,R8 Basing for subfield descriptor            
+RPTSFLD  DS    0H                    Process subfield                           
+         MVC   FMTYPE,ADMN_PROF_FIELDTYPE Field type in FMPLIST    @L1A         
+         LA    R14,ADMN_PROF_FIELDNAME Get addr of field name      @L1A         
+         ST    R14,FMNAME@             Store in FMPLIST            @L1A         
+         MVC   FMDATLEN,ADMN_PROF_FIELDLEN Store data length       @L1A         
+         LR    R14,R1                Get R_admin output buffer @   @L1A         
+         A     R14,ADMN_PROF_DATA_OFFSET Add data offset           @L1A         
+         ST    R14,FMDATA@           Store data addr in p-list     @L1A         
+         TM    ADMN_PROF_FIELDFLAG,FMBOOLV Is boolean value TRUE?  @L1A         
+         BZ    DOMSG1                No                            @L1A         
+         OI    FMFLAG,FMBOOLV        Yes, set value on in p-list   @L1A         
+DOMSG1   DS    0H                                                  @L1A         
+         BAL   R14,FLDMSG            Print subfield name and value              
+         LA    R8,ADMN_PROF_NEXTFIELD Get next FD address                       
+         BCT   R7,RPTSFLD            Loop if subfields remaining                
+         BAL   R14,SEPMSG            Print separator                            
+         BCT   R6,RPTOCC             Loop if occurrences remaining              
+         LR    R5,R8                 All done. Set R5 to next FD addr           
+         BR    R15                   Return to caller                           
+         DROP  R8                                                               
+*---------------------------------------------------------------------*         
+* SEGMSG:                                                             *         
+*                                                                     *         
+* At the beginning of each segment, issue a message identifying the   *         
+* segment name.                                                       *         
+*                                                                     *         
+* Register input:  R4  = number of fields in this segment             *         
+*                  R8  = address of 8-character segment name      @L1A*         
+*                  R14 = return address                               *         
+*                                                                     *         
+* Register output:                                                    *         
+*                                                                     *         
+* Register usage:                                                     *         
+*---------------------------------------------------------------------*         
+SEGMSG   DS    0H                                                               
+         STM   14,12,REGSAVE        Save caller's regs                          
+         MVC   OLDNUM,=A(3)         Three message segments                      
+         LA    R10,L'MSG2+4                                                     
+         STH   R10,SEG1LEN                                                      
+         XC    SEG1OFF,SEG1OFF                                                  
+         MVC   SEG1DATA,MSG2                                                    
+         LA    R10,8+4              Get segment name length + header            
+         STH   R10,SEG2LEN                                                      
+         LA    R10,10               Offset of 1st insert                        
+         STH   R10,SEG2OFF                                                      
+         MVC   SEG2DATA(8),0(R8)    Move in segment name           @L1C         
+         LA    R2,6                 Max 2-digit number of fields                
+         STH   R2,SEG3LEN                                                       
+         LA    R2,L'MSG2            Insert position of insert (eol)             
+         STH   R2,SEG3OFF                                                       
+         CVD   R4,PACKDEC1          Convert binary to packed decimal            
+         LA    R2,PACKDEC1          Going to use 8 byte field for both          
+         UNPK  0(2,R2),6(2,R2)      Then to zoned decimal                       
+         OI    1(R2),X'F0'          Fix the sign nibble                         
+         MVC   SEG3DATA(2),PACKDEC1 Move 2-char number of fields                
+         L     R1,CPPLPTR           Get address of CPPL                         
+         USING CPPL,R1              And establish addressability                
+         L     R2,CPPLUPT                                                       
+         L     R3,CPPLECT                                                       
+         BAL   R10,ISSUEMSG         Go issue PUTLINE               @L1C         
+         LM    14,12,REGSAVE        Restore caller's regs                       
+         BR    R14                  Return to caller                            
+         DROP  R1                                                               
+         EJECT                                                                  
+*---------------------------------------------------------------------*         
+* RPTMSG:                                                             *         
+*                                                                     *         
+* At the beginning of each repeat field, print a message identifying  *         
+* the repeat field header name. There is no data to print.            *         
+*                                                                     *         
+* Input:  R14 = return address                                        *         
+*         FMPLIST area in dynamic storage                         @L1C*         
+*                                                                     *         
+* Output: FMPLIST is cleared for subsequent use                   @L1C*         
+*                                                                     *         
+* Register usage:                                                     *         
+*                                                                     *         
+*---------------------------------------------------------------------*         
+RPTMSG   DS    0H                                                               
+         STM   14,12,REGSAVE        Save caller's regs                          
+         MVC   OLDNUM,=A(4)         Four message segments                       
+         LA    R10,L'MSG3+4                                                     
+         STH   R10,SEG1LEN                                                      
+         XC    SEG1OFF,SEG1OFF                                                  
+         MVC   SEG1DATA,MSG3                                                    
+         LA    R10,8+4              Get field name length + header              
+         STH   R10,SEG2LEN                                                      
+         LA    R10,16               Offset of 1st insert                        
+         STH   R10,SEG2OFF                                                      
+         L     R10,FMNAME@          Get field name address         @L1A         
+         MVC   SEG2DATA(8),0(R10)   Move in field name             @L1C         
+*                                                                               
+         LA    R2,6                 Max 2-digit #subfields                      
+         STH   R2,SEG3LEN                                                       
+         LA    R2,27                Offset of 2nd insert                        
+         STH   R2,SEG3OFF                                                       
+         L     R4,FMDIM             Num of subflds per occurrence  @L1C         
+         CVD   R4,PACKDEC1          Convert binary to packed decimal            
+         LA    R2,PACKDEC1          Going to use 8 byte field for both          
+         UNPK  0(2,R2),6(2,R2)      Then to zoned decimal                       
+         OI    1(R2),X'F0'          Fix the sign nibble                         
+         MVC   SEG3DATA(2),PACKDEC1 Move 2-char number of subfields             
+*                                                                               
+         LA    R2,8                 Max 4-digit #occurrences                    
+         STH   R2,SEG4LEN                                                       
+         LA    R2,L'MSG3            Offset of 3rd insert (end of line)          
+         STH   R2,SEG4OFF                                                       
+         L     R4,FMNUMOCC          Number of occurrences          @L1C         
+         CVD   R4,PACKDEC2          Convert binary to packed decimal            
+         LA    R2,PACKDEC2          Point to source                             
+         UNPK  0(4,R2),5(3,R2)      Then to zoned decimal                       
+         OI    3(R2),X'F0'          Fix the sign nibble                         
+         MVC   SEG4DATA(4),PACKDEC2 Move 4-char number of occurrences           
+*                                                                               
+         L     R1,CPPLPTR           Get address of CPPL                         
+         USING CPPL,R1              And establish addressability                
+         L     R2,CPPLUPT                                                       
+         L     R3,CPPLECT                                                       
+         BAL   R10,ISSUEMSG         Go issue PUTLINE               @L1C         
+         XC    FMPLIST(FMPLLEN),FMPLIST  Clear input parm list     @L1A         
+         LM    14,12,REGSAVE        Restore caller's regs                       
+         BR    R14                  Return to caller                            
+         DROP  R1                                                               
+         EJECT                                                                  
+*---------------------------------------------------------------------*         
+* FLDMSG:                                                             *         
+*                                                                     *         
+* For each field, display the field name and its value.               *         
+*                                                                     *         
+* Input:  R14 = return address                                        *         
+*         FMPLIST area in dynamic storage                         @L1C*         
+*                                                                     *         
+* Output: FMPLIST is cleared for subsequent use                   @L1C*         
+*                                                                     *         
+* Register usage:                                                     *         
+*                                                                     *         
+* Register usage:                                                     *         
+*---------------------------------------------------------------------*         
+FLDMSG   DS    0H                                                               
+         STM   14,12,REGSAVE        Save caller's regs                          
+         MVC   OLDNUM,=A(3)         Three message segments                      
+         XC    SEG1OFF,SEG1OFF      Segment 1 offset always 0                   
+         XR    R9,R9                Clear R9 for insert                         
+         ICM   R9,B'0011',FMTYPE    Get type of field              @L1C         
+         L     R8,=A(ADMN_PROF_REPEAT)                                          
+         NR    R9,R8                Piece of repeat field?                      
+         BZ    NOTRPT               Nope                                        
+         LA    R10,L'MSG4RPT+4      Use extra indentation for repeat            
+         STH   R10,SEG1LEN                                                      
+         MVC   SEG1DATA,MSG4RPT                                                 
+         LA    R10,5                                               @L1A         
+         STH   R10,SEG2OFF          Indent field name 5 spaces     @L1C         
+         LA    R10,L'MSG4RPT        Offset of 3rd insert (end of line)          
+         STH   R10,SEG3OFF                                                      
+         B     NXTMSEG                                                          
+NOTRPT   DS    0H                                                               
+         LA    R10,L'MSG4+4                                                     
+         STH   R10,SEG1LEN                                                      
+         MVC   SEG1DATA,MSG4                                                    
+         LA    R10,3                                               @L1A         
+         STH   R10,SEG2OFF          Indent field name 3 spaces     @L1C         
+         LA    R10,L'MSG4           Offset of 3rd insert (end of line)          
+         STH   R10,SEG3OFF                                                      
+NXTMSEG  DS    0H                                                               
+         LA    R10,8+4              Get field name length + header              
+         STH   R10,SEG2LEN                                                      
+         L     R10,FMNAME@          Get field name address         @L1A         
+         MVC   SEG2DATA(8),0(R10)   Move in field name             @L1C         
+*                                                                               
+         ICM   R9,B'0011',FMTYPE          Reload field type        @L1C         
+         L     R8,=A(ADMN_PROF_BOOLEAN)                                         
+         NR    R9,R8                      Is field boolean?                     
+         BZ    NOTBOOL                                                          
+         TM    FMFLAG,FMBOOLV             Is boolean value bit on? @L1C         
+         BZ    NOTTRUE                                                          
+         LA    R10,4+4              Length("TRUE") + header                     
+         STH   R10,SEG3LEN                                                      
+         MVC   SEG3DATA,=C'TRUE'                                                
+         B     DOFPUT                                                           
+NOTTRUE  DS    0H                                                               
+         LA    R10,5+4              Length("FALSE") + header                    
+         STH   R10,SEG3LEN                                                      
+         MVC   SEG3DATA,=C'FALSE'                                               
+         B     DOFPUT                                                           
+NOTBOOL  DS    0H                                                               
+         L     R10,FMDATLEN               Get length of field data @L1C         
+         LA    R14,L'SEG3DATA             Get length of buffer     @L1A         
+         CR    R10,R14                    Is value > buffer length?@L1C         
+         BNH   NOPROB                     No                                    
+         LA    R10,L'SEG3DATA             Lazy again, just truncate             
+NOPROB   DS    0H                                                               
+         ST    R10,SAVEDLEN               Save it for later                     
+         LA    R10,4(R10)                 Add 4 for header                      
+         STH   R10,SEG3LEN                Store it                              
+         L     R14,FMDATA@                Get address of field data@L1C         
+         LA    R15,SEG3DATA               Target: msg segment 3 data            
+         L     R10,SAVEDLEN               Reload field length                   
+         BCTR  R10,0                Decrement length for move                   
+         EX    R10,MOVESTR          Move field data                             
+DOFPUT   DS    0H                                                               
+         L     R1,CPPLPTR           Get address of CPPL                         
+         USING CPPL,R1              And establish addressability                
+         L     R2,CPPLUPT                                                       
+         L     R3,CPPLECT                                                       
+         BAL   R10,ISSUEMSG         Go issue PUTLINE               @L1C         
+         XC    FMPLIST(FMPLLEN),FMPLIST  Clear input parm list     @L1A         
+         LM    14,12,REGSAVE        Restore caller's regs                       
+         BR    R14                  Return to caller                            
+         DROP  R1                                                               
+         EJECT                                                                  
+*---------------------------------------------------------------------*         
+* SEPMSG:                                                             *         
+*                                                                     *         
+* Print a separator line between occurrences of a repeat field.       *         
+*                                                                     *         
+* Register input:  R14 = return address                               *         
+*                                                                     *         
+* Register output:                                                    *         
+*                                                                     *         
+* Register usage:                                                     *         
+*                                                                     *         
+*---------------------------------------------------------------------*         
+SEPMSG   DS    0H                                                               
+         STM   14,12,REGSAVE        Save caller's regs                          
+         MVC   OLDNUM,=A(1)         One message segment                         
+         LA    R10,L'MSG5+4                                                     
+         STH   R10,SEG1LEN                                                      
+         XC    SEG1OFF,SEG1OFF                                                  
+         MVC   SEG1DATA,MSG5                                                    
+         L     R1,CPPLPTR           Get address of CPPL                         
+         USING CPPL,R1              And establish addressability                
+         L     R2,CPPLUPT                                                       
+         L     R3,CPPLECT                                                       
+         BAL   R10,ISSUEMSG         Go issue PUTLINE               @L1C         
+         LM    14,12,REGSAVE        Restore caller's regs                       
+         BR    R14                  Return to caller                            
+         DROP  R1                                                               
+         EJECT                                                                  
+*---------------------------------------------------------------------*         
+* SETRMSG:                                                        @L1A*         
+*                                                                     *         
+* Print a heading message for SETROPTS data.                          *         
+*                                                                     *         
+* Register input:  R14 = return address                               *         
+*                                                                     *         
+* Register output:                                                    *         
+*                                                                     *         
+* Register usage:                                                     *         
+*                                                                     *         
+*---------------------------------------------------------------------*         
+SETRMSG  DS    0H                                                               
+         STM   14,12,REGSAVE        Save caller's regs                          
+         MVC   OLDNUM,=A(1)         One message segment                         
+         LA    R10,L'MSGA+4                                                     
+         STH   R10,SEG1LEN                                                      
+         XC    SEG1OFF,SEG1OFF                                                  
+         MVC   SEG1DATA,MSGA                                                    
+         L     R1,CPPLPTR           Get address of CPPL                         
+         USING CPPL,R1              And establish addressability                
+         L     R2,CPPLUPT                                                       
+         L     R3,CPPLECT                                                       
+         BAL   R10,ISSUEMSG         Go issue PUTLINE               @L1C         
+         LM    14,12,REGSAVE        Restore caller's regs                       
+         BR    R14                  Return to caller                            
+         DROP  R1                                                               
+         EJECT                                                                  
+*---------------------------------------------------------------------*         
+* DOSETR:                                                         @L1A*         
+*                                                                     *         
+* Process the SETROPTS extract output. It's in a different format     *         
+* than profile extract output, but conceptually similar. We will      *         
+* make this transparent as much as possible, by creating output that  *         
+* is consistent with profile-related output. This involves:           *         
+*  - Issuing a different "heading" message (no profile and class).    *         
+*  - Issuing a segment message for BASE (which actually reflects      *         
+*    the output as returned by R_admin).                              *         
+*  - Hard-coding lists of boolean and repeat fields, since, unlike    *         
+*    profile extract, this information is not contained within the    *         
+*    output, but rather in the documentation (in fact, only the       *         
+*    boolean fields are documented as such; we just need to know      *         
+*    that the class-related fields, and only the class-related        *         
+*    fields, are repeat fields).                                      *         
+*  - For repeat fields (i.e. all the class-related fields), the data  *         
+*    is returned by R_admin as a blank-separated list of classes.     *         
+*    in a simulated repeat-field-header message. Since SETROPTS       *         
+*    extract repeat fields don't have "header" (count) fields (like   *         
+*    they do in profile extract), we will simply use the field name   *         
+*    as-is as the "header" field.                                     *         
+*                                                                     *         
+* Register input:  R1  = Address of R_admin output buffer             *         
+*                  R14 = Return address                               *         
+*                                                                     *         
+* Register output:                                                    *         
+*                                                                     *         
+* Register usage                                                      *         
+*  R1 = R_admin output buffer (OUTMSG)                                *         
+*  R3 = Address of BASE segment entry                                 *         
+*  R4 = Number of field entries to process                            *         
+*  R5 = Address of current field entry                                *         
+*  R9 = For repeat fields, the number of occurrences (classes)        *         
+*  R10= For repeat fields, the address of the nth class name          *         
+*---------------------------------------------------------------------*         
+DOSETR   DS    0H                                                               
+         STM   14,12,REGSAVE         Save caller's regs                         
+         BAL   R14,SETRMSG           Issue heading message                      
+         L     R1,OUTMSG             Get output address in R1                   
+         USING ADMN_XTRUNL_MAP,R1                                               
+         LA    R3,ADMN_XTRUNL_ENTRY  Get address of segment entry               
+         USING ADMN_USRADM_SEGENTRY,R3                                          
+         XR    R4,R4                 Clear it out                               
+         ICM   R4,B'0011',ADMN_USRADM_FLD_NUM   Number of field entries         
+         LA    R8,ADMN_USRADM_SEG_NAME  Name of segment (BASE)                  
+         BAL   R14,SEGMSG            Issue segment message                      
+         LA    R5,ADMN_USRADM_FLDSTRT Get address of field entry                
+         USING ADMN_USRADM_FLDENTRY,R5                                          
+*                                                                               
+DOSFLDS  DS    0H                    For each field descriptor                  
+*                                                                               
+* Check to see if this is a boolean field                                       
+*                                                                               
+         L     R8,SRBOOLN            Get number of boolean fields               
+         LA    R9,SRBOOLS            Get addr of first field                    
+CHKBOOL  DS    0H                    See if it's a repeat field                 
+         CLC   ADMN_USRADM_FLD_NAME(8),0(R9)  Match?                            
+         BE    SBOOL                 Yes, boolean field                         
+         LA    R9,8(R9)              Bump to next field name                    
+         BCT   R8,CHKBOOL            Decrement number of fields                 
+*                                                                               
+* Check to see if this is a repeat field                                        
+*                                                                               
+         L     R8,SRPTFLDN           Get number of repeat fields                
+         LA    R9,SRPTFLDS           Get addr of first field                    
+CHKRPT   DS    0H                    See if it's a repeat field                 
+         CLC   ADMN_USRADM_FLD_NAME(8),0(R9)  Match?                            
+         BE    SREPEAT               Yes, repeat field                          
+         LA    R9,8(R9)              Bump to next field name                    
+         BCT   R8,CHKRPT             Decrement number of fields                 
+         B     SCHAR                 It's a straight character field            
+*                                                                               
+* Boolean fields land here. Set up p-list to print them.                        
+*                                                                               
+SBOOL    DS    0H                                                               
+         MVC   FMTYPE,=AL2(ADMN_PROF_BOOLEAN) Set field type                    
+         CLI   ADMN_USRADM_FLD_FLAG,C'Y'      Is value TRUE?                    
+         BNE   SFALSE                No                                         
+         OI    FMFLAG,FMBOOLV        Yes, set in FMPLIST                        
+SFALSE   DS    0H                                                               
+         B     SFLDMSG               Go issue message                           
+*                                                                               
+* Character fields land here. Make sure they have data before                   
+* reporting on them (e.g. the seclevel audit field SLEVAUDT may                 
+* contain a defined SECLEVEL, but if the length is 0, the setting               
+* is not active, and we simply suppress the field output).                      
+*                                                                               
+SCHAR    DS    0H                                                               
+         OC    ADMN_USRADM_FLD_LEN,ADMN_USRADM_FLD_LEN  Any field data?         
+         BZ    SNEXTFLD              No, don't report on the field              
+         XC    FMTYPE,FMTYPE         Set field type                             
+         B     SFLDMSG               Go issue message                           
+*                                                                               
+* Repeat fields land here. All class names are padded to 8 characters           
+* and a trailing blank separates each class name, including the final           
+* entry. So, the number of entries can be easily calculated by:                 
+* data_length/9. We won't bother determining the actual length of a             
+* class name when displaying it, but will unconditionally display               
+* 8 characters.                                                                 
+*                                                                               
+SREPEAT  DS    0H                                                               
+         XR    R8,R8                 Clear it                                   
+         XR    R9,R9                 Clear it                                   
+         ICM   R8,B'0011',ADMN_USRADM_FLD_LEN Get field data length             
+         SRDA  R8,32(0)              Shift into R9 (R1+1) with sign             
+         LA    R14,9                 Length of class name + blank               
+         DR    R8,R14                Divide data length by 9                    
+         ST    R9,FMNUMOCC           Quotient from division is in R9            
+         LA    R14,ADMN_USRADM_FLD_NAME Get address of field name               
+         ST    R14,FMNAME@           Store in FMPLIST                           
+         MVC   FMDIM,=A(1)           Dimension always 1 for SETROPTS            
+         BAL   R14,RPTMSG            Go print header field                      
+*                                                                               
+* Now loop through the class list, issuing a field message for each             
+* occurrence. The number of occurrences is in R9. The address of the            
+* nth class name is maintained in R10.                                          
+*                                                                               
+         LA    R10,ADMN_USRADM_FLD_DATA Point at first entry                    
+SRPTLOOP DS    0H                                                               
+         ST    R10,FMDATA@           Store data addr in p-list                  
+         LA    R14,ADMN_USRADM_FLD_NAME Get address of field name               
+         ST    R14,FMNAME@              Put address in FMPLIST                  
+         LA    R14,8                    Constant length of 8                    
+         ST    R14,FMDATLEN             Store data length                       
+         L     R14,=A(ADMN_PROF_REPEAT) Indicate piece of repeat field          
+         STH   R14,FMTYPE            Set field type in FMPLIST                  
+         BAL   R14,FLDMSG            Display field name and value               
+         BAL   R14,SEPMSG            Print separator                            
+         LA    R10,9(R10)            Point at next class name                   
+         BCT   R9,SRPTLOOP           Decrement number of fields                 
+         B     SNEXTFLD              Get next field                             
+*                                                                               
+* Set common FMPLIST fields and call to issue the message                       
+*                                                                               
+SFLDMSG  DS    0H                                                               
+         LA    R14,ADMN_USRADM_FLD_NAME Get address of field name               
+         ST    R14,FMNAME@              Put address in FMPLIST                  
+         XR    R14,R14                  Clear it                                
+         ICM   R14,B'0011',ADMN_USRADM_FLD_LEN Get field data length            
+         ST    R14,FMDATLEN             Store data length                       
+         LA    R14,ADMN_USRADM_FLD_DATA Get address of field data               
+         ST    R14,FMDATA@           Store data addr in p-list                  
+         BAL   R14,FLDMSG            Display field name and value               
+*                                                                               
+* Set basing for next field descriptor. Decrement count of fields               
+* to see if we are finished.                                                    
+*                                                                               
+SNEXTFLD DS    0H                                                               
+         XR    R6,R6                 Clear it                      @L1A         
+         ICM   R6,B'0011',ADMN_USRADM_FLD_LEN Length of field data @L1C         
+         LA    R14,(ADMN_USRADM_FLD_DATA-ADMN_USRADM_FLDENTRY)     @L1C         
+         AR    R6,R14                Length of this field entry    @L1A         
+         AR    R5,R6                 Get next field entry address               
+         BCT   R4,DOSFLDS            Decrement number of fields                 
+         DROP  R1                                                               
+         BR    R15                   Return to caller                           
+         EJECT                                                                  
+*---------------------------------------------------------------------*         
+* ISSUEMSG:                                                       @L1A*         
+*                                                                     *         
+* Issue a message to the user using PUTLINE.                          *         
+*                                                                     *         
+* Register input:  R2  = UPT address                                  *         
+*                  R3  = ECT address                                  *         
+*                  R10 = Return address                               *         
+*                                                                     *         
+*---------------------------------------------------------------------*         
+ISSUEMSG DS    0H                                                               
+         XC    PUTECB,PUTECB        Clear ECB                                   
+         PUTLINE    PARM=PUTSEQ,UPT=(R2),ECT=(R3),ECB=PUTECB,          *        
+               OUTPUT=(OLDNUM,TERM,SINGLE,INFOR),MF=(E,PUTIOPL)                 
+         BR    R10                   Return to caller                           
+         EJECT                                                                  
+*                                                                               
+***********************************************************************         
+*                                                                               
+*                                                                               
+* PARSE macros used to describe the command operands                            
+*                                                                               
+*                                                                               
+***********************************************************************         
+RACPDE   IKJPARM                                                                
+KWSETR   IKJKEYWD                                                               
+         IKJNAME 'SETROPTS'                                                     
+KWALL    IKJKEYWD                                                               
+         IKJNAME 'ALL'                                             @L1A         
+KWBASE   IKJKEYWD                                                               
+         IKJNAME 'BASEONLY'                                        @L1A         
+KWNAME   IKJKEYWD                                                               
+         IKJNAME 'NAMEONLY'                                        @L1A         
+KWUPPER  IKJKEYWD                                                               
+         IKJNAME 'UPPERCASE'                                       @L1A         
+KWGEN    IKJKEYWD                                                               
+         IKJNAME 'GENERIC'                                         @L1A         
+KWSUPER  IKJKEYWD                                                               
+         IKJNAME 'SUPERVISOR'                                      @L1A         
+KWCMDATH IKJKEYWD                                                               
+         IKJNAME 'CMDAUTH'                                         @L1A         
+         IKJNAME 'NOCMDAUTH'                                       @L1A         
+KWFACIL  IKJKEYWD                                                               
+         IKJNAME 'FACILITYAUTH'                                    @L1A         
+KWCLASS  IKJKEYWD                                                               
+         IKJNAME 'CLASS',SUBFLD=SEQCLASS                                        
+KWPROF   IKJKEYWD                                                               
+         IKJNAME 'PROFILE',SUBFLD=SEQPROF                                       
+KWUSER   IKJKEYWD ,                                                             
+         IKJNAME  'USER',SUBFLD=SEQUSER                                         
+KWSUBP   IKJKEYWD ,                                                             
+         IKJNAME  'SUBPOOL',SUBFLD=SEQSUBP                                      
+SEQCLASS IKJSUBF                                                                
+SFCLASS  IKJIDENT 'CLASS',MAXLNTH=8,FIRST=ANY,OTHER=ANY,               *        
+               DEFAULT='USER',                                         *        
+               HELP=('RACF class name from which to extract')                   
+*                                                                               
+SEQPROF  IKJSUBF                                                                
+SFPROF   IKJIDENT 'PROFILE',MAXLNTH=255,FIRST=ANY,OTHER=ANY,           *        
+               HELP=('RACF profile name to extract'),ASIS,             *        
+               PROMPT='Profile name. Use <user>.<group> for CONNECT'            
+SEQUSER  IKJSUBF                                                                
+SFUSER   IKJIDENT 'USERID',MAXLNTH=8,FIRST=ALPHANUM,                   *        
+               OTHER=ALPHANUM,PROMPT='(User ID)',                      *        
+               HELP=('User ID under whose authority to run')                    
+SEQSUBP  IKJSUBF                                                                
+SFSUBP   IKJIDENT 'SUBPOOL',MAXLNTH=3,FIRST=NUMERIC,INTEG,             *        
+               OTHER=NUMERIC,PROMPT='Subpool number',                  *        
+               HELP=('A subpool number from 0 to 255')                          
+         IKJENDP                                                                
+         EJECT                                                                  
+*                                                                               
+* static data                                                                   
+*                                                                               
+         DS    0D                                                               
+DYNSIZE  DC    AL4(SIZEDATD)       dynamic area size                            
+USERCLS  DC    CL4'USER'           USER class                                   
+GRPCLS   DC    CL5'GROUP'          GROUP class                                  
+CONCLS   DC    CL7'CONNECT'        CONNECT class                                
+DATCLS   DC    CL7'DATASET'        DATASET class                   @L1A         
+PUTSEQ   PUTLINE MF=L                                                           
+*                                                                               
+* Define text of command output and error messages. There must be               
+* a leading blank so that we are immune to the TSO PROFILE MSGID                
+* setting.                                                                      
+*                                                                               
+MSG1     DC    CL41' Displaying profile  in class . Segments:'                  
+MSG2     DC    CL18' Segment:  Fields:'                                         
+MSG3     DC    CL40'   Repeat field: Subfields: Occurrences:'                   
+MSG4     DC    CL4'   :'             2 spaces||fieldname||:||value              
+MSG4RPT  DC    CL6'     :'           4 spaces||fieldname||:||value              
+MSG5     DC    CL50'     ---------------------------------------------'         
+MSG6     DC    CL46' R_admin Error! SAFrc  - RACFrc  - RACFreason '             
+MSG7     DC    CL26' Error! Unsupported class!'                                 
+MSG8     DC    CL60' Syntax: RACSEQ SETROPTS | CLASS(class) PROFILE(proX        
+               file) ALL'                                          @L1C         
+MSG9     DC    CL28' IKJPARS error! Return Code '                               
+MSGA     DC    CL25' Displaying SETROPTS data'                                  
+*                                                                               
+* SETROPTS extract output does not indicate the field type. So, we @L1A         
+* will hardcode a table of the repeat fields defined to SETROPTS.  @L1A         
+         DS    0F                                                  @L1A         
+SRPTFLDN DC    AL4(13)             Number of repeat fields         @L1A         
+SRPTFLDS DC    CL8'CLASSACT'                                       @L1A         
+         DC    CL8'CLASSTAT'                                       @L1A         
+         DC    CL8'GENCMD  '                                       @L1A         
+         DC    CL8'GENERIC '                                       @L1A         
+         DC    CL8'GENLIST '                                       @L1A         
+         DC    CL8'GLOBAL  '                                       @L1A         
+         DC    CL8'RACLIST '                                       @L1A         
+         DC    CL8'AUDIT   '                                       @L1A         
+         DC    CL8'LOGALWYS'                                       @L1A         
+         DC    CL8'LOGNEVER'                                       @L1A         
+         DC    CL8'LOGSUCC '                                       @L1A         
+         DC    CL8'LOGFAIL '                                       @L1A         
+         DC    CL8'LOGDEFLT'                                       @L1A         
+*                                                                               
+* SETROPTS extract output does not indicate the field type. So, we @L1A         
+* will hardcode a table of the boolean fields defined to SETROPTS. @L1A         
+SRBOOLN  DC    AL4(31)             Number of boolean fields        @L1A         
+SRBOOLS  DC    CL8'INITSTAT'                                       @L1A         
+         DC    CL8'CMDVIOL '                                       @L1A         
+         DC    CL8'OPERAUDT'                                       @L1A         
+         DC    CL8'SAUDIT  '                                       @L1A         
+         DC    CL8'APPLAUDT'                                       @L1A         
+         DC    CL8'SLABAUDT'                                       @L1A         
+         DC    CL8'MIXDCASE'                                       @L1A         
+         DC    CL8'RULES   '                                       @L1A         
+         DC    CL8'ADDCREAT'                                       @L1A         
+         DC    CL8'ADSP    '                                       @L1A         
+         DC    CL8'COMPMODE'                                       @L1A         
+         DC    CL8'EGN     '                                       @L1A         
+         DC    CL8'GENOWNER'                                       @L1A         
+         DC    CL8'GRPLIST '                                       @L1A         
+         DC    CL8'MLQUIET '                                       @L1A         
+         DC    CL8'MLSTABLE'                                       @L1A         
+         DC    CL8'MLNAMES '                                       @L1A         
+         DC    CL8'SLBYSYS '                                       @L1A         
+         DC    CL8'REALDSN '                                       @L1A         
+         DC    CL8'SECLABCT'                                       @L1A         
+         DC    CL8'TAPEDSN '                                       @L1A         
+         DC    CL8'WHENPROG'                                       @L1A         
+         DC    CL8'MODGDG  '                                       @L1A         
+         DC    CL8'MODGROUP'                                       @L1A         
+         DC    CL8'MODUSER '                                       @L1A         
+         DC    CL8'MODEL   '                                       @L1A         
+         DC    CL8'ERASE   '                                       @L1A         
+         DC    CL8'ERASEALL'                                       @L1A         
+         DC    CL8'JESBATCH'                                       @L1A         
+         DC    CL8'JESEARLY'                                       @L1A         
+         DC    CL8'JESXBM  '                                       @L1A         
+*                                                                               
+         DS    0D                                                               
+         LTORG                                                                  
+*                                                                               
+* DSECT for this routine's dynamic area                                         
+*                                                                               
+DATD     DSECT                                                                  
+         DS    0D                                                               
+SAVEAREA DS    18F                 register save area                           
+REGSAVE  DS    16F                 internal subroutine save area                
+SAVEDLEN DS    F                   Temp variable for field data length          
+SAVEFLAG DS    F                   Saved command-line options      @L1A         
+DYNPPL   DS    CL(L_PPL)           PPL area                                     
+PPLPTR   DS    F                   Pointer to DYNPPL                            
+CPPLPTR  DS    F                   Pointer to input CPPL                        
+PDLPTR   DS    F                   Pointer to output PDL                        
+PLIST@   DS    F                   Pointer to previous R_admin pl  @L1A         
+UPT@     DS    F                   Pointer to UPT                  @L1A         
+ECT@     DS    F                   Pointer to ECT                  @L1A         
+PUTIOPL  DS    4F                  E-form IOPL area for PUTLINE                 
+PUTECB   DS    F                   ECB for PUTLINE                              
+MYFLAGS  DS    XL1                 Local processing flags          @L1A         
+NEXTREQ  EQU   X'80'               Indicates a next request        @L1A         
+FOUND1   EQU   X'40'               Indicates >=1 profiles found    @L1A         
+SPOOKY   EQU   X'20'               Indicates a ghost-generic found @L1A         
+PACKDEC1 DS    CL8                 Output for CVD                               
+PACKDEC2 DS    CL8                 Output for CVD                               
+PACKDEC3 DS    CL8                 Output for CVD                               
+*                                                                               
+* The following fields comprise the interface to the FLDMSG        @L1A         
+* subroutine, which issues a message for a field.                  @L1A         
+*                                                                               
+FMPLIST  DS    0CL15               P-list for FLDMSG subroutine    @L1A         
+FMNAME@  DS    A                   Addr of 8-char field name       @L1A         
+FMDATLEN DS    F                   Length of field data            @L1A         
+FMDATA@  DS    A                   Address of field data           @L1A         
+         ORG   *-8                 Remap for repeat field header   @L1A         
+FMDIM    DS    F                   Dimension of repeat field       @L1A         
+FMNUMOCC DS    F                   Number of repeat occurrences    @L1A         
+FMTYPE   DS    XL2                 Field type (ADMN_PROF_FIELDTYPE)@L1A         
+FMFLAG   DS    XL1                 Field flags                     @L1A         
+FMBOOLV  EQU   X'80'               Field value for boolean field   @L1A         
+FMPLLEN  EQU   *-FMPLIST           Length of this parameter list   @L1A         
+*                                                                               
+*                                                                               
+* Output Line Descriptor (OLD) fields for PUTLINE                               
+OLDNUM   DS    F                   Number of segments                           
+OLDSEGA1 DS    F                   Pointer to first message segment             
+OLDSEGA2 DS    F                   Pointer to second message segment            
+OLDSEGA3 DS    F                   Pointer to third message segment             
+OLDSEGA4 DS    F                   Pointer to fourth message segment            
+SEG1LEN  DS    H                   Segment 1 length                             
+SEG1OFF  DS    H                   Segment 1 offset                             
+SEG1DATA DS    CL100               Segment 1 data                               
+SEG2LEN  DS    H                   Segment 2 length                             
+SEG2OFF  DS    H                   Segment 2 offset                             
+SEG2DATA DS    CL100               Segment 2 data                               
+SEG3LEN  DS    H                   Segment 3 length                             
+SEG3OFF  DS    H                   Segment 3 offset                             
+SEG3DATA DS    CL255               Segment 3 data                               
+SEG4LEN  DS    H                   Segment 4 length                             
+SEG4OFF  DS    H                   Segment 4 offset                             
+SEG4DATA DS    CL255               Segment 4 data                               
+*                                                                               
+* Parms for IRRSEQ00                                                            
+*                                                                               
+WORKAREA DS    CL1024                                                           
+ALET     DS    F                                                                
+SAFRC    DS    F                                                                
+RACFRC   DS    F                                                                
+RACFRS   DS    F                                                                
+FUNCODE  DS    AL1                                                              
+USER     DS    0CL9                                                             
+USERLEN  DS    AL1                                                              
+USERID   DS    CL8                                                              
+ACEE     DS    F                                                                
+SUBPOOL  DS    AL1                                                              
+OUTMSG   DS    F                                                                
+RADPLIST DS    CL(ADMN_PROF_PROFNAME-ADMN_PROF_MAP) Plist header                
+EXTPROF  DS    CL246                  Name of profile to extract   @L1C         
+SETPLIST DS    CL14  Setropts Plist header (ADMN_XTRSETR_MAP)      @L1A         
+*                                                                               
+* Parm list for IRRSEQ00.  That is, a list of adresses to the actual            
+* Parameter data defined above.                                                 
+*                                                                               
+WORKAREA@ DS    A                                                               
+ALET1@    DS    A                                                               
+SAFRC@    DS    A                                                               
+ALET2@    DS    A                                                               
+RACFRC@   DS    A                                                               
+ALET3@    DS    A                                                               
+RACFRS@   DS    A                                                               
+FUNCODE@  DS    A                                                               
+RADPLIST@ DS    A                                                               
+USER@     DS    A                                                               
+ACEE@     DS    A                                                               
+SUBPOOL@  DS    A                                                               
+OUTMSG@   DS    A                                                               
+SIZEDATD EQU   *-DATD              length of DSECT                              
+*                                                                               
+***********************************************************************         
+* The following DSECT maps the results of the parse.                  *         
+***********************************************************************         
+         EJECT                                                                  
+SEQPDL   DSECT                                                                  
+PDLHDR   DS    CL8                                                              
+PDLSETR  DS    H     SETROPTS option                                            
+PDLALL   DS    H      ALL option                                   @L1A         
+PDLBASE  DS    H      BASEONLY option                              @L1A         
+PDLNAME  DS    H      NAMEONLY option                              @L1A         
+PDLUPPER DS    H      UPPER-case the name where appropriate option @L1A         
+PDLGEN   DS    H      GENERIC option                               @L1A         
+PDLSUPER DS    H      SUPERVISOR state option                      @L1A         
+PDLCMD   DS    H      NO/CMDAUTH option                            @L1A         
+PDLFACIL DS    H      FACILITYAUTH option                          @L1A         
+PDLCLASS DS    H                                                                
+PDLPROF  DS    H                                                                
+PDLUSER  DS    H      USER option                                  @L1A         
+PDLSUBP  DS    H      SUBPOOL option                               @L1A         
+*        DS    H                                                                
+PDECLASS DS    0CL8                                                             
+CLSPTR   DS    F                                                                
+CLSLEN   DS    H                                                                
+         DS    CL2                                                              
+PDEPROF  DS    0CL8                                                             
+PROFPTR  DS    F                                                                
+PROFLEN  DS    H                                                                
+         DS    CL2                                                              
+PDEUSERK DS    0CL8                                                             
+USERKPTR DS    F                                                                
+USERKLEN DS    H                                                                
+         DS    CL2                                                              
+PDESUBP  DS    0CL8                                                             
+SUBPPTR  DS    F                                                                
+SUBPLEN  DS    H                                                                
+         DS    CL2                                                              
+*                                                                               
+* equates                                                                       
+*                                                                               
+R0       EQU   0                                                                
+R1       EQU   1                                                                
+R2       EQU   2                                                                
+R3       EQU   3                                                                
+R4       EQU   4                                                                
+R5       EQU   5                                                                
+R6       EQU   6                                                                
+R7       EQU   7                                                                
+R8       EQU   8                                                                
+R9       EQU   9                                                                
+R10      EQU   10                                                               
+R11      EQU   11                                                               
+R12      EQU   12                                                               
+R13      EQU   13                                                               
+R14      EQU   14                                                               
+R15      EQU   15                                                               
+         EJECT                                                                  
+*                                                                               
+* MAPPINGS                                                                      
+*                                                                               
+         IKJCPPL                                                                
+         IKJPPL                                                                 
+L_PPL    EQU   *-PPL                                                            
+         EJECT                                                                  
+         IRRPCOMP                                                               
+         EJECT                                                                  
+         CVT   DSECT=YES        CVT MAPPING NEEDED FOR CALLTSSR MACRO           
+         END   RACSEQ                                                           

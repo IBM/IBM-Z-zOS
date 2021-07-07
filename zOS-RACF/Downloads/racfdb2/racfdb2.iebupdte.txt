@@ -1,0 +1,1023 @@
+./   ADD  NAME=JCL                                                              
+//RCFDB2   JOB (CBNG),'RACF/DB2 CONV',MSGCLASS=H,                       00001001
+//  MSGLEVEL=(0,0),CLASS=A                                              00002000
+//STEP1  EXEC  PGM=IKJEFT01                                             00003000
+//SYSTSPRT DD  SYSOUT=*                                                 00003100
+//***** ENTER THE RXSQL LIBRARY BELOW, UNLESS IT IS LINKLISTED *****    00003200
+//STEPLIB  DD  DISP=SHR,DSN=SYS1.SCRXLMD                                00003300
+//SYSPROC  DD  DISP=SHR,DSN=RCF.RACFDB2.PACKAGE                         00003400
+//SYSEXEC  DD  DISP=SHR,DSN=RCF.RACFDB2.PACKAGE                         00003500
+//CLIST    DD  DISP=SHR,DSN=RCF.RACFDB2.CONVCLST                        00003601
+//*CLIST    DD  DISP=(NEW,CATLG),DSN=RCF.RACFDB2.CONVCLST,              00003701
+//*   UNIT=SYSDA,SPACE=(CYLS,(1,1)),DCB=(RECFM=VB,LRECL=255)            00003801
+//SYSTSIN  DD  *                                                        00003900
+  EXECUTIL SEARCHDD(YES)                                                00004000
+  %RXSADM OWNNAM DSN  DSN      2                                        00004100
+  %RXSRES OWNNAM DSN  DSN      2                                        00004200
+//*       OWNER  SSID CLASSMNT MODEL CHAROPT                            00005000
+./   ADD  NAME=RXSADM                                                           
+/*Rexx*/                                                                        
+Arg owner ssid classmnt model charopt .                                         
+If owner="" Then Do                                                             
+  Say "Owner must be specified"                                                 
+  Exit                                                                          
+End                                                                             
+If ssid="" Then Do                                                              
+  Say "SSID must be specified"                                                  
+  Exit                                                                          
+End                                                                             
+If classmnt="" Then classmnt="DSN"                                              
+If model="" Then model=2                                                        
+                                                                                
+hdr.0 = 1                                                                       
+hdr.1 = "/* DB2 to RACF conversion CLIST */"                                    
+"EXECIO * DISKW CLIST (STEM hdr."                                               
+                                                                                
+   /* Set class based on 'Classification Model' */                              
+   /* If an invalid model, we default to II     */                              
+If model=1 Then class=Strip(ssid)"ADM"charopt                                   
+Else class=classmnt"ADM"charopt                                                 
+                                                                                
+   /* Set up RXSQL variables */                                                 
+RXSQL_DB2SUBSYS = ssid                                                          
+RXSQL_DB2PLAN = 'RXSQL'                                                         
+                                                                                
+call sys_attr "SYSADM","SYSADMAUTH"                                             
+call sys_attr "SYSOPR","SYSOPRAUTH"                                             
+call sys_attr "SYSCTRL","SYSCTRLAUTH"                                           
+                                                                                
+call db_attr "DBADM","DBADMAUTH"                                                
+call db_attr "DBMAINT","DBMAINTAUTH"                                            
+call db_attr "DBCTRL","DBCTRLAUTH"                                              
+                                                                                
+   /* Resource privileges */                                                    
+If model=1 Then class="M"Strip(ssid)"SM"charopt                                 
+Else class="M"classmnt"SM"charopt                                               
+call sys_attr "ARCHIVE","ARCHIVEAUTH"                                           
+call sys_attr "BINDADD","BINDADDAUTH"                                           
+call bindagent                                                                  
+call sys_attr "CREATEALIAS","CREATEALIASAUTH"                                   
+call sys_attr "CREATEDBA","CREATEDBAAUTH"                                       
+call sys_attr "CREATEDBC","CREATEDBCAUTH"                                       
+call sys_attr "CREATESG","CREATESGAUTH"                                         
+call sys_attr "DISPLAY","DISPLAYAUTH"                                           
+call sys_attr "MONITOR1","MON1AUTH"                                             
+call sys_attr "MONITOR2","MON2AUTH"                                             
+call sys_attr "RECOVER","RECOVERAUTH"                                           
+call sys_attr "STOPALL","STOPALLAUTH"                                           
+call sys_attr "STOSPACE","STOSPACEAUTH"                                         
+call sys_attr "TRACE","TRACEAUTH"                                               
+/* Requires DB 5.1 to test */                                                   
+call sys_attr "CREATETMTAB","CREATETMTABAUTH"                                   
+                                                                                
+"EXECIO 0 DISKW CLIST (FINIS"                                                   
+Exit                                                                            
+                                                                                
+sys_attr:                                                                       
+/*****************************************************************/             
+/* Get DB2 system administrative authorities                     */             
+/*****************************************************************/             
+  Arg auth,col                                                                  
+  If model=1 Then prof=auth                                                     
+  Else prof=ssid"."auth                                                         
+                                                                                
+     /* First determine if it is given to PUBLIC */                             
+  sql="SELECT "col" FROM SYSIBM.SYSUSERAUTH WHERE GRANTEE='PUBLIC'"             
+  call ZSQL                                                                     
+                                                                                
+     /* If there are no rows, it is not public */                               
+  If RXSQL_0 = 0 Then uac="NONE"                                                
+  Else uac="READ"                                                               
+                                                                                
+     /* Define base profile */                                                  
+  cmd="RDEF "class prof" UACC("uac") OWNER("owner") AUDIT(ALL(READ))"           
+  Push cmd                                                                      
+  "EXECIO 1 DISKW CLIST"                                                        
+                                                                                
+     /* Remove executor from access list */                                     
+  cmd="PERMIT "prof" CLASS("class") RESET"                                      
+  Push cmd                                                                      
+  "EXECIO 1 DISKW CLIST"                                                        
+                                                                                
+     /* Get all ids (except PUBLIC) for access list */                          
+           /* Without GRANT */                                                  
+  sql="SELECT GRANTEE FROM SYSIBM.SYSUSERAUTH",                                 
+    "WHERE "col"='Y' AND GRANTEE^='PUBLIC'"                                     
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    cmd="PERMIT "prof" CLASS("class") ACC(READ) ID(",                           
+        Strip(grantee.i)")"                                                     
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+           /* With GRANT */                                                     
+  sql="SELECT GRANTEE FROM SYSIBM.SYSUSERAUTH",                                 
+    "WHERE "col"='G' AND GRANTEE^='PUBLIC'"                                     
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    cmd="PERMIT "prof" CLASS("class") ACC(ALTER) ID(",                          
+        Strip(grantee.i)")"                                                     
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+Return     /* sys_attr */                                                       
+                                                                                
+bindagent:                                                                      
+/*****************************************************************/             
+/* Get DB2 system BINDAGENT authority                            */             
+/*****************************************************************/             
+     /* Create (ssid.)grantor.BINDAGENT profile for each GRANTOR */             
+     /* And remove executor from access list */                                 
+  sql="SELECT DISTINCT GRANTOR FROM SYSIBM.SYSUSERAUTH",                        
+    "WHERE BINDAGENTAUTH^=' '"                                                  
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(grantor.i)'.BINDAGENT'                           
+    Else prof=Strip(ssid)'.'Strip(grantor.i)'.BINDAGENT'                        
+    cmd="RDEF "class prof" UACC(NONE) AUDIT(ALL(READ)) OWNER(",                 
+        owner")"                                                                
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+                                                                                
+    cmd="PERMIT "prof" CLASS("class") RESET"                                    
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* Change UACC if it is given to PUBLIC */                                 
+  sql="SELECT DISTINCT GRANTOR FROM SYSIBM.SYSUSERAUTH",                        
+    "WHERE BINDAGENTAUTH^=' ' AND GRANTEE='PUBLIC'"                             
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(grantor.i)'.BINDAGENT'                           
+    Else prof=Strip(ssid)'.'Strip(grantor.i)'.BINDAGENT'                        
+    cmd="RALT " class prof" UACC(READ)"                                         
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* Get all ids (except PUBLIC) for access list */                          
+  sql="SELECT GRANTOR, GRANTEE FROM SYSIBM.SYSUSERAUTH",                        
+    "WHERE BINDAGENTAUTH='Y' AND GRANTEE^='PUBLIC'"                             
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(grantor.i)'.BINDAGENT'                           
+    Else prof=Strip(ssid)'.'Strip(grantor.i)'.BINDAGENT'                        
+    cmd="PERMIT "prof" CLASS("class") ACC(READ) ID(",                           
+        Strip(grantee.i)")"                                                     
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+  sql="SELECT GRANTOR, GRANTEE FROM SYSIBM.SYSUSERAUTH",                        
+    "WHERE BINDAGENTAUTH='G' AND GRANTEE^='PUBLIC'"                             
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(grantor.i)'.BINDAGENT'                           
+    Else prof=Strip(ssid)'.'Strip(grantor.i)'.BINDAGENT'                        
+    cmd="PERMIT "prof" CLASS("class") ACC(ALTER) ID(",                          
+        Strip(grantee.i)")"                                                     
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+Return     /* bindagent */                                                      
+                                                                                
+db_attr:                                                                        
+/*****************************************************************/             
+/* Get DB2 database administrative authorities                   */             
+/*****************************************************************/             
+  Arg auth,col                                                                  
+                                                                                
+      /* Find all databases, and make commands to create profiles */            
+      /* for 'auth'. Then remove executor from access list.       */            
+  sql="SELECT DISTINCT NAME FROM SYSIBM.SYSDBAUTH"                              
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=Strip(ssid)'.'Strip(name.i)'.'auth                                
+    cmd="RDEF "class prof" UACC(NONE) AUDIT(ALL(READ))",                        
+        "OWNER("owner")"                                                        
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+                                                                                
+    cmd="PE "prof" CLASS("class") RESET"                                        
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* If any of those were PUBLIC, change UACC to READ */                     
+  sql="SELECT DISTINCT NAME FROM SYSIBM.SYSDBAUTH",                             
+    "WHERE GRANTEE='PUBLIC' AND "col"^=' '"                                     
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=Strip(ssid)'.'Strip(name.i)'.'auth                                
+    cmd="RALT "class prof" UACC(READ)/ NEXT"                                    
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* Get all ids (except PUBLIC) for access list */                          
+  sql="SELECT NAME, GRANTEE FROM SYSIBM.SYSDBAUTH",                             
+    "WHERE GRANTEE^='PUBLIC' AND "col"='Y'"                                     
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=Strip(ssid)'.'Strip(name.i)'.'auth                                
+    cmd="PERMIT "prof" CLASS("class") ACC(READ) ID(",                           
+        Strip(grantee.i)")"                                                     
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+  sql="SELECT NAME, GRANTEE FROM SYSIBM.SYSDBAUTH",                             
+    "WHERE GRANTEE^='PUBLIC' AND "col"='G'"                                     
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=Strip(ssid)'.'Strip(name.i)'.'auth                                
+    cmd="PERMIT "prof" CLASS("class") ACC(ALTER) ID(",                          
+        Strip(grantee.i)")"                                                     
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+Return                                                                          
+                                                                                
+packadm_attr:                                                                   
+/*****************************************************************/             
+/* Get DB2 PACKADM                                               */             
+/*****************************************************************/             
+  Arg auth                                                                      
+                                                                                
+      /* Find all collections, and make commands to create profiles */          
+      /* for 'auth'. Then remove executor from access list.         */          
+  sql="SELECT DISTINCT NAME FROM SYSIBM.SYSRESAUTH"                             
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=Strip(ssid)'.'Strip(name.i)'.'auth                                
+    cmd="RDEF "class prof" UACC(NONE) AUDIT(ALL(READ)) OWNER("owner")"          
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+                                                                                
+    cmd="PERMIT "prof" CLASS("class") RESET"                                    
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* If any of those were PUBLIC, change UACC to READ */                     
+  sql="SELECT DISTINCT NAME FROM SYSIBM.SYSRESAUTH",                            
+    "WHERE GRANTEE='PUBLIC' AND QUALIFIER='PACKADM'",                           
+    "AND OBTYPE='C' AND USEAUTH^=' '",                                          
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=Strip(ssid)'.'Strip(name.i)'.'auth                                
+    cmd="RALT "class prof" UACC(READ)"                                          
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* Get all ids (except PUBLIC) for access list */                          
+  sql="SELECT NAME, GRANTEE FROM SYSIBM.SYSRESAUTH",                            
+    "WHERE GRANTEE^='PUBLIC' AND QUALIFIER='PACKADM'",                          
+    "AND OBTYPE='C' AND USEAUTH='Y'",                                           
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=Strip(ssid)'.'Strip(name.i)'.'auth                                
+    cmd="PERMIT "prof" CLASS("class") ACC(READ) ID("Strip(grantee.i)")"         
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+  sql="SELECT NAME, GRANTEE FROM SYSIBM.SYSRESAUTH",                            
+    "WHERE GRANTEE^='PUBLIC' AND QUALIFIER='PACKADM'",                          
+    "AND OBTYPE='C' AND USEAUTH='G'",                                           
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=Strip(ssid)'.'Strip(name.i)'.'auth                                
+    cmd="PERMIT "prof" CLASS("class") ACC(ALTER) ID(",                          
+        Strip(grantee.i)")"                                                     
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+Return                                                                          
+                                                                                
+ZSQL:                                                                           
+  err_sw = "0"                                                                  
+  call RXSQL sql                                                                
+  If RXSQL_SQLCODE^=0 & RXSQL_SQLCODE^=100 Then Do                              
+    err_sw = "1"                                                                
+    Say "RXSQL_0: " RXSQL_0                                                     
+    Say "SQLCODE: " RXSQL_SQLCODE RXSQL_SQLERRD.3                               
+    Say "SQLERRM: " RXSQL_SQLERRM                                               
+  End                                                                           
+Return                                                                          
+./   ADD  NAME=RXSRES                                                           
+/*Rexx*/                                                                        
+Arg owner ssid classmnt model charopt .                                         
+If owner="" Then Do                                                             
+  Say "Owner must be specified"                                                 
+  Exit                                                                          
+End                                                                             
+If ssid="" Then Do                                                              
+  Say "SSID must be specified"                                                  
+  Exit                                                                          
+End                                                                             
+If classmnt="" Then classmnt="DSN"                                              
+If model="" Then model=2                                                        
+                                                                                
+hdr.0 = 1                                                                       
+hdr.1 = "/* DB2 to RACF conversion CLIST */"                                    
+"EXECIO * DISKW CLIST (STEM hdr."                                               
+                                                                                
+   /* Set up RXSQL variables */                                                 
+RXSQL_DB2SUBSYS = ssid                                                          
+RXSQL_DB2PLAN = 'RXSQL'                                                         
+                                                                                
+   /* Table privileges */                                                       
+call tab_priv "ALTER","ALTERAUTH"                                               
+call tab_priv "DELETE","DELETEAUTH"                                             
+call tab_priv "INDEX","INDEXAUTH"                                               
+call tab_priv "INSERT","INSERTAUTH"                                             
+call tab_priv "SELECT","SELECTAUTH"                                             
+call tab_priv "REFERENCES","REFERENCESAUTH"                                     
+                                                                                
+   /* Database privileges */                                                    
+call def_priv "DB","CREATETAB","CREATETABAUTH","DB"                             
+call def_priv "DB","CREATETS","CREATETSAUTH","DB"                               
+call def_priv "DB","DISPLAYDB","DISPLAYDBAUTH","DB"                             
+call def_priv "DB","DROP","DROPAUTH","DB"                                       
+call def_priv "DB","IMAGCOPY","IMAGCOPYAUTH","DB"                               
+call def_priv "DB","LOAD","LOADAUTH","DB"                                       
+call def_priv "DB","REORG","REORGAUTH","DB"                                     
+call def_priv "DB","RECOVERDB","RECOVERDBAUTH","DB"                             
+call def_priv "DB","REPAIR","REPAIRAUTH","DB"                                   
+call def_priv "DB","STARTDB","STARTDBAUTH","DB"                                 
+call def_priv "DB","STATS","STATSAUTH","DB"                                     
+call def_priv "DB","STOPDB","STOPAUTH","DB"                                     
+                                                                                
+   /* Plan privileges */                                                        
+call def_priv "PN","BIND","BINDAUTH","PLAN"                                     
+call def_priv "PN","EXECUTE","EXECUTEAUTH","PLAN"                               
+                                                                                
+   /* Package privileges */                                                     
+call pack_priv "BIND","BINDAUTH"                                                
+call pack_priv "EXECUTE","EXECUTEAUTH"                                          
+call pack_priv "COPY","COPYAUTH"                                                
+                                                                                
+   /* Collection privileges */                                                  
+call cltn_priv "CREATEIN"                                                       
+                                                                                
+   /* Use BUFFERPOOL/STOGROUP/TABLESPACE privileges */                          
+call use_priv "USE","B","BP"                                                    
+call use_priv "USE","S","SG"                                                    
+call use_priv "USE","R","TS"                                                    
+                                                                                
+"EXECIO 0 DISKW CLIST (FINIS"                                                   
+call RXSQLEND                                                                   
+Exit                                                                            
+                                                                                
+def_priv:                                                                       
+/*****************************************************************/             
+/* Get DB2 Default privileges (plans, db, etc.)                  */             
+/*****************************************************************/             
+  Arg type,auth,col,tab                                                         
+  If model=1 Then class="M"Strip(ssid)||type||charopt                           
+  Else class="M"classmnt||type||charopt                                         
+                                                                                
+      /* Find all objects, and make commands to create profiles */              
+      /* for 'auth'. Then remove executor from access list.     */              
+  sql="SELECT DISTINCT NAME FROM SYSIBM.SYS"tab"AUTH"                           
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=ssid'.'Strip(name.i)'.'auth                                       
+    cmd="RDEF "class prof" UACC(NONE) AUDIT(ALL(READ))",                        
+        "OWNER("owner")"                                                        
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+                                                                                
+    cmd="PERMIT "prof" CLASS("class") RESET"                                    
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* If any of those were PUBLIC, change UACC to READ */                     
+  sql="SELECT DISTINCT NAME FROM SYSIBM.SYS"tab"AUTH",                          
+    "WHERE GRANTEE IN ('PUBLIC','PUBLIC*') AND "col"^=' '",                     
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=ssid'.'Strip(name.i)'.'auth                                       
+    cmd="RALT "class prof" UACC(READ)"                                          
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* Get all ids (except PUBLIC) for access list */                          
+  sql="SELECT NAME, GRANTEE SYSIBM.SYS"tab"AUTH",                               
+    "WHERE GRANTEE NOT IN ('PUBLIC','PUBLIC*') AND "col"='Y'",                  
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=ssid'.'Strip(name.i)'.'auth                                       
+    cmd="PERMIT "prof" CLASS("class") ACC(READ)",                               
+      "ID("Strip(grantee.i)")"                                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+  sql="SELECT NAME, GRANTEE SYSIBM.SYS"tab"AUTH",                               
+    "WHERE GRANTEE NOT IN ('PUBLIC','PUBLIC*') AND "col"='G'",                  
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=ssid'.'Strip(name.i)'.'auth                                       
+    cmd="PERMIT "prof" CLASS("class") ACC(ALTER)",                              
+      "ID("Strip(grantee.i)")"                                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+Return    /* def_priv */                                                        
+                                                                                
+tab_priv:                                                                       
+/*****************************************************************/             
+/* Get DB2 Tables privileges                                     */             
+/*****************************************************************/             
+  Arg auth,col                                                                  
+  If model=1 Then class="M"Strip(ssid)"TB"charopt                               
+  Else class="M"classmnt"TB"charopt                                             
+                                                                                
+      /* Find all objects, and make commands to create profiles */              
+      /* for non-column based authority */                                      
+  sql="SELECT TCREATOR, TTNAME FROM SYSIBM.SYSTABAUTH",                         
+    "WHERE GRANTEETYPE=' '"                                                     
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(tcreator.i)'.'Strip(ttname.i)                    
+    Else prof=ssid'.'Strip(tcreator.i)'.'Strip(ttname.i)                        
+    prof=prof'.'auth                                                            
+    cmd="RDEF "class prof" UACC(NONE) AUDIT(ALL(READ))",                        
+        "OWNER("owner")"                                                        
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+                                                                                
+    cmd="PERMIT "prof" CLASS("class") RESET"                                    
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* If any of those were PUBLIC, change UACC to READ */                     
+  sql="SELECT TCREATOR, TTNAME FROM SYSIBM.SYSTABAUTH",                         
+    "WHERE GRANTEE IN ('PUBLIC','PUBLIC*') AND "col"^=' '",                     
+    "AND GRANTEETYPE=' '"                                                       
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(tcreator.i)'.'Strip(ttname.i)                    
+    Else prof=ssid'.'Strip(tcreator.i)'.'Strip(ttname.i)                        
+    prof=prof'.'auth                                                            
+    cmd="RALT "class prof" UACC(READ)"                                          
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* Get all ids (except PUBLIC) for access list */                          
+  sql="SELECT TCREATOR, TTNAME, GRANTEE FROM SYSIBM.SYSTABAUTH",                
+    "WHERE GRANTEE NOT IN ('PUBLIC','PUBLIC*') AND "col"='Y'",                  
+    "AND GRANTEETYPE=' '"                                                       
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(tcreator.i)'.'Strip(ttname.i)                    
+    Else prof=ssid'.'Strip(tcreator.i)'.'Strip(ttname.i)                        
+    prof=prof'.'auth                                                            
+    cmd="PERMIT "prof" CLASS("class") ACC(READ)",                               
+      "ID("Strip(grantee.i)")"                                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+  sql="SELECT TCREATOR, TTNAME, GRANTEE FROM SYSIBM.SYSTABAUTH",                
+    "WHERE GRANTEE NOT IN ('PUBLIC','PUBLIC*') AND "col"='G'",                  
+    "AND GRANTEETYPE=' '"                                                       
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(tcreator.i)'.'Strip(ttname.i)                    
+    Else prof=ssid'.'Strip(tcreator.i)'.'Strip(ttname.i)                        
+    prof=prof'.'auth                                                            
+    cmd="PERMIT "prof" CLASS("class") ACC(ALTER)",                              
+      "ID("Strip(grantee.i)")"                                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+Return    /* tab_priv */                                                        
+                                                                                
+tab_upd:                                                                        
+/*****************************************************************/             
+/* Get DB2 Table Update privileges                               */             
+/*****************************************************************/             
+  If model=1 Then class="M"Strip(ssid)"TB"charopt                               
+  Else class="M"classmnt"TB"charopt                                             
+                                                                                
+      /* Find all objects, and make commands to create profiles */              
+      /* for non-column based authority */                                      
+  sql="SELECT TCREATOR, TTNAME FROM SYSIBM.SYSTABAUTH",                         
+      "WHERE GRANTEETYPE=' '"                                                   
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(tcreator.i)'.'Strip(ttname.i)                    
+    Else prof=ssid'.'Strip(tcreator.i)'.'Strip(ttname.i)                        
+    prof=prof'.UPDATE'                                                          
+    cmd="RDEF "class prof" UACC(NONE) AUDIT(ALL(READ))",                        
+        "OWNER("owner")"                                                        
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+                                                                                
+    cmd="PERMIT "prof" CLASS("class") RESET"                                    
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* If any of those were PUBLIC, change UACC to READ */                     
+  sql="SELECT TCREATOR, TTNAME FROM SYSIBM.SYSTABAUTH",                         
+      "WHERE GRANTEE IN ('PUBLIC','PUBLIC*') AND UPDATEAUTH^=' '",              
+      "AND GRANTEETYPE=' ' AND UPDATECOLS=' '"                                  
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(tcreator.i)'.'Strip(ttname.i)                    
+    Else prof=ssid'.'Strip(tcreator.i)'.'Strip(ttname.i)                        
+    prof=prof'.UPDATE'                                                          
+    cmd="RALT "class prof" UACC(READ)"                                          
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* Get all ids (except PUBLIC) for access list */                          
+  sql="SELECT TCREATOR, TTNAME, GRANTEE FROM SYSIBM.SYSTABAUTH",                
+      "WHERE GRANTEE NOT IN ('PUBLIC','PUBLIC*') AND",                          
+      "UPDATEAUTH='Y' AND GRANTEETYPE=' ' AND UPDATECOLS=' '",                  
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(tcreator.i)'.'Strip(ttname.i)                    
+    Else prof=ssid'.'Strip(tcreator.i)'.'Strip(ttname.i)                        
+    prof=prof'.UPDATE'                                                          
+    cmd="PERMIT "prof" CLASS("class") ACC(READ)",                               
+      "ID("Strip(grantee.i)")"                                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+  sql="SELECT TCREATOR, TTNAME, GRANTEE FROM SYSIBM.SYSTABAUTH",                
+      "WHERE GRANTEE NOT IN ('PUBLIC','PUBLIC*') AND",                          
+      "UPDATEAUTH='G' AND GRANTEETYPE=' ' AND UPDATECOLS=' '",                  
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(tcreator.i)'.'Strip(ttname.i)                    
+    Else prof=ssid'.'Strip(tcreator.i)'.'Strip(ttname.i)                        
+    prof=prof'.UPDATE'                                                          
+    cmd="PERMIT "prof" CLASS("class") ACC(ALTER)",                              
+      "ID("Strip(grantee.i)")"                                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+      /************************************************/                        
+      /* Now for Column-only                          */                        
+      /************************************************/                        
+                                                                                
+      /* Find all objects, and make commands to create profiles */              
+      /* for column based authority */                                          
+  sql="SELECT T.TCREATOR, T.TTNAME, C.COLNAME",                                 
+    "FROM SYSIBM.SYSTABAUTH T,",                                                
+    "SYSIBM.SYSCOLAUTH C WHERE T.GRANTEETYPE=' ' AND",                          
+    "T.DATEGRANTED=C.DATEGRANTED AND T.TIMEGRANTED=C.TIMEGRANTED",              
+    "AND T.TTNAME=C.TNAME AND T.TCREATOR=C.CREATOR",                            
+    "AND T.UPDATECOLS='*' AND T.UPDATEAUTH^=' '"                                
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(t.tcreator.i)'.'Strip(t.ttname.i)                
+    Else prof=ssid'.'Strip(t.tcreator.i)'.'Strip(t.ttname.i)                    
+    prof=prof'.'c.colname.i'.UPDATE'                                            
+    cmd="RDEF "class prof" UACC(NONE) AUDIT(ALL(READ))",                        
+      "OWNER("owner")"                                                          
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+                                                                                
+    cmd="PERMIT "prof" CLASS("class") RESET"                                    
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* If any of those were PUBLIC, change UACC to READ */                     
+  sql="SELECT T.TCREATOR, T.TTNAME, C.COLNAME",                                 
+    "FROM SYSIBM.SYSTABAUTH T,",                                                
+    "SYSIBM.SYSCOLAUTH C WHERE T.GRANTEETYPE=' ' AND",                          
+    "T.DATEGRANTED=C.DATEGRANTED AND T.TIMEGRANTED=C.TIMEGRANTED",              
+    "AND T.TTNAME=C.TNAME AND T.TCREATOR=C.CREATOR",                            
+    "AND T.GRANTEE IN ('PUBLIC','PUBLIC*')",                                    
+    "AND T.UPDATECOLS='*' AND T.UPDATEAUTH^=' '"                                
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(t.tcreator.i)'.'Strip(t.ttname.i)                
+    Else prof=ssid'.'Strip(t.tcreator.i)'.'Strip(t.ttname.i)                    
+    prof=prof'.c.'colname.i'.UPDATE'                                            
+    cmd="RALT "class prof" UACC(READ)"                                          
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* Get all ids (except PUBLIC) for access list */                          
+  sql="SELECT T.TCREATOR, T.TTNAME, C.COLNAME, T.GRANTEE",                      
+    "FROM SYSIBM.SYSTABAUTH T, SYSIBM.SYSCOLAUTH C",                            
+    "WHERE T.GRANTEETYPE=' ' AND",                                              
+    "T.DATEGRANTED=C.DATEGRANTED AND T.TIMEGRANTED=C.TIMEGRANTED",              
+    "AND T.TTNAME=C.TNAME AND T.TCREATOR=C.CREATOR",                            
+    "AND T.GRANTEE NOT IN ('PUBLIC','PUBLIC*')",                                
+    "AND T.UPDATECOLS='*' AND T.UPDATEAUTH^='Y'"                                
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(t.tcreator.i)'.'Strip(t.ttname.i)                
+    Else prof=ssid'.'Strip(t.tcreator.i)'.'Strip(t.ttname.i)                    
+    prof=prof'.'c.colname.i'.UPDATE'                                            
+    cmd="PERMIT "prof" CLASS("class") ACC(READ)",                               
+      "ID("Strip(t.grantee.i)")"                                                
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+  sql="SELECT T.TCREATOR, T.TTNAME, C.COLNAME, T.GRANTEE",                      
+    "FROM SYSIBM.SYSTABAUTH T, SYSIBM.SYSCOLAUTH C",                            
+    "WHERE T.GRANTEETYPE=' ' AND",                                              
+    "T.DATEGRANTED=C.DATEGRANTED AND T.TIMEGRANTED=C.TIMEGRANTED",              
+    "AND T.TTNAME=C.TNAME AND T.TCREATOR=C.CREATOR",                            
+    "AND T.GRANTEE NOT IN ('PUBLIC','PUBLIC*')",                                
+    "AND T.UPDATECOLS='*' AND T.UPDATEAUTH^='G'"                                
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(t.tcreator.i)'.'Strip(t.ttname.i)                
+    Else prof=ssid'.'Strip(t.tcreator.i)'.'Strip(t.ttname.i)                    
+    prof=prof'.'c.colname.i'.UPDATE'                                            
+    cmd="PERMIT "prof" CLASS("class") ACC(ALTER)",                              
+      "ID("Strip(c.grantee.i)")"                                                
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+Return    /* tab_upd */                                                         
+                                                                                
+use_priv:                                                                       
+/*****************************************************************/             
+/* Get DB2 USE privileges (bufferpool, stogroup, tablespace)     */             
+/*****************************************************************/             
+  Arg auth,obtype,type                                                          
+  If model=1 Then class="M"Strip(ssid)||type||charopt                           
+  Else class="M"classmnt||type||charopt                                         
+                                                                                
+      /* Find all objects, and make commands to create profiles */              
+      /* for 'auth'. Then remove executor from access list.     */              
+  sql="SELECT DISTINCT NAME FROM SYSIBM.SYSRESAUTH",                            
+      "WHERE OBTYPE='"obtype"'"                                                 
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=ssid'.'Strip(name.i)'.'auth                                       
+    cmd="RDEF "class prof" UACC(NONE) AUDIT(ALL(READ))",                        
+        "OWNER("owner")"                                                        
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+                                                                                
+    cmd="PERMIT "prof" CLASS("class") RESET"                                    
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* If any of those were PUBLIC, change UACC to READ */                     
+  sql="SELECT DISTINCT NAME FROM SYSIBM.SYSRESAUTH",                            
+      "WHERE OBTYPE='"obtype"' AND USEAUTH^=' '",                               
+      "AND GRANTEE IN ('PUBLIC','PUBLIC*')"                                     
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=ssid'.'Strip(name.i)'.'auth                                       
+    cmd="RALT "class prof" UACC(READ)"                                          
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* Get all ids (except PUBLIC) for access list */                          
+  sql="SELECT NAME, GRANTEE FROM SYSIBM.SYSRESAUTH",                            
+      "WHERE OBTYPE='"obtype"' AND USEAUTH='Y'",                                
+      "AND GRANTEE NOT IN ('PUBLIC','PUBLIC*')"                                 
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=ssid'.'Strip(name.i)'.'auth                                       
+    cmd="PERMIT "prof" CLASS("class") ACC(READ)",                               
+      "ID("Strip(grantee.i)")"                                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+  sql="SELECT NAME, GRANTEE FROM SYSIBM.SYSRESAUTH",                            
+      "WHERE OBTYPE='"obtype"' AND USEAUTH='G'",                                
+      "AND GRANTEE NOT IN ('PUBLIC','PUBLIC*')"                                 
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)'.'auth                                   
+    Else prof=ssid'.'Strip(name.i)'.'auth                                       
+    cmd="PERMIT "prof" CLASS("class") ACC(ALTER)",                              
+      "ID("Strip(grantee.i)")"                                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+Return    /* use_priv */                                                        
+                                                                                
+pack_priv:                                                                      
+/*****************************************************************/             
+/* Get DB2 Package privileges                                    */             
+/*    This gets tricky, because SYSPACKAUTH has COLLID and       */             
+/* can have * for NAME (Package ID).  We must define all the     */             
+/* permits with * first, then PERMIT FROM(xx.*) as well as the   */             
+/* normal permits.                                               */             
+/*    We also ignore any row where GRANTEETYPE='P' (for access)  */             
+/*****************************************************************/             
+  Arg auth,col                                                                  
+  If model=1 Then class="M"Strip(ssid)"PK"charopt                               
+  Else class="M"classmnt"PK"charopt                                             
+                                                                                
+      /* Find ALL packages, and make commands to create profiles */             
+      /* for 'auth'. Then remove executor from access list.      */             
+  sql="SELECT COLLID, NAME FROM SYSIBM.SYSPACKAUTH"                             
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(collid.i)'.'Strip(name.i)'.'auth                 
+    Else prof=ssid'.'Strip(collid.i)'.'Strip(name.i)'.'auth                     
+    cmd="RDEF "class prof" UACC(NONE) AUDIT(ALL(READ))",                        
+        "OWNER("owner")"                                                        
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+                                                                                
+    cmd="PERMIT "prof" CLASS("class") RESET"                                    
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* If any of those were PUBLIC, change UACC to READ */                     
+  sql="SELECT COLLID, NAME FROM SYSIBM.SYSPACKAUTH",                            
+    "WHERE GRANTEE IN ('PUBLIC','PUBLIC*') AND "col"^=' '",                     
+    "AND GRANTEETYPE=' '"                                                       
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(collid.i)'.'Strip(name.i)'.'auth                 
+    Else prof=ssid'.'Strip(collid.i)'.'Strip(name.i)'.'auth                     
+    cmd="RALT "class prof" UACC(READ)"                                          
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* Get all ids (except PUBLIC) for access list to '*' packs */             
+  sql="SELECT COLLID, GRANTEE FROM SYSIBM.SYSPACKAUTH",                         
+    "WHERE GRANTEE NOT IN ('PUBLIC','PUBLIC*') AND "col"='Y'",                  
+    "AND GRANTEETYPE=' ' AND NAME='*'"                                          
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(collid.i)'.*.'auth                               
+    Else prof=ssid'.'Strip(collid.i)'.*.'auth                                   
+    cmd="PERMIT "prof" CLASS("class") ACC(READ)",                               
+      "ID("grantee.i")"                                                         
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+  sql="SELECT COLLID, GRANTEE FROM SYSIBM.SYSPACKAUTH",                         
+    "WHERE GRANTEE NOT IN ('PUBLIC','PUBLIC*') AND "col"='G'",                  
+    "AND GRANTEETYPE=' ' AND NAME='*'"                                          
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(collid.i)'.*.'auth                               
+    Else prof=ssid'.'Strip(collid.i)'.*.'auth                                   
+    cmd="PERMIT "prof" CLASS("class") ACC(ALTER)",                              
+      "ID("grantee.i")"                                                         
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* Now copy those access lists to individual package profiles */           
+  sql="SELECT A.COLLID, A.NAME FROM SYSIBM.SYSPACKAUTH A",                      
+    "WHERE A.NAME^='*' AND A.GRANTEETYPE=' ' AND",                              
+    "EXISTS(SELECT B.COLLID FROM SYSIBM.SYSPACKAUTH B WHERE",                   
+      "B.NAME='*' AND A.COLLID=B.COLLID",                                       
+      "AND B.GRANTEETYPE=' ')"                                                  
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prefix=Strip(a.collid.i)"."                                 
+    Else prefix=ssid"."Strip(a.collid.i)"."                                     
+    cmd="PERMIT "prefix||Strip(a.name.i)"."auth,                                
+      "CLASS("class") FROM("prefix".*."auth")"                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* Get all ids (except PUBLIC) for access to individual pack  */           
+     /* profiles                                                   */           
+  sql="SELECT COLLID, NAME, GRANTEE FROM SYSIBM.SYSPACKAUTH",                   
+    "WHERE GRANTEE NOT IN ('PUBLIC','PUBLIC*') AND "col"='Y'",                  
+    "AND GRANTEETYPE=' ' AND NAME^='*'"                                         
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(collid.i)"."Strip(name.i)"."auth                 
+    Else prof=ssid"."Strip(collid.i)"."Strip(name.i)"."auth                     
+    cmd="PERMIT "prof" CLASS("class") ACC(READ)",                               
+      "ID("Strip(grantee.i)")"                                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+  sql="SELECT COLLID, NAME, GRANTEE FROM SYSIBM.SYSPACKAUTH",                   
+    "WHERE GRANTEE NOT IN ('PUBLIC','PUBLIC*') AND "col"='G'",                  
+    "AND GRANTEETYPE=' ' AND NAME^='*'"                                         
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(collid.i)"."Strip(name.i)"."auth                 
+    Else prof=ssid"."Strip(collid.i)"."Strip(name.i)"."auth                     
+    cmd="PERMIT "prof" CLASS("class") ACC(ALTER)",                              
+      "ID("Strip(grantee.i)")"                                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+Return     /* pack_priv */                                                      
+                                                                                
+cltn_priv:                                                                      
+/*****************************************************************/             
+/* Get DB2 Collection privileges                                 */             
+/*    This gets tricky, because SYSRESAUTH with OBTYPE='C'       */             
+/* can have * for NAME (Collection ID).  We must define all      */             
+/* the permits with * first, then PERMIT FROM(xx.*) as well as  */              
+/* the normal permits.                                           */             
+/*****************************************************************/             
+  Arg auth                                                                      
+  If model=1 Then class="M"Strip(ssid)"CL"charopt                               
+  Else class="M"classmnt"CL"charopt                                             
+                                                                                
+      /* Find all objects, and make commands to create profiles */              
+      /* for 'auth'. Then remove executor from access list.     */              
+  sql="SELECT DISTINCT NAME FROM SYSIBM.SYSRESAUTH",                            
+    "WHERE OBTYPE='C' AND QUALIFIER='        '"                                 
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)"."auth                                   
+    Else prof=ssid"."Strip(name.i)"."auth                                       
+    cmd="RDEF "class prof" UACC(NONE) AUDIT(ALL(READ))",                        
+      "OWNER("owner")"                                                          
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+                                                                                
+    cmd="PERMIT "prof" CLASS("class") RESET"                                    
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* If any of those were PUBLIC, change UACC to READ */                     
+  sql="SELECT DISTINCT NAME FROM SYSIBM.SYSRESAUTH",                            
+    "WHERE OBTYPE='C' AND QUALIFIER='        '",                                
+    "AND GRANTEE IN ('PUBLIC','PUBLIC*') AND USEAUTH^=' '"                      
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)"."auth                                   
+    Else prof=ssid"."Strip(name.i)"."auth                                       
+    cmd="RALT "class prof" UACC(READ)"                                          
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* Get all ids (except PUBLIC) for access list to '*' coll.s */            
+  sql="SELECT NAME, GRANTEE FROM SYSIBM.SYSRESAUTH",                            
+    "WHERE OBTYPE='C' AND QUALIFIER='        '",                                
+    "AND GRANTEE NOT IN ('PUBLIC','PUBLIC*') AND USEAUTH='Y'",                  
+    "AND NAME='*'"                                                              
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)"."auth                                   
+    Else prof=ssid"."Strip(name.i)"."auth                                       
+    cmd="PERMIT "prof" CLASS("class") ACC(READ)",                               
+      "ID("Strip(grantee.i)")"                                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+  sql="SELECT NAME, GRANTEE FROM SYSIBM.SYSRESAUTH",                            
+    "WHERE OBTYPE='C' AND QUALIFIER='        '",                                
+    "AND GRANTEE NOT IN ('PUBLIC','PUBLIC*') AND USEAUTH='G'",                  
+    "AND NAME='*'"                                                              
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)"."auth                                   
+    Else prof=ssid"."Strip(name.i)"."auth                                       
+    cmd="PERMIT "prof" CLASS("class") ACC(ALTER)",                              
+      "ID("Strip(grantee.i)")"                                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+                                                                                
+     /* Now copy the '*' access list to the individuals ones */                 
+  sql="SELECT DISTINCT NAME FROM SYSIBM.SYSRESAUTH",                            
+    "WHERE OBTYPE='C' AND QUALIFIER='        '",                                
+    "AND NAME^='*'"                                                             
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)"."auth                                   
+    Else prof=ssid"."Strip(name.i)"."auth                                       
+    If model=1 Then fromprof="*."auth                                           
+    Else fromprof=ssid".*."auth                                                 
+    cmd="PERMIT "prof" CLASS("class") FROM("fromprof")"                         
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+                                                                                
+     /* Get all ids (except PUBLIC) for access to individual */                 
+     /* collection profiles                                  */                 
+  sql="SELECT NAME, GRANTEE FROM SYSIBM.SYSRESAUTH",                            
+    "WHERE OBTYPE='C' AND QUALIFIER='        '",                                
+    "AND GRANTEE NOT IN ('PUBLIC','PUBLIC*') AND USEAUTH='Y'",                  
+    "AND NAME^='*'"                                                             
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)"."auth                                   
+    Else prof=ssid"."Strip(name.i)"."auth                                       
+    cmd="PERMIT "prof" CLASS("class") ACC(READ)",                               
+      "ID("Strip(grantee.i)")"                                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+  sql="SELECT NAME, GRANTEE FROM SYSIBM.SYSRESAUTH",                            
+    "WHERE OBTYPE='C' AND QUALIFIER='        '",                                
+    "AND GRANTEE NOT IN ('PUBLIC','PUBLIC*') AND USEAUTH='G'",                  
+    "AND NAME^='*'"                                                             
+  call ZSQL                                                                     
+  Do i = 1 to RXSQL_0                                                           
+    If model=1 Then prof=Strip(name.i)"."auth                                   
+    Else prof=ssid"."Strip(name.i)"."auth                                       
+    cmd="PERMIT "prof" CLASS("class") ACC(ALTER)",                              
+      "ID("Strip(grantee.i)")"                                                  
+    Push cmd                                                                    
+    "EXECIO 1 DISKW CLIST"                                                      
+  End                                                                           
+Return    /* cltn_priv */                                                       
+                                                                                
+ZSQL:                                                                           
+  err_sw = "0"                                                                  
+  call RXSQL sql                                                                
+  If RXSQL_SQLCODE^=0 & RXSQL_SQLCODE^=100 Then Do                              
+    err_sw = "1"                                                                
+    Say "RXSQL_0: " RXSQL_0                                                     
+    Say "SQLCODE: " RXSQL_SQLCODE RXSQL_SQLERRD.3                               
+    Say "SQLERRM: " RXSQL_SQLERRM                                               
+  End                                                                           
+Return                                                                          
+./   ADD  NAME=DOC                                                              
+      DB2 to RACF Conversion Utility                                            
+                                                                                
+This utility will convert the contents of the SYSIBM.SYSxxxAUTH tables          
+to equivalent RACF profiles.  The RACF profiles are used in conjunction         
+with the RACF-provided DB2 Authorization Exit.                                  
+                                                                                
+In order to run the utility, you must have SELECT authority to every            
+SYSIBM.SYSxxxAUTH table.  In order to execute the CLIST generated by            
+the utility you must have RACF-Special -or-                                     
+Class Authority (CLAUTH) to all applicable classes AND you must be              
+the OWNER of the new profiles or the OWNER must be within the scope             
+of a group to which you have Group-Special.                                     
+                                                                                
+The utility requires RXSQL be installed.  RXSQL is a licensed product           
+of IBM and is an add-on for REXX/TSO.  RXSQL contains a plan which              
+must be bound to the DB2 subsystem.  The default name for this plan             
+is RXSQL.  If the plan is bound under a different name, you must                
+update the RXSADM and RXSRES execs to change the line                           
+RXSQL_DB2PLAN = 'RXSQL'                                                         
+to the appropriate value.                                                       
+                                                                                
+The utility consists of two execs and one set of JCL.  The JCL is               
+member JCL, and the execs are RXSADM and RXSRES, all within this                
+dataset.  The exec will generate RACF commands to the dataset                   
+defined in the JCL by the ddcard 'CLIST'.  The JCL contains examples            
+of the CLIST ddcard if it already exists or if it needs to be created.          
+Comment the one that is not appropriate.                                        
+                                                                                
+The utility does not execute any RACF commands, it only generates them          
+and writes them to the CLIST ddcard.                                            
+                                                                                
+Basically, the utility operates by:                                             
+1)  Finding all privileges or resources which must be protected and             
+    generating RDEF commands for those.  Note that AUDIT(ALL(READ))             
+    is generated for all commands from RSXADM.                                  
+2)  Determining whether the privileges or resources were granted to             
+    PUBLIC and changing the UACC to READ in this case.  Note the author         
+    does not check for PUBLIC being granted with the GRANT option.              
+3)  Determine all authorization ids without GRANT and generates a               
+    PERMIT with ACCESS(READ).                                                   
+3)  Determine all authorization ids with GRANT and generates a                  
+    PERMIT with ACCESS(ALTER).  Since the profiles are generally                
+    discrete, ALTER access gives the ability to 'grant' others                  
+    access.                                                                     
+                                                                                
+The utility does NOT use the grouping classes.  I recommend that                
+you evaluate the possibility of combining profiles into grouping                
+profiles to ease administration.  However, I could not determine                
+any algorithm to use to evaluate the possibility.  I considered                 
+combining profiles where the current GRANTs were identical, but                 
+decided that it may not remain in that manner.  While one organization          
+would grant SYSCTL and SYSOPR to the same userids, another may not.             
+And what profile name would the utility generate if it did combine              
+SYSCTL and SYSOPR?                                                              
+                                                                                
+- Peter Harroun   IBM Global Services-West (Boulder)                            
+./   ENDUP                                                                      

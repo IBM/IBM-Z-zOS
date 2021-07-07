@@ -1,0 +1,59 @@
+LOAD DATA                                                                       
+    INDDN IRRADU00                                                              
+    RESUME YES                                                                  
+    LOG NO                                                                      
+    INTO TABLE USER01.HDR                                                       
+    (                                                                           
+     HDR_EVENT_TYPE        POSITION(1:8)         CHAR(8),                       
+     HDR_EVENT_QUAL        POSITION(10:17)       CHAR(8),                       
+     HDR_TIME_WRITTEN      POSITION(19:26)       TIME    EXTERNAL(8)            
+          NULLIF(HDR_TIME_WRITTEN =' '),                                        
+     HDR_DATE_WRITTEN      POSITION(28:37)       DATE    EXTERNAL(10)           
+          NULLIF(HDR_DATE_WRITTEN =' '),                                        
+     HDR_SYSTEM_SMFID      POSITION(39:42)       CHAR(4),                       
+     HDR_VIOLATION         POSITION(44:44)       CHAR(1),                       
+     HDR_USER_NDFND        POSITION(49:49)       CHAR(1),                       
+     HDR_USER_WARNING      POSITION(54:54)       CHAR(1),                       
+     HDR_EVT_USER_ID       POSITION(59:66)       CHAR(8),                       
+     HDR_EVT_GRP_ID        POSITION(68:75)       CHAR(8),                       
+     HDR_AUTH_NORMAL       POSITION(77:77)       CHAR(1),                       
+     HDR_AUTH_SPECIAL      POSITION(82:82)       CHAR(1),                       
+     HDR_AUTH_OPER         POSITION(87:87)       CHAR(1),                       
+     HDR_AUTH_AUDIT        POSITION(92:92)       CHAR(1),                       
+     HDR_AUTH_EXIT         POSITION(97:97)       CHAR(1),                       
+     HDR_AUTH_FAILSFT      POSITION(102:102)     CHAR(1),                       
+     HDR_AUTH_BYPASS       POSITION(107:107)     CHAR(1),                       
+     HDR_AUTH_TRUSTED      POSITION(112:112)     CHAR(1),                       
+     HDR_LOG_CLASS         POSITION(117:117)     CHAR(1),                       
+     HDR_LOG_USER          POSITION(122:122)     CHAR(1),                       
+     HDR_LOG_SPECIAL       POSITION(127:127)     CHAR(1),                       
+     HDR_LOG_ACCESS        POSITION(132:132)     CHAR(1),                       
+     HDR_LOG_RACINIT       POSITION(137:137)     CHAR(1),                       
+     HDR_LOG_ALWAYS        POSITION(142:142)     CHAR(1),                       
+     HDR_LOG_CMDVIOL       POSITION(147:147)     CHAR(1),                       
+     HDR_LOG_GLOBAL        POSITION(152:152)     CHAR(1),                       
+     HDR_TERM_LEVEL        POSITION(157:159)     INTEGER EXTERNAL(3)            
+          NULLIF(HDR_TERM_LEVEL    =' '),                                       
+     HDR_BACKOUT_FAIL      POSITION(161:161)     CHAR(1),                       
+     HDR_PROF_SAME         POSITION(166:166)     CHAR(1),                       
+     HDR_TERM              POSITION(171:178)     CHAR(8),                       
+     HDR_JOB_NAME          POSITION(180:187)     CHAR(8),                       
+     HDR_READ_TIME         POSITION(189:196)     TIME    EXTERNAL(8)            
+          NULLIF(HDR_READ_TIME     =' '),                                       
+     HDR_READ_DATE         POSITION(198:207)     DATE    EXTERNAL(10)           
+          NULLIF(HDR_READ_DATE     =' '),                                       
+     HDR_SMF_USER_ID       POSITION(209:216)     CHAR(8),                       
+     HDR_LOG_LEVEL         POSITION(218:218)     CHAR(1),                       
+     HDR_LOG_VMEVENT       POSITION(223:223)     CHAR(1),                       
+     HDR_LOG_LOGOPT        POSITION(228:228)     CHAR(1),                       
+     HDR_LOG_SECL          POSITION(233:233)     CHAR(1),                       
+     HDR_LOG_COMPATM       POSITION(238:238)     CHAR(1),                       
+     HDR_LOG_APPLAUD       POSITION(243:243)     CHAR(1),                       
+     HDR_LOG_NONOMVS       POSITION(248:248)     CHAR(1),                       
+     HDR_LOG_OMVSNPRV      POSITION(253:253)     CHAR(1),                       
+     HDR_AUTH_OMVSSU       POSITION(258:258)     CHAR(1),                       
+     HDR_AUTH_OMVSSYS      POSITION(263:263)     CHAR(1),                       
+     HDR_USR_SECL          POSITION(268:275)     CHAR(8),                       
+     HDR_RACF_VERSION      POSITION(277:280)     CHAR(4)                        
+          )                                                                     
+                                                                                

@@ -1,0 +1,1253 @@
+/* REXX */                                                                      
+/**********************************************************************/        
+/*                                                                    */        
+/* Licensed Materials - Property of IBM                               */        
+/* 5694-A01                                                           */        
+/* Copyright IBM Corp. 2017                                           */        
+/*                                                                    */        
+/* Name: DSNT2PRM                                                     */        
+/*                                                                    */        
+/*                                                                    */        
+/* Author: Jun Ogata                                                  */        
+/*                                                                    */        
+/**********************************************************************/        
+/*                                                                    */        
+/* DSNT2PRM: Data Set Names and Range Table Convert Utility.          */        
+/*           This web deliverable REXX program will convert the       */        
+/*           provided ICHRDSNT and/or ICHRRNG load modules; or        */        
+/*           extract the Data Set Name and Range Tables from storage  */        
+/*           and generate a matching PARMLIB member.                  */        
+/*                                                                    */        
+/* Input/Output arguments:                                            */        
+/* -----------------------                                            */        
+/*   DSNT2PRM can be used in the following ways:                      */        
+/*                                                                    */        
+/*   1> Reading the DSNT and range table from storage.                */        
+/*        If an output data set is provided, the results will be      */        
+/*        stored there. If an output data set is not specified, or is */        
+/*        a "*", the output is displayed to the user's screen.        */        
+/*   EX "some.dataset(DSNT2PRM)" "[<output.dataset(member)> | *]      */        
+/*                                [- [SCREENOUT]                      */        
+/*                                   [DEBUG] [DEBUG2] [OUTPUT]]"      */        
+/*                                                                    */        
+/*   2> Processing only ICHRDSNT from a data set.                     */        
+/*        If an output data set is provided, the results will be      */        
+/*        stored there. If a "*" is specified for the output data set,*/        
+/*        the output is displayed to the user's screen.               */        
+/*   EX "some.dataset(DSNT2PRM)" " <output.dataset(member)> | *       */        
+/*                                 <input.ichrdsnt(member)>           */        
+/*                                [- [SCREENOUT]                      */        
+/*                                   [DEBUG] [DEBUG2] [OUTPUT]]"      */        
+/*                                                                    */        
+/*   3> Processing only ICHRRNG  from a data set.                     */        
+/*        If an output data set is provided, the results will be      */        
+/*        stored there. If a "*" is specified for the output data set,*/        
+/*        the output is displayed to the user's screen.  Note that    */        
+/*        the 2nd parameter must be a "*" to indicate that a ICHRDSNT */        
+/*        is not to be processed.                                     */        
+/*   EX "some.dataset(DSNT2PRM)" " <output.dataset(member)> | *       */        
+/*                                 *                                  */        
+/*                                 <input.ichrrng(member)>            */        
+/*                                [- [SCREENOUT]                      */        
+/*                                   [DEBUG] [DEBUG2] [OUTPUT]]"      */        
+/*                                                                    */        
+/*   4> Processing both the ICHRDSNT and ICHRRNG from a data set.     */        
+/*        If an output data set is provided, the results will be      */        
+/*        stored there. If a "*" is specified for the output data set,*/        
+/*        the output is displayed to the user's screen.               */        
+/*   EX "some.dataset(DSNT2PRM)" " <output.dataset(member)> | *       */        
+/*                                 <input.ichrdsnt(member)>           */        
+/*                                 <input.ichrrng(member)>            */        
+/*                                [- [SCREENOUT]                      */        
+/*                                   [DEBUG] [DEBUG2] [OUTPUT]]"      */        
+/*                                                                    */        
+/*   <output.dataset> is the data set member that you want to save    */        
+/*                    the generated PARMLIB statements in.  If this   */        
+/*                    value is not specified or is an "*", the        */        
+/*                    generated output ONLY goes to the user's screen */        
+/*                    and an warning message will be issued.          */        
+/*                                                                    */        
+/*   <input.ichrdsnt> is the ICHRDSNT load module you wish to         */        
+/*                    convert. DSNT2PRM makes no assumption for the   */        
+/*                    member name.                                    */        
+/*                                                                    */        
+/*   <input.ichrrng>  is the ICHRRNG  load module you wish to         */        
+/*                    convert. DSNT2PRM makes no assumption for the   */        
+/*                    member name.                                    */        
+/*                                                                    */        
+/*   Anything after the "-" will be for optional values used by       */        
+/*   DSNT2PRM.                                                        */        
+/*                                                                    */        
+/*   SCREENOUT Turn on generating output to screen when output        */        
+/*               data set is provided.                                */        
+/*                                                                    */        
+/*   DEBUG     Turn on internal debugging messaging.                  */        
+/*   DEBUG2    Turn on light version of internal debugging.           */        
+/*   OUTPUT    Turn on generating output to screen when output        */        
+/*               data set is provided.                                */        
+/*                                                                    */        
+/* Return codes:                                                      */        
+/* -------------                                                      */        
+/*   00 - Everything successful.                                      */        
+/*   04 - Warning encountered, but otherwise successful.              */        
+/*   08 - Error encountered.                                          */        
+/*   12 - Terminating error encountered, and DSNT2PRM execution ended */        
+/*        early.                                                      */        
+/*                                                                    */        
+/* Usage Notes:                                                       */        
+/* ------------                                                       */        
+/*   * All data sets are assumed to exist and are cataloged.          */        
+/*   * All data sets names must be fully qualified.                   */        
+/*   * None of the data sets used can be a PDSE.                      */        
+/*   * If "*" is provided for both input values (the <input.ichrdsnt> */        
+/*     and <input.ichrrng> load modules values) or both are not       */        
+/*     specified, DSNT2PRM will attempt to create the PARMLIB member  */        
+/*     based on what is in storage.                                   */        
+/*                                                                    */        
+/**********************************************************************/        
+/*                                                                    */        
+/* Disclaimers, etc..                                                 */        
+/*                                                                    */        
+/* This program contains code made available by IBM Corporation       */        
+/* on an AS IS basis. Any one receiving this program is               */        
+/* considered to be licensed under IBM copyrights to use the          */        
+/* IBM-provided source code in any way he or she deems fit,           */        
+/* including copying it, compiling it, modifying it, and              */        
+/* redistributing it, with or without modifications, except that      */        
+/* it may be neither sold nor incorporated within a product that      */        
+/* is sold.  No license under any IBM patents or patent               */        
+/* applications is to be implied from this copyright license.         */        
+/*                                                                    */        
+/* The software is provided "as-is", and IBM disclaims all            */        
+/* warranties, express or implied, including but not limited to       */        
+/* implied warranties of merchantibility or fitness for a             */        
+/* particular purpose.  IBM shall not be liable for any direct,       */        
+/* indirect, incidental, special or consequential damages arising     */        
+/* out of this agreement or the use or operation of the software.     */        
+/*                                                                    */        
+/* A user of this program should understand that IBM cannot           */        
+/* provide technical support for the program and will not be          */        
+/* responsible for any consequences of use of the program.            */        
+/*                                                                    */        
+/**********************************************************************/        
+/*                                                                    */        
+/* CHANGE ACTIVITY:                                                   */        
+/* ----------------                                                   */        
+/* $L0=PARMLIB HRF77B0 081717 PDJSO1: PARMLIB support             @L0A*/        
+/* $L1=PARMLIB HRF77B0 112917 PDJSO1: Minor code changes.         @L1A*/        
+/* $D1=PARMLIB HRF77B0 091018 PDJSO1: Debugging change            @D1A*/        
+/* $L2=PARMLIB HRF77B0 012919 PDJSO1: Fix Typo.                   @L2A*/        
+/*                                                                    */        
+/* CHANGE DESCRIPTION:                                                */        
+/* -------------------                                                */        
+/* A - Original code                                              @L0A*/        
+/* A - * Cleanup some comments.                                   @L1A*/        
+/*     * Always generate header (including DATABASE_OPTIONS)      @L1A*/        
+/*     * Use unique message variables.                            @L1A*/        
+/*     * Add SCREENOUT option.                                    @L1A*/        
+/*     * Add support for invalid DSDTDSMO value.                  @L1A*/        
+/*     * Change how parmlib member is written out.                @L1A*/        
+/*     * Allow for large hex value translations.                  @L1A*/        
+/*     * Move Open of output dataset.                             @L1A*/        
+/*     * Update of message DCU105I                                @L1A*/        
+/*     * Fix exponential number issue with address.               @L1A*/        
+/* A - * Add debug message for return code from FREE call.        @D1A*/        
+/* A - * Fix typo in SYSPLEX output.                              @L2A*/        
+/*                                                                    */        
+/**********************************************************************/        
+/**********************************************************************/        
+/*                                                                    */        
+/* The following "Reference" variable is a list of characters that    */        
+/* DSNT2PRM will translate into a character string for the range      */        
+/* table.  If the range table finds a character value that is not in  */        
+/* this varable, it will save the range as a HEX string.              */        
+/*                                                                    */        
+/* Different code pages may have a variant meaning for certain        */        
+/* characters, which may not include certain characters that may be   */        
+/* valid for you.  If you wish to add more characters, so that you    */        
+/* avoid some of your ranges to be in HEX, you can add them to this   */        
+/* list after the "_" (underscore).                                   */        
+/*                                                                    */        
+/**********************************************************************/        
+Reference = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"||,                                     
+            "abcdefghijklmnopqrstuvwxyz"||,                                     
+            "1234567890"||,                                                     
+            " .-_"                                                              
+                                                                                
+/**********************************************************************/        
+parse arg InParms                                                               
+                                                                                
+/* ------------------------- */                                                 
+/* Initalize module varables */                                                 
+/* ------------------------- */                                                 
+RetCode    = 0          /* Final return code                      */            
+FinalMsg.  = 0          /* Turn all info and warning messages off */            
+OutData.   = 0          /* Clear out output data buffer           */            
+BadDSName. = 0          /* Clear out bad data set name field  @L1A*/            
+BadRCCode. = 0          /* Clear out bad ret code field       @L1A*/            
+NUMERIC DIGITS 10       /* Allow for large Hex translations   @L1A*/            
+                                                                                
+/* ------------------------------------------------------------------ */        
+/* Parse out Output Dataset, ICHRDSNT, ICHRRNG, and progam options    */        
+/* ------------------------------------------------------------------ */        
+parse value InParms With OutData InData1 InData2 "-" Options                    
+Options = TRANSLATE(Options)                                                    
+                                                                                
+/* ----------------------------------- */                                       
+/* Check to see if I turn on debugging */                                       
+/* ----------------------------------- */                                       
+Debug = 0               /* Debug  on = 1 , off = 0 */                           
+Debug2 = 0              /* Debug2 on = 1 , off = 0 */                           
+If (POS("DEBUG2",OPTIONS) > 0) Then                                             
+  DEBUG2 = 1                                                                    
+Else If (POS("DEBUG",OPTIONS) > 0) Then                                         
+  DEBUG = 1                                                                     
+                                                                                
+/* -------------------------------------------------- */                        
+/* Check to see if I turn on dumping output to screen */                        
+/* -------------------------------------------------- */                        
+ScreenOut = 0           /* ScreenOut on = 1 , off = 0 */                        
+If (POS("SCREENOUT",OPTIONS) > 0 |,                                             
+    POS("OUTPUT",OPTIONS) > 0) Then                             /*@L1C*/        
+  ScreenOut = 1                                                                 
+                                                                                
+OutData = Strip(OutData)                                                        
+InData1 = Strip(InData1)                                                        
+InData2 = Strip(InData2)                                                        
+If DEBUG Then Say "DEBUG: Output Data set = "OutData                            
+If DEBUG Then Say "DEBUG: DSNT   Data set = "InData1                            
+If DEBUG Then Say "DEBUG: RRNG   Data set = "InData2                            
+                                                                                
+/* ------------------------------------- */                                     
+/* Determine what to process, from where */                                     
+/* ------------------------------------- */                                     
+GetFromMem  = 1         /* Assume we are getting from storage.      */          
+ProcessDSNT = 0         /* Assume we don't have ICHRDSNT to process */          
+ProcessRRNG = 0         /* Assume we don't have ICHRRNG  to process */          
+If (InData1 <> "" & InData1 <> "*") Then Do                                     
+  If DEBUG Then Say "DEBUG: Have ICHRDSNT to processs."                         
+  ProcessDSNT = 1                                                               
+  GetFromMem  = 0       /* Turn off getting from storage */                     
+End                                                                             
+If (InData2 <> "" & InData2 <> "*") Then Do                                     
+  If DEBUG Then Say "DEBUG: Have ICHRRNG  to processs."                         
+  ProcessRRNG = 1                                                               
+  GetFromMem  = 0       /* Turn off getting from storage */                     
+End                                                                             
+                                                                                
+/* ----------------------------- */                                             
+/* Find DSDT and RRNG in storage */                                             
+/* ----------------------------- */                                             
+If (GetFromMem = 1) Then                                                        
+  Call Find_TABLES                                                              
+                                                                                
+/* ----------------------- */                                                   
+/* Process in-storage DSDT */                                                   
+/* ----------------------- */                                                   
+If (GetFromMem = 1) Then Do                                                     
+  Call Process_ICHPDSDT_Mem                                                     
+  ProcessDSNT = 1       /* There is ICHRDSNT data to process */                 
+End                                                                             
+/* ------------------------ */                                                  
+/* Process DSNT Load module */                                                  
+/* ------------------------ */                                                  
+Else If (ProcessDSNT = 1) Then                                                  
+  Call Process_ICHRDSNT_Load                                                    
+                                                                                
+If DEBUG THEN Say "DEBUG: ********************************************"         
+                                                                                
+/* ----------------------- */                                                   
+/* Process in-storage RRNG */                                                   
+/* ----------------------- */                                                   
+If (GetFromMem = 1) Then Do                                                     
+  Call Process_ICHRRNG_Mem                                                      
+  ProcessRRNG = 1       /* There is ICHRRNG  data to process */                 
+End                                                                             
+/* ------------------------ */                                                  
+/* Process RRNG Load module */                                                  
+/* ------------------------ */                                                  
+Else If (ProcessRRNG = 1) Then                                                  
+  Call Process_ICHRRNG_Load                                                     
+                                                                                
+/* ------------------------------------------------------------------ */        
+/* Generate header */                                                           
+/* --------------- */                   /* Always generate header @L1D*/        
+Call Generate_Header                                                            
+                                                                                
+/* -------------------------- */                                                
+/* Generate DSNT PARMLIB data */                                                
+/* -------------------------- */                                                
+If (ProcessDSNT = 1) Then                                                       
+  Call Generate_DSNT                                                            
+                                                                                
+/* --------------------------------- */                                         
+/* Generate Range Table PARMLIB data */                                         
+/* --------------------------------- */                                         
+If (ProcessRRNG = 1) Then                                                       
+  Call Generate_ICHRRNG                                                         
+                                                                                
+If (Retcode <= 8) Then Do                                                       
+/* ------------------------ */                                                  
+/* Validate output Data set */                                                  
+/* ------------------------ */                                                  
+  If (OutData <> "" & OutData <> "*") Then Do                   /*@L1M*/        
+    "ALLOC FI(IRRDCUO1) DA('"OutData"') OLD"                    /*@L1M*/        
+    SaveRC = RC                                                 /*@L1M*/        
+    If (SaveRC > 0) Then Do                                     /*@L1M*/        
+      FinalMsg.203E  = 1   /* DCU203E Output data set not found.  @L1M*/        
+      RetCode        = 12  /*   Terminating error.                @L1M*/        
+      BadDSName.M203E = OutData                                 /*@L1C*/        
+      BadRCCode.M203E = SaveRC                                  /*@L1C*/        
+    End                                                         /*@L1M*/        
+                                                                                
+/* ----------------- */                                                         
+/* Write output file */                                                         
+/* ----------------- */                                                         
+    Else Do                                                     /*@L1A*/        
+      "EXECIO" OutData.0 "DISKW IRRDCUO1 (FINI STEM OutData."   /*@L1C*/        
+      SaveRC = RC                                                               
+      If (SaveRC > 0) Then Do                                                   
+        FinalMsg.204E   = 1  /* DCU204E Output data set write error   */        
+        RetCode         = 12 /*   Terminating error.                  */        
+        BadDSName.M204E = OutData                               /*@L1C*/        
+        BadRCCode.M204E = SaveRC                                /*@L1C*/        
+      End                                                                       
+    End                                                         /*@L1A*/        
+                                                                                
+    "FREE F(IRRDCUO1)"                                                          
+    IF DEBUG THEN  Say "== FREE RC = "||rc                      /*@D1A*/        
+  End  /* Output dataset provided */                            /*@L1M*/        
+  Else                                                          /*@L1M*/        
+    FinalMsg.103I = 1     /* DCU103I No OUTPUT PARMLIB member was     */        
+                          /*   Provided.                          @L1M*/        
+End                                                                             
+                                                                                
+/* --------------------------------------------- */                             
+/* If all good so far and output generated then: */                             
+/*   * Tell user to run RACPRMCK.                */                             
+/*   * Check we are running on V2R3 or higher.   */                             
+/* --------------------------------------------- */                             
+If (RetCode = 0 & OutData <> "" & OutData <> "*") Then Do                       
+  FinalMsg.105I = 1   /* DCU105I Syntax checker was not executed.   */          
+                                                                                
+  SYSOPSYS = MVSVAR(SYSOPSYS)                                                   
+                                                                                
+  If DEBUG THEN Say "DEBUG: SYSOPSYS --"SYSOPSYS                                
+  Parse value sysopsys with OSTYPE RELEASE .                                    
+                                                                                
+  If (RELEASE < "02.03.00") Then                                                
+    FinalMsg.106W = 1   /* DCU106W Release not 2.3 or greater.      */          
+End                                                                             
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* Generate program error & warning messages */                                 
+/* ----------------------------------------- */                                 
+QuickExit:                                                                      
+SaveRC  = Generate_messages()                                                   
+RetCode = MAX(SaveRC,RetCode)                                                   
+                                                                                
+If (RetCode > 4) Then Do                                                        
+  Say " "                                                                       
+  Say "DCU003E Unsuccessful execution of DSNT2PRM. Return code = "||,           
+      RetCode                                                                   
+End                                                                             
+Else If (RetCode > 0) Then Do                                                   
+  Say " "                                                                       
+  Say "DCU002W Successful execution of DSNT2PRM, with WARNINGS! "||,            
+      " Return code = "RetCode                                                  
+End                                                                             
+Else                                                                            
+  Say "DCU001I Successful execution of DSNT2PRM."                               
+                                                                                
+Exit(RetCode)                                                                   
+                                                                                
+/**********************************************************************/        
+/*                                                                    */        
+/* Find_Tables:                                                       */        
+/*                                                                    */        
+/* Find DSDT and RRNG in storage.                                     */        
+/*   CVT  + '3E0'x (992) = RCVT                                       */        
+/*   RCVT + 'E0'x  (224) = DSDT                                       */        
+/*   RCVT + 'E4'x  (228) = RRNG                                       */        
+/*                                                                    */        
+/**********************************************************************/        
+Find_Tables:                                                                    
+  If DEBUG THEN Say "DEBUG: >> In Find_Tables"                                  
+                                                                                
+  CVT = C2X(storage(10,4))                                                      
+  If DEBUG THEN Say "DEBUG: CVT        --"||Right(CVT,8,'0')||"--"              
+  Call TestAddress CVT,"CVT"                                                    
+                                                                                
+  RCVTAddr = D2X(X2D(CVT) + 992)    /* RCVT     = CVT + '3E0'x (992) */         
+  If DEBUG THEN Say "DEBUG: RCVT Addr. --"||Right(RCVTAddr,8,'0')||"--"         
+  RCVT = C2X(storage(RCVTAddr,4))                                               
+  If DEBUG THEN Say "DEBUG: RCVT       --"||Right(RCVT,8,'0')||"--"             
+  Call TestAddress RCVT,"RCVT"                                                  
+                                                                                
+  DSDTAddr = D2X(X2D(RCVT) + 224)   /* ICHPDSDT = RCVT + 'E0'x (224) */         
+  ICHPDSDT = C2X(storage(DSDTAddr,4))                                           
+  IF DEBUG THEN Say "DEBUG: ICHPDSDT   --"||Right(ICHPDSDT,8,'0')||"--"         
+  Call TestAddress ICHPDSDT,"RCVTDSDT"                                          
+                                                                                
+  RRNGAddr = D2X(X2D(RCVT) + 228)   /* ICHRRNG  = RCVT + 'E4'x (228) */         
+  ICHRRNG  = C2X(storage(RRNGAddr,4))                                           
+  IF DEBUG THEN Say "DEBUG: ICHRRNG    --"||Right(ICHRRNG,8,'0')||"--"          
+  Call TestAddress ICHRRNG,"RCVTRNGP"                                           
+                                                                                
+Return                                                                          
+                                                                                
+/**********************************************************************/        
+/*                                                                    */        
+/* Process_ICHRRNG_Mem:                                               */        
+/*                                                                    */        
+/* Processing the ICHRRNG data from storage.                          */        
+/*                                                                    */        
+/*   Offset Dec  Len  Value                                           */        
+/*   ----------  ---  ----------------------------------------        */        
+/*       0        4   Number of Array Elements.                       */        
+/*       4       45   Array of Range/DS-Number pair                   */        
+/*       4       44     Lower bound of Range                          */        
+/*      48        1     Data Set Sequence Number                      */        
+/*                                                                    */        
+/* Output Range Table Structure:                                      */        
+/*   Range.0 = Number of ranges                                       */        
+/*   Range.x = Start of range x                                       */        
+/*   DS.x    = Data set sequence number for range x                   */        
+/*                                                                    */        
+/**********************************************************************/        
+Process_ICHRRNG_Mem:                                                            
+  If DEBUG THEN Say "DEBUG: >> In Process_ICHRRNG_Mem"                          
+  If (RetCode > 8) Then Return         /* Terminating Error....    */           
+                                                                                
+  If DEBUG THEN Say "DEBUG: >> "||,                                             
+                "ICHRRNG found at address '"||Right(ICHRRNG,8,'0')||"'x"        
+                                                                                
+  Range.0 = C2D(storage(ICHRRNG,4))    /* Get number of elements.  */           
+  Pointer = D2X(X2D(ICHRRNG) + 4)      /* Move pointer to first    */           
+                                       /*   element in array.      */           
+  IF DEBUG THEN  Say "DEBUG: Ranges "||Range.0                                  
+                                                                                
+  Do I = 1 to Range.0                  /* Loop through all ranges  */           
+    IF DEBUG THEN  Say "DEBUG: Processing Range = "||I                          
+    Range.I = storage(pointer,44)      /* Get Lower bound of range */           
+    Pointer = D2X(X2D(pointer) + 44)   /* Move pointer to Seq. #   */           
+                                                                                
+    DS.I = C2D(storage(pointer,1))     /* Get Data set Seq. #      */           
+    Pointer = D2X(X2D(pointer) + 1)    /* Move pointer to next     */           
+                                       /*   element in array.      */           
+  End /* Do Loop */                                                             
+Return                                                                          
+                                                                                
+/**********************************************************************/        
+/*                                                                    */        
+/* Process_ICHRRNG_Load:                                              */        
+/*                                                                    */        
+/* Processing the ICHRRNG data from a load module.                    */        
+/*                                                                    */        
+/*   Offset Dec  Len  Value                                           */        
+/*   ----------  ---  ----------------------------------------        */        
+/*       0        4   Number of Array Elements.                       */        
+/*       4       45   Array of Range/DS-Number pair                   */        
+/*       4       44     Lower bound of Range                          */        
+/*      48        1     Data Set Sequence Number                      */        
+/*                                                                    */        
+/* Output Range Table Structure:                                      */        
+/*   Range.0 = Number of ranges                                       */        
+/*   Range.x = Start of range x                                       */        
+/*   DS.x    = Data set sequence number for range x                   */        
+/*                                                                    */        
+/**********************************************************************/        
+Process_ICHRRNG_Load:                                                           
+  If DEBUG THEN Say "DEBUG: >> In Process_ICHRRNG_Load"                         
+  If (RetCode > 8) Then Return      /* Terminating Error....          */        
+                                                                                
+  /* ---------------------------- */                                            
+  /* Read in ICHRRNG  Load Module */                                            
+  /* ---------------------------- */                                            
+  "ALLOC DA('"InData2"') FILE(IRRDCUI2) SHR REUSE"                              
+  SaveRC = RC                                                                   
+  If (SaveRC > 0) Then Do           /* Allocate of ICHRRNG failed     */        
+    FinalMsg.201E = 1   /* DCU201E Input  data set not found.         */        
+    RetCode       = 12  /*   Terminating error.                       */        
+    BadDSName.M201E = InData2                                   /*@L1C*/        
+    BadRCCode.M201E = SaveRC                                    /*@L1C*/        
+  End                                                                           
+  Else Do                                                                       
+    IF DEBUG THEN  Say "DEBUG: Allocate successful"                             
+                                                                                
+    "EXECIO * DISKR  IRRDCUI2  (STEM  DATA. FINIS "                             
+    SaveRC = RC                                                                 
+    If (SaveRC > 0) Then Do         /* EXECIO of ICHRRNG failed       */        
+      FinalMsg.202E = 1   /* DCU202E Failure of read of input data set*/        
+      RetCode       = 12  /*   Terminating error.                     */        
+      BadDSName.M202E = InData2                                 /*@L1C*/        
+      BadRCCode.M202E = SaveRC                                  /*@L1C*/        
+    End                                                                         
+    Else Do                         /* Read Successful                */        
+      IF (DEBUG | DEBUG2) THEN                                                  
+        Say "DEBUG: ICHRRNG  EyeCatcher >>"||SUBSTR(DATA.1,9,8)||"<<"           
+                                                                /*@L1C*/        
+                                                                                
+      Call Find_Module              /* Find start of ICHRRNG          */        
+      Pointer = 1                   /* Set pointer to # of elements   */        
+                                    /*  in RRNG.                      */        
+                                    /* Get number of elements.   */             
+      Range.0 = C2D(substr(Data.ModSt,pointer,4))                               
+      Pointer = Pointer + 4         /* Move pointer to 1st range      */        
+      IF DEBUG THEN  Say "DEBUG: Ranges "||Range.0                              
+                                                                                
+      /* ------------------------------------ */                                
+      /* Validate data length is reasonable   */                                
+      /*   See range table mapping in prolog. */                                
+      /* ------------------------------------ */                                
+      TotalLen = 4 + (Range.0 * 45)                                             
+      IF DEBUG THEN  Say "DEBUG: TotalLen = "||TotalLen||,                      
+                         "       Actual Len = "||Length(Data.ModSt)             
+      If (TotalLen > Length(Data.ModSt)) Then Do                                
+        FinalMsg.205E = 1   /* DCU205E # of elements goes beyond the  */        
+                            /*   length of data.                      */        
+        RetCode       = 12  /*   Terminating error.                   */        
+        BadDSName.M205E = InData2                               /*@L1C*/        
+      End                                                                       
+      Else Do                                                                   
+        Do I = 1 to Range.0                                                     
+          IF DEBUG THEN  Say "DEBUG: Processing Range = "||I                    
+                                    /* Get Lower bound of range       */        
+          Range.I = substr(Data.ModSt,pointer,44)                               
+          Pointer = Pointer + 44    /* Move pointer to Seq. #         */        
+                                    /* Get Data set Seq. #            */        
+          DS.I = C2D(substr(Data.ModSt,pointer,1))                              
+          Pointer = Pointer + 1     /* Move pointer to next element   */        
+                                    /*   in array.                    */        
+        End /* Do Loop */                                                       
+      End /* Valid length */                                                    
+    End /* Read Successful */                                                   
+  End /* Allocate Successful */                                                 
+                                                                                
+  "FREE F(IRRDCUI2)"                                                            
+    IF DEBUG THEN  Say "== FREE RC = "||rc                      /*@D1A*/        
+  Drop Data.                                                                    
+Return                                                                          
+                                                                                
+/**********************************************************************/        
+/*                                                                    */        
+/* Generate_ICHRRNG:                                                  */        
+/*                                                                    */        
+/* Based on the extracted RRNG data, generate the RACF Range Table    */        
+/* entries in the PARMLIB member.                                     */        
+/*                                                                    */        
+/* Input Range Table Structure:                                       */        
+/*   Range.0 = Number of ranges                                       */        
+/*   Range.x = Start of range x                                       */        
+/*   DS.x    = Data set sequence number for range x                   */        
+/*                                                                    */        
+/**********************************************************************/        
+Generate_ICHRRNG:                                                               
+  If DEBUG THEN Say "DEBUG: >> In Generate_ICHRRNG"                             
+  If (RetCode > 8) Then Return        /* Terminating Error....        */        
+                                                                                
+  Say " "                                                                       
+  Say "DCU005I Generate PARMLIB data based on ICHRRNG data."                    
+  Say "        Ranges = "Range.0                                                
+  Call WriteData(,                                                              
+    "/* ----------------------------------------------------------- */")        
+                                                                                
+  /* --------------------- */                                                   
+  /* Generate Range Table. */                                                   
+  /* --------------------- */                                                   
+  Call WriteData("RANGETABLE")                                                  
+                                                                                
+  Do I = 1 to Range.0                                                           
+    IF DEBUG THEN  Say "== Range = "||I                                         
+                                                                                
+    /* ------------------- */                                                   
+    /* Process Lower bound */                                                   
+    /* ------------------- */                                                   
+    Data = STRIP(Range.I,'T','0'x)    /* Strip all ending 0 values.   */        
+    If (Length(Data) = 0) Then        /* If we strip everything...    */        
+      Data = '00'x                    /*   Starting '00' value.       */        
+                                                                                
+    /* ------------------------ */                                              
+    /* Attempt to convert input */                                              
+    /* ------------------------ */                                              
+    DataType = "CHAR"                                                           
+    If (verify(Data,Reference) = 0) Then /* Only permitted chars?     */        
+      data = "'"||Data||"'"              /* If so, use char format    */        
+    Else Do                              /* If not, use hex format    */        
+      data = "'"||C2X(Data)||"'"                                                
+      DataType = "HEX"                                                          
+    End                                                                         
+                                                                                
+    /* -------------------------------------------------------------- */        
+    /* How break point was calculated.                                */        
+    /*   Max output = 71 characters.                                  */        
+    /*   "  START(" =  8 characters.                                  */        
+    /*   If the string is less then 63 characters (71-8 = 63), then   */        
+    /*     the line does not need to be split.                        */        
+    /*                                                                */        
+    /*   "HEX)"     =  4 Characters.                                  */        
+    /*   If the string is less then 59 characters (63-4 = 59), then   */        
+    /*     the "HEX)" can be on the same line.                        */        
+    /*     This situation can never happen for CHAR data.             */        
+    /* -------------------------------------------------------------- */        
+    /* Generate START entry */                                                  
+    /* -------------------- */                                                  
+    If (Length(Data) < 63) Then       /* If we don't have to break    */        
+                                      /*   the string.                */        
+      If (Length(Data) < 59) Then     /* Can I fit HEX in?            */        
+                                      /*   Yes I can                  */        
+        Call WriteData("  START("||Data||" "||DataType||")")                    
+      Else Do                         /*   No I can't                 */        
+        Call WriteData("  START("||Data)                                        
+        Call WriteData("        "||DataType||")")                               
+      End                                                                       
+    Else Do                           /* Input data must be split.    */        
+      DataPt1 = SUBSTR(Data,1,63)                                               
+      DataPt2 = SUBSTR(Data,64)                                                 
+      Call WriteData("  START("||DataPt1)                                       
+      Call WriteData(DataPt2||" "||DataType||")")                               
+    End                                                                         
+                                                                                
+    /* ------------------------ */                                              
+    /* Generate Data set seq. # */                                              
+    /* ------------------------ */                                              
+    Call WriteData("    ENTRYNUMBER("||DS.I||")")                               
+  End                                                                           
+Return                                                                          
+                                                                                
+/**********************************************************************/        
+/*                                                                    */        
+/* Process_ICHPDSDT_Mem:                                              */        
+/*                                                                    */        
+/* Processing the ICHRDSDT data from storage.                         */        
+/*                                                                    */        
+/*   Offset Dec  Len  Value                                           */        
+/*   ----------  ---  ----------------------------------------        */        
+/*       4         4  Number of Array Elements.                       */        
+/*     136         1  Data Sharing Flags (DSDTDSFL)                   */        
+/*     137         1  RACF Data sharing mode (DSDTDSMO)               */        
+/*     144       352  Entry for Data Set Information.                 */        
+/*                    NOTE: Mapping for primary and backup RACF       */        
+/*                          bases are the same.                       */        
+/*     173         1    Primary/Backup RACF database status.          */        
+/*                        (DSDPSTAT/DSDBSTAT)                         */        
+/*     176         1    # of in-storage buffers.                      */        
+/*     177        44    Primary/Backup Data set name.                 */        
+/*                                                                    */        
+/* Output Data set name table structure:                              */        
+/*   Entries       = Number of data set pairs (Primary/Backup)        */        
+/*   Sysplex       = Sysplex mode.                                    */        
+/*   DSPrim.x      = Primary RACF data set name.                      */        
+/*   DSBack.x      = Backup  RACF data set name.                      */        
+/*   Buffer.x      = # of in-Storage buffers for data set pair.       */        
+/*   Backup.x      = Backup status.                                   */        
+/*                                                                    */        
+/**********************************************************************/        
+Process_ICHPDSDT_Mem:                                                           
+  If DEBUG THEN Say "DEBUG: >> In Process_ICHPDSDT_Mem"                         
+  If (RetCode > 8) Then Return       /* Terminating Error....         */        
+                                                                                
+  If DEBUG THEN Say "DEBUG: >> "||,                                             
+              "ICHPDSDT found at address '"||Right(ICHPDSDT,8,'0')||"'x"        
+                                                                                
+  FinalMsg.104W = 1        /* DCU104W In-Storage DSNT may not match   */        
+                           /*   ICHRDSNT that was IPLed with.         */        
+                                                                                
+  Pointer = D2X(X2D(ICHPDSDT) + 4)   /* Move pointer to number of     */        
+                                     /*   elements in DSDT.           */        
+  Entries = C2D(storage(pointer,4))  /* Get number of elements.       */        
+                                                                                
+  Pointer = D2X(X2D(pointer) + 132)  /* Point to DSDTDSFL             */        
+  DSDTDSFL = storage(pointer,1)      /* Get DSDTDSFL                  */        
+  Pointer = D2X(X2D(pointer) +   1)  /* Point to DSDTDSMO             */        
+  DSDTDSMO = C2D(storage(pointer,1)) /* Get DSDTDSMO                  */        
+                                                                                
+  IF DEBUG THEN  Say "DEBUG: DSDTDSFL "||C2D(DSDTDSFL)                          
+  IF DEBUG THEN  Say "DEBUG: DSDTDSMO "||DSDTDSMO                               
+                                                                                
+  /* ---------------------------------------------------------------- */        
+  /* DSDTDSFL Mapping (1 byte):                                       */        
+  /*   1--- ---- DSDTDSRQ - Enabled for sysplex communication. See    */        
+  /*                          DSDTDSMO for actual state.              */        
+  /*                                                                  */        
+  /* DSDTDSMO Mapping (Fixed 8):                                      */        
+  /*   0 = No Datasharing (i.e. Sysplex Communications mode).         */        
+  /*   1 = Datasharing mode.                                          */        
+  /*   2 = In Read-Only mode.                                         */        
+  /*   3 = In Transition mode, Is either in Read-Only or Datasharing  */        
+  /*       after connect services called.                             */        
+  /* ---------------------------------------------------------------- */        
+  /* Process SYSPLEX state based */                                             
+  /* on DSDTDSFL and DSDTDSMO.   */                                             
+  /* --------------------------- */                                             
+  If (Bitand(DSDTDSFL,'80'x) = '00'x) Then                                      
+    SYSPLEX = "NOCOMMUNICATIONS" /* No SYSPLEX-Communications mode    */        
+  Else Do                                                                       
+    If (DSDTDSMO = 0) Then                                                      
+      SYSPLEX = "COMMUNICATIONS" /* SYSPLEX-Communications mode       */        
+    Else if (DSDTDSMO = 1) Then                                 /*@L1C*/        
+      SYSPLEX = "DATASHARING"    /* SYSPLEX-Datasharing mode          */        
+    Else If (DSDTDSMO = 2) Then Do                              /*@L1C*/        
+      FinalMsg.101W = 1    /* DCU101W In READ-ONLY mode. Will force   */        
+                           /*   system to Datasharing mode.           */        
+      SYSPLEX = "DATASHARING"    /* SYSPLEX-Datasharing mode          */        
+    End                                                                         
+    Else If (DSDTDSMO = 3) Then Do                              /*@L1C*/        
+      FinalMsg.102W = 1    /* DCU102W In a transition state. Will     */        
+                           /*   force system to Datasharing mode.     */        
+      SYSPLEX = "DATASHARING"    /* SYSPLEX-Datasharing mode          */        
+    End                                                                         
+    Else Do                                                     /*@L1A*/        
+      FinalMsg.107W = 1    /* DCU107W Unsupported value for ...   @L1A*/        
+      FinalMsg.107WData = "DSDTDSMO"                /* DSDTDSMO  *@L1A*/        
+      SYSPLEX = "Unsupported value DSDTDSMO = "||DSDTDSMO       /*@L1A*/        
+    End                                                         /*@L1A*/        
+  End                                                                           
+  IF DEBUG THEN  Say "DEBUG: SYSPLEX = "||SYSPLEX                               
+                                                                                
+  Pointer = D2X(X2D(pointer) + 7)    /* Point to start of 1st entry   */        
+                                                                                
+  /* ---------------------------------------------------------------- */        
+  /* Mapping of a single entry.  First entry is at +144 from start of */        
+  /* the DSDT.                                                        */        
+  /*                                                                  */        
+  /*   Offset Dec  Len  Value                                         */        
+  /*   ----------  ---  ----------------------------------------      */        
+  /*       0       176  Entry for Primary or Backup data set.         */        
+  /*      29         1  Data set status (DSDPSTAT / DSDBSTAT)         */        
+  /*      32         1  # of in-storage buffers.                      */        
+  /*      33        44  Primary/Backup Data set name.                 */        
+  /*                                                                  */        
+  /* ---------------------------------------------------------------- */        
+  Do I = 1 to Entries                                                           
+    IF DEBUG THEN  Say "DEBUG: Entry # "||I                                     
+    IF DEBUG THEN  Say "DEBUG: Struct --"||pointer||"--"                        
+                                                                                
+    Do J = 1 to 2  /* Processing data set pairs      */                         
+                   /*   J = 1 Primary / J = 2 Backup */                         
+      IF DEBUG & J = 1 THEN SAY "DEBUG: Processing Primary DB"                  
+      IF DEBUG & J = 2 THEN SAY "DEBUG: Processing Backup  DB"                  
+                                                                                
+      Pointer = D2X(X2D(pointer) + 29) /* Point to RACF DS Status     */        
+      IF DEBUG THEN  Say "DEBUG: Stat@  --"||pointer||"--"                      
+      DSDxSTAT = storage(pointer,1)    /* Get DSDxSTAT.               */        
+      IF DEBUG THEN  Say "DEBUG: DSDxSTAT ="||X2B(C2X(DSDxSTAT))||"="           
+                                                                                
+      /* ------------------------------------------------------------ */        
+      /* DSDxSTAT Mapping (1 byte):                                   */        
+      /*   1--- ---- DSDxACTV - Data set is active.                   */        
+      /*   ---- -1-- DSDxALTI - ALTERI Requests are backed-up.        */        
+      /*                                                              */        
+      /* ------------------------------------------------------------ */        
+      /* Determine Backup DS Copy options */                                    
+      /* -------------------------------- */                                    
+      If (J = 2) Then Do               /* Look at Backup Structure */           
+        IF (Bitand(DSDxSTAT,'84'x) = '84'x) Then                                
+          Backup.I = "ALL"                                                      
+        Else IF (Bitand(DSDxSTAT,'84'x) = '80'x) Then                           
+          Backup.I = "NOSTATS"                                                  
+        Else                                                                    
+          Backup.I = "NONE"                                                     
+        IF DEBUG THEN  Say "DEBUG: Backup --"||Backup.I||"--"                   
+      End /* Determine copy option */                                           
+                                                                                
+      Pointer = D2X(X2D(pointer) + 3)   /* Point to # in-Storage     */         
+                                        /*   buffers.                */         
+      If (J = 1) Then Do                /* Look at Primary Structure */         
+        Buffer.I = C2D(storage(pointer,1)) /* Get # of in-Storage    */         
+                                           /*   buffers.             */         
+        IF DEBUG THEN  Say "DEBUG: Buffer --"||Buffer.I||"--"                   
+      End                                                                       
+      Pointer = D2X(X2D(pointer) +  1)  /* Point to RACF Data set    */         
+                                        /*   name.                   */         
+      If (J = 1) Then                   /* Get Primary DB name.      */         
+        DSPrim.I= Storage(pointer,44)                                           
+      Else                              /* Get Backup  DB name.      */         
+        DSBack.I= Storage(pointer,44)                                           
+      Pointer = D2X(X2D(pointer) + 143) /* Point to next entry.      */         
+    End /* Do Loop - DB Pair */                                                 
+  End /* Do Loop - Entries */                                                   
+Return                                                                          
+                                                                                
+/**********************************************************************/        
+/*                                                                    */        
+/* Process_ICHRDSNT_Load:                                             */        
+/*                                                                    */        
+/* Processing the ICHRDSNT data from a load module.                   */        
+/*                                                                    */        
+/*   Offset Dec  Len  Value                                           */        
+/*   ----------  ---  ----------------------------------------        */        
+/*       0         1  Number of Array Elements.                       */        
+/*       1        90  Entry for Data Set Information.                 */        
+/*       1        44    Primary Data set name.                        */        
+/*      45        44    Backup  Data set name.                        */        
+/*      89         1    # of in-storage buffers.                      */        
+/*      90         1    Data set flag fields.                         */        
+/*                                                                    */        
+/* Output Data set name table structure:                              */        
+/*   Entries       = Number of data set pairs (Primary/Backup)        */        
+/*   Sysplex       = Sysplex mode.                                    */        
+/*   DSPrim.x      = Primary RACF data set name.                      */        
+/*   DSBack.x      = Backup  RACF data set name.                      */        
+/*   Buffer.x      = # of in-Storage buffers for data set pair.       */        
+/*   Backup.x      = Backup status.                                   */        
+/*                                                                    */        
+/**********************************************************************/        
+Process_ICHRDSNT_Load:                                                          
+  If DEBUG THEN Say "DEBUG: >> In Process_ICHRDSNT_Load"                        
+  If (RetCode > 8) Then Return       /* Terminating Error....         */        
+                                                                                
+  /* ---------------------------- */                                            
+  /* Read in ICHRDSNT Load Module */                                            
+  /* ---------------------------- */                                            
+  "ALLOC DA('"InData1"') FILE(IRRDCUI1) SHR REUSE"                              
+  SaveRC = RC                                                                   
+  If (SaveRC > 0) Then Do           /* Allocate of ICHRDSNT failed    */        
+    FinalMsg.201E = 1   /* DCU201E Input  data set not found.         */        
+    RetCode       = 12  /*   Terminating error.                       */        
+    BadDSName.M201E = InData1                                   /*@L1C*/        
+    BadRCCode.M201E = SaveRC                                    /*@L1C*/        
+  End                                                                           
+  Else Do                                                                       
+    IF DEBUG THEN  Say "DEBUG: Allocate successful"                             
+                                                                                
+    "EXECIO * DISKR  IRRDCUI1  (STEM  DATA. FINIS "                             
+    SaveRC = RC                                                                 
+    If (SaveRC > 0) Then Do         /* EXECIO of ICHRDSNT failed      */        
+      FinalMsg.202E = 1   /* DCU202E Failure of read of input data set*/        
+      RetCode       = 12  /*   Terminating error.                     */        
+      BadDSName.M202E = InData1                                 /*@L1C*/        
+      BadRCCode.M202E = SaveRC                                  /*@L1C*/        
+    End                                                                         
+    Else Do                         /* Read Successful                */        
+      IF (DEBUG | DEBUG2) THEN                                                  
+        Say "DEBUG: ICHRDSNT EyeCatcher >>"||SUBSTR(DATA.1,9,8)||"<<"           
+                                                                /*@L1C*/        
+      Call Find_Module              /* Find start of ICHRDSNT         */        
+      Pointer = 1                   /* Move pointer to # of           */        
+                                    /*   elements in DSNT.            */        
+                                    /* Get number of elements.        */        
+      Entries = C2D(substr(Data.ModSt,pointer,1))                               
+      IF DEBUG THEN  Say "DEBUG: Entries "||Entries                             
+                                                                                
+      /* ------------------------------------ */                                
+      /* Validate data length is reasonable   */                                
+      /*   See DSNT mapping in prolog.        */                                
+      /* ------------------------------------ */                                
+      TotalLen = 1 + (Entries * 90)                                             
+      IF DEBUG THEN  Say "DEBUG: TotalLen = "||TotalLen||,                      
+                         "       Actual Len = "||Length(Data.ModSt)             
+      If (TotalLen > Length(Data.ModSt)) Then Do                                
+        FinalMsg.205E = 1   /* DCU205E # of elements goes beyond the  */        
+                            /*   length of data.                      */        
+        RetCode       = 12  /*   Terminating error.                   */        
+        BadDSName     = InData1                                                 
+      End                                                                       
+      Else Do                                                                   
+        Do I = 1 to Entries                                                     
+          IF DEBUG THEN  Say "DEBUG: Entry # "||I                               
+                                                                                
+          Pointer = Pointer + 1      /* Move pointer to Primary DS    */        
+                                     /* Get Primary RACF DS name.     */        
+          DSPrim.I = Substr(Data.ModSt,pointer,44)                              
+                                                                                
+          Pointer = Pointer + 44     /* Move pointer to Backup DS     */        
+                                     /* Get Backup RACF DS name.      */        
+          DSBack.I = Substr(Data.ModSt,pointer,44)                              
+                                                                                
+          Pointer = Pointer + 44     /* Move pointer to # of          */        
+                                     /*   in-Storage buffers.         */        
+                                     /* Get # of in-Storage Buffers   */        
+          Buffer.I = C2D(Substr(Data.ModSt,pointer,1))                          
+                                                                                
+          Pointer = Pointer + 1      /* Move pointer Data set opt.    */        
+                                     /* Save Data set options.        */        
+          DBOpt = Substr(Data.ModSt,pointer,1)                                  
+                                                                                
+          /* -------------------------------------------------------- */        
+          /* Data Set Name Table Flag field (1 byte):                 */        
+          /*   00-- ---- = No updates to the backup data set.         */        
+          /*   10-- ---- = All updates, but no statistics.            */        
+          /*   11-- ---- = All updates, including statistics.         */        
+          /*                                                          */        
+          /*   ---- 00-- = Not enabled for sysplex communications.    */        
+          /*   ---- 10-- = Enabled for sysplex communications, but in */        
+          /*                 non-datasharing mode.                    */        
+          /*   ---- 01-- = Enabled for datasharing mode.              */        
+          /*   ---- 11-- = Enabled for datasharing mode.              */        
+          /*                                                          */        
+          /* -------------------------------------------------------- */        
+          /* Determine Backup DS Copy options */                                
+          /* -------------------------------- */                                
+          If DEBUG THEN  Say "DEBUG: Data set Flags "||C2X(DBOpt)               
+          IF (Bitand(DBOpt,'C0'x) = 'C0'x) Then                                 
+            Backup.I = "ALL"                                                    
+          Else IF (Bitand(DBOpt,'C0'x) = '80'x) Then                            
+            Backup.I = "NOSTATS"                                                
+          Else                                                                  
+            Backup.I = "NONE"                                                   
+                                                                                
+          /* --------------------- */                                           
+          /* Process SYSPLEX state */                                           
+          /* --------------------- */                                           
+          If (I = 1) Then Do /* Processing first entry. */                      
+            If (Bitand(DBOpt,'0C'x) = '00'x) Then                               
+                                 /* No SYSPLEX-Communications mode */           
+              SYSPLEX = "NOCOMMUNICATIONS"                                      
+            Else If (Bitand(DBOpt,'0C'x) = '08'x) Then                          
+                                 /* SYSPLEX-Communications mode   */            
+              SYSPLEX = "COMMUNICATIONS"                        /*@L2C*/        
+            Else                                                                
+                                 /* SYSPLEX-Datasharing mode       */           
+              SYSPLEX = "DATASHARING"                                           
+          End /* Processing first entry */                                      
+          IF DEBUG THEN  Say "DEBUG: SYSPLEX = "||SYSPLEX                       
+                                                                                
+        End /* Do Loop */                                                       
+      End /* Valid length */                                                    
+    End /* Read Successful */                                                   
+  End /* Allocate Successful */                                                 
+                                                                                
+  "FREE F(IRRDCUI1)"                                                            
+    IF DEBUG THEN  Say "== FREE RC = "||rc                      /*@D1A*/        
+  Drop Data.                                                                    
+Return                                                                          
+                                                                                
+/**********************************************************************/        
+/*                                                                    */        
+/* Generate_DSNT:                                                     */        
+/*                                                                    */        
+/* Based on the extracted DSNT data, generate the SYSPLEX and         */        
+/* DATASETNAMETABLE entries in the PARMLIB member.                    */        
+/*                                                                    */        
+/* Input Data set name table structure:                               */        
+/*   Entries       = Number of data set pairs (Primary/Backup)        */        
+/*   Sysplex       = Sysplex mode.                                    */        
+/*   DSPrim.x      = Primary RACF data set name.                      */        
+/*   DSBack.x      = Backup  RACF data set name.                      */        
+/*   Buffer.x      = # of in-Storage buffers for data set pair.       */        
+/*   Backup.x      = Backup status.                                   */        
+/*                                                                    */        
+/**********************************************************************/        
+Generate_DSNT:                                                                  
+  If DEBUG THEN Say "DEBUG: >> In Generate_DSNT"                                
+  If (RetCode > 8) Then Return      /* Terminating Error....          */        
+                                                                                
+  Say " "                                                                       
+  Say "DCU004I Generate PARMLIB data based on ICHRDSNT data."                   
+  Say "        # of DS = "Entries                                               
+                                                                                
+  Call WriteData(,                                                              
+    "/* ----------------------------------------------------------- */")        
+                                                                                
+  /* ------------------------ */                                                
+  /* Generate SYSPLEX setting */                                                
+  /* ------------------------ */                                                
+  Call WriteData("SYSPLEX("||Sysplex||")")                                      
+                                                                                
+  /* ------------------------- */                                               
+  /* Generate DataSetNameTable */                                               
+  /* ------------------------- */                                               
+  Call WriteData("DATASETNAMETABLE")                                            
+  Do I = 1 to Entries                                                           
+    IF DEBUG THEN  Say "DEBUG: DS # = "||I                                      
+                                                                                
+    /* --------------------------------------------- */                         
+    /* Determine if there is a primary RACF Data set */                         
+    /* name, and if so generate an entry in PARMLIB, */                         
+    /* otherwise provide a null value.               */                         
+    /* --------------------------------------------- */                         
+    Call WriteData("  ENTRY")                                                   
+    Test = Strip(DSPrim.I,'T','0'x)      /* Test if all '00'x   */              
+    PrimaryDS = Strip(DSPrim.I)          /* Test if all blanks  */              
+    If (Length(PrimaryDS) > 0 & Length(Test) > 0) Then                          
+      Call WriteData("    PRIMARYDSN('"||PrimaryDS||"')")                       
+    Else                                                                        
+      Call WriteData("    PRIMARYDSN(' ')    /* No Primary Data set */")        
+                                                                                
+    /* -------------------------------------------- */                          
+    /* Determine if there is a backup RACF Data set */                          
+    /* name, and if so generate an entry in PARMLIB,*/                          
+    /* otherwise provide a null value.              */                          
+    /* -------------------------------------------- */                          
+    Test = Strip(DSBack.I,'T','0'x)      /* Test if all '00'x   */              
+    BackupDS = Strip(DSBack.I)           /* Test if all blanks  */              
+    If (Length(BackupDS) > 0 & Length(Test) > 0) Then                           
+      Call WriteData("    BACKUPDSN('"||BackupDS||"')")                         
+    Else                                                                        
+      Call WriteData("    BACKUPDSN(' ')     /* No Backup Data set */")         
+                                                                                
+    /* ------------------------ */                                              
+    /* Generate BACKUP options. */                                              
+    /* ------------------------ */                                              
+    Call WriteData("    UPDATEBACKUP("||Backup.I||")")                          
+                                                                                
+    /* ----------------------------------- */                                   
+    /* Generate in-storage Buffer setting. */                                   
+    /* ----------------------------------- */                                   
+    Call WriteData("    BUFFERS("||Buffer.I||")")                               
+  End                                                                           
+                                                                                
+Return                                                                          
+                                                                                
+/**********************************************************************/        
+/*                                                                    */        
+/* Find_Module:                                                       */        
+/*                                                                    */        
+/* This routine will find the start of the first module in a load     */        
+/* module.  Once found, the routine will set the ModSt value with the */        
+/* line in which the module was found in.                             */        
+/*                                                                    */        
+/* Based on information pulled from the "z/OS MVS Program Management: */        
+/* Advanced Facilities" book, the first byte defines the record type. */        
+/*   '20'x = CESD Record mapping                                      */        
+/*   '40'x = SYM  Record mapping                                      */        
+/*   '80'x = CSECT Identification record                              */        
+/*   '0D'x = Control Record - Also last record before start of first  */        
+/*           module.                                                  */        
+/*                                                                    */        
+/**********************************************************************/        
+Find_Module:                                                                    
+  If DEBUG THEN Say "DEBUG: >> In Find Module"                                  
+                                                                                
+  FoundMod = 999                                                                
+  Do I = 1 to Data.0 While (FoundMod = 999)                                     
+    TestByte = C2X(SubStr(Data.I,1,1))                                          
+    If (TestByte = '20') Then Do                                                
+      If DEBUG Then Say "DEBUG: CESD Record mapping ('20'x)"                    
+    End                                                                         
+    Else If (TestByte = '40') Then Do                                           
+      If DEBUG Then Say "DEBUG: SYM Record mapping ('40'x)"                     
+    End                                                                         
+    Else If (TestByte = '80') Then Do                                           
+      If DEBUG Then Say "DEBUG: CSECT Identification Record ('80'x)"            
+    End                                                                         
+    Else If (TestByte = '0D') Then Do                                           
+      If DEBUG Then Say "DEBUG: Control Record ('0D'x)"                         
+      FoundMod = I + 1              /* Next line should be the module */        
+    End                                                                         
+    Else Do                                                                     
+      If DEBUG Then Say "DEBUG: Unknown record type ('"||TestByte||"'x)"        
+    End                                                                         
+  End                                                                           
+  If FoundMod > Data.0 Then Do                                                  
+    If DEBUG Then Do                                                            
+      Say "DEBUG: Cannot find start line of module.  DSNT2PRM assumes"          
+      Say "       that it is the last line of data in the load module."         
+                                                                /*@L1C*/        
+    End                                                                         
+    FoundMod = Data.0                                                           
+  End                                                                           
+  ModSt = FoundMod                                                              
+Return                                                                          
+                                                                                
+/**********************************************************************/        
+/*                                                                    */        
+/* Generate_Header:                                                   */        
+/*                                                                    */        
+/* Create a header for PARMLIB member created.                        */        
+/*                                                                    */        
+/**********************************************************************/        
+Generate_Header:                                                                
+  If DEBUG THEN Say "DEBUG: >> In Generate_Header"                              
+  If (RetCode > 8) Then Return        /* Terminating Error....        */        
+                                                                                
+  Call WriteData(,                                                              
+    "/* --------------------------------------------------------------")        
+  Call WriteData("--")                                                          
+  Call WriteData("--  This PARMLIB member was generated on "||Date('U'))        
+  Call WriteData("--  by the DSNT2PRM utility on system "||,                    
+                      MVSVAR(SYSNAME)||".")                                     
+  Call WriteData("--")                                                          
+                                                                                
+  If (GetFromMem = 1) Then Do         /* Got infor from memory.       */        
+    Call WriteData("--  In-Storage version of ICHRDSNT & ICHRRNG "||,           
+                   "were used")                                                 
+  End                                                                           
+                                                                                
+                                      /* Write out used DSNT name.    */        
+  If (InData1 <> "" & InData1 <> "*") Then Do                                   
+    Call WriteData("--  ICHRDSNT used, was from ")                              
+    Call WriteData("--      "||InData1)                                         
+  End                                                                           
+                                                                                
+                                      /* Write out used RNG  name.    */        
+  If (InData2 <> "" & InData2 <> "*") Then Do                                   
+    Call WriteData("--  ICHRRNG  used, was from ")                              
+    Call WriteData("--      "||InData2)                                         
+  End                                                                           
+                                                                                
+  Call WriteData("--  to generate this PARMLIB member.")                        
+  Call WriteData("--")                                                          
+  Call WriteData(,                                                              
+    "-------------------------------------------------------------- */")        
+  Call WriteData("DATABASE_OPTIONS")                                            
+                                                                                
+Return                                                                          
+                                                                                
+/**********************************************************************/        
+/*                                                                    */        
+/* WriteData:                                                         */        
+/*                                                                    */        
+/* General routine to write data either to Screen or to File (if      */        
+/* output PARMLIB member is provided).                                */        
+/*                                                                    */        
+/**********************************************************************/        
+WriteData:                                                                      
+  parse arg LineOut                                                             
+                                                                                
+  /* -------------------------- */                                              
+  /* Write to Screen.           */                                              
+  /* No output parmlib provided */                                              
+  /* -------------------------- */                                              
+  If (OutData = "" | OutData = "*") Then                                        
+    Say LineOut                                                                 
+  /* -------------------------- */                                              
+  /* Write to output parmlib.   */                                              
+  /* -------------------------- */                                              
+  Else Do                                                                       
+    If (ScreenOut = 1) then                                                     
+      Say LineOut                                                               
+    OutData.0 = Outdata.0 + 1                                                   
+    x = Outdata.0                                                               
+    outdata.x = LineOut                                                         
+  End                                                                           
+Return                                                                          
+                                                                                
+/**********************************************************************/        
+/*                                                                    */        
+/* TestAddress                                                        */        
+/*                                                                    */        
+/* General routine to check if I got a zero address.  If so we will   */        
+/* exit out of the program with error messages.                       */        
+/*                                                                    */        
+/**********************************************************************/        
+TestAddress:                                                                    
+  parse arg TestAddr,ZeroField                                                  
+                                                                                
+  /* -------------------------- */                                              
+  /* Add some extra debugging   */                                              
+  /* to check TestAddr data.    */                                              
+  /* -------------------------- */                                              
+  If DEBUG Then Do                                              /*@L1A*/        
+     Say "DEBUG: >> Datatype = "||DataType(TestAddr)            /*@L1A*/        
+     If (DataType(TestAddr,"X")) Then                                           
+       Say "DEBUG: >> Datatype = also HEX"                      /*@L1A*/        
+  End                                                           /*@L1A*/        
+                                                                                
+  /* -------------------------- */                                              
+  /* Test if address is zero.   */                                              
+  /* -------------------------- */                                              
+  If (X2D(TestAddr) = 0) Then Do   /* If so....                   @L1C*/        
+    FinalMsg.206E = 1       /* DCU206E zero address encountered.      */        
+    RetCode       = 12      /*   Terminating error.               @L1A*/        
+    Signal QuickExit;       /*   and get out of DSNT2PRM              */        
+  End                                                                           
+Return                                                                          
+                                                                                
+/**********************************************************************/        
+/*                                                                    */        
+/* Generate_messages                                                  */        
+/*                                                                    */        
+/* Generate error and warning messages at the end of processing of    */        
+/* convert utility.                                                   */        
+/*                                                                    */        
+/**********************************************************************/        
+Generate_messages:                                                              
+  If DEBUG THEN Say "DEBUG: >> In Generate_messages"                            
+  LocalRC = 0                                                                   
+                                                                                
+  Say " "                                                                       
+  /* ---------------------- */                                                  
+  /* Informational messages */                                                  
+  /* ---------------------- */                                                  
+  If (FinalMsg.103I = 1) Then Do                                                
+    Say "DCU103I INFO:    No OUTPUT data set was specified."                    
+    LocalRC = 0                                                                 
+  End                                                                           
+  If (FinalMsg.105I = 1) Then Do                                                
+    Say "DCU105I INFO:    Verify the generated output using the "||,            
+        "RACPRMCK command."                                     /*@L1C*/        
+    LocalRC = 0                                                                 
+  End                                                                           
+                                                                                
+  /* ---------------------- */                                                  
+  /* Warning       messages */                                                  
+  /* ---------------------- */                                                  
+  If (FinalMsg.106W = 1) Then Do                                                
+    Say "DCU106W WARNING: DSNT2PRM running on V2R2 release or lower."           
+    LocalRC = 4                                                                 
+  End                                                                           
+  If (FinalMsg.101W = 1) Then Do                                                
+    Say "DCU101W WARNING: Currently in READ-ONLY mode."                         
+    Say "  Assuming SYSPLEX option is supposed to be "||,                       
+          "Datasharing mode."                                                   
+    RetCode = 4                                                                 
+  End                                                                           
+  If (FinalMsg.102W = 1) Then Do                                                
+    Say "DCU102W WARNING: Currently in a SYSPLEX transition state."             
+    Say "  Assuming SYSPLEX option is supposed to be "||,                       
+          "Datasharing mode."                                                   
+    RetCode = 4                                                                 
+  End                                                                           
+  If (FinalMsg.104W = 1) Then Do                                                
+    Say "DCU104W WARNING: Using current in-storage Data Set Name Table"         
+    Say "  values.  These values may NOT match what you IPLed with."            
+    RetCode = 4                                                                 
+  End                                                                           
+  If (FinalMsg.107W = 1) Then Do                                /*@L1A*/        
+    Say "DCU107W WARNING: Unsupported value for "||FinalMsg.107WData||,         
+        "."                                                     /*@L1A*/        
+    RetCode = 4                                                 /*@L1A*/        
+  End                                                           /*@L1A*/        
+                                                                                
+  /* ---------------------- */                                                  
+  /* Terminating   messages */                                                  
+  /* ---------------------- */                                                  
+  If (FinalMsg.201E = 1) Then Do                                                
+    Say "DCU201E ERROR:   Input data set '"||BadDSName.M201E||,                 
+                          "' allocation failure."               /*@L1C*/        
+    Say "  ALLOCATE command generated return code = "||BadRCCode.M201E          
+                                                                /*@L1C*/        
+    Say "  Terminating execution of DSNT2PRM."                                  
+    LocalRC = 12                                                                
+  End                                                                           
+  If (FinalMsg.202E = 1) Then Do                                                
+    Say "DCU202E ERROR:   Input data set '"||BadDSName.M202E||,                 
+                          "' read error."                       /*@L1C*/        
+    Say "  EXECIO command generated return code = "||BadRCCode.M202E            
+                                                                /*@L1C*/        
+    Say "  Terminating execution of DSNT2PRM."                                  
+    LocalRC = 12                                                                
+  End                                                                           
+  If (FinalMsg.203E = 1) Then Do                                                
+    Say "DCU203E ERROR:   Output data set '"||BadDSName.M203E||,                
+                          "' allocation failure."               /*@L1C*/        
+    Say "  ALLOCATE command generated return code = "||BadRCCode.M203E          
+                                                                /*@L1C*/        
+    Say "  Terminating execution of DSNT2PRM."                                  
+    LocalRC = 12                                                                
+  End                                                                           
+  If (FinalMsg.204E = 1) Then Do                                                
+    Say "DCU204E ERROR:   Output data set '"||BadDSName.M204E||,                
+                          "' write error."                      /*@L1C*/        
+    Say "  EXECIO command generated return code = "||BadRCCode.M204E            
+                                                                /*@L1C*/        
+    Say "  Terminating execution of DSNT2PRM."                                  
+    LocalRC = 12                                                                
+  End                                                                           
+  If (FinalMsg.205E = 1) Then Do                                                
+    Say "DCU205E ERROR:   Input data not long enough for the # of",             
+                          "elements provided"                                   
+    Say "  in input data set '"||BadDSName.M205E||"'."          /*@L1C*/        
+    Say "  Terminating execution of DSNT2PRM."                                  
+    LocalRC = 12                                                                
+  End                                                                           
+  If (FinalMsg.206E = 1) Then Do                                                
+    Say "DCU206E ERROR:   Zero address encountered for '"||,                    
+                          ZeroField||"'."                                       
+    Say "  Terminating execution of DSNT2PRM."                                  
+    LocalRC = 12                                                                
+  End                                                                           
+Return(LocalRC)                                                                 
+                                                                                

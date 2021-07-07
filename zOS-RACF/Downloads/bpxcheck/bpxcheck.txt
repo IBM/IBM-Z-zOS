@@ -1,0 +1,619 @@
+/*rexx*/
+/*******************************************************************/
+/* This exec uses IRRXUTIL to report the status of various UNIX-   */
+/* related settings in RACF. It will aid in the conversion from    */
+/* the use of the BPX.DEFAULT.USER profile to the use of automatic */
+/* OMVS segment assignment using BPX.UNIQUE.USER, but could be     */
+/* generally useful regardless.                                    */
+/*                                                                 */
+/* The following profiles/settings are analysed:                   */
+/*  - AIM stage of the RACF database                               */
+/*  - Existence of UNIXMAP class mapping profile for UID 0, and    */
+/*    a calculation determining if you have too many superusers    */
+/*    to perform a successful AIM conversion.                      */
+/*  - Existence of BPX.DEFAULT.USER in the FACILITY class          */
+/*    - And of the model USER/GROUP profiles defined therein.      */
+/*  - Existence of SHARED.IDS in the UNIXPRIV class                */
+/*  - Existence of BPX.NEXT.USER in the FACILITY class             */
+/*  - Existence of BPX.UNIQUE.USER in the FACILITY class           */
+/*    - And of the model USER profile defined therein.             */
+/*                                                                 */
+/* The exec will first check that you have the system SPECIAL      */
+/* attribute, and that you have the necessary authority to the     */
+/* R_admin callable service.                                       */
+/*                                                                 */
+/*******************************************************************/
+/*                                                                 */
+/* This program contains code made available by IBM Corporation    */
+/* on an AS IS basis. Any one receiving this program is            */
+/* considered to be licensed under IBM copyrights to use the       */
+/* IBM-provided source code in any way he or she deems fit,        */
+/* including copying it, compiling it, modifying it, and           */
+/* redistributing it, with or without modifications, except that   */
+/* it may be neither sold nor incorporated within a product that   */
+/* is sold.  No license under any IBM patents or patent            */
+/* applications is to be implied from this copyright license.      */
+/*                                                                 */
+/* The software is provided "as-is", and IBM disclaims all         */
+/* warranties, express or implied, including but not limited to    */
+/* implied warranties of merchantibility or fitness for a          */
+/* particular purpose.  IBM shall not be liable for any direct,    */
+/* indirect, incidental, special or consequential damages arising  */
+/* out of this agreement or the use or operation of the software.  */
+/*                                                                 */
+/* A user of this program should understand that IBM cannot        */
+/* provide technical support for the program and will not be       */
+/* responsible for any consequences of use of the program.         */
+/*                                                                 */
+/*******************************************************************/
+say "Checking your authority to use this program:"
+say ""
+call check_authority
+if result > 0 then
+  return result   
+say ""
+say "---------------------------------------------------------------"
+say ""
+ 
+maxrc = 0
+aim_stage = "0"
+aim_blocked = "false"
+call report_aim_stage
+say "---------------------------------------------------------------"
+say ""
+ 
+if aim_stage < "2" then do
+  call process_U0
+  say "---------------------------------------------------------------"
+  say ""
+end
+ 
+dflt_exists = "FALSE"
+call process_default
+say "---------------------------------------------------------------"
+say ""
+ 
+ 
+shr_exists = "FALSE"
+call process_shared
+say "---------------------------------------------------------------"
+say ""
+ 
+next_exists = "FALSE"
+call process_next
+say "---------------------------------------------------------------"
+say ""
+ 
+uniq_exists = "FALSE"
+call process_unique
+say "---------------------------------------------------------------"
+say ""
+ 
+return maxrc
+ 
+ 
+/*******************************************************************/
+/* See if BPX.NEXT.USER exists in the FACILITY class. If so,       */
+/* report on the range of UIDs and GIDs being used to assign       */
+/* new values.                                                     */
+/*                                                                 */
+/*******************************************************************/
+process_next: procedure expose maxrc next_exists
+  rc = extract_profile("FACILITY", "BPX.NEXT.USER", "FALSE")
+  say ""
+  if rc = 0 then do
+    next_exists = "TRUE"
+    call process_appl_range
+  end
+return
+ 
+/*******************************************************************/
+/* See if SHARED.IDS exists in the UNIXPRIV class.                 */
+/*                                                                 */
+/*******************************************************************/
+process_shared: procedure expose maxrc shr_exists
+  rc = extract_profile("UNIXPRIV", "SHARED.IDS", "TRUE")
+  if rc = 0 then do
+    shr_exists = "TRUE"
+    myrc=IRRXUTIL("EXTRACT","_SETROPTS","_SETROPTS","SETR")
+ 
+    /* Check that UNIXPRIV class is active */
+    found = "false"
+    if (word(myrc,1)=0) then do
+      do i = 1 to SETR.BASE.CLASSACT_CT.REPEATCOUNT Until(found="true")
+        if SETR.BASE.CLASSACT.i = "UNIXPRIV" then do
+          say "The UNIXPRIV class is active."
+          found = "true"
+        end
+      end
+      if found /= "true" then
+        say "The UNIXPRIV class is not active!"
+ 
+      /* Check that UNIXPRIV class is RACLISTed */
+      found = "false" /* reset value */
+      do i = 1 to SETR.BASE.RACLIST_CT.REPEATCOUNT Until(found="true")
+        if SETR.BASE.RACLIST.i = "UNIXPRIV" then do
+          say "The UNIXPRIV class is RACLISTed."
+          found = "true"
+        end
+      end
+      if found /= "true" then
+        say "The UNIXPRIV class is not RACLISTed!"
+    end
+  end
+  say ""
+return
+ 
+/*******************************************************************/
+/* See if BPX.DEFAULT.USER exists in the FACILITY class. If so,    */
+/* report on the specified model user ID and optional model group. */
+/*                                                                 */
+/*******************************************************************/
+process_default: procedure expose maxrc dflt_exists
+  rc = extract_profile("FACILITY", "BPX.DEFAULT.USER", "FALSE")
+  say ""
+  if rc = 0 then do
+    dflt_exists = "TRUE"
+    call process_appl("BPX.DEFAULT.USER")
+  end
+return
+ 
+/*******************************************************************/
+/* See if BPX.UNIQUE.USER exists in the FACILITY class. If so,     */
+/* report on the specified model user ID.                          */
+/*                                                                 */
+/*******************************************************************/
+process_unique: procedure expose maxrc uniq_exists
+  rc = extract_profile("FACILITY", "BPX.UNIQUE.USER", "FALSE")
+  say ""
+  if rc = 0 then do
+    uniq_exists = "TRUE"
+    call process_appl("BPX.UNIQUE.USER")
+  end
+return
+ 
+/*******************************************************************/
+/* Analyse the APPLDATA string of the specified profile.           */
+/*  - Display the OMVS segment of the model user ID pointed to.    */
+/*  - Indicate if the model user ID is PROTECTED or RESTRICTED.    */
+/*  - Display the GID of the model group profile, if specified.    */
+/*                                                                 */
+/*******************************************************************/
+process_appl: procedure expose maxrc PROF.
+  arg profile
+  user = ""
+  group = ""
+  if Length(PROF.BASE.APPLDATA.1) > 0 then do
+    slash = pos("/",PROF.BASE.APPLDATA.1)  /* find delimiter */
+    if slash = 0 then do
+      user = PROF.BASE.APPLDATA.1
+    end
+    else do
+      user = substr(PROF.BASE.APPLDATA.1,1,slash-1)
+      group = substr(PROF.BASE.APPLDATA.1,slash+1)
+    end
+  end
+  else do
+    say "But it is not being used because the APPLDATA field is",
+        "empty."
+  end
+ 
+  /******************************************************************/
+  /* We now extract the USER, and then GROUP profile specified in   */
+  /* the APPLDATA. Note that each invocation of IRRXUTIL blows away */
+  /* the REXX stem variables containing the previous profile's      */
+  /* fields, so any logic that requires such information needs to   */
+  /* first save it.                                                 */
+  /******************************************************************/
+ 
+  if length(user) > 0 then do
+    say profile "points to model userId" user"."
+    rc = extract_profile("USER", user, "FALSE")
+    if rc = 0 then do
+      if PROF.OMVS.0 > 0 then do  /* OMVS segment has fields */
+        say " "user"'s OMVS segment contains the following fields:"
+        do i = 1 to PROF.OMVS.0
+          field_name = PROF.OMVS.i     /* ith field name */
+          field_val = PROF.OMVS.field_name.1
+          if profile = "BPX.DEFAULT.USER" then
+            if field_name = "UID" & field_val = 0 then do
+              say "  "field_name":"field_val "     <-- Holy Cow, your",
+                  "default identity is the superuser!!!"
+            end
+            else do
+              say "  "field_name":"field_val
+            end
+          else /* Must be BPX.UNIQUE.USER */
+            if field_name = "UID" then do
+              say "  "field_name":"field_val "     <-- This field is",
+                  "ignored and should be removed to avoid confusion."
+            end
+            else do
+              say "  "field_name":"field_val
+            end
+        end
+      end
+      else do
+        say "But" user "has no OMVS segment fields,",
+            "and thus is not being used."
+      end
+ 
+      if PROF.BASE.HASPWD.1 = "TRUE" then do
+        say "Note that" user "is not a PROTECTED user. It should be."
+      end
+      if PROF.BASE.REST.1 = "FALSE" then do
+        say "Note that" user "is not a RESTRICTED user. It should be."
+      end
+    end
+ 
+    if length(group) > 0 then do
+      say ""
+      say profile "points to model group" group"."
+      rc = extract_profile("GROUP", group, "FALSE")
+      if rc = 0 then do
+        if PROF.OMVS.0 > 0 then do  /* OMVS segment has fields */
+          say " "group"'s OMVS segment contains the following fields:"
+          do i = 1 to PROF.OMVS.0
+            field_name = PROF.OMVS.i     /* ith field name */
+            field_val = PROF.OMVS.field_name.1
+            say "  "field_name":"field_val
+          end
+        end
+        else do
+          say "But" group "has no OMVS segment fields,",
+              "and thus is not being used."
+        end
+      end
+    end
+    else do
+      say "A model group is not specified."
+    end
+  end
+  say ""
+return
+ 
+/*******************************************************************/
+/* Analyse the APPLDATA string of the BPX.NEXT.USER profile and    */
+/* report on whether UIDs or GIDs are being automatically          */
+/* assigned, and within what range of values.                      */
+/*******************************************************************/
+process_appl_range:
+  user = ""
+  group = ""
+  if Length(PROF.BASE.APPLDATA.1) > 0 then do
+    slash = pos("/",PROF.BASE.APPLDATA.1)  /* find delimiter */
+    if slash = 0 then do
+      user = PROF.BASE.APPLDATA.1
+    end
+    else if slash = 1 then do
+      group = substr(PROF.BASE.APPLDATA.1,slash+1)
+    end
+    else if slash = Length(PROF.BASE.APPLDATA.1) then do
+      user = substr(PROF.BASE.APPLDATA.1,1,slash-1)
+    end
+    else do
+      user = substr(PROF.BASE.APPLDATA.1,1,slash-1)
+      group = substr(PROF.BASE.APPLDATA.1,slash+1)
+    end
+  end
+  else do
+    say "But it is not being used because the APPLDATA field is",
+        "empty."
+    return
+  end
+ 
+  if length(user) > 0 & user /= "NOAUTO" then do
+    call process_ID_range "UIDs"  user
+  end
+  else do
+    say "UIDs are not being automatically assigned."
+  end
+ 
+  if length(group) > 0 & group /= "NOAUTO" then do
+    call process_ID_range "GIDs"  group
+  end
+  else do
+    say "GIDs are not being automatically assigned."
+  end
+ 
+return
+ 
+/*******************************************************************/
+/* Analyse the *ID range string in further detail.                 */
+/*******************************************************************/
+process_ID_range:
+  arg type string
+  id_start = ""
+  id_end   = ""
+  max_id = 2147483647
+ 
+  dash = pos("-",string)        /* find delimiter */
+  if dash = 0 then do
+   id_start = string
+  end
+  else do
+    id_start = substr(string,1,dash-1)
+    id_end = substr(string,dash+1)
+  end
+ 
+  if Length(id_end) = 0 then do
+    say " "type "are being assigned starting with" id_start "with an",
+        "upper boundary of the maximum value of 2,147,483,647."
+  end
+  else do
+    say " "type "are being assigned starting with" id_start "with an",
+        "upper boundary of" id_end"."
+  end
+ 
+  if Length(id_end) = 0 then
+    id_end = max_id
+  if id_start = id_end then
+    say " Note that available" type "have been exhausted within the",
+        "specified range."
+  if id_start > id_end then
+    say " Note that the specified range is invalid."
+ 
+return
+ 
+/*******************************************************************/
+/* Generalized utility routine to extract a given profile in a     */
+/* a given class using the IRRXUTIL interface. A "generic"         */
+/* parameter indicates whether the input profile name (really a    */
+/* resource name) can be covered by a generic profile.             */
+/*                                                                 */
+/* Issue a specific message based on an analysis of the return     */
+/* code from IRRXUTIL.                                             */
+/*                                                                 */
+/*******************************************************************/
+extract_profile: procedure expose maxrc PROF.
+arg type,profile,generic
+ 
+/*-------------------------------------------------------------------*/
+/* Use IRRXUTIL to extract the profile into the stem named "PROF.    */
+/*-------------------------------------------------------------------*/
+myrc=IRRXUTIL("EXTRACT",type,profile,"PROF",,generic)
+select
+ when (word(myrc,1)=0) then do
+   If PROF.PROFILE <> profile then do
+     say type "class resource" profile "is covered by the generic",
+         "profile" PROF.PROFILE
+   end
+   else
+     say type "class profile" profile "is defined."
+   rc = 0
+ end
+ when (myrc="12 12 4 4 4") then do
+   say type "class profile" profile "is not defined."
+   rc = 4
+ end
+ when (myrc="12 12 8 8 24") then do
+   say "You are not authorized to see" profile "in the" type "class,",
+       "possibly because you do not have",
+       "authority to use the R_admin callable service.",
+       "Run this program from a properly authorized user."
+   rc = 8
+   maxrc = MAX(maxrc,8)
+ end
+ otherwise do
+   say "An error occurred while reading" type "class profile",
+       profile ":" myrc".",
+       "RACF Macros and Interfaces documents the return code values."
+   rc = 12
+   maxrc = MAX(maxrc,12)
+ end
+end
+return rc
+ 
+/*-------------------------------------------------------------------*/
+/* For UNIXMAP profile U0, report all the user IDs on the access     */
+/* list, with their names.  Keep a running total of the lengths      */
+/* of the user IDs so we can assert whether or not there will be     */
+/* an AIM stage 1 failure.                                           */
+/*                                                                   */
+/* According to RACF system Programmer's Guide, there can be a       */
+/* maximum of 129 8-character user IDs without causing an AIM stage  */
+/* 1 conversion failure.                                             */
+/*                                                                   */
+/* This routine extracts the U0 profile, and then the USER profile   */
+/* for each user in the access list. Note that each invocation       */
+/* of IRRXUTIL blows away the REXX stem variables containing         */
+/* the previous profile's fields, so any logic that requires         */
+/* such information needs to first save it.                          */
+/*-------------------------------------------------------------------*/
+process_U0: procedure expose maxrc aim_blocked
+ 
+/* Check that UNIXMAP class is active */
+found = "false"
+myrc=IRRXUTIL("EXTRACT","_SETROPTS","_SETROPTS","SETR")
+if (word(myrc,1)=0) then do
+  do i = 1 to SETR.BASE.CLASSACT_CT.REPEATCOUNT Until(found="true")
+    if SETR.BASE.CLASSACT.i = "UNIXMAP" then do
+      say "The UNIXMAP class is active."
+      found = "true"
+    end
+  end
+  if found /= "true" then
+    say "The UNIXMAP class is not active."
+end
+ 
+maxlen = 129*8 /* Max number of user ID bytes. */
+ 
+rc = extract_profile("UNIXMAP", "U0", "FALSE")
+say ""
+if rc = 0 then do
+  /*-----------------------------------------------------------------*/
+  /* Display number of entries on the standard access list.          */
+  /*-----------------------------------------------------------------*/
+  say "There are" PROF.BASE.ACLCNT.REPEATCOUNT ,
+      "entries on the standard access list."
+  len = 0
+  if PROF.BASE.ACLCNT.REPEATCOUNT > 0 then do
+    say "The access list contains the following user IDs:"
+    say
+    say " User ID    Name               Protected"
+    say " ======== ==================== ========="
+ 
+    /*---------------------------------------------------------------*/
+    /* Extract user ID in order to display the user name.  It's      */
+    /* possible the user is authorized to list the U0 access list    */
+    /* but not the actual user profiles. That's OK, we can still     */
+    /* perform the necessary calculation based solely on the access  */
+    /* list.                                                         */
+    /*---------------------------------------------------------------*/
+    do i = 1 to PROF.BASE.ACLCNT.REPEATCOUNT
+      myrc=IRRXUTIL("EXTRACT","USER",PROF.BASE.ACLID.i,"USER")
+      if (word(myrc,1)=0) then do
+        say " "Left(PROF.BASE.ACLID.i,8) Left(USER.BASE.NAME.1,20),
+            " "USER.BASE.PROTECTD.1
+        len = len + Length(PROF.BASE.ACLID.i)
+      end
+      else if (myrc = '12 12 4 4 4') then do  /* user not found */
+        say " "Left(PROF.BASE.ACLID.i,8) Left("User not defined!",20)
+        len = len + Length(PROF.BASE.ACLID.i)
+      end
+      else if (myrc = '12 12 8 8 24') then do  /* not authorized */
+        say " "Left(PROF.BASE.ACLID.i,8) ,
+              "Not authorized to see user name!"
+        len = len + Length(PROF.BASE.ACLID.i)
+      end
+      else do
+        say "Error retrieving user profile:" myrc
+      end
+    end
+    say ""
+    say "The maximum cumulative user ID length you can have without",
+        "getting an error when converting to AIM stage 1 is" maxlen"."
+    say ""
+    say "Your cumulative user ID length is" len"."
+    say ""
+    if (len/maxlen)*100 <= 10 then
+      say "Congratulations!  You don't have very many UID(0) users. ",
+          "You are a credit to your profession! Extra special bonus",
+          "points if none of your UID(0) users are carbon-based life",
+          "forms!"
+    else if (len/maxlen)*100 <= 80 then
+      say "You appear to have plenty of room to spare."
+    else if (len/maxlen)*100 <= 90 then
+      say "You will not encounter an AIM error, but you are",
+          "approaching the maximum and should make an effort to",
+          "reduce your number of superusers.  You can wait until",
+          "after you've completed the AIM conversion, however."
+    else if (len/maxlen)*100 < 100 then
+      say "You are approaching critical mass!  You should make an",
+          "immediate effort to reduce your number of superusers!",
+          " The AIM conversion should work OK,",
+          "however, as long as UID(0) users aren't being added as",
+          "we speak."
+    else if (len/maxlen)*100 = 100 then
+      say "You are at critical mass!  You should make an",
+          "immediate effort to reduce your number of superusers!",
+          " The AIM conversion should work OK,",
+          "however, as long as UID(0) users aren't being added as",
+          "we speak."
+    else do
+      say "You have too many UID(0) users!  Do *NOT* attempt an AIM",
+          "conversion at this time, or you'll be sorry!"
+      aim_blocked = "true"
+    end
+    say ""
+    say "Note: A value of 'TRUE' for 'Protected' usually indicates",
+        "that the user is not human. The converse is not necessarily true,",
+        "though it generally should be. The 'Name' column may provide a",
+        "clue as to the purpose of the user ID."
+    say ""
+  end
+end
+return
+ 
+/*-------------------------------------------------------------------*/
+/* Report on the AIM stage of the RACF dataset by reading the RCVT.  */
+/*                                                                   */
+/*-------------------------------------------------------------------*/
+report_aim_stage: procedure expose aim_stage
+  cvt_addr = c2d(Storage(10,4)) /* CVT address */
+  rcvt_addr = c2d(Storage(d2x(cvt_addr + 992),4)) /* RCVT address */
+  aim_stage = Storage(d2x(rcvt_addr+330),1)   /* Get RCVTALIS field */
+  aim_stage = c2d(aim_stage) /* Convert 2-bit field to decimal */
+  say "The RACF database is in AIM stage" aim_stage"."
+  say ""
+return
+ 
+/*-------------------------------------------------------------------*/
+/* Check that the caller has R_admin authority and the system        */
+/* SPECIAL attribute.                                                */
+/*-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
+/* Use IRRXUTIL to extract the user's USER profile.                  */
+/*-------------------------------------------------------------------*/
+check_authority:
+maxrc = 0
+rc = extract_profile2("USER",USERID())
+if (rc=0) then do
+  If PROF.BASE.SPECIAL.1 /= "TRUE" then do
+    say ""
+    say "However, you do not",
+        "have the system SPECIAL attribute.",
+        "This program must be performed by a user",
+        "with the system SPECIAL attribute."
+    maxrc = 4
+  end
+  /* Extract a GROUP and general resource profile that always exists */
+  /* and the SETROPTS options, to verify the remaining access reqs.  */
+  Else do
+    say "You have the system SPECIAL attribute as well."
+    rc = extract_profile2("GROUP","SYS1")
+    rc = extract_profile2("SECLABEL","SYSHIGH")
+    rc = extract_profile2("_SETROPTS","_SETROPTS")
+  end
+end
+ 
+if (maxrc = 0) then do
+  say ""
+  say "You have all the required authority! Continuing..."
+end
+else if (maxrc = 8) then do
+  say ""
+  say "You (or a properly authorized security administrator)",
+      "needs to grant you authority to the resource(s) listed above."
+end
+return maxrc
+ 
+/*******************************************************************/
+/* Generalized utility routine to extract a given profile in a     */
+/* a given class using the IRRXUTIL interface.                     */
+/*                                                                 */
+/* Issue a specific message based on an analysis of the return     */
+/* code from IRRXUTIL.                                             */
+/*                                                                 */
+/*******************************************************************/
+extract_profile2: procedure expose maxrc PROF.
+arg type,profile
+ 
+if type = "USER" then
+  resource = "IRR.RADMIN.LISTUSER"
+else if type = "GROUP" then
+  resource = "IRR.RADMIN.LISTGRP"
+else if type = "_SETROPTS" then
+  resource = "IRR.RADMIN.SETROPTS.LIST"
+else
+  resource = "IRR.RADMIN.RLIST"
+ 
+/*-------------------------------------------------------------------*/
+/* Use IRRXUTIL to extract the profile into the stem named "PROF."   */
+/*-------------------------------------------------------------------*/
+myrc=IRRXUTIL("EXTRACT",type,profile,"PROF")
+select
+ when (word(myrc,1)=0) then do
+   say "You are authorized to" resource"."
+   rc = 0
+ end
+ when (myrc="12 12 8 8 24") then do
+   say "You are not authorized to" resource"."
+   rc = 8
+   maxrc = MAX(maxrc,8)
+ end
+ /* Other errors would occur after passing the auth check, so ignore */
+ otherwise do
+ end
+end
+return rc

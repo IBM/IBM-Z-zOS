@@ -1,0 +1,56 @@
+ICHDEX01 TITLE 'ICHDEX01 - Sample Password Authentication Exit'         00010000
+*********************************************************************** 00020000
+***                                                                 *** 00038000
+***  MODULE - ICHDEX01                                              *** 00039000
+***                                                                 *** 00039100
+***      This sample exit sets a return code of X'08' to ensure     *** 00039200
+***      that the default for the encryption of passwords is DES.   *** 00039300
+***                                                                 *** 00039700
+***  INPUT: Registers at entry                                      *** 00039800
+***                                                                 *** 00039900
+***        R0     Irrelevant                                        *** 00039910
+***        R1     Pointer to parameter list                         *** 00040000
+***        R2-R12 Irrelevant                                        *** 00040100
+***        R13    Pointer to register save area                     *** 00040200
+***        R14    Return Address                                    *** 00050000
+***        R15    Irrelevant                                        *** 00090000
+***                                                                 *** 00100000
+***  RETURN CODES:                                                  *** 00110000
+***     8 - DES encription only                                     *** 00120000
+***                                                                 *** 00140000
+***  Register usage:                                                *** 00150000
+***   R15 - Return code                                             *** 00160000
+***                                                                 *** 00200000
+*------------------------------------------------------------------**** 00236000
+***                                                                 *** 00237300
+***      COPYRIGHT IBM CORPORATION, 2015                            *** 00237401
+***                                                                 *** 00237500
+***      THIS CODE HAS NOT BEEN SUBMITTED TO ANY FORMAL IBM TEST    *** 00237600
+***      AND IS DISTRIBUTED ON AN "AS IS" BASIS WITHOUT ANY         *** 00237700
+***      WARRANTY EITHER EXPRESS OR IMPLIED. THE IMPLEMENTATION     *** 00237800
+***      OF ANY OF THE TECHNIQUES DESCRIBED OR USED HEREIN IS A     *** 00237900
+***      CUSTOMER RESPONSIBILITY AND DEPENDS ON THE CUSTOMER'S      *** 00238000
+***      OPERATIONAL ENVIRONMENT. WHILE EACH ITEM MAY HAVE BEEN     *** 00239000
+***      REVIEWED FOR ACCURACY IN A SPECIFIC SITUATION AND MAY      *** 00240000
+***      RUN IN A SPECIFIC ENVIRONMENT, THERE IS NO GUARANTEE       *** 00250000
+***      THAT THE SAME OR SIMILAR RESULTS WILL BE OBTAINED ELSE-    *** 00260000
+***      WHERE. CUSTOMERS ATTEMPTING TO ADAPT THESE TECHNIQUES TO   *** 00270000
+***      THEIR OWN ENVIRONMENTS DO SO AT THEIR OWN RISK.            *** 00280000
+***                                                                 *** 00290000
+*********************************************************************** 00300000
+*********************************************************************** 00310000
+         EJECT                                                          00320000
+ICHDEX01 CSECT ,                                                        00330000
+ICHDEX01 AMODE 31                                                       00340000
+ICHDEX01 RMODE 31                                                       00350000
+ICHDEX01 CSECT                                                          00360000
+         SAVE  (14,12),,ICHDEX01-&SYSDATE-&SYSTIME                      00370000
+         LA    R15,8                                                    00390100
+         BR    R14                                                      00390200
+*********************************************************************** 00986500
+* Equates                                                             * 00986600
+*********************************************************************** 00986700
+R14      EQU   14                                                       01000900
+R15      EQU   15                                                       01001000
+         EJECT                                                          01002000
+         END   ICHDEX01                                                 01060000

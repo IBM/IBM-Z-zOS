@@ -1,0 +1,345 @@
+/* DBSECLV: REXX exec to read the output of IRRDBU00 and update it    */
+/* to include external seclevel and category names.                   */
+/*                                                                    */
+/*%Copyright Copyright IBM Corporation, 1994                          */
+/* Author: Walt Farrell  WFARRELL at KGNVMC                           */
+/*                    or wfarrell@vnet.ibm.com                        */
+/*                    or USIB3H89 at IBMMAIL                          */
+/*                                                                    */
+/*                                                                    */
+/*                                                                    */
+/* Change Activity:                                                   */
+/*                                                                    */
+/* $L0=DBSECLV HRF2210 940816 PDWBF1: Original Code               @L0A*/
+/* $P1=DBSECLV HRF2210 940817 PDWBF1: " HWM" problem; X37 abends  @P1A*/
+/*                                                                    */
+/* Change Description:                                                */
+/*                                                                    */
+/* A000000-999999  Original Code                                      */
+/* C - Recognize the " HWM" category and don't consider it.           */
+/* A - Recognize output errors from execio                            */
+/*                                                                    */
+/**********************************************************************/
+/**********************************************************************/
+/*                                                                    */
+/* The following statements should not be changed by the user of      */
+/* this exec                                                          */
+/*                                                                    */
+/**********************************************************************/
+
+signal on novalue
+signal on syntax
+address tso
+
+/********************************/
+/* initialize some variables    */
+/********************************/
+return_code = 0        /* return code for normal returns              */
+seclevel. = ''         /* stem for translating seclevels              */
+category. = ''         /* stem for translating categories             */
+outcount = 0           /* number of output variables set for line.    */
+count1   = 0           /* number of INDD1 input records processed.    */
+count2   = 0           /* number of INDD2 input records processed.    */
+cmdcount = 0           /* number of output variables set for line.    */
+done2 = 0       /* 1 = all indd2 records have been processed          */
+dd2rc=0         /* return code from last execio to indd2              */
+i2 = 0          /* number of indd2 records read but not yet processed */
+d2.0 = 0        /* number of indd2 records read on last execio        */
+done1 = 0       /* 1 = all indd1 records have been processed          */
+dd1rc=0         /* return code from last execio to indd1              */
+execio_rc = 0   /* return code from last execio to outdd1         @P1A*/
+i1 = 0          /* number of indd1 records read but not yet processed */
+d1.0 = 0        /* number of indd1 records read on last execio        */
+iocount = 100   /* number of records to read or write at a time       */
+
+/**********************************/
+/* process INDD2 and build tables */
+/* for seclevel and category      */
+/* translation                    */
+/**********************************/
+
+do loop2 = 1 by 1 while done2 = 0          /* loop while indd2 has
+                                              unprocessed data        */
+  /********************************************************************/
+  /* get a record from indd2 and analyze it                           */
+  /********************************************************************/
+  if i2 < d2.0 then i2 = i2+1              /*   use next in-storage
+                                              record,                 */
+  else if dd2rc = 0 then do                /*   else if not eof       */
+    "execio" iocount "diskr indd2 (stem d2." /*     read more records */
+    dd2rc = rc                             /*     save return code    */
+    if d2.0 > 0 then i2 = 1                /*     if ok use 1st record*/
+    else done2 = 1                         /*     else set eof        */
+    end /* dd2rc = 0 */
+  else done2 = 1                           /*   else set eof on indd2 */
+
+  if done2 = 0 then do                     /*   if indd2 not at eof   */
+    count2 = count2+1                      /*     bump record count   */
+    data2 = d2.i2                          /*     copy the data       */
+    call build_table                       /*   go build a table entry*/
+    end /* done2 = 0 */
+  end loop2                                /* end "loop while indd2...*/
+
+/**********************************/
+/* process INDD1 and append the   */
+/* external seclevel or category  */
+/* names where appropriate, with  */
+/* the modified records written to*/
+/* OUTDD1                         */
+/**********************************/
+
+do loop1 = 1 by 1 while done1 = 0,         /* loop while indd1 has
+                                              unprocessed data    @P1C*/
+   & execio_rc = 0                         /* and no output error @P1A*/
+
+  /********************************************************************/
+  /* get a record from indd1 and process it                           */
+  /********************************************************************/
+  if i1 < d1.0 then i1 = i1+1              /*   use next in-storage
+                                              record,                 */
+  else if dd1rc = 0 then do                /*   else if not eof       */
+    "execio" iocount "diskr indd1 (stem d1." /*     read more records */
+    dd1rc = rc                             /*     save return code    */
+    if d1.0 > 0 then i1 = 1                /*     if ok use 1st record*/
+    else done1 = 1                         /*     else set eof        */
+    end /* dd1rc = 0 */
+  else done1 = 1                           /*   else set eof on indd1 */
+
+  if done1 = 0 then do                     /*   if indd1 not at eof   */
+    count1 = count1+1                      /*     bump record count   */
+    data1 = d1.i1                          /*     copy the data       */
+    call process_record                    /*   go process it         */
+    end /* done1 = 0 */
+  end loop1                                /* end "loop while indd1...*/
+
+if outcount <> 0 then                      /* write rest of output
+                                              records, if any     @P1A*/
+  "execio" outcount "diskw outdd1 (stem line. finis"   /*         @P1M*/
+
+/************************/
+/* Issue stats messages */
+/************************/
+if execio_rc = 0 then do                   /* issue normal messages if
+                                              OK                  @P1A*/
+  say 'Successful termination: '
+  say '  'count1 'records processed from INDD1'
+  say '  'count2 'records processed from INDD2'
+  end                                      /* end "issue normal"  @P1A*/
+else signal errdone                        /* else go note a failure
+                                                                  @P1A*/
+
+/*******************/
+/* Close the files */
+/*******************/
+"execio 0 diskr indd1 (finis"
+"execio 0 diskr indd2 (finis"
+"execio 0 diskw outdd1 (finis"            /*                      @P1A*/
+
+/*******************/
+/* Done.  Exit.    */
+/*******************/
+exit return_code
+/**********************************************************************/
+/* Build a table entry to describe a seclevel or category value       */
+/**********************************************************************/
+build_table:
+/* parse general resource member data */
+parse var data2   1 grmem_rtype,          /* parse the data           */
+  6 grmem_name,
+  253 grmem_class_name,
+  262 grmem_member,
+  518 .,
+  551 grmem_seclevel,    /* seclevel should only be 3 chars, not 5 */
+  554 .,
+  555 grmem_category,
+  560
+
+grmem_name = strip(grmem_name)            /* remove blanks from names */
+grmem_class_name = strip(grmem_class_name)
+grmem_member = strip(grmem_member,'T')    /*                      @P1C*/
+
+if grmem_rtype <> '0503' then do          /* Validate record type 0503*/
+  say '>>> DBSECLV found incorrect record type in file INDD2.'
+  say '>>> Data:' data2
+  say '>>>'
+  signal errdone
+  end
+
+if grmem_name <> 'SECLEVEL',             /* Validate profile name as  */
+ & grmem_name <> 'CATEGORY' then do      /* SECLEVEL or CATEGORY      */
+  say '>>> DBSECLV found incorrect profile name in file INDD2.'
+  say '>>> Data:' data2
+  say '>>>'
+  signal errdone
+  end
+
+if grmem_class_name <> 'SECDATA' then do /* Validate class name       */
+  say '>>> DBSECLV found incorrect class name in file INDD2.'
+  say '>>> Data:' data2
+  say '>>>'
+  signal errdone
+  end
+
+if grmem_name = 'SECLEVEL' then           /* Check profile name and   */
+  call build_seclevel                     /* build appropriate entry  */
+else
+  call build_category
+
+return                                    /* return to mainline       */
+
+/**********************************************************************/
+/* Build a seclevel table entry                                       */
+/**********************************************************************/
+build_seclevel:
+
+if seclevel.grmem_seclevel = '' then      /* if not found before,     */
+  seclevel.grmem_seclevel = grmem_member  /* build table entry        */
+                                          /* Name is seclevel.number, */
+                                          /* Value is the external    */
+                                          /* seclevel name            */
+else do                                   /* else issue warning       */
+  say '>>>Warning: Multiple SECLEVEL names have a value of ',
+      grmem_seclevel
+  say '>>>         DBSECLV will use the first one found, ',
+      seclevel.grmem_seclevel
+  return_code = 4                         /* and set return code      */
+  end
+return                                    /* return to caller         */
+
+/**********************************************************************/
+/* Build a category table entry                                       */
+/**********************************************************************/
+build_category:
+
+if grmem_member = ' HWM' then nop         /* skip the " HWM" category
+                                                                  @P1A*/
+
+else if category.grmem_category = '' then /* if not found before, @P1C*/
+  category.grmem_category = grmem_member  /* build table entry        */
+                                          /* Name is category.number, */
+                                          /* Value is the external    */
+                                          /* category name            */
+else do                                   /* else issue warning       */
+                                          /* note: this case should not
+                                             happen unless the
+                                             category counter has
+                                             wrapped for some reason  */
+  say '>>>Warning: Multiple CATEGORY names have a value of ',
+      grmem_category
+  say '>>>         DBSECLV will use the first one found, ',
+      category.grmem_category
+  return_code = 4                         /* and set return code      */
+  end
+return                                    /* return to caller         */
+
+/**********************************************************************/
+/* Process a record from INDD1                                        */
+/**********************************************************************/
+process_record:
+rtype = substr(data1,1,4)               /* isolate the record type    */
+select                                  /* select correct routine     */
+  when rtype='0200' then call addsecl 454
+  when rtype='0201' then call addcat 15
+  when rtype='0400' then call addsecl 489
+  when rtype='0401' then call addcat 58
+  when rtype='0500' then call addsecl 750
+  when rtype='0502' then call addcat 262
+  otherwise nop
+  end
+
+call output_record
+
+return
+
+/**********************************************************************/
+/* Add a seclevel to a record:                                        */
+/*   If record contains a seclevel, perform a lookup and append       */
+/*   the external seclevel name to the record.                        */
+/*   If the seclevel is unknown, append *unknown-- and the numeric    */
+/*   value.                                                           */
+/*   Else append blanks so the records have a consistent length.      */
+/*                                                                    */
+/**********************************************************************/
+addsecl: arg pos
+rec_seclevel = substr(data1,pos,3)         /* Extract the seclevel    */
+
+if rec_seclevel <> '000' then do           /* If seclevel provided    */
+  if seclevel.rec_seclevel <> '' then      /* If name known           */
+    data1 = data1 substr(seclevel.rec_seclevel,1,39)  /* append it    */
+  else                                     /* else show unknown       */
+    data1 = data1 substr('*unknown--'rec_seclevel,1,39)
+  end
+else
+  data1 = data1 substr('*none',1,39)       /* else append *none       */
+
+return
+
+/**********************************************************************/
+/* Add a category to a record:                                        */
+/*   Perform a lookup and replace the internal category number in the */
+/*   input record with the external category name.  If the category   */
+/*   number is unknown, replace it with *unknown-- followed by the    */
+/*   number.                                                          */
+/*                                                                    */
+/* Note: This code depends on the category number being the last      */
+/*       field on the record, which it is today.                      */
+/**********************************************************************/
+addcat: arg pos
+rec_category = substr(data1,pos,5)         /* Extract category number */
+
+data1 = substr(data1,1,pos-1)              /* delete number from
+                                              record                  */
+if category.rec_category <> '' then        /* if name is known        */
+  data1 = data1 substr(category.rec_category,1,39)   /* append it     */
+else                                       /* else show unknown       */
+   data1 = data1 substr('*unknown--'rec_category,1,39)
+
+return
+
+/**********************************************************************/
+/*                                                                    */
+/* Write a record to OUTDD1:                                          */
+/*                                                                    */
+/**********************************************************************/
+output_record:
+ outcount = outcount + 1                  /* count the output line    */
+ line.outcount = data1                    /* add line to the stem     */
+ if outcount >= iocount then do           /* if we've created at least
+                                           iocount (100?) lines       */
+   "execio * diskw outdd1 (stem line."    /* write them to file       */
+   execio_rc = rc                         /* detect output errors @P1A*/
+   outcount = 0                           /* set line count to zero   */
+   drop line.                             /* delete the output lines  */
+   end                                    /* end if we've created...  */
+ return
+
+/**********************************************************************/
+/* Handle SYNTAX error condition:                                     */
+/*   Issue error message and close files                              */
+/**********************************************************************/
+syntax: say '>>>SYNTAX raised at line 'sigl
+  if sourceline() <> 0 then
+    say '>>>Source line is: 'sourceline(sigl)
+  signal errdone
+/**********************************************************************/
+/* Handle NOVALUE error condition:                                    */
+/*   Issue error message and close files                              */
+/**********************************************************************/
+novalue: say '>>>NOVALUE raised at line 'sigl
+  parse version . langlevel .
+  if langlevel > 3.45 then
+    say '>>>Field in error is: 'condition('D')
+  if sourceline() <> 0 then
+    say '>>>Source line is: 'sourceline(sigl)
+errdone:
+  say ' '
+  say '>>>Last INDD1 record processed: 'count1
+  say '>>>Last INDD2 record processed: 'count2
+  say '>>> '
+  say '>>>Quitting early.'
+  "execio 0 diskr indd1 (finis"
+  "execio 0 diskr indd2 (finis"
+  "execio" outcount "diskw outdd1 (stem line. finis"
+  return_code = 16
+  exit return_code
+

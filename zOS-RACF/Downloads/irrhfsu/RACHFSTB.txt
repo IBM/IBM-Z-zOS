@@ -1,0 +1,244 @@
+------------------------------------------------------------------------        
+--          Create the TABLESPACE for the IRRHFSU tables              --        
+------------------------------------------------------------------------        
+--   ;                                                                          
+ CREATE TABLESPACE IRRHFSU IN RACFDB2                                           
+     LOCKSIZE    TABLESPACE                                                     
+     SEGSIZE       64                                                           
+     PCTFREE        0                                                           
+     USING STOGROUP STOGRP01                                                    
+        PRIQTY   2000                                                           
+        SECQTY    500                                                           
+        ERASE     YES                                                           
+        ;                                                                       
+------------------------------------------------------------------------        
+--             HFS Basic Data                                         --        
+------------------------------------------------------------------------        
+--   ;                                                                          
+CREATE TABLE USER01.HFS_BD (                                                    
+     HFSBD_NAME         VARCHAR(1023) NOT NULL,                                 
+     HFSBD_INODE        INTEGER    NOT NULL,                                    
+     HFSBD_FILE_TYPE    CHAR(8)    NOT NULL,                                    
+     HFSBD_OWN_UID      INTEGER    NOT NULL,                                    
+     HFSBD_OWN_UNAME    CHAR(8),                                                
+     HFSBD_OWN_GID      INTEGER    NOT NULL,                                    
+     HFSBD_OWN_GNAME    CHAR(8),                                                
+     HFSBD_S_ISUID      CHAR(1)    NOT NULL,                                    
+     HFSBD_S_ISGID      CHAR(1)    NOT NULL,                                    
+     HFSBD_S_ISVTX      CHAR(1)    NOT NULL,                                    
+     HFSBD_OWN_READ     CHAR(1)    NOT NULL,                                    
+     HFSBD_OWN_WRITE    CHAR(1)    NOT NULL,                                    
+     HFSBD_OWN_EXEC     CHAR(1)    NOT NULL,                                    
+     HFSBD_GRP_READ     CHAR(1)    NOT NULL,                                    
+     HFSBD_GRP_WRITE    CHAR(1)    NOT NULL,                                    
+     HFSBD_GRP_EXEC     CHAR(1)    NOT NULL,                                    
+     HFSBD_OTH_READ     CHAR(1)    NOT NULL,                                    
+     HFSBD_OTH_WRITE    CHAR(1)    NOT NULL,                                    
+     HFSBD_OTH_EXEC     CHAR(1)    NOT NULL,                                    
+     HFSBD_APF          CHAR(1)    NOT NULL,                                    
+     HFSBD_PROGRAM      CHAR(1)    NOT NULL,                                    
+     HFSBD_SHAREAS      CHAR(1)    NOT NULL,                                    
+     HFSBD_AAUD_READ    CHAR(8)    NOT NULL,                                    
+     HFSBD_AAUD_WRITE   CHAR(8)    NOT NULL,                                    
+     HFSBD_AAUD_EXEC    CHAR(8)    NOT NULL,                                    
+     HFSBD_UAUD_READ    CHAR(8)    NOT NULL,                                    
+     HFSBD_UAUD_WRITE   CHAR(8)    NOT NULL,                                    
+     HFSBD_UAUD_EXEC    CHAR(8)    NOT NULL,                                    
+     HFSBD_AUDITID      CHAR(32)   NOT NULL,                                    
+     HFSBD_FID          CHAR(16)   NOT NULL,                                    
+     HFSBD_CREATE_DATE  DATE       NOT NULL,                                    
+     HFSBD_CREATE_TIME  TIME       NOT NULL,                                    
+     HFSBD_LASTREF_DATE DATE       NOT NULL,                                    
+     HFSBD_LASTREF_TIME TIME       NOT NULL,                                    
+     HFSBD_LASTCHG_DATE DATE       NOT NULL,                                    
+     HFSBD_LASTCHG_TIME TIME       NOT NULL,                                    
+     HFSBD_LASTDAT_DATE DATE       NOT NULL,                                    
+     HFSBD_LASTDAT_TIME TIME       NOT NULL,                                    
+     HFSBD_NUMBER_LINKS INTEGER    NOT NULL,                                    
+     HFSBD_SHARELIB     CHAR(1)    NOT NULL,                                    
+     HFSBD_ACCESS_ACL   CHAR(1)    NOT NULL,                                    
+     HFSBD_FILEMOD_ACL  CHAR(1)    NOT NULL,                                    
+     HFSBD_DIRMOD_ACL   CHAR(1)    NOT NULL,                                    
+     HFSBD_SECLABEL     CHAR(8),                                                
+     HFSBD_DSNAME       CHAR(44),                                               
+     HFSBD_LINK         VARCHAR(1023)                                           
+     )                                                                          
+     IN RACFDB2.IRRHFSU                                                         
+     ;                                                                          
+                                                                                
+------------------------------------------------------------------------        
+--             HFS File Access record                                 --        
+------------------------------------------------------------------------        
+--   ;                                                                          
+CREATE TABLE USER01.HFS_AC (                                                    
+     HFACC_NAME         VARCHAR(1023) NOT NULL,                                 
+     HFACC_INODE        INTEGER       NOT NULL,                                 
+     HFACC_TYPE         CHAR(8)       NOT NULL,                                 
+     HFACC_UNIXID       INTEGER       NOT NULL,                                 
+     HFACC_ID_NAME      CHAR(8),                                                
+     HFACC_READ         CHAR(1)       NOT NULL,                                 
+     HFACC_WRITE        CHAR(1)       NOT NULL,                                 
+     HFACC_EXEC         CHAR(1)       NOT NULL                                  
+     )                                                                          
+     IN RACFDB2.IRRHFSU                                                         
+     ;                                                                          
+                                                                                
+------------------------------------------------------------------------        
+--             HFS File Model Access record                           --        
+------------------------------------------------------------------------        
+--   ;                                                                          
+CREATE TABLE USER01.HFS_AF (                                                    
+     HFACF_NAME           VARCHAR(1023) NOT NULL,                               
+     HFACF_INODE          INTEGER       NOT NULL,                               
+     HFACF_TYPE           CHAR(8)       NOT NULL,                               
+     HFACF_UNIXID         INTEGER       NOT NULL,                               
+     HFACF_ID_NAME        CHAR(8),                                              
+     HFACF_READ           CHAR(1)       NOT NULL,                               
+     HFACF_WRITE          CHAR(1)       NOT NULL,                               
+     HFACF_EXEC           CHAR(1)       NOT NULL                                
+     )                                                                          
+     IN RACFDB2.IRRHFSU                                                         
+     ;                                                                          
+                                                                                
+                                                                                
+------------------------------------------------------------------------        
+--             HFS Directory Model Access record                      --        
+------------------------------------------------------------------------        
+--   ;                                                                          
+CREATE TABLE USER01.HFS_AD (                                                    
+     HFACD_NAME           VARCHAR(1023) NOT NULL,                               
+     HFACD_INODE          INTEGER       NOT NULL,                               
+     HFACD_TYPE           CHAR(8)       NOT NULL,                               
+     HFACD_UNIXID         INTEGER       NOT NULL,                               
+     HFACD_ID_NAME        CHAR(8),                                              
+     HFACD_READ           CHAR(1)       NOT NULL,                               
+     HFACD_WRITE          CHAR(1)       NOT NULL,                               
+     HFACD_EXEC           CHAR(1)       NOT NULL                                
+     )                                                                          
+     IN RACFDB2.IRRHFSU                                                         
+     ;                                                                          
+                                                                                
+                                                                                
+------------------------------------------------------------------------        
+--             HFS Mounted File System record                         --        
+------------------------------------------------------------------------        
+--   ;                                                                          
+CREATE TABLE USER01.HFS_FS (                                                    
+     HFMFS_DSNAME         CHAR(64)      NOT NULL,                               
+     HFMFS_TYPE           CHAR(8)       NOT NULL,                               
+     HFMFS_MODE           CHAR(10)      NOT NULL,                               
+     HFMFS_SECURITY       CHAR(10)      NOT NULL,                               
+     HFMFS_SETUID         CHAR(10)      NOT NULL,                               
+     HFMFS_MUID           INTEGER       NOT NULL,                               
+     HFMFS_MUSER          CHAR(8)       NOT NULL,                               
+     HFMFS_MOUNTPOINT     VARCHAR(1023)                                         
+     )                                                                          
+     IN RACFDB2.IRRHFSU                                                         
+     ;                                                                          
+                                                                                
+                                                                                
+                                                                                
+------------------------------------------------------------------------        
+--   Indices for the HFS Basic Data Record Type  (0900)               --        
+------------------------------------------------------------------------        
+--  ;                                                                           
+CREATE        INDEX USER01.HFS_BD_IX1                                           
+       ON USER01.HFS_BD                                                         
+          (HFSBD_OWN_UID)                                                       
+           USING      STOGROUP   STOGRP01                                       
+           PRIQTY     100                                                       
+           SECQTY     50                                                        
+           CLUSTER                                                              
+           PCTFREE    0                                                         
+           CLOSE      NO                                                        
+           ;                                                                    
+CREATE        INDEX USER01.HFS_BD_IX2                                           
+       ON USER01.HFS_BD                                                         
+          (HFSBD_OWN_UNAME)                                                     
+           USING      STOGROUP   STOGRP01                                       
+           PRIQTY     100                                                       
+           SECQTY     50                                                        
+           PCTFREE    0                                                         
+           CLOSE      NO                                                        
+           ;                                                                    
+CREATE        INDEX USER01.HFS_BD_IX3                                           
+       ON USER01.HFS_BD                                                         
+          (HFSBD_OWN_GID)                                                       
+           USING      STOGROUP   STOGRP01                                       
+           PRIQTY     100                                                       
+           SECQTY     50                                                        
+           PCTFREE    0                                                         
+           CLOSE      NO                                                        
+           ;                                                                    
+CREATE        INDEX USER01.HFS_BD_IX4                                           
+       ON USER01.HFS_BD                                                         
+          (HFSBD_OWN_GNAME)                                                     
+           USING      STOGROUP   STOGRP01                                       
+           PRIQTY     100                                                       
+           SECQTY     50                                                        
+           PCTFREE    0                                                         
+           CLOSE      NO                                                        
+           ;                                                                    
+                                                                                
+CREATE        INDEX USER01.HFS_AC_IX1                                           
+       ON USER01.HFS_AC                                                         
+          (HFACC_UNIXID)                                                        
+           USING      STOGROUP   STOGRP01                                       
+           PRIQTY     100                                                       
+           SECQTY     50                                                        
+           PCTFREE    0                                                         
+           CLOSE      NO                                                        
+           ;                                                                    
+                                                                                
+CREATE        INDEX USER01.HFS_AC_IX2                                           
+       ON USER01.HFS_AC                                                         
+          (HFACC_ID_NAME)                                                       
+           USING      STOGROUP   STOGRP01                                       
+           PRIQTY     100                                                       
+           SECQTY     50                                                        
+           PCTFREE    0                                                         
+           CLOSE      NO                                                        
+           ;                                                                    
+CREATE        INDEX USER01.HFS_AF_IX1                                           
+       ON USER01.HFS_AF                                                         
+          (HFACF_UNIXID)                                                        
+           USING      STOGROUP   STOGRP01                                       
+           PRIQTY     100                                                       
+           SECQTY     50                                                        
+           PCTFREE    0                                                         
+           CLOSE      NO                                                        
+           ;                                                                    
+                                                                                
+                                                                                
+CREATE        INDEX USER01.HFS_AF_IX2                                           
+       ON USER01.HFS_AF                                                         
+          (HFACF_ID_NAME)                                                       
+           USING      STOGROUP   STOGRP01                                       
+           PRIQTY     100                                                       
+           SECQTY     50                                                        
+           PCTFREE    0                                                         
+           CLOSE      NO                                                        
+           ;                                                                    
+                                                                                
+                                                                                
+CREATE        INDEX USER01.HFS_AD_IX1                                           
+       ON USER01.HFS_AD                                                         
+          (HFACD_UNIXID)                                                        
+           USING      STOGROUP   STOGRP01                                       
+           PRIQTY     100                                                       
+           SECQTY     50                                                        
+           PCTFREE    0                                                         
+           CLOSE      NO                                                        
+           ;                                                                    
+                                                                                
+                                                                                
+CREATE        INDEX USER01.HFS_AD_IX2                                           
+       ON USER01.HFS_AD                                                         
+          (HFACD_ID_NAME)                                                       
+           USING      STOGROUP   STOGRP01                                       
+           PRIQTY     100                                                       
+           SECQTY     50                                                        
+           PCTFREE    0                                                         
+           CLOSE      NO                                                        
+           ;                                                                    
+                                                                                

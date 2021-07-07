@@ -1,0 +1,179 @@
+Documentation for CDT2DYN - A REXX exec to help change
+installation-define RACF classes into dynamic classes.
+------------------------------------------------------------------------
+    Copyright IBM Corporation, 2004
+------------------------------------------------------------------------
+  This file contains the following sections:
+
+    DISCLAIMERS, ETC
+    ABOUT CDT2DYN
+    HOW TO INVOKE CDT2DYN
+    OUTPUT OF CDT2DYN
+    RESTRICTIONS
+    TYPICAL USAGE SCENARIO
+    CUSTOMIZATION
+    REVISION HISTORY
+
+------------------------------------------------------------------------
+DISCLAIMERS, ETC:
+
+This program contains code made available by IBM Corporation on
+an AS IS basis.  Anyone receiving this program is considered
+to be licensed under IBM copyrights to use the IBM-provided
+source code in any way he or she deems fit, including copying
+it, compiling it, modifying it, and redistributing it with or
+without modifications, except that it may be neither sold nor
+incorporated within a product that is sold.  No license under
+any IBM patents or patent applications is to be implied from
+this copyright license.
+
+The software is provided "as-is", and IBM disclaims all
+warranties, express or implied, including but not limited to
+implied warranties of merchantibility or fitness for a
+particular purpose.  IBM shall not be liable for any direct,
+indirect, incidental, special or consequential damages arising
+out of this agreement or the use or operation of the software.
+
+A user of this program should understand that IBM cannot provide
+technical support for the program and will not be responsible
+for any consequences of use of the program.
+
+The program's author will attempt to provide informal support
+and assistance, if she has the time to do so.  If you have
+questions about using this program, or suggestions for
+enhancements, please communicate them via the RACF-L mailing
+list.  To subscribe to RACF-L, you should send a note to:
+  listserv@listserv.uga.edu
+and include the following line in the body of the note,
+substituting your first name and last name as indicated:
+  subscribe racf-l first_name last_name
+To post messages to RACF-L, send them to racf-l@listserv.uga.edu
+and include a relevant Subject: line.
+
+The program's author can also be reached directly via email to
+   LWard@us.ibm.com
+    or Laurie Ward/Poughkeepsie/IBM@IBMUS
+However, she would strongly prefer that all contact regarding
+this program be via the mechanisms indicated above.
+
+------------------------------------------------------------------------
+ABOUT CDT2DYN
+
+  This program will examine the contents of the current classes
+  in the RACF static class descriptor table.  (Any
+  existing dynamic classes will be ignored.)  For all static
+  installation-defined classes, it will create the commands
+  necessary to put those installation-defined classes into the
+  dynamic CDT (BUILDCMD parameter).  It can then execute the
+  commands which were built (RUNCMD parameter), which will define
+  the dynamic classes in the CDT general resource class.
+
+------------------------------------------------------------------------
+HOW TO INVOKE CDT2DYN
+
+   From the TSO command line, execute the REXX EXEC from the
+   dataset in which it resides.  For example:
+
+   EXEC 'data.set.name(CDT2DYN)'
+          - or -
+   EXEC 'prefix.CDT2DYN.EXEC'
+
+   Optional Parameters:
+           BUILDCMD | NOBUILDCMD  Default is BUILDCMD
+             Specify BUILDCMD if you want to build commands
+               to define dynamic classes from your current
+               installation classes in the CDT.
+             Specify NOBUILDCMD if you do not want to build
+               the commands.  You can specify this with the
+               RUNCMD parameter if you have already built your
+               commands, optionally edited the commands, and
+               now you want to run them.
+           RUNCMD   | NORUNCMD    Default is NORUNCMD
+             Specify RUNCMD to run the commands built by this
+               utility.
+             Specify NORUNCMD if you do not want to run the
+               commands built by this utility.  You may want to
+               edit or examine the commands before they are
+               executed.
+
+------------------------------------------------------------------------
+OUTPUT OF CDT2DYN
+
+   The dataset 'prefix.DYNCLAS.EXEC' is created and optionally
+   executed.  If this dataset already exists, it will be
+   overwritten.  The existing dataset must have RECFM=V or
+   RECFM=F and LRECL=255 for the utility to run properly.
+
+------------------------------------------------------------------------
+RESTRICTIONS
+
+   This utility must be run on a z/OS Version 1 Release 6 system
+   or later with a TSO/E environment available.
+   If the commands built by this utility are run
+   on a prior z/OS system, the commands will fail as the CDT
+   class and the CDTINFO keyword are new in z/OS V1R6.
+
+------------------------------------------------------------------------
+TYPICAL USAGE SCENARIO
+
+     1) Build commands to define the dynamic classes:
+          EXEC 'prefix.REXX.EXEC(CDT2DYN)'
+        Note: With no parameters, this will build the commands
+        and put them into dataset prefix.DYNCLAS.EXEC but will
+        not run them.
+     2) Examine commands in prefix.DYNCLAS.EXEC produced by the
+        CDT2DYN utility.  Normally no changes are necessary
+        for these commands.  Your installation may require
+        changes to them, such as adding an OWNER keyword.
+     3) Run the commands to define the dynamic classes:
+           EXEC 'prefix.REXX.EXEC(CDT2DYN)' 'NOBUILDCMD RUNCMD'
+        Note: This will run the commands built in Step 1).
+              It must be run by a user with one of the following
+              authorities:
+              a) RACF SPECIAL authority
+               - or -
+              b) CLAUTH authority to the CDT class and
+                 (if the FIELD class is active and RACLISTed)
+                 FIELD class access to the CDTINFO segment
+                 fields (see the RACF Security Administrator's
+                 Guide for more information).
+     4) Put the dynamic classes into the CDT:
+           SETROPTS CLASSACT(CDT) RACLIST(CDT)
+               - or -
+           SETROPTS RACLIST(CDT) REFRESH
+        Note: These commands must be run by a user with
+              appropriate authority, as documented in the
+              RACF Command Language Reference.
+
+------------------------------------------------------------------------
+CUSTOMIZATION
+
+There are 2 statements near the beginning of the CDT2DYN EXEC
+that may be changed to tailor this exec to work at your
+installation.
+
+output_dataset = "DYNCLAS.EXEC"
+  Change this if you want to use a different dataset
+  name for the output file.
+  Note: The name will be prefixed with your TSO prefix,
+  unless you provide a string enclosed in single quotes.
+
+dataset_attributes = 'SPACE(1,1)'
+  Change this if you want to use different parameters on
+  the ALLOCATE command for the output file.  Do not include
+  or change RECFM, BLKSIZE, or LRECL.
+
+------------------------------------------------------------------------
+REVISION HISTORY
+
+2004 May 24  - 1.0.00 Restricted release
+2004 Sept 24 - 1.0.01 General release
+     Fix ALLOCATE statements by adding 'address TSO' and
+     fix multi-line command.
+     Add start message and parameter messages.
+     Add logic to handle NOBUILDCMD NORUNCMD.
+     Add logic to handle case where no commands are built.
+     Skip classes that are already duplicated by a dynamic one.
+------------------------------------------------------------------------
+THE END
+

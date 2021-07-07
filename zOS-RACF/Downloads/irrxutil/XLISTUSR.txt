@@ -1,0 +1,87 @@
+/* REXX */                                                                      
+/**********************************************************************         
+ Licensed Materials - Property of IBM                                           
+ 5694-A01                                                                       
+ Copyright IBM Corp. 2010                                                       
+                                                                                
+ Name:    XLISTUSR                                                              
+                                                                                
+ Author: Bruce Wells - brwells@us.ibm.com                                       
+                                                                                
+ Purpose: Takes a user ID and displays its list of groups in                    
+          alphabetic order. If no user is supplied, IBMUSER is used             
+          as the default.                                                       
+                                                                                
+ Input:   A RACF user ID                                                        
+                                                                                
+ Example: ex 'MYHLQ.RACF.CLISTS(XLISTUSR)' 'User'                               
+                                                                                
+ Authorization required:                                                        
+          - READ access to IRR.RADMIN.LISTUSER in FACILITY plus                 
+            authority to list the user profile                                  
+                                                                                
+ Notes: - Due to its use of ISPF tables, this exec must be                      
+          executed from an ISPF environment.                                    
+                                                                                
+**********************************************************************/         
+parse arg profile                                                               
+if profile="" then profile="IBMUSER"                                            
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Use IRRXUTIL to extract the user ID into the stem named "USR".    */         
+/*-------------------------------------------------------------------*/         
+myrc=IRRXUTIL("EXTRACT","USER",profile,"USR")                                   
+say ""                                                                          
+say ""                                                                          
+say ""                                                                          
+if (word(myrc,1)<>0) then do                                                    
+   say "MYRC="myrc                                                              
+   say "An error occurred "                                                     
+   exit 1                                                                       
+end                                                                             
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Create an ISPF table to store the groups contained within the     */         
+/* connection list.                                                  */         
+/*-------------------------------------------------------------------*/         
+TBCMD="TBCREATE        "||,  /* Create command                       */         
+    "ACLGRPS"||,             /* Table name.                          */         
+    " KEYS(ACGRPNM) "||,     /* Key (db key) is group name           */         
+    "NOWRITE "||,            /* temporary in-storage only table      */         
+    "REPLACE "               /* Replace if already exists            */         
+ADDRESS ISPEXEC TBCMD                                                           
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Set up sorting for the table by group name.                       */         
+/*-------------------------------------------------------------------*/         
+TBCMD="TBSORT ACLGRPS FIELDS(ACGRPNM,C,A)"                                      
+ADDRESS ISPEXEC TBCMD                                                           
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* For each connected group, add an entry to our ISPF table.         */         
+/* and add an entry to our ISPF table.                               */         
+/*-------------------------------------------------------------------*/         
+gcnt = USR.BASE.CONNECTS.REPEATCOUNT                                            
+do i = 1 to gcnt                                                                
+  ACGRPNM = USR.BASE.CGROUP.i                                                   
+  TBCMD="TBADD ACLGRPS ORDER"                                                   
+  ADDRESS ISPEXEC TBCMD                                                         
+end                                                                             
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* Now display the groups from our sorted group table.               */         
+/*-------------------------------------------------------------------*/         
+say "The user is connected to the following groups:"                            
+say                                                                             
+address ISPEXEC "TBTOP ACLGRPS"                                                 
+do i = 1 to gcnt                                                                
+  TBCMD = "TBSKIP ACLGRPS"                                                      
+  ADDRESS ISPEXEC TBCMD                                                         
+  if rc = 0 then                                                                
+    say " "ACGRPNM                                                              
+end                                                                             
+                                                                                
+address ISPEXEC "TBEND ACLGRPS"         /* Delete the table          */         
+                                                                                
+say                                                                             
+say "retval="||myrc                                                             
