@@ -124,8 +124,8 @@ import com.ibm.smf.format.UnsupportedVersionException;
      * where xxx is the user data type value, in decimal.  
      * <p>
      * The custom formatter class must:
-     * <br>(1) extend com.ibm.ws390.sm.smfview.UserDataSection
-     * <br>(2) define a CTOR that takes a com.ibm.ws390.sm.smfview.UserDataSection object 
+     * <br>(1) extend com.ibm.smf.was.common.UserDataSection
+     * <br>(2) define a CTOR that takes a com.ibm.smf.was.common.UserDataSection object 
      *     as its only argument.  (Note: It is highly recommended that this CTOR call 
      *     super(UserDataSection);)
      *     
@@ -143,7 +143,7 @@ import com.ibm.smf.format.UnsupportedVersionException;
 	    int type = 120;
       int subtype = recordSubType;
       int udstype = uds.m_dataType;
-	    String formatterPackage = "com.ibm.ws390.smf.formatters.";
+	    String formatterPackage = "com.ibm.smf.format.types.";
 	    String newClassName = formatterPackage + "SMFType"+type+"SubType"+subtype+"UserDataType"+udstype;
 
       UserDataSection newUds = uds;  // initialize with base UDS object
