@@ -1,3 +1,7 @@
+What Is New
+===========
+* [z/OS Workload Manager: Performance Infrastructure Improvements in zOS V2.5 WLM](Documents/Performance Infrastructure Improvements in zOS V2.5 WLM.pdf)
+
 Inside WLM
 ==========
 * [Capping Technologies and Optimization of the Four Hour Rolling Average Consumption](Documents/Capping_Technologies_and_4HRA_Optimization_2016.pdf)
