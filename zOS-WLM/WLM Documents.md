@@ -1,4 +1,4 @@
-What is new
+What is New
 ===========
 * [z/OS Workload Manager: Performance Infrastructure Improvements in zOS V2.5 WLM](Documents/Performance_Infrastructure_Improvements_in_zOS_V2.5_WLM.pdf)
 
