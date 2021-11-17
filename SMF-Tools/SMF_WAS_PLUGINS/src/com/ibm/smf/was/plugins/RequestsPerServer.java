@@ -245,6 +245,8 @@ public class RequestsPerServer implements SMFFilter {
 		smf_printstream.println(last_line);
 	}	
 	
+	public HashMap getServers() {return servers;}
+	
 	/**
 	 * A little sub-class to hold data about a particular server.
 	 */

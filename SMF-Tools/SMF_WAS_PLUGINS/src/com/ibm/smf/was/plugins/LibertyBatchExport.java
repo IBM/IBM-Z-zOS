@@ -41,7 +41,7 @@ import com.ibm.smf.was.plugins.utilities.ConversionUtilities;
  */
 public class LibertyBatchExport implements SMFFilter {
 
-	private SmfPrintStream smf_printstream = null;
+	protected SmfPrintStream smf_printstream = null;
 	private boolean header_written = false;
 	
 	public enum BatchStatus {STARTING, STARTED, STOPPING, STOPPED, FAILED, COMPLETED, ABANDONED };

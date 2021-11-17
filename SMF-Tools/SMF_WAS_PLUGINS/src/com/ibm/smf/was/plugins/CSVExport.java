@@ -41,7 +41,7 @@ import com.ibm.smf.was.plugins.utilities.STCK;
  */
 public class CSVExport implements SMFFilter {
 
-	private SmfPrintStream smf_printstream = null;
+	protected SmfPrintStream smf_printstream = null;
 	private boolean header_written = false;
 	
 	public boolean initialize(String parms) 
