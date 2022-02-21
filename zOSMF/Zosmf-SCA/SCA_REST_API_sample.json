@@ -1,0 +1,14 @@
+{
+  "resourceItems": [
+    {
+      "resourceProfile": "IRR.DIGTCERT.LISTRING",
+      "resourceClass": "FACILITY",
+      "access": "READ"
+    },
+    {
+      "resourceProfile": "CEA.SIGNAL.ENF83",
+      "resourceClass": "SERVAUTH",
+      "access": "READ"
+    }
+  ]
+}
