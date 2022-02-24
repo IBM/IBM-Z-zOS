@@ -27,7 +27,6 @@
 #   use of the sample code, even if they have been advised of
 #   the possibility of such damages.
 #
-# -----------------------------------------------------------------
 ###################################################################
 
 .PHONY: all run32 run64
