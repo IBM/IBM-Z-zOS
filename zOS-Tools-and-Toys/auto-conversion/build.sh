@@ -37,4 +37,4 @@ export BUILD_DIR=$PWD
 target=
 [ $# -gt 0 ] && target=${1}
 
-gmake -f $REPO_DIR/makefile $target
+gmake -f $REPO_DIR/Makefile $target
