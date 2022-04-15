@@ -9,7 +9,7 @@ If you would like to see a new feature, please [raise an issue](https://github.c
 
 ### Fixing bugs
 
-If you would like to report a bug, please [raise an issue](https://github.com/IBM/IBM-Z-zOS/issues).
+If you would like to report a bug or vulnerability, please [raise an issue](https://github.com/IBM/IBM-Z-zOS/issues).
 
 ### Merge approval
 
