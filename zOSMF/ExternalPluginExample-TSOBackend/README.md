@@ -115,4 +115,4 @@ Find your plug-in in z/OSMF. In the z/OSMF classic view, expand the `Configurati
 Note that the z/OSMF category can be changed in the `myextapp.properties` file. To select a different category, see the link in **Step 4**.
 
 
-For questions or comments about this external plug-in, contact: caoy@cn.ibm.com, whwuhbj@cn.ibm.com
+For questions or comments about this external plug-in, contact: yunyyang@cn.ibm.com, bjdongm@cn.ibm.com
