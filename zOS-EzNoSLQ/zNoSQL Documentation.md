@@ -23,9 +23,10 @@ Performance Considerations:
 
 Getting Started:
 * [Getting Started with EzNoSQL](#Getting_Started) 
-* [EzNoSQL Executables and side files](#Executables_and_Side_Files)
-* [Sample IBM XL Compile procedure]
-* [Sample application program]
+* [EzNoSQL Executables and Side Files](#Executables_and_Side_Files)
+* [Sample IBM XL C/C++ Procedure](#Sample_Application_Program)
+* [Sample Application Program](#Compile_and_Link)
+* [Sample IBM XL C/C++ Procedure](#Sample_Application_Program)
 
 Application Programming Interfaces (APIs)
 * [Application Programming Tiers](#Application_Programming_Tiers)
@@ -243,13 +244,11 @@ Optionally, the loading of data into the CF cache may be bypassed and reduce ove
 
 # Getting_Started 
 
-The EzNoSQL APIs can be called from application programs running in either 31 or 64 bit mode.  The programs can link to the required executables and side files directly from z/OS USS directories.  This section explains the required files along with their location and description. 
-
-A sample application program is provided to test the system configuration and to gain familarity with some of the available APIs.  The full suite of available APIs are detailed in the following sections.
+The EzNoSQL APIs can be called from application user programs running in either 31 or 64 bit mode.  The user programs can link to the required executables and side files directly from z/OS USS directories.  This section explains the required files along with their location and description. Additonally, a sample user program, containing compile and link instructions, is provided to help test the system configuration and to gain familarity with a subset of the available APIs.  The full suite of available APIs are detailed in the following sections.
 
 ## Executables_and_Side_Files 
 
-The following table shows the names and locations of the EzNoSQL executables and side files:
+The following table shows the names and locations of the EzNoSQL executables, side files, and sample program:
 
 | member            | type       | location          | description                                                                                                          |
 | ----------------- | -----------| ----------------  | -------------------------------------------------------------------------------------------------------------------- |
@@ -260,6 +259,22 @@ The following table shows the names and locations of the EzNoSQL executables and
 | znsqdb.h          | `text`     | /usr/include/zos/ | 64 bit x file |    
 | igwznsqsamp1.c    | `text`     | /samples/ibm/     | sample appliation program    
 
+## Sample_Application_Program
+
+Sample user program: /samples/ibm/igwznsqsamp1.c, is a 31bit user program which does the following sequence of API calls:
+1)  Create a one megabyte JSON (non-recoverable) EzNoSQL database with a primary key of `"_id"`.
+3)  Create a one megabyte non-unique secondary index with a key of `"Author"`.
+4)  Connect (open) the database
+5)  Insert 3 documents with identical key values for `"Author":"J. R. R. Tolkien"`
+6)  Position to the top of the secondary index and read all three documents sequentially 
+7)  Disconnect (close) the data base.
+8)  Destroy the database.
+
+## Compile_and_Link
+
+To compile and link sample program /samples/ibm/igwznsqsamp1.c:                           
+xlc -c -qDLL -qcpluscmt -qLSEARCH="//'SYS1.SCUNHF'" igwznsqsamp1.c 
+xlc -o igwznsqsamp1 igwznsqsamp1.o -W l,DLL libigwznsqd31.x        
 
 # Application_Programming_Tiers 
 
