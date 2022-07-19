@@ -264,9 +264,9 @@ The following table shows the names and locations of the EzNoSQL executables, si
 Sample user program: /samples/ibm/igwznsqsamp1.c, is a 31bit user program which does the following sequence of API calls:
 1)  Create a one megabyte JSON (non-recoverable) EzNoSQL database with a primary key of `"_id"`.
 3)  Create a one megabyte non-unique secondary index with a key of `"Author"`.
-4)  Connect (open) the database
-5)  Insert 3 documents with identical key values for `"Author":"J. R. R. Tolkien"`
-6)  Position to the top of the secondary index and read all three documents sequentially 
+4)  Connect (open) the database.
+5)  Insert 3 documents with identical key values for `"Author":"J. R. R. Tolkien"`.
+6)  Position to the top of the secondary index and read all three documents sequentially. 
 7)  Disconnect (close) the data base.
 8)  Destroy the database.
 
