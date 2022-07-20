@@ -250,14 +250,14 @@ The EzNoSQL APIs can be called from application user programs running in either 
 
 The following table shows the names and locations of the EzNoSQL executables, side decks, and sample program:
 
-| Member            | Location              | Description                                                                                                          |
-| ----------------- | --------------------- | ----------------  | -------------------------------------------------------------------------------------------------------------------- |
-| `libigwznsqd31.so`  | `/usr/lib/ibm/`     | 31-bit API Library DLL |    
-| `libigwznsqd31.x`   | `/usr/lib/ibm/`     | 31-bit x side deck |   
-| `libigwznsqd64.so`  | `/usr/lib/ibm/`     | 64-bit API Library DLL |   
-| `libigwznsqd64.x`   | `/usr/lib/ibm/`     | 64-bit APIs | 
-| `znsqdb.h`          | `/usr/include/zos/` | EzNoSQL Header File |    
-| `igwznsqsamp1.c`    | `/samples/ibm/`     | Sample 31-bit application program    
+| Member              | Location              | Description                           |
+| ------------------- | --------------------- | ------------------------------------- |
+| `libigwznsqd.so`    | `/usr/lib/ibm/`       | 31-bit API Library DLL |    
+| `libigwznsqd31.x`   | `/usr/lib/ibm/`       | 31-bit x side deck |   
+| `libigwznsqd64.so`  | `/usr/lib/ibm/`       | 64-bit API Library DLL |   
+| `libigwznsqd64.x`   | `/usr/lib/ibm/`       | 64-bit APIs | 
+| `znsqdb.h`          | `/usr/include/zos/`   | EzNoSQL Header File |    
+| `igwznsqsamp1.c`    | `/samples/ibm/`       | Sample 31-bit application program |    
 
 ## Sample_Application_Program
 
