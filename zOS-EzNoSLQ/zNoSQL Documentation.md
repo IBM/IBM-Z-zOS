@@ -2,24 +2,24 @@
 
 # Table of Contents
 Introduction and Concepts:
-* [Introduction to EzNoSQL](#Introduction_to_EzNoSQL)
-* [JSON Documents](#JSON_Documents)
-* [Primary Keys](#Primary_keys)
-* [Secondary Indexes](#Secondary_Indexes)
-* [Active Secondary Indexes](#Active_Secondary_Indexes)
-* [Non-Unique Secondary Indexes](#Non-Unique_Secondary_Indexes)
-* [Multi Level Keys](#Multi_Level_Keys)
-* [Document Retrieval](#Document_Retrieval)
-* [Recoverable Databases](#Recoverable_Data_Sets)
+* [Introduction to EzNoSQL](#Introduction-to-EzNoSQL)
+* [JSON Documents](#JSON-Documents)
+* [Primary Keys](#Primary-keys)
+* [Secondary Indexes](#Secondary-Indexes)
+* [Active Secondary Indexes](#Active-Secondary-Indexes)
+* [Non-Unique Secondary Indexes](#NonUnique-Secondary-Indexes)
+* [Multi Level Keys](#Multi-Level-Keys)
+* [Document Retrieval](#Document-Retrieval)
+* [Recoverable Databases](#Recoverable-Data-Sets)
 
 System Requirements
-* [System Requirements](#System_Requirements)
-* [Hardware/Software Requirements](#Hardware_Software_Requirements)
-* [Storage Administration Requirements](#Storage_Administration_Requirements) 
-* [Application Requirements](#Application_Requirements)
+* [System Requirements](#System-Requirements)
+* [Hardware/Software Requirements](#Hardware-Software-Requirements)
+* [Storage Administration Requirements](#Storage-Administration-Requirements) 
+* [Application Requirements](#Application-Requirements)
  
 Performance Considerations: 
-* [In Memory Caching](#In_Memory_Caching)
+* [In Memory Caching](#In-Memory-Caching)
 
 Getting Started:
 * [Getting Started with EzNoSQL](#Getting-Started) 
@@ -29,14 +29,14 @@ Getting Started:
 * [Sample IBM XL C/C++ Procedure](#Sample-Application-rogram)
 
 Application Programming Interfaces (APIs)
-* [Application Programming Tiers](#Application_Programming_Tiers)
+* [Application Programming Tiers](#Application-Programming-Tiers)
 
 Data Management APIs:
 * [znsq_create](#znsq_create)
 * [znsq_create_index](#znsq_create_index)
 * [znsq_destroy](#znsq_destroy)
 * [znsq_add_index](#znsq_add_index)
-* [znsq_drop_index](#znsq_drop_index)
+* [znsq_drop_index](#znsq_drop_-index)
 * [znsq_report_stats](#znsq_report_stats)
 
 Connection Management APIs:
@@ -60,16 +60,16 @@ Document Management APIs:
 * [znsq_backout](#znsq_backout)
 
 Diagnostic Management APIs:
-* [znsq_last_result](#znsq_last_result)
+* [znsq_last_result](#znsq-last-result)
 
 Return and Reason Codes:
-* [Return Code 0](#Return_Code_0)
-* [Return Code 8](#Return_Code_8)
-* [Return Code 12](#Return_Code_12)
-* [Return Code 16](#Return_Code_16)
-* [Return Code 36](#Return_Code_36)
+* [Return Code 0](#Return-Code-0)
+* [Return Code 8](#Return-Code-8)
+* [Return Code 12](#Return-Code-12)
+* [Return Code 16](#Return-Code-16)
+* [Return Code 36](#Return-Code-36)
 
-# Introduction_to_EzNoSQL 
+# Introduction to EzNoSQL 
 
 EzNoSQL for z/OS provides a comprehensive set of C based Application Progammer Interfaces (APIs), which enable applications to store JSON (UTF-8) documents while utilizing the full data sharing capabilities of IBM's Parallel Sysplex technology and System z operating system (z/OS). The JSON data can be accessed as either non-recoverable, or with recoverable (transactional) consistency across the sysplex. The APIs also allow for the creation of secondary indexes, which provide for faster queries to specific key fields within the JSON data.  
 
@@ -80,7 +80,7 @@ IBM's Parallel Sysplex Coupling Facility (CF) technology, enables separate proce
 ![image](https://media.github.ibm.com/user/329101/files/68680500-eb19-11ec-9082-bb908596e988)
 
 
-## JSON_Documents
+## JSON Documents
 
 EzNoSQL is a document oriented data store which accepts UTF-8 JSON documents (analogous to records or rows in other data bases). The JSON documents must meet the format as described by[JavaScript Object Notation (JSON)](https://www.json.org/json-en.html). JSON documents consist of an unordered set of `key:value` elements enclosed in brackets, and can be up to 2 gigbytes in size. The document may contain arrays and other imbedded documents:
 ```
@@ -95,7 +95,7 @@ EzNoSQL is a document oriented data store which accepts UTF-8 JSON documents (an
 }
 ```
 
-## Primary_Keys
+## Primary Keys
 
 The EzNoSQL database can be defined with a user supplied primary key, where the chosen key must be contained in each the document and paired with a unique value.
 
@@ -118,7 +118,7 @@ Note that the use of auto generated keys will incur more CPU overhead when compa
 The inserted documents can then be retrieved directly via the primary keyname and value (e.g.`"Customer_id":"4084"` or `"znsq_id":"..generatedkeyvalue.."`).  Alternatively, all the documents in the database can be retrieved in a consective fashion, beginning either with the first or the last document without providing a keyname value. Retrieving documents in this manner will not return documents in order of the key values.
 
 
-## Secondary_Indexes
+## Secondary Indexes
 
 Documents may also be retreived or updated through the use of secondary (alternate) indexes. Secondary indexes contain alternate keys, which can be used to retrieve the documents in the database. By creating alternate keys, the application can have more than one option for locating specific documents, or can find groups of like documents much faster than scanning the entire database.  
 
@@ -142,19 +142,19 @@ The document can now be retrieved either through the primary index using a keyna
 When secondary index keynames are paired with an array, alternate keys will be generated for all the values in the array.  For example, a secondary keyname of "Accounts" would allow the above document to be retrieved using a value of "Checking" or "Savings".  For a primary keyname, only the first value in the array will be used as the primary key. 
 
 
-### Active_Secondary_Indexes
+### Active Secondary Indexes
 
 Secondary indexes are created inactive by default and only while the database is disconnected.  The index can then be built and activated by adding the index at any point in time after the creation of the index.  Note that time it takes to build an index is relative to how large the database is.  All active indexes are updated when new documents are inserted, erased, or updated via the primary or any of the other (active) secondary indexes.  If a secondary index is no longer required, it can made be switched to inactive (quiesced) across the sysplex.
 
 Once a secondary index is switched to inactive, it will no longer be updated and may become down level (out of sync) with the documents in the database.  While an index is inactive, any requests to access documents via the inactive index will be failed.  Switching the index to inactive will remove the addtional overhead of maintaining the index.  Inactive indexes can be re-activated and rebuilt by re-adding the index.  
 
 
-### Non-Unique_Secondary_Indexes
+### NonUnique Secondary Indexes
 
 Secondary indexes can be defined as unique or non-unique.  For unique indexes, each value must be unique or a duplicate key error is returned. The primary index is always a unique index.  For non-unique secondary indexes, the value can be used to retrieve all the documents which contain the same value. EzNoSQL will return a reason code informing the application when more than on documents exist for the alternate key.     
 
 
-## Multi_Level_Keys
+## Multi Level Keys
 
 Both the primary and secondary indexes can have a single level keyname, or can have a multiple level keyname (referred to as a multikey). The indiviual levels are connected by the reverse solidus character \.  For example, a secondary keyname of "Address\Steet" would allow the following document to be retrieved using a value of "1 Main Street".
 ```
@@ -178,7 +178,7 @@ Multikey names can also span into imbedded documents or an array of imbedded doc
 }  
 ```
 
-## Document_Retrieval
+## Document Retrieval
 
 Documents can be directly read, updated, or erased by specifying the desired keyname and value of the specific document to be retrieved/updated.  Additionally, documents can be retrieved in an ordered fashion through the use of secondary indexes.  The application can position (znsq_position) into the secondary index to a specific key value, or for any value greater than or equal to the desired key range. The documents can then be be retrieved in a (sequential) ascending or descending order, and optionally updated (znsq_update_result) or deleted (znsq_delete_result) following the retrieval. When using sequential access to update or erase documents, the documents will not be visable on disk and to other sharers until either:  the end of the buffer is reached, a znsq_close_result is issued, or a successful close of the data base.  When a znsq_close_result is issue, positioning is ended and a new znsq_position must be issued to re-establish position within the secondary index.  EzNoSQL will return a reason code when reading alternate (non-unique) duplicate keys.
 
@@ -187,7 +187,7 @@ In order to iterate in an order fashion over the primary key, and optionally upd
 While the alternate key value size is not restricted, the keys will be truncated after 251 bytes. Truncated keys may result in non-unique keys with other keys containing the same first 251 bytes.  Sequentially reading truncated keys may return the documents out of order and require further sorting by the application. EzNoSQL will return a reason code alerting the application if a truncated key is retrieved.  
 
 
-## Recoverable_Data_Sets
+## Recoverable Data Sets
 
 The recoverablity of a database determines the duration of the locking and the transactional (atomic) capabilities when accessing documents in and across EzNoSQL database. EzNoSQL will obtain a document level exclusive lock for any type of update (write, update, or delete) of a document, and an optional shared lock for reads:  
 
@@ -200,16 +200,16 @@ For recoverable databases, an optional autocommit can be requested by the applic
 If the task ends normally without a commit for the last transaction, an implicit commit will be issued by EzNoSQL. If the task ends abnormally without a commit following the last transaction, an implicit backed out will be issue by EzNoSQL.  Transactions which fail to backout will be shunted, and the locks owned by the transaction will be retained until the issue preventing the backout is resolved.  Using the log options ALL parameter adds forward recovery logging for the database and requires a forward recovery log to be assigned to the database.
 
 
-# System_Requirements 
+# System Requirements 
 
-## Hardware_Software_Requirements
+## Hardware Software Requirements
 
 EzNoSQL executes in an IBM Parallel Syplex configuration.  Refer to https://www.ibm.com/docs/en/zos/2.5.0?topic=mvs-zos-setting-up-sysplex  for more information on configuring a Parallel Sysplex. The minimum hardware/software configuration for zNoSQL requires:
 1. at least one logical partition (LPAR), running IBM's Version 2.4 z/OS operating system or above in plexmode with APAR OA62553.
 2. at least one internal or external Coupling Facility (CF) attached to the LPAR(s) (https://www.google.com/search?client=firefox-b-1-d&q=PR%2FSM+Planning+Guide). 
 EzNoSQL is provided with z/OS and does not require any additonal software licences.  
 
-## Storage_Administration_Requirements 
+## Storage Administration Requirements 
 
 1. Enable the SMSVSAM address space on each LPAR which will access the EzNoSQL databases. If recoverable EzNoSQL databases will be accessed, the DFSMS Transaction VSAM (TVS) manager must be enabled and configured including the availability of foward recovery logstreams if required by the application (https://www.ibm.com/docs/en/zos/2.5.0?topic=administration-administering-vsam-record-level-sharing, or https://www.redbooks.ibm.com/abstracts/sg246105.html_- (Chapters 5 and 6).
 2. Configure one or more SMS storage classes (STORCLAS) containing a CACHESET (https://www.ibm.com/docs/en/zos/2.5.0?topic=sharing-defining-storage-classes-vsam-rls#dscrls). The CACHESET identifies the name of one or more CF cache structures for use by the EzNoSQL databases (https://www.ibm.com/docs/en/zos/2.5.0?topic=sharing-defining-vsam-rls-attributes-in-data-classes).
@@ -219,7 +219,7 @@ EzNoSQL is provided with z/OS and does not require any additonal software licenc
 6. Optionally create SMS data classes (DATACLAS) to enable additional system functions such as encryption, data compression, SMSVSAM 64 bit buffering, and control of space allocation amounts.  Provide the name of the DATACLAS to the application architect for use when defining the database, or it can be assigned dynamically by the system through the use of SMS Access Control System (ACS) (https://www.ibm.com/docs/en/zos/2.5.0?topic=attributes-defining-shareoptions-rls-data-class#dorlsadc). 
 7. Optionally create SMS management classes (MGMTCLAS) to provide backup and data retention requirements for the EzNoSQL data. Provide the name of the MGMTCLAS to the application architect for use when defining the database, or it can be assigned dynamically by the system through the use of SMS Access Control System (ACS) (link).
 
-## Application_Requirements:
+## Application Requirements:
 
 Contact your system administrator for requirements when creating EzNoSQL databases:
 1. High level qualifier(s) for database names
@@ -227,9 +227,9 @@ Contact your system administrator for requirements when creating EzNoSQL databas
 3. DATACLAS name if not assigned by the system for optional features (i.e. encryption, compression, storing data in the CF global cache) if required by the application
 4. MGMTCLAS name if not assigned by the system for application requirements related to data backup frequency and data retention   
 
-# Performance_Considerations
+# Performance Considerations
 
-## In_Memory_Caching
+## In Memory Caching
 
 EzNoSQL databases are accessed via the Record Level Sharing (RLS) function on the z/OS servers. RLS provides a 3 tier storage hierarchy which includes: 
  1. local real memory buffering
@@ -276,7 +276,7 @@ To compile and link the sample program `/samples/ibm/igwznsqsamp1.c`:
 xlc -c -qDLL -qcpluscmt -qLSEARCH="//'SYS1.SCUNHF'" igwznsqsamp1.c 
 xlc -o igwznsqsamp1 igwznsqsamp1.o -W l,DLL libigwznsqd31.x        
 
-# Application_Programming_Tiers 
+# Application Programming Tiers 
 
 The following section lists the EzNoSQL Application Programming Interfaces (APIs) available to the application architect. The APIs are classified in four tiers:
 1. *Data Management* - APIs to create, destroy, disable, and report on the EzNoSQL databases and associated indexes.  
