@@ -23,10 +23,10 @@ Performance Considerations:
 
 Getting Started:
 * [Getting Started with EzNoSQL](#Getting-Started) 
-* [EzNoSQL Executables and Side Decks](#Executables_and_Side_Files)
-* [Sample IBM XL C/C++ Procedure](#Sample_Application_Program)
-* [Sample Application Program](#Compile_and_Link)
-* [Sample IBM XL C/C++ Procedure](#Sample_Application_Program)
+* [EzNoSQL Executables and Side Decks](#Executables-and-Side-Files)
+* [Sample IBM XL C/C++ Procedure](#Sample-Application-Program)
+* [Sample Application Program](#Compile-and-Link)
+* [Sample IBM XL C/C++ Procedure](#Sample-Application-rogram)
 
 Application Programming Interfaces (APIs)
 * [Application Programming Tiers](#Application_Programming_Tiers)
@@ -246,7 +246,7 @@ Optionally, the loading of data into the CF cache may be bypassed and reduce ove
 
 The EzNoSQL APIs can be called from application user programs running in either 31-bit or 64-bit mode.  The user programs can link to the required executables and side decks directly from z/OS USS directories.  This section explains the required files along with their location and description. Additionally, a sample user program, containing compile and link instructions, is provided to help test the system configuration and to gain familiarity with a subset of the available APIs.  The full suite of available APIs are detailed in the following sections.
 
-## Executables_and_Side_Decks 
+## Executables and Side Decks 
 
 The following table shows the names and locations of the EzNoSQL executables, side decks, and sample program:
 
@@ -259,18 +259,18 @@ The following table shows the names and locations of the EzNoSQL executables, si
 | `znsqdb.h`          | `/usr/include/zos/`   | EzNoSQL Header File |    
 | `igwznsqsamp1.c`    | `/samples/ibm/`       | Sample 31-bit application program |    
 
-## Sample_Application_Program
+## Sample Application Program
 
 Sample user program: /samples/ibm/igwznsqsamp1.c, is a 31-bit user program which does the following sequence of API calls:
 1)  Create a one megabyte JSON (non-recoverable) EzNoSQL database with a primary key of `"_id"`.
 3)  Create a one megabyte non-unique secondary index with a key of `"Author"`.
 4)  Connect (open) the database.
-5)  Insert 3 documents with identical key values for `"Author":"J. R. R. Tolkien"`.
+5)  Insert three documents with identical key values for `"Author":"J. R. R. Tolkien"`.
 6)  Position to the top of the secondary index and read all three documents sequentially. 
 7)  Disconnect (close) the data base.
 8)  Destroy the database.
 
-## Compile_and_Link
+## Compile and Link
 
 To compile and link the sample program `/samples/ibm/igwznsqsamp1.c`:                           
 xlc -c -qDLL -qcpluscmt -qLSEARCH="//'SYS1.SCUNHF'" igwznsqsamp1.c 
