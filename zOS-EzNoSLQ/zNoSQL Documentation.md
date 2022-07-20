@@ -22,11 +22,11 @@ Performance Considerations:
 * [In Memory Caching](#In_Memory_Caching)
 
 Getting Started:
-* [Getting Started with EzNoSQL](#Getting Started) 
-* [EzNoSQL Executables and Side Files](#Executables and Side Files)
-* [Sample IBM XL C/C++ Procedure](#Sample Application Program)
-* [Sample Application Program](#Compile and Link)
-* [Sample IBM XL C/C++ Procedure](#Sample Application Program)
+* [Getting Started with EzNoSQL](#Getting%20Started) 
+* [EzNoSQL Executables and Side Files](#Executables%20and%20Side%20Files)
+* [Sample IBM XL C/C++ Procedure](#Sample%20Application%20Program)
+* [Sample Application Program](#Compile%20and%20Link)
+* [Sample IBM XL C/C++ Procedure](#Sample%20Application%20Program)
 
 Application Programming Interfaces (APIs)
 * [Application Programming Tiers](#Application_Programming_Tiers)
