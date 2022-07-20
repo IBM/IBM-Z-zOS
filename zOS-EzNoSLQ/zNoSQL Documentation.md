@@ -242,7 +242,7 @@ When a JSON document is written to the database, the buffer potentially containi
  
 Optionally, the loading of data into the CF cache may be bypassed and reduce overhead if global caching is not required (for example in a single LPAR configuration).  The RLSCFCACHE option in the SMS DATACLAS controls which buffers are loaded into the CF on behalf of the database.  When electing to cache data in the CF, separate cache structures can be assigned to different groups of databases.  Separate cache sturctures can provide more consistent performance by providing isolation from other RLS data.  Contact the z/OS Storage Administrator for caching requirements. 
 
-# Getting Started 
+# Getting%20Started 
 
 The EzNoSQL APIs can be called from application user programs running in either 31 or 64 bit mode.  The user programs can link to the required executables and side files directly from z/OS USS directories.  This section explains the required files along with their location and description. Additonally, a sample user program, containing compile and link instructions, is provided to help test the system configuration and to gain familarity with a subset of the available APIs.  The full suite of available APIs are detailed in the following sections.
 
