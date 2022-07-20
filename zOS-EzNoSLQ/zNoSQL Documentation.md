@@ -22,11 +22,11 @@ Performance Considerations:
 * [In Memory Caching](#In_Memory_Caching)
 
 Getting Started:
-* [Getting Started with EzNoSQL](# Getting%20Started) 
-* [EzNoSQL Executables and Side Files](#Executables%20and%20Side%20Files)
-* [Sample IBM XL C/C++ Procedure](#Sample%20Application%20Program)
-* [Sample Application Program](#Compile%20and%20Link)
-* [Sample IBM XL C/C++ Procedure](#Sample%20Application%20Program)
+* [Getting Started with EzNoSQL](#Getting%20Started) 
+* [EzNoSQL Executables and Side Files](#Executables_and_Side_Files)
+* [Sample IBM XL C/C++ Procedure](#Sample_Application_Program)
+* [Sample Application Program](#Compile_and_Link)
+* [Sample IBM XL C/C++ Procedure](#Sample_Application_Program)
 
 Application Programming Interfaces (APIs)
 * [Application Programming Tiers](#Application_Programming_Tiers)
@@ -246,7 +246,7 @@ Optionally, the loading of data into the CF cache may be bypassed and reduce ove
 
 The EzNoSQL APIs can be called from application user programs running in either 31 or 64 bit mode.  The user programs can link to the required executables and side files directly from z/OS USS directories.  This section explains the required files along with their location and description. Additonally, a sample user program, containing compile and link instructions, is provided to help test the system configuration and to gain familarity with a subset of the available APIs.  The full suite of available APIs are detailed in the following sections.
 
-## Executables and Side Files 
+## Executables_and_Side_Files 
 
 The following table shows the names and locations of the EzNoSQL executables, side files, and sample program:
 
@@ -259,7 +259,7 @@ The following table shows the names and locations of the EzNoSQL executables, si
 | znsqdb.h          | `text`     | /usr/include/zos/ | 64 bit x file |    
 | igwznsqsamp1.c    | `text`     | /samples/ibm/     | sample appliation program    
 
-## Sample Application Program
+## Sample_Application_Program
 
 Sample user program: /samples/ibm/igwznsqsamp1.c, is a 31bit user program which does the following sequence of API calls:
 1)  Create a one megabyte JSON (non-recoverable) EzNoSQL database with a primary key of `"_id"`.
@@ -270,7 +270,7 @@ Sample user program: /samples/ibm/igwznsqsamp1.c, is a 31bit user program which 
 7)  Disconnect (close) the data base.
 8)  Destroy the database.
 
-## Compile and Link
+## Compile_and_Link
 
 To compile and link sample program /samples/ibm/igwznsqsamp1.c:                           
 xlc -c -qDLL -qcpluscmt -qLSEARCH="//'SYS1.SCUNHF'" igwznsqsamp1.c 
