@@ -22,7 +22,7 @@ Performance Considerations:
 * [In Memory Caching](#In_Memory_Caching)
 
 Getting Started:
-* [Getting Started with EzNoSQL](#Getting%20Started) 
+* [Getting Started with EzNoSQL](# Getting%20Started) 
 * [EzNoSQL Executables and Side Files](#Executables%20and%20Side%20Files)
 * [Sample IBM XL C/C++ Procedure](#Sample%20Application%20Program)
 * [Sample Application Program](#Compile%20and%20Link)
