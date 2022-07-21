@@ -252,12 +252,12 @@ The following table shows the names and locations of the EzNoSQL executables, si
 
 | Member              | Location              | Description                           |
 | ------------------- | --------------------- | ------------------------------------- |
-| `libigwznsqd.so`    | `/usr/lib/ibm/`       | 31-bit API Library DLL |    
-| `libigwznsqd31.x`   | `/usr/lib/ibm/`       | 31-bit x side deck |   
-| `libigwznsqd64.so`  | `/usr/lib/ibm/`       | 64-bit API Library DLL |   
-| `libigwznsqd64.x`   | `/usr/lib/ibm/`       | 64-bit APIs | 
+| `libigwznsqd.so`    | `/usr/lib/IBM/`       | 31-bit API Library DLL |    
+| `libigwznsqd31.x`   | `/usr/lib/IBM/`       | 31-bit x side deck |   
+| `libigwznsqd64.so`  | `/usr/lib/IBM/`       | 64-bit API Library DLL |   
+| `libigwznsqd64.x`   | `/usr/lib/IBM/`       | 64-bit APIs | 
 | `znsqdb.h`          | `/usr/include/zos/`   | EzNoSQL Header File |    
-| `igwznsqsamp1.c`    | `/samples/ibm/`       | Sample 31-bit application program |    
+| `igwznsqsamp1.c`    | `/samples/IBM/`       | Sample 31-bit application program |    
 
 ## Sample Application Program
 
