@@ -272,9 +272,9 @@ Sample user program: /samples/ibm/igwznsqsamp1.c, is a 31-bit user program which
 
 ## Compile and Link
 
-To compile and link the sample program `/samples/ibm/igwznsqsamp1.c`:                           
-xlc -c -qDLL -qcpluscmt -qLSEARCH="//'SYS1.SCUNHF'" igwznsqsamp1.c 
-xlc -o igwznsqsamp1 igwznsqsamp1.o -W l,DLL libigwznsqd31.x        
+To compile and link the sample program `/samples/ibm/igwznsqsamp1.c`:  
+xlc -c -qDLL -qcpluscmt -qLSEARCH="//'SYS1.SCUNHF'" igwznsqsamp1.c   
+xlc -o igwznsqsamp1 igwznsqsamp1.o -W l,DLL /usr/lib/libigwznsqd31.x 
 
 # Application Programming Tiers 
 
