@@ -252,15 +252,15 @@ The following table shows the names and locations of the EzNoSQL executables, si
 
 | Member              | Location              | Description                           |
 | ------------------- | --------------------- | ------------------------------------- |
-| `libigwznsqd.so`    | `/usr/lib/IBM/`       | 31-bit API Library DLL |    
-| `libigwznsqd31.x`   | `/usr/lib/IBM/`       | 31-bit x side deck |   
-| `libigwznsqd64.so`  | `/usr/lib/IBM/`       | 64-bit API Library DLL |   
-| `libigwznsqd64.x`   | `/usr/lib/IBM/`       | 64-bit APIs | 
+| `libigwznsqd.so`    | `/usr/lib/`           | 31-bit API Library DLL |    
+| `libigwznsqd31.x`   | `/usr/lib/`           | 31-bit x side deck |   
+| `libigwznsqd64.so`  | `/usr/lib/`           | 64-bit API Library DLL |   
+| `libigwznsqd64.x`   | `/usr/lib/`           | 64-bit APIs | 
 | `znsqdb.h`          | `/usr/include/zos/`   | EzNoSQL Header File |    
-| `igwznsqsamp1.c`    | `/samples/IBM/`       | Sample 31-bit application program |    
+| `igwznsqsamp1.c`    | `/samples/`           | Sample 31-bit application program |    
 
 ## Sample Application Program
-
+ 
 Sample user program: /samples/ibm/igwznsqsamp1.c, is a 31-bit user program which does the following sequence of API calls:
 1)  Create a one megabyte JSON (non-recoverable) EzNoSQL database with a primary key of `"_id"`.
 3)  Create a one megabyte non-unique secondary index with a key of `"Author"`.
