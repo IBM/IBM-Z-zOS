@@ -663,7 +663,7 @@ Additional connections can be established as needed by the same user task, or ot
    C constant which will contain the connection token after a successful open.    
 
 `dsname` 
-   C string containing the name of the UTF-8 JSON c string providing the primary database name specified on a prior create or other system API.
+   C string containing the name of the primary database name specified on a prior create or other system API.
 
 `flags`
    1 (= (1 << 0)) indicates read only access is requested for this connection.  Read level security access to the database will be checked, and all write requests will fail. 
