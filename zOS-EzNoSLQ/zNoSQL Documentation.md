@@ -660,7 +660,7 @@ Additional connections can be established as needed by the same user task, or ot
 #### Parameters
 
 `znsq_connection_t` 
-   C constant which will contain the connection token after a successful open.    
+   C-constant which will contain the connection token after a successful open.    
 
 `dsname` 
    C-string containing the name of the primary database name specified on a prior create or other system API.
@@ -763,7 +763,7 @@ of znsq_close_result APIs.  For non-recoverable databases, the lock will be rele
 #### Parameters
 
 `znsq_connection_t` 
-   C constant contains the connection token from a previous znsq_open.    
+   C-constant contains the connection token from a previous znsq_open.    
 
 `buf` 
    contains a buffer to receive the JSON document following a success read.
@@ -855,7 +855,7 @@ Issues a request to locate a specific key value (or a key value greater than or 
 #### Parameters
 
 `znsq_connection_t` 
-   C constant contains the connection token from a previous znsq_open.  
+   C-constant contains the connection token from a previous znsq_open.  
    
 `znsq_result_set_t'
 `   int32_t token returned following the successful completion of the API and used for subsequent read, update, or delete result APIs.    
@@ -922,7 +922,7 @@ The read request can opt to retrieve the documents for update which will obtain 
 #### Parameters
 
 `znsq_connection_t` 
-   C constant contains the connection token from a previous znsq_open. 
+   C-constant contains the connection token from a previous znsq_open. 
    
 `znsq_result_set_t'
 `   int32_t token returned from a previous successful znsq_position or znsq_next_result.       
@@ -985,7 +985,7 @@ Ends positioning into the EzNoSQL database previously established by the znsq_po
 #### Parameters
 
 `znsq_connection_t` 
-   C constant contains the connection token from a previous znsq_open.    
+   C-constant contains the connection token from a previous znsq_open.    
 
 `znsq_result_set_t'
 `   int32_t token returned from previous znsq_position.    
@@ -1032,7 +1032,7 @@ If the auto-commit option is active for the connection, then a commit will be is
 #### Parameters
 
 `znsq_connection_t` 
-   C constant contains the connection token from a previous znsq_open.    
+   C-constant contains the connection token from a previous znsq_open.    
 
 `buf` 
    contains the JSON document followed by an ending delimter of x'00'.
@@ -1109,7 +1109,7 @@ If the auto-commit option is active for the connection, then a commit will be is
 #### Parameters
 
 `znsq_connection_t` 
-   C constant contains the connection token from a previous znsq_open.  
+   C-constant contains the connection token from a previous znsq_open.  
    
 `key` 
    C-string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
@@ -1163,7 +1163,7 @@ If the auto-commit option is active for the connection, then a commit will be is
 #### Parameters
 
 `znsq_connection_t` 
-   C constant contains the connection token from a previous znsq_open.
+   C-constant contains the connection token from a previous znsq_open.
    
 `znsq_result_set_t'
 `   int32_t token returned from a previous successful completion of a znsq_read or znsq_next_result with the update options specified.         
@@ -1207,7 +1207,7 @@ If the auto-commit option is active for the connection, then a commit will be is
 #### Parameters
 
 `znsq_connection_t` 
-   C constant contains the connection token from a previous znsq_open.    
+   C-constant contains the connection token from a previous znsq_open.    
 
 `newbuf` 
    contains a copy of the updated document to replace the existing version of the document.  All secondary indexes will be updated to relect any alternate key changes found in the  new version of the document.
@@ -1273,7 +1273,7 @@ If the auto-commit option is active for the connection, then a commit will be is
 #### Parameters
 
 `znsq_connection_t` 
-   C constant contains the connection token from a previous znsq_open. 
+   C-constant contains the connection token from a previous znsq_open. 
    
 `znsq_result_set_t'
 `   int32_t token returned by a previous znsq_read with the update option or znsq_next_result.       
@@ -1327,7 +1327,7 @@ Issues a commit to end the current transaction and release document level locks.
 #### Parameters
 
 `znsq_connection_t` 
-   C constant contains the connection token from a previous znsq_open. 
+   C-constant contains the connection token from a previous znsq_open. 
    
 #### Return value
 The return code of the function. 
@@ -1361,7 +1361,7 @@ Updates the connection to the database to enable or disable the auto commit opti
 #### Parameters
 
 `znsq_connection_t` 
-   C constant contains the connection token from a previous znsq_open. 
+   C-constant contains the connection token from a previous znsq_open. 
    
 `options`
    Pointer to an object of type [`znsq_commit_options`](znsq_commit_options), where the set autocommit options are provided.   
@@ -1409,7 +1409,7 @@ Issues an abort to end the current transaction, restore updated documents to the
 #### Parameters
 
 `znsq_connection_t` 
-   C constant contains the connection token from a previous znsq_open. 
+   C-constant contains the connection token from a previous znsq_open. 
    
 #### Return value
 The return code of the function. 
