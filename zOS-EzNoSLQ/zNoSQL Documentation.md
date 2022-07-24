@@ -300,7 +300,7 @@ Creates a EzNoSQL primary index database with the name specified in parameter *d
 ​
 #### Parameters
 `dsname`
-   C string containing the name of the database. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $).  The remaining seven characters are either alphabetic, numeric (0 - 9), national, a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.DATA. 
+   C-string containing the name of the database. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $).  The remaining seven characters are either alphabetic, numeric (0 - 9), national, a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.DATA. 
 ​
 `options`
    Pointer to an object of type [`znsq_create_options`](znsq_create_options), where the database attributes are provided.
@@ -324,11 +324,11 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | avg_doc_size      | `int`                         | Average size of all documents in the database.  Providing an accurate size as close as possible may improve                     performance when reading/writing to the database.  A zero value will result in a default physical blocksize of 32768.|     
 | update_percent    | `int`                         | Percentage of actual update requests compared to writes (inserts) and deletes.  Used inconjuntion with a non-zero                          avg_doc_size will further aid in read/write performace by optimizing the physical blocksize by EzNoSQL. |                  
 | znsq_log_options  | `enum`                        | Database recovery option: </br>0 indicates the database is non-recoverable (NONE). This is the default option.</br>2 indicates the database is recoverable (UNDO) and supports backout logging only.</br>3 indicates the database is recoverable (ALL) and supports both backout and forward recovery logging.</br>Refer to section Non-Recoverable vs Recoverable Database for information on this option. |
-| primary_key       | `char`                        | UTF-8 JSON c string providing the primary keyname for the database. The string must be < 256 bytes including quotes, and end with one byte of x'00'.  The keyname may consist of a multi level name.  Omitting the keyname results in auto generated keys. Refer to sections Multi Level Keynames and Primary Keyed vs Auto Generated Keys for more information on these options. |                                                               
-| storclas          | `char`                        | C string in EBCIDC (maximum of 8 characters) for the required system storage class name (STORCLAS). </br>Refer to section System Administration Requirements for more information on this option. |
-| mgmtclas          | `char`                        | C string in EBCIDC (maximum of 8 character) for the optional system management class name (MGMTCLAS).</br>Refer to section System Administration Requirements for more information on this option. |
-| dataclas          | `char`                        | C string in EBCIDC (maximum of 8 characters) for the optional system management data class name (DATACLAS).</br>Refer to the section System Administration Requirements for more information on this option. |
-| logstreamId       | `char`                        | C string in EBCIDC (maximum of 26 characters) for the optional forwards recovrey log stream.  Required when znsq_log_option = 3 (ALL) is specified. |
+| primary_key       | `char`                        | UTF-8 JSON C-string providing the primary keyname for the database. The string must be < 256 bytes including quotes, and end with one byte of x'00'.  The keyname may consist of a multi level name.  Omitting the keyname results in auto generated keys. Refer to sections Multi Level Keynames and Primary Keyed vs Auto Generated Keys for more information on these options. |                                                               
+| storclas          | `char`                        | C-string in EBCIDC (maximum of 8 characters) for the required system storage class name (STORCLAS). </br>Refer to section System Administration Requirements for more information on this option. |
+| mgmtclas          | `char`                        | C-string in EBCIDC (maximum of 8 character) for the optional system management class name (MGMTCLAS).</br>Refer to section System Administration Requirements for more information on this option. |
+| dataclas          | `char`                        | C-string in EBCIDC (maximum of 8 characters) for the optional system management data class name (DATACLAS).</br>Refer to the section System Administration Requirements for more information on this option. |
+| logstreamId       | `char`                        | C-string in EBCIDC (maximum of 26 characters) for the optional forwards recovrey log stream.  Required when znsq_log_option = 3 (ALL) is specified. |
 
 Example of creating a keyed EzNoSQL database:
 ```
@@ -363,7 +363,7 @@ Creates a secondary index with for the name specified in parameters *altname*, u
 #### Parameters
   
  `alternate_key` 
-   C string containing the name of the UTF-8 JSON c string providing the secondary keyname for the index. The string must be < 256 bytes including quotes and end in one byte of x'00'.  The keyname may consists of a multi level name.  Refer to section Multi Level Keynames for more information on this option. 
+   C-string containing the name of the UTF-8 JSON C-string providing the secondary keyname for the index. The string must be < 256 bytes including quotes and end in one byte of x'00'.  The keyname may consists of a multi level name.  Refer to section Multi Level Keynames for more information on this option. 
    
  `flags`
    1 (= (1 << 0)) indicates the creation of a unique index. Non-Unique indexes may contain alternate keys representing one or more documents, while unique indexes ensure only one document is represented by each key.  Attempting to insert duplicate documents with the same alternate key into a unique index will result in a
@@ -390,9 +390,9 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | ----------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | version           | `int`                         | API version.                                                                                                         |
 | base_name         | `char`                        | Primary index database name specified on the associated znsq_create.                                                 |
-| aix_name          | `char`                        | C string containing the name of the secondary index. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0-9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.AIX1.|
-| path_name         | `char`                        | C string containing the path name of the secondary index. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.PATH1. |
-| dataclas          | `char`                        | C string in EBCIDC (maximum of 8 characters) for the optional system management data class name (DATACLAS).</br>Refer to the section System Administration Requirements for more information on this option. |
+| aix_name          | `char`                        | C-string containing the name of the secondary index. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0-9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.AIX1.|
+| path_name         | `char`                        | C-string containing the path name of the secondary index. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.PATH1. |
+| dataclas          | `char`                        | C-string in EBCIDC (maximum of 8 characters) for the optional system management data class name (DATACLAS).</br>Refer to the section System Administration Requirements for more information on this option. |
 | max_space         | `int`                         | Maximum space of database in mega bytes.                                                                             |
 | znsq_integrity    | `enum`                        | Read integrity option:</br>0indicates no read integrity (NRI).</br>1 indicates consist read (CR).</br>2 indicates consistent read extended (CRE).</br>Refer to section Non-Recoverable vs Recoverable Databases for information on this option.|                                                                      |
 
@@ -438,7 +438,7 @@ Destroys a EzNoSQL primary and/or secondary index databases previously created w
 ​
 #### Parameters
 `dsname`
-   C string containing the name of the previously created EzNoSQL database. 
+   C-string containing the name of the previously created EzNoSQL database. 
  
 #### Return value
 The return code of the function.  
@@ -484,8 +484,8 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | member            | type                          | description                                                                                                          |
 | ----------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | version           | `int`                         | API version.                                                                                                         |
-| base_name         | `char`                        | C string containing the name of the primary index. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.DATA. |
-| aix_name          | `char`                        | C string containing the name of the secondary index. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.AIX1. |
+| base_name         | `char`                        | C-string containing the name of the primary index. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.DATA. |
+| aix_name          | `char`                        | C-string containing the name of the secondary index. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.AIX1. |
 |                                                                                                                                                                          |
 
 Example of creating a non unique secondary index with descending access:
@@ -517,7 +517,7 @@ Disables (drops) a EzNoSQL secondary index across the sysplex.  When disabled, a
 
 #### Parameters
 `dsname`
-   C string containing the name of the previously added EzNoSQL index by the znsq_add_index API. 
+   C-string containing the name of the previously added EzNoSQL index by the znsq_add_index API. 
  
 #### Return value
 The return code of the function. 
@@ -533,7 +533,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | member            | type                          | description                                                                                                          |
 | ----------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | version           | `int`                         | API version.                                                                                                         |
-| base_name          | `char`                        | C string containing the name of the database. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.AIX1. |
+| base_name          | `char`                        | C-string containing the name of the database. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.AIX1. |
 |                                                                                                                                                                          |
 
 
@@ -663,7 +663,7 @@ Additional connections can be established as needed by the same user task, or ot
    C constant which will contain the connection token after a successful open.    
 
 `dsname` 
-   C string containing the name of the primary database name specified on a prior create or other system API.
+   C-string containing the name of the primary database name specified on a prior create or other system API.
 
 `flags`
    1 (= (1 << 0)) indicates read only access is requested for this connection.  Read level security access to the database will be checked, and all write requests will fail. 
@@ -773,7 +773,7 @@ of znsq_close_result APIs.  For non-recoverable databases, the lock will be rele
    returned to the caller along with the required buffer length.  
 
 `key` 
-   C string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
+   C-string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
 
 `key_value` 
    value for the specific document to be retrieved.  
@@ -861,10 +861,10 @@ Issues a request to locate a specific key value (or a key value greater than or 
 `   int32_t token returned following the successful completion of the API and used for subsequent read, update, or delete result APIs.    
 
 `key` 
-   C string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
+   C-string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
 
 `key_value` 
-   C string containing the value for the specific document to be retrieved.
+   C-string containing the value for the specific document to be retrieved.
 
 `znsq_search_method`  
    1  indicates that the first (or last) document equal to specified key_value should be located for subsequent sequential retrieves/updates/deletes.
@@ -1057,7 +1057,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | member            | type                          | description                                                                                                          |
 | ----------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | version           | `int`                         | API version.                                                                                                         |
-| key_name          | `char`                        | C string containing the keyname used on the znsq_create or znsq_create_index including an ending delimiter of x'00'; | 
+| key_name          | `char`                        | C-string containing the keyname used on the znsq_create or znsq_create_index including an ending delimiter of x'00'; | 
 | autokey_buffer    | `char`                        | Mimimum buffer of 120 bytes to receive the generated key for auto generated EzNoSQL databases.                       |
 | autokey_length    | 'char'                        | Length of the returned auto generated key.                                                                           |                                                                                                                                                                  |                                                                                                                                                              
 	
@@ -1112,7 +1112,7 @@ If the auto-commit option is active for the connection, then a commit will be is
    C constant contains the connection token from a previous znsq_open.  
    
 `key` 
-   C string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
+   C-string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
 
 `key_value` 
    value for the specific document to be retrieved.     
@@ -1213,7 +1213,7 @@ If the auto-commit option is active for the connection, then a commit will be is
    contains a copy of the updated document to replace the existing version of the document.  All secondary indexes will be updated to relect any alternate key changes found in the  new version of the document.
 
 `key` 
-   C string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
+   C-string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
 
 `key_value` 
    value for the specific document to be retrieved.  
