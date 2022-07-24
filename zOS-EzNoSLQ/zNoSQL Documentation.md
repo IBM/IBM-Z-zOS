@@ -195,7 +195,7 @@ The recoverablity of a database determines the duration of the locking and the t
 
 * Recoverable database are created using the log options(UNDO or ALL) parameter.  When the database is created with the UNDO or ALL option, the document level locks (exclusive or CRE shared locks) are held for the duration of the transaction and only released after a successful commit or abort.  A transaction is started and assigned a unit of work (UOW) id when the first update is made to any EzNoSQL database under the current task.  The transaction can then be explicitly committed or backed out by the application via the EzNoSQL APIs.  Following a commit or abort, the next update will start a new transaction id.
  
-For recoverable databases, an optional autocommit can be requested by the application at open/connection time.  The autocommit option will generate a commit after every update.  Autocommit is active by default at open time, however, the option can be switched on or off at any time while the task is connected to the database. Note that frequent committing can cause additional overhead when updating the database, while in-frequent commiting can cause record lock contention with other sharers of the database.  
+For recoverable databases, an optional autocommit can be requested by the application at open/connection time.  The autocommit option will generate a commit after every update.  Autocommit is active by default at open time, however, the option can be switched on or off at any time while the task is connected to the database. Note that frequent commits can cause additional overhead when updating the database, while in-frequent commits can cause record lock contention with other sharers of the database.  
 
 If the task ends normally without a commit for the last transaction, an implicit commit will be issued by EzNoSQL. If the task ends abnormally without a commit following the last transaction, an implicit backed out will be issue by EzNoSQL.  Transactions which fail to abort will be shunted, and the locks owned by the transaction will be retained until the issue preventing the abort is resolved.  Using the log options ALL parameter adds forward recovery logging for the database and requires a forward recovery log to be assigned to the database.
 
@@ -293,14 +293,14 @@ APIs in the Data Management section must run in task mode and non cross memory m
 
 ### znsq_create
 
-`int znsq_create( const char * dsname, const znsq_create_options * options );`
+`int znsq_create(const char * dsname, const znsq_create_options * options );`
 
 #### Create EzNoSQL Database
 Creates a EzNoSQL primary index database with the name specified in parameter *dsname* using the attributes that are specified by the *options* parameter. Note that EzNoSQL databases can also be created through other system APIs and are compatible and sharable with the EzNoSQL APIs.  
 ​
 #### Parameters
 `dsname`
-   C string containing the name of the primary index. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $).  The remaining seven characters are either alphabetic, numeric (0 - 9), national, a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.DATA. 
+   C string containing the name of the database. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $).  The remaining seven characters are either alphabetic, numeric (0 - 9), national, a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.DATA. 
 ​
 `options`
    Pointer to an object of type [`znsq_create_options`](znsq_create_options), where the database attributes are provided.
@@ -355,14 +355,14 @@ Example of creating a keyed EzNoSQL database:
 
 ### znsq_create_index
 
-`int znsq_create_index(const char *altname, const char *altkey, const char *dsname, const char *pathname, unsigned int flags, const znsq_create_index_options *options);`
-
+`int znsq_create_index(const char *alternate_key, unsigned int flags,const znsq_create_index_options *options) `   
+                   
 #### Create EzNoSQL Secondary Index
 Creates a secondary index with for the name specified in parameters *altname*, using a keyname of *altkey*.  The database to be associated with this index is specifed in the *dsname* parameter.  Together, the secondary index and database are assoicated by the *pathname* parameter.  The pathname is used internally by EzNoSQL to identify the correct association of the secondary index to its base database. The secondary index is created in an inactive state, and must activated via the znsq_add_index API before attempting to access documents via the specified altkeys. For EzNoSQL databases created as recoverable (znsq_log_options=UNDO/ALL), a commit will be issued for any active transation following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.
 
 #### Parameters
   
- `altkey` 
+ `alternate_key` 
    C string containing the name of the UTF-8 JSON c string providing the secondary keyname for the index. The string must be < 256 bytes including quotes and end in one byte of x'00'.  The keyname may consists of a multi level name.  Refer to section Multi Level Keynames for more information on this option. 
    
  `flags`
@@ -513,7 +513,7 @@ Example of creating a non unique secondary index with descending access:
 `int znsq_drop_index(const znsq_drop_index_options *options);`
 
 #### Disable a secondary index
-Disables (drops) a EzNoSQL secondary index across the sysplex.  When disabled, access is prevented for reads and writes until such a time as the index is re-enabled via the znsq_add_index command.  Note that disabling an index will effect all sharers of the database including those access by EzNoSQL and other system APIs. 
+Disables (drops) a EzNoSQL secondary index across the sysplex.  When disabled, access is prevented for reads and writes until such a time as the index is re-enabled via the znsq_add_index command.  Note that disabling an index will effect all sharers of the database including those accessed by EzNoSQL and other system APIs. 
 
 #### Parameters
 `dsname`
@@ -533,7 +533,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | member            | type                          | description                                                                                                          |
 | ----------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | version           | `int`                         | API version.                                                                                                         |
-| aix_name          | `char`                        | C string containing the name of the secondary index. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.AIX1. |
+| base_name          | `char`                        | C string containing the name of the database. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.AIX1. |
 |                                                                                                                                                                          |
 
 
@@ -754,8 +754,8 @@ APIs in the Data Retrieval section provide direct and sequential retrievals/upda
 `int znsq_read(znsq_connection_t con, const char *buf, size_t *buf_len, const char *key, const char *key_value, unsigned int flags, znsq_read_options *options);`
 
 #### direct read documents 
-Issues a direct read for a previously added document using the key name and key_value specified on the read request.  The key name must match the key name on a previously issued znsq_create, znsq_create_index, or a generated "znsq_id" elememt. The value must match a previously added key_value paired with the specified
-keyname, otherwise a document not found error is returned.  
+Issues a direct read for a previously added document using the key name and key_value specified on the read request.  The key name must match the name on a previously issued znsq_create, znsq_create_index, or a generated "znsq_id" element. The value must match a previously added key_value paired with the specified
+key, otherwise a document not found error is returned.  
 
 The read request can opt to retrieve the document for update which will obtain an exclusive lock and return a result set token representing ownership of the lock.  The result set token must then be used to issue an update, delete, or end result for the document via znsq_update_result, znsq_delete_result,
 of znsq_close_result APIs.  For non-recoverable databases, the lock will be released following the update or delete request.  For recoverable databases, the lock will be released by the znsq_commit or znsq_abort APIs.  
@@ -850,7 +850,7 @@ Example of reading a document from a EzNoSQL database:
 	    
 			
 #### Position to a key within the EzNoSQL database 
-Issues a request to locate a specific key value (or a key value greater than or equal to) the desired key range. When the key value length is zero, positioning will be to the first or last document in the database based on the search order parameter: a search order (specifed with the znsq_open API)Ez of forward (default) will position to the first document, while backward will position to the last document. Following a successful position, a result_set token is returned which is then used as input for subsequent sequential retrieves or updates/deletes.  Positioning is therefore required prior to issuing the znsq_next_result, znsq_update_result, or the znsq_delete_result APIs.  Postioning can be terminated by using the znsq_close_result API.
+Issues a request to locate a specific key value (or a key value greater than or equal to) the desired key range. When the key value length is zero, positioning will be to the first or last document in the database based on the search order parameter: a search order (specifed with the znsq_open API)Ez of forward (default) will position to the first document, while backward will position to the last document. Following a successful position, a result_set token is returned which is then used as input for subsequent sequential retrieves or updates/deletes.  Positioning is therefore required prior to issuing the znsq_next_result, znsq_update_result, or the znsq_delete_result APIs.  Postioning should be terminated by using the znsq_close_result API in order to release the result_set.
             
 #### Parameters
 
@@ -867,7 +867,7 @@ Issues a request to locate a specific key value (or a key value greater than or 
    C string containing the value for the specific document to be retrieved.
 
 `znsq_search_method`  
-   1  indicates that the first (or last) document equal to specified key_value should be located for subsquent sequential retrieves/updates/deletes.
+   1  indicates that the first (or last) document equal to specified key_value should be located for subsequent sequential retrieves/updates/deletes.
    2  indicates that the first (or last) document greater than or equal to the specified key_value should be located for sequential retrieves/updates/deletes.
 
 `flags`
@@ -1197,7 +1197,7 @@ Example of a delete result for a document from a EzNoSQL database:
 `int znsq_update(znsq_connection_t con, const char *newbuf,const char *key, const char *key_value);`
 			  
 #### direct update documents 
-Issues a direct update for a previously added document using the requested keyname and key_value, and providing the updated version of the document.  The keyname must match the keyname on a previously issued znsq_create, znsq_create_index, or a generated "znsq_id" elememt. The value must match a previously added value paired with the specified
+Issues a direct update for a previously added document using the requested keyname and key_value, and providing the updated version of the document.  The keyname must match the keyname on a previously issued znsq_create, znsq_create_index, or a generated "znsq_id" element. The value must match a previously added value paired with the specified
 keyname, otherwise a document not found error is returned.  
 
 An exclusive document level lock will be obtained for the update request.  For non-recoverable databases, the lock will be released immediately following the request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends. 
@@ -1266,7 +1266,7 @@ Example of updating a document in a EzNoSQL database:
 `int znsq_update_result(znsq_connection_t con, znsq_result_set_t result, const char *buf, size_t buf_len);`
 			  
 #### Update Documents after Reads for Update  
-Updates existing documents previously retrieved by a (direct) znsq_read or a (sequential) znsq_next_result with the update options specified. An exclusive document level lock was obtained by the read requests.  For non-recoverable databases, the lock will be released immediately following the updatee result request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends. 
+Updates existing documents previously retrieved by a (direct) znsq_read or a (sequential) znsq_next_result with the update options specified. An exclusive document level lock was obtained by the read requests.  For non-recoverable databases, the lock will be released immediately following the update result request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends. 
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful update.   
              
@@ -1276,7 +1276,7 @@ If the auto-commit option is active for the connection, then a commit will be is
    C constant contains the connection token from a previous znsq_open. 
    
 `znsq_result_set_t'
-`   int32_t token returned by a previous znsq_read with the update option.       
+`   int32_t token returned by a previous znsq_read with the update option or znsq_next_result.       
 
 `buf` 
    Contains a copy of the updated document to replace the existing version of the document.  All secondary indexes will be updated to relect any alternate key changes found in the  new version of the document.
@@ -1356,7 +1356,7 @@ Example of commiting transactions for a EzNoSQL database:
 `int znsq_set_autocommit(znsq_connection_t con, const znsq_commit_options *options);`
   
 #### Enable/Disable Auto Commit 
-Updates the connection to the database to enable or disable the auto commit option.  When enabled, EzNoSQL will issue a commit after every update. Commiting after every update request can incur overhead compared to optimizing commits for larger groups of updates. Conversely, commiting to infrequently can impact other sharers of the database from accessing the locked documents.  
+Updates the connection to the database to enable or disable the auto commit option.  When enabled, EzNoSQL will issue a commit after every update. Commits after every update request can incur overhead compared to optimizing commits for larger groups of updates. Conversely, commiting to infrequently can impact other sharers of the database from accessing the locked documents.  
                
 #### Parameters
 
