@@ -124,7 +124,7 @@ Documents may also be retreived or updated through the use of secondary (alterna
 
 When creating a secondary index, the application developer assigns the alternate keyname which contains the value to be used as the alternate key. The alternate keynames must be less than 256 characters, however the paired values are not restricted. Secondary indexes must be physically created while the database is fully disconnected (closed), however the activation or deactivation can ocur dynmaically while the database is connected (open) and in use. Consideration should be given when creating secondary indexes, as each additional active index will incur overhead when updating he database.
 
-Assume a EzNoSQL database is created with a primary keyname of "Customer_id", and a secondary index with an alternate keyname of "Address", and contains the following document:
+Assume an EzNoSQL database is created with a primary keyname of "Customer_id", and a secondary index with an alternate keyname of "Address", and contains the following document:
 ```
 {
  "Customer_id":"4084",
@@ -296,7 +296,7 @@ APIs in the Data Management section must run in task mode and non cross memory m
 `int znsq_create(const char * dsname, const znsq_create_options * options );`
 
 #### Create EzNoSQL Database
-Creates a EzNoSQL primary index database with the name specified in parameter *dsname* using the attributes that are specified by the *options* parameter. Note that EzNoSQL databases can also be created through other system APIs and are compatible and sharable with the EzNoSQL APIs.  
+Creates an EzNoSQL primary index database with the name specified in parameter *dsname* using the attributes that are specified by the *options* parameter. Note that EzNoSQL databases can also be created through other system APIs and are compatible and sharable with the EzNoSQL APIs.  
 ​
 #### Parameters
 `dsname`
@@ -434,7 +434,7 @@ Example of creating a non unique secondary index with descending access:
 `int znsq_destroy(const char *dsname);`
 
 #### Destroy EzNoSQL Database
-Destroys a EzNoSQL primary and/or secondary index databases previously created with the name specified in parameter *dsname*.  A znsq_close must be issued for all previous opens whether issued via EzNoSQL or other API's sharing the database.
+Destroys an EzNoSQL primary and/or secondary index databases previously created with the name specified in parameter *dsname*.  A znsq_close must be issued for all previous opens whether issued via EzNoSQL or other API's sharing the database.
 ​
 #### Parameters
 `dsname`
@@ -447,7 +447,7 @@ If the database was destroyed, the return code is 0.
 
 If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
 
-Example of destroying a EzNoSQL:
+Example of destroying an EzNoSQL:
 ```
       char* dsname = "MY.JSON.DATA";                          //  Database name, "MY" qualifer assigned by the system administrator
            
@@ -513,7 +513,7 @@ Example of creating a non unique secondary index with descending access:
 `int znsq_drop_index(const znsq_drop_index_options *options);`
 
 #### Disable a secondary index
-Disables (drops) a EzNoSQL secondary index across the sysplex.  When disabled, access is prevented for reads and writes until such a time as the index is re-enabled via the znsq_add_index command.  Note that disabling an index will effect all sharers of the database including those accessed by EzNoSQL and other system APIs. 
+Disables (drops) an EzNoSQL secondary index across the sysplex.  When disabled, access is prevented for reads and writes until such a time as the index is re-enabled via the znsq_add_index command.  Note that disabling an index will effect all sharers of the database including those accessed by EzNoSQL and other system APIs. 
 
 #### Parameters
 `dsname`
@@ -537,7 +537,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 |                                                                                                                                                                          |
 
 
-Example of dropping a EzNoSQL index:
+Example of dropping an EzNoSQL index:
 ```
       char* dsname = "MY.JSON.AIX1";                         //  Seconday index name from znsq_add_index
       char* base_name = "MY.JSON.DATA;                       //  Associated database name for the primary index
@@ -652,8 +652,8 @@ APIs in the Connection Management section, must run in task mode and non cross m
 
 `int znsq_open(znsq_connection_t *con, const char *dsname, unsigned int flags, const struct znsq_open_options *options);`
 
-#### Establishes an open connection to a EzNoSQL database 
-Opens a EzNoSQL database by establishing a connection between the user's task and the database.  Additionally, the open API establishes the optional parameters to be used on behalf of this connection, such as read integrity, lock timeout, auto commit, read only, write force, and read access direction for the primary index:
+#### Establishes an open connection to an EzNoSQL database 
+Opens an EzNoSQL database by establishing a connection between the user's task and the database.  Additionally, the open API establishes the optional parameters to be used on behalf of this connection, such as read integrity, lock timeout, auto commit, read only, write force, and read access direction for the primary index:
 
 Additional connections can be established as needed by the same user task, or other tasks executing across the sysplex. Additional connections allow for the use of different options, or to load balance the workload across different processors.  A successful open returns a connection token which must be provided on other APIs for reading and writing to the database.
 
@@ -694,7 +694,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | znsq_boolean      | `enum`                        | The boolean auto commit option specifies if EzNoSQL will issue a commit after any type of update (write, update, erase), or a read integrity extended (CRE) request on behalf if the user. If this option is omitted, then commits will be performed by the system after each update or CRE read. Note that commits are required only for databases created with the log_options of undo or all, or for reads with the use of the CRE option. Commiting after every update request can incur overhead compared to optimizing commits for larger groups of updates. Conversely, commiting to infrequently can impact other sharers of the database from accessing the locked documents:</br>0 indicates auto commit (default)</br>1 indicates auto commit</br>2 indicates no auto commit</br>Refer to section Non-Recoverable vs Recoverable Databases for information on this option. |
 |                                                                                                                                                                          |
 
-Example of opening a EzNoSQL database:
+Example of opening an EzNoSQL database:
 ```
       char* base_name = "MY.JSON.DATA";                            //  Database name for primary index created with znsq_create
       znsq_connection_t connection = 0;                            //  Initialize returned connection token
@@ -733,7 +733,7 @@ Closes the connection to the EzNoSQL database previously established by a znsq_o
 
 znsq_connection_t      The znsq_connection_t represents the connection token previously returned by the znsq_open API.  
 
-Example of closing a EzNoSQL database:
+Example of closing an EzNoSQL database:
 ```
       return_code = znsq_close(connection);                        // Connection token returned by znsq_open       
 
@@ -801,7 +801,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | result_set        | `znsq_result_set_t`           | Returned when the update option is set in flags and to be used for subsequent znsq_update_result or znsq_erase_result APIs.|                                                                          
 |                                                                                                                                                                          |
 
-Example of reading a document from a EzNoSQL database:
+Example of reading a document from an EzNoSQL database:
 ```
      struct znsq_read_options read_options;
      unsigned int read_flags = 0;                                      //  Initialize read flags
@@ -881,7 +881,7 @@ If successful position, the return code is 0.
 If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 
 2 and 3 of the return code.
 
-Example of positioning to document from a EzNoSQL database:
+Example of positioning to document from an EzNoSQL database:
 ```
      char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};                 //  "_id" in utf-8  225F696422
      char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                     //  "01" 
@@ -948,7 +948,7 @@ If successful read, the return code is 0.
 If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 
 2 and 3 of the return code.
 
-Example of reading documents sequentially from a EzNoSQL database:
+Example of reading documents sequentially from an EzNoSQL database:
 ```
      unsigned int next_result_flags = 0;
      char *read_buf = calloc(200, 1);                                  //  Buffer for returned document
@@ -1102,7 +1102,7 @@ Example of writing a document to a keyed EzNoSQL database:
 `int znsq_delete(znsq_connection_t, const char *key, const char *key_value);`
 
 #### Delete Documents 
-Deletes (erases) existing documents from a EzNoSQL database using the provided primary or secondary key name and paired key_value.  An exclusive document level lock will be obtained for the delete request.  For non-recoverable datasets, the lock will be released immediately following the request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends. All secondary indexes will be updated to relect any alternate key deletions when the document is deleted.
+Deletes (erases) existing documents from an EzNoSQL database using the provided primary or secondary key name and paired key_value.  An exclusive document level lock will be obtained for the delete request.  For non-recoverable datasets, the lock will be released immediately following the request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends. All secondary indexes will be updated to relect any alternate key deletions when the document is deleted.
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful delete.   
 
@@ -1124,7 +1124,7 @@ If the database was created, the return code is 0.
 
 If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
 
-Example of deleting a document from a EzNoSQL database:  
+Example of deleting a document from an EzNoSQL database:  
 ```
       char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};            // "_id" in utf-8  225F696422 
       char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                // "01"
@@ -1175,7 +1175,7 @@ If the database was created, the return code is 0.
 
 If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
 
-Example of a delete result for a document from a EzNoSQL database:  
+Example of a delete result for a document from an EzNoSQL database:  
 ```
        return_code = znsq_delete_result(
         connection,
@@ -1226,7 +1226,7 @@ If successful read, the return code is 0.
 If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 
 2 and 3 of the return code.
 
-Example of updating a document in a EzNoSQL database:
+Example of updating a document in an EzNoSQL database:
 
       char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};            // "_id" in utf-8  225F696422
       char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                // "01"   
@@ -1292,7 +1292,7 @@ If successful read, the return code is 0.
 If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 
 2 and 3 of the return code.
 
-Example of updating a document in a EzNoSQL database:
+Example of updating a document in an EzNoSQL database:
 
       char update_buf[13] = {                                           //  Updated document (adds new element) 
         0x7B, 0x22, 0x5f, 0x69, 0x64, 0x22, 0x3A, 0x22, 0x30, 0x31, 0x22, 0x2C,
@@ -1337,7 +1337,7 @@ If successful commit, the return code is 0.
 If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 
 2 and 3 of the return code.
 
-Example of commiting transactions for a EzNoSQL database:
+Example of commiting transactions for an EzNoSQL database:
 ```
            
      return_code = znsq_commit(
@@ -1384,7 +1384,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | znsq_autocommit   | `enum`                        | Enable or disable auto commits:</br>0 indicates the auto commit option is disabled.</br>1 indicates the auto commit option is enabled. |                                                                                                                                                           
 |            
 
-Example of enabling auto commit for a EzNoSQL database:
+Example of enabling auto commit for an EzNoSQL database:
 ```
      commit_options.znsq_autocommit = 1;                            //  Enables auto commit  
                 
@@ -1419,7 +1419,7 @@ If successful abort, the return code is 0.
 If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 
 2 and 3 of the return code.
 
-Example of commiting transactions for a EzNoSQL database:
+Example of commiting transactions for an EzNoSQL database:
 ```
            
      return_code = znsq_abort(
