@@ -57,7 +57,7 @@ Document Management APIs:
 * [znsq_update_result](#znsq_update_result)
 * [znsq_commit](#znsq_commit)
 * [znsq_set_autocommit](#znsq_set_autocommit)
-* [znsq_backout](#znsq_backout)
+* [znsq_abort](#znsq_abort)
 
 Diagnostic Management APIs:
 * [znsq_last_result](#znsq-last-result)
@@ -193,11 +193,11 @@ The recoverablity of a database determines the duration of the locking and the t
 
 * Non-recoverable database are created using the default log options(NONE) parameter.  When the database is created with the NONE options, the document level locks are held only for the duration of the update or read.  For any type of update, the document level lock is obtained exclusively and protects the document from multiple (simultaneous) updates.  For reads, by default there is no read integrity (NRI).  With NRI, the latest version of the document is returned at the time of the read. Optionally shared locks may be obtained to provide a consist read which will protect a reader from viewing the document in the middle of an update. The shared locks may be obtained only for the duration of the read (CR) or for the duration of the transaction (CRE).  Obtaining shared locks may incur overhead and should be used only when required. 
 
-* Recoverable database are created using the log options(UNDO or ALL) parameter.  When the database is created with the UNDO or ALL option, the document level locks (exclusive or CRE shared locks) are held for the duration of the transaction and only released after a successful commit or backout.  A transaction is started and assigned a unit of work (UOW) id when the first update is made to any EzNoSQL database under the current task.  The transaction can then be explicitly committed or backed out by the application via the EzNoSQL APIs.  Following a commit or backout, the next update will start a new transaction id.
+* Recoverable database are created using the log options(UNDO or ALL) parameter.  When the database is created with the UNDO or ALL option, the document level locks (exclusive or CRE shared locks) are held for the duration of the transaction and only released after a successful commit or abort.  A transaction is started and assigned a unit of work (UOW) id when the first update is made to any EzNoSQL database under the current task.  The transaction can then be explicitly committed or backed out by the application via the EzNoSQL APIs.  Following a commit or abort, the next update will start a new transaction id.
  
 For recoverable databases, an optional autocommit can be requested by the application at open/connection time.  The autocommit option will generate a commit after every update.  Autocommit is active by default at open time, however, the option can be switched on or off at any time while the task is connected to the database. Note that frequent committing can cause additional overhead when updating the database, while in-frequent commiting can cause record lock contention with other sharers of the database.  
 
-If the task ends normally without a commit for the last transaction, an implicit commit will be issued by EzNoSQL. If the task ends abnormally without a commit following the last transaction, an implicit backed out will be issue by EzNoSQL.  Transactions which fail to backout will be shunted, and the locks owned by the transaction will be retained until the issue preventing the backout is resolved.  Using the log options ALL parameter adds forward recovery logging for the database and requires a forward recovery log to be assigned to the database.
+If the task ends normally without a commit for the last transaction, an implicit commit will be issued by EzNoSQL. If the task ends abnormally without a commit following the last transaction, an implicit backed out will be issue by EzNoSQL.  Transactions which fail to abort will be shunted, and the locks owned by the transaction will be retained until the issue preventing the abort is resolved.  Using the log options ALL parameter adds forward recovery logging for the database and requires a forward recovery log to be assigned to the database.
 
 
 # System Requirements 
@@ -281,7 +281,7 @@ xlc -o igwznsqsamp1 igwznsqsamp1.o -W l,DLL /usr/lib/libigwznsqd31.x
 The following section lists the EzNoSQL Application Programming Interfaces (APIs) available to the application architect. The APIs are classified in four tiers:
 1. *Data Management* - APIs to create, destroy, disable, and report on the EzNoSQL databases and associated indexes.  
 2. *Connection Management* - APIs to establish a connection to the EzNoSQL database, or disconnect the connection when access is no longer required.
-3. *Document Management* - APIs to write, delete, update, read, commit, and backout documents in the EzNoSQL databases.
+3. *Document Management* - APIs to write, delete, update, read, commit, and abort documents in the EzNoSQL databases.
 4. *Document Retrieval* - APIs to position within the database and sequentially browse the documents via associated indexes.
 
 ![image](https://media.github.ibm.com/user/329101/files/c6a48580-fc8a-11ec-8cad-87c06a2ba221)
@@ -653,7 +653,7 @@ APIs in the Connection Management section, must run in task mode and non cross m
 `int znsq_open(znsq_connection_t *con, const char *dsname, unsigned int flags, const struct znsq_open_options *options);`
 
 #### Establishes an open connection to a EzNoSQL database 
-Opens a EzNoSQL database by establishing a connection between the user's task and the database.  Additionally, the open API establishes the optional parameters to be used on behalf of this connection, such as read integrity, lock timeout, auto commit, read only, write force, and read access direction (for the primary index):
+Opens a EzNoSQL database by establishing a connection between the user's task and the database.  Additionally, the open API establishes the optional parameters to be used on behalf of this connection, such as read integrity, lock timeout, auto commit, read only, write force, and read access direction for the primary index:
 
 Additional connections can be established as needed by the same user task, or other tasks executing across the sysplex. Additional connections allow for the use of different options, or to load balance the workload across different processors.  A successful open returns a connection token which must be provided on other APIs for reading and writing to the database.
 
@@ -758,7 +758,7 @@ Issues a direct read for a previously added document using the key name and key_
 keyname, otherwise a document not found error is returned.  
 
 The read request can opt to retrieve the document for update which will obtain an exclusive lock and return a result set token representing ownership of the lock.  The result set token must then be used to issue an update, delete, or end result for the document via znsq_update_result, znsq_delete_result,
-of znsq_close_result APIs.  For non-recoverable databases, the lock will be released following the update or delete request.  For recoverable databases, the lock will be released by the znsq_commit or znsq_backout APIs.  
+of znsq_close_result APIs.  For non-recoverable databases, the lock will be released following the update or delete request.  For recoverable databases, the lock will be released by the znsq_commit or znsq_abort APIs.  
                
 #### Parameters
 
@@ -917,7 +917,7 @@ Example of positioning to document from a EzNoSQL database:
 #### sequential retrieval of documents by ascending/descending key value 
 Issues a sequential read for the next key value based on the search order specified in the znsq_open API. Prior to reading sequentially, a znsq_position must be issued to create the result_set token representing the starting key value.  The result_set token is used as input for each sequential read in order to receive the document in the user provided buffer. The znsq_close_result API is used to end the positioning into the key range. Note that depending on the read integrity option specified in the znsq_open API, shared locks maybe obtained for each retrievel, and for CRE held until a commit is issued.  
 
-The read request can opt to retrieve the documents for update which will obtain an exclusive lock. The result set token must then be used to issue an update, delete, or end result for the document via znsq_update_result, znsq_delete_result, or znsq_close_result APIs.  For non-recoverable databasess, the lock will be released following the update or delete request.  For recoverable databases, the lock will be released by the znsq_commit, znsq_backout APIs, or the end of the task.  
+The read request can opt to retrieve the documents for update which will obtain an exclusive lock. The result set token must then be used to issue an update, delete, or end result for the document via znsq_update_result, znsq_delete_result, or znsq_close_result APIs.  For non-recoverable databasess, the lock will be released following the update or delete request.  For recoverable databases, the lock will be released by the znsq_commit, znsq_abort APIs, or the end of the task.  
                
 #### Parameters
 
@@ -1102,7 +1102,7 @@ Example of writing a document to a keyed EzNoSQL database:
 `int znsq_delete(znsq_connection_t, const char *key, const char *key_value);`
 
 #### Delete Documents 
-Deletes (erases) existing documents from a EzNoSQL database using the provided primary or secondary key name and paired key_value.  An exclusive document level lock will be obtained for the delete request.  For non-recoverable datasets, the lock will be released immediately following the request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_backout, or when the task ends. All secondary indexes will be updated to relect any alternate key deletions when the document is deleted.
+Deletes (erases) existing documents from a EzNoSQL database using the provided primary or secondary key name and paired key_value.  An exclusive document level lock will be obtained for the delete request.  For non-recoverable datasets, the lock will be released immediately following the request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends. All secondary indexes will be updated to relect any alternate key deletions when the document is deleted.
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful delete.   
 
@@ -1156,7 +1156,7 @@ Example of deleting a document from a EzNoSQL database:
 `int znsq_delete_result(znsq_connection_t con, znsq_result_set_t result);`
 
 #### Delete Result 
-Deletes (erases) existing documents previously retrieved by a (direct) znsq_read or a (sequential) znsq_next_result with the update options specified. An exclusive document level lock was obtained by the read requests.  For non-recoverable datasets, the lock will be released immediately following the delete result request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_backout, or when the task ends. 
+Deletes (erases) existing documents previously retrieved by a (direct) znsq_read or a (sequential) znsq_next_result with the update options specified. An exclusive document level lock was obtained by the read requests.  For non-recoverable datasets, the lock will be released immediately following the delete result request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends. 
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful delete.   
 
@@ -1200,7 +1200,7 @@ Example of a delete result for a document from a EzNoSQL database:
 Issues a direct update for a previously added document using the requested keyname and key_value, and providing the updated version of the document.  The keyname must match the keyname on a previously issued znsq_create, znsq_create_index, or a generated "znsq_id" elememt. The value must match a previously added value paired with the specified
 keyname, otherwise a document not found error is returned.  
 
-An exclusive document level lock will be obtained for the update request.  For non-recoverable databases, the lock will be released immediately following the request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_backout, or when the task ends. 
+An exclusive document level lock will be obtained for the update request.  For non-recoverable databases, the lock will be released immediately following the request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends. 
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful update.   
                
@@ -1266,7 +1266,7 @@ Example of updating a document in a EzNoSQL database:
 `int znsq_update_result(znsq_connection_t con, znsq_result_set_t result, const char *buf, size_t buf_len);`
 			  
 #### Update Documents after Reads for Update  
-Updates existing documents previously retrieved by a (direct) znsq_read or a (sequential) znsq_next_result with the update options specified. An exclusive document level lock was obtained by the read requests.  For non-recoverable databases, the lock will be released immediately following the updatee result request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_backout, or when the task ends. 
+Updates existing documents previously retrieved by a (direct) znsq_read or a (sequential) znsq_next_result with the update options specified. An exclusive document level lock was obtained by the read requests.  For non-recoverable databases, the lock will be released immediately following the updatee result request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends. 
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful update.   
              
@@ -1400,11 +1400,11 @@ Example of enabling auto commit for a EzNoSQL database:
       }
 ```   
 
-### znsq_backout    
-`int znsq_backout(znsq_connection_t con);`
+### znsq_abort    
+`int znsq_abort(znsq_connection_t con);`
   
-#### Backout Updates 
-Issues a backout to end the current transaction, restore updated documents to their original versions prior to the start of the transaction, and release the document level locks.  The next write, delete, or update request will start a new transaction.
+#### Abort Updates 
+Issues an abort to end the current transaction, restore updated documents to their original versions prior to the start of the transaction, and release the document level locks.  The next write, delete, or update request will start a new transaction.
                
 #### Parameters
 
@@ -1414,7 +1414,7 @@ Issues a backout to end the current transaction, restore updated documents to th
 #### Return value
 The return code of the function. 
 
-If successful backout, the return code is 0.
+If successful abort, the return code is 0.
 
 If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 
 2 and 3 of the return code.
@@ -1422,12 +1422,12 @@ If an error occurred, the return code contains the detailed error reason. The ma
 Example of commiting transactions for a EzNoSQL database:
 ```
            
-     return_code = znsq_backout(
+     return_code = znsq_abort(
         connection
      );
         
       if (return_code != 0) {
-        Ilog("Error returned from znsq_backout()");
+        Ilog("Error returned from znsq_abort()");
         Ilog("Return code received: X%x", znsq_err(return_code));
         free(read_buf_ptr);
         break;
@@ -1794,7 +1794,7 @@ ________________________________________________________________________________
 ___________________________________________________________________________________________________________________
 0091(X'5B')  Retained lock failure. A request to obtain a document level lock has failed because the lock is in a
              retained state from a previous transaction, which has either failed to back out (transaction shunted),
-             or has closed the database and not yet issued a commit or backout.  The request to obtain the lock is
+             or has closed the database and not yet issued a commit or abort.  The request to obtain the lock is
              failed until such a time the owning transaction (URID) completes the transaction. 
                                        
              Ensure all transactions are committed before closing the database to limit the window retain locks may
@@ -2018,7 +2018,7 @@ ________________________________________________________________________________
              Verify the database was created using the logOptions(UNDO/ALL).  The znsq_report API can be used to verify this
              option.  If the database is defined correctly, contact the z/OS Storage Administrator.
 _____________________________________________________________________________________________________________________________
-0276(X'114') Backout failed. The znsq_backout API detected a failure.  The znsq_backout API should only be used for databases 
+0276(X'114') Abort failed. The znsq_abort API detected a failure.  The znsq_abort API should only be used for databases 
              defined as a recoverable database (logOptions(UNDO/ALL).
                                                  
              Verify the data set was created using the logOptions(UNDO/ALL).  The `znsq_report_stats` API can be used to 
