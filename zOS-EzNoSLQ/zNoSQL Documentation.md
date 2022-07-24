@@ -323,7 +323,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | max_space         | `int`                         | Maximum space of database in mega bytes. Additional space will be added per document for system metadata and generated keys:</br>Keyed:.....................................x'AC' bytes</br>Auto generated Keyed:....x'132' bytes</br>Refer to section Primary keyed vs Auto-generated keyed databases for information on this option. | 
 | avg_doc_size      | `int`                         | Average size of all documents in the database.  Providing an accurate size as close as possible may improve                     performance when reading/writing to the database.  A zero value will result in a default physical blocksize of 32768.|     
 | update_percent    | `int`                         | Percentage of actual update requests compared to writes (inserts) and deletes.  Used inconjuntion with a non-zero                          avg_doc_size will further aid in read/write performace by optimizing the physical blocksize by EzNoSQL. |                  
-| znsq_log_options  | `enum`                        | Database recovery option: </br>0 indicates the database is non-recoverable (NONE). This is the default option.</br>1 indicates the database is non-recoverable (NONE).</br>2 indicates the database is recoverable (UNDO) and supports backout logging only.</br>3 indicates the database is recoverable (ALL) and supports both backout and forward recovery logging.</br>Refer to section Non-Recoverable vs Recoverable Database for information on this option. |
+| znsq_log_options  | `enum`                        | Database recovery option: </br>0 indicates the database is non-recoverable (NONE). This is the default option.</br>2 indicates the database is recoverable (UNDO) and supports backout logging only.</br>3 indicates the database is recoverable (ALL) and supports both backout and forward recovery logging.</br>Refer to section Non-Recoverable vs Recoverable Database for information on this option. |
 | primary_key       | `char`                        | UTF-8 JSON c string providing the primary keyname for the database. The string must be < 256 bytes including quotes, and end with one byte of x'00'.  The keyname may consist of a multi level name.  Omitting the keyname results in auto generated keys. Refer to sections Multi Level Keynames and Primary Keyed vs Auto Generated Keys for more information on these options. |                                                               
 | storclas          | `char`                        | C string in EBCIDC (maximum of 8 characters) for the required system storage class name (STORCLAS). </br>Refer to section System Administration Requirements for more information on this option. |
 | mgmtclas          | `char`                        | C string in EBCIDC (maximum of 8 character) for the optional system management class name (MGMTCLAS).</br>Refer to section System Administration Requirements for more information on this option. |
@@ -1926,13 +1926,13 @@ ________________________________________________________________________________
              Verify that a valid connection token was passed on the znsq API.  If valid the problem to z/OS support. 
 ________________________________________________________________________________________________________________________
 0122(X'7A')  Internal ACB control block pool could not be freed. The a znsq API could not free the storage for an 
-             internal (ACB) control block. This error would most likely be a interal system logic error.  A system dump 
+             internal (ACB) control block. This error would most likely be an interal system logic error.  A system dump 
              is produced for this error.     
                           
              Report the problem to z/OS support.
 ________________________________________________________________________________________________________________________
 0123(X'7B')  Free of internal (BTREE) control block failed. The a znsq API could not free the storage for a node in  
-             a system BTREE. This error would most likely be a interal system logic error.  A system dump is produced 
+             a system BTREE. This error would most likely be an interal system logic error.  A system dump is produced 
              for this error.     
                           
              Report the problem to z/OS support.
@@ -2057,7 +2057,7 @@ ________________________________________________________________________________
                                                  
              Ensure a connection token was passed to the znsq_close API.
 ________________________________________________________________________________________________________________________________
-0289(X'121') A invalid connection token. The znsq_close API detected an invalid connection token.   
+0289(X'121') An invalid connection token. The znsq_close API detected an invalid connection token.   
                                                  
              Ensure a valid connection token was passed to the znsq_close API.
 ________________________________________________________________________________________________________________________________
@@ -2199,12 +2199,12 @@ ________________________________________________________________________________
                                                    
              Close the connenction and reopen the database after the znsq server is available.
 __________________________________________________________________________________________________________________________________
-0121(X'7C')  The system's znsq trnsactional server (DFSMSTVS) is not available. DFSMSTVS either did not fully initialize or has 
+0124(X'7C')  The system's znsq trnsactional server (DFSMSTVS) is not available. DFSMSTVS either did not fully initialize or has 
              been quiesced. Accessing EzNoSQL databases as recoverable, require the availablity of DFSMSTVS.   
                                                    
              Report the issue to the z/OS Storage Aministrator.
 __________________________________________________________________________________________________________________________________
-0121(X'7D')  The system's znsq trnsactional server (DFSMSTVS) is not installed. DFSMSTVS is not specififed as enabled in the list	 
+0125(X'7D')  The system's znsq trnsactional server (DFSMSTVS) is not installed. DFSMSTVS is not specififed as enabled in the list	 
              of optional product features for z/OS. Accessing EzNoSQL databases as recoverable, require the availablity of 
 	     DFSMSTVS.   
 	     
@@ -2239,7 +2239,7 @@ ________________________________________________________________________________
              Possibly close databases to free up menory.  Report the problem to z/OS support if the memory
              shortage is unexpected.
 _____________________________________________________________________________________________________________________________________
-0032(X'20')  Internal control block could not be obtained. The znsq_open or znsq_add_index APIs could not obtain storage for a an ACB
+0032(X'20')  Internal control block could not be obtained. The znsq_open or znsq_add_index APIs could not obtain storage for an ACB
              control block. This error would most likely be related to a memory shortage.      
                           
              Possibly close database to free up menory.  Report the problem to z/OS support if the memory
@@ -2376,8 +2376,7 @@ ________________________________________________________________________________
 __________________________________________________________________________________________________________________________________________
 0290(X'122') Database in use. The znsq_destroy API detected the database is still open/allocated.   
                                                  
-             Ensure a the connection for this database is closed usng the znsq_close API before attempting to destory the data 
-             set.    
+             Ensure the connection for this database is closed using the znsq_close API before attempting to destory the database.    
 _________________________________________________________________________________________________________________________________________
 0292(X'124') UTF8 conversion failed. The `znsq_report_stats` API encountered an error converting data set information (such as the data set name)
              to UTF8.  This is likely due to an invalid connenction token or an internal error.
