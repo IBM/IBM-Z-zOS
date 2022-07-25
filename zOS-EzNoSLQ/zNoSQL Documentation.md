@@ -2007,8 +2007,8 @@ ________________________________________________________________________________
 0266(X'10A') - Reserved.
 0271(X'10F')
 _____________________________________________________________________________________________________________________________
-0272(X'110') Invalid keyname opening and alternate index. While accessing the database, the keyname was not found matching 
-             a keyname added by a previous znsq_create or znsq_add_index API.    	
+0272(X'110') Invalid keyname when accessing an EzNoSQL database. The keyname passed as input does not match the database
+             keyname from the znsq_create or any other keynames provided on znsq_create_index APIs.      	
                                     
              Verify that a znsq_create or znsq_add_index was issued to add the keyname passed on the read/write API. 
 _____________________________________________________________________________________________________________________________
