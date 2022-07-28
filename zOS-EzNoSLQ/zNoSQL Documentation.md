@@ -1558,6 +1558,18 @@ ________________________________________________________________________________
              The program may want locate the full key in the returned document before using the key.  
 ____________________________________________________________________________________________________________
 
+## Return_Code_4
+____________________________________________________________________________________________________________
+Return Code 04(X'04) 
+Reason Code Meaning
+___________________________________________________________________________________________________________	     
+0027('1B')  Undo log write failed. While accessing a EzNoSQL database, the undo logi s not available or
+            the write failed.    
+                          
+             Contact the z/OS Storage Administrator and provide additional documentation via the 
+	     znsq_last_result report.	  
+____________________________________________________________________________________________________________
+
 ## Return_Code_8
 ____________________________________________________________________________________________________________
 Return Code 08(X'08') 
@@ -1631,9 +1643,31 @@ ________________________________________________________________________________
              the required alternate key.    
                           
              Ensure a znsq_add_index was issued to build an index for the required alternate key.
+____________________________________________________________________________________________________________	     
+0028('1C')  Forward recovery log write failed. While accessing a EzNoSQL database, the forward recovery log 
+             is not available or the write failed.    
+                          
+             Contact the z/OS Storage Administrator and provide additional documentation via the 
+	     znsq_last_result report.	     
 ____________________________________________________________________________________________________________
-0041(X'29') - Reserved.
-0048(X'30')
+0029(X'1D')  CF cache structure failure. While accessing a EzNoSQL database, the Coupling Facility (CF) 
+             cache failed during the open of the database.    
+                          
+             Contact the z/OS Storage Administrator and provide additional documentation via the 
+	     znsq_last_result report.	    
+____________________________________________________________________________________________________________
+0030(X'1E')  CF cache structure is unavailable. While accessing a EzNoSQL database, the Coupling Facility
+             (CF) cache structure associated with the database's storage class is unavaliable during the 
+	     open ofthe database.    
+                          
+             Contact the z/OS Storage Administrator and provide additional documentation via the 
+	     znsq_last_result report.	   
+____________________________________________________________________________________________________________
+0031(X'1F')  CF cache set is unavailable. While accessing a EzNoSQL database, the Coupling Facility
+             (CF) cache set is not found in the database's storage class during the open ofthe database.    
+                          
+             Contact the z/OS Storage Administrator and provide additional documentation via the 
+	     znsq_last_result report.	  	     
 ____________________________________________________________________________________________________________
 0051(X'33')  The JSON/BSON primary keyname field was not found in the catalog when accessing the database.
              The database does not appear to be a valid noSLQ DATABASE. 
@@ -2068,8 +2102,14 @@ ________________________________________________________________________________
              Limit the size of the documents to 62K when using recoverable data sets.  The logOptions attribute is returned
              on the `znsq_report_stats` API.
 ________________________________________________________________________________________________________________________________
-0296(X'128') - Reserved.
-4095(X'FFF') 
+0296(X'128')  CF cache set is not found. While accessing a EzNoSQL database, the Coupling Facility (CF) cache set was not found	
+             in the database's storage class during the open of the database.    
+                          
+             Contact the z/OS Storage Administrator and provide additional documentation via the 
+	     znsq_last_result report.	
+________________________________________________________________________________________________________________________________
+0297(X'1298') - 
+4095(X'FFF') Reserved.
 ________________________________________________________________________________________________________________________________
 
 ## Return_Code_12
