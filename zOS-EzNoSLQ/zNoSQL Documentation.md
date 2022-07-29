@@ -1568,7 +1568,7 @@ ________________________________________________________________________________
             the write failed.    
                           
              Contact the z/OS Storage Administrator and provide additional documentation via the 
-	     znsq_last_result report.	  
+	          znsq_last_result report.	  
 ____________________________________________________________________________________________________________
 
 ## Return Code 8
