@@ -64,6 +64,7 @@ Diagnostic Management APIs:
 
 Return and Reason Codes:
 * [Return Code 0](#Return-Code-0)
+* [Return Code 4](#Return-Code-4)
 * [Return Code 8](#Return-Code-8)
 * [Return Code 12](#Return-Code-12)
 * [Return Code 16](#Return-Code-16)
