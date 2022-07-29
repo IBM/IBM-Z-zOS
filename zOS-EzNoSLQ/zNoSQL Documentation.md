@@ -1568,7 +1568,7 @@ ________________________________________________________________________________
             the write failed.    
                           
              Contact the z/OS Storage Administrator and provide additional documentation via the 
-	          znsq_last_result report.	  
+	         znsq_last_result report.	  
 ____________________________________________________________________________________________________________
 
 ## Return Code 8
@@ -1649,26 +1649,26 @@ ________________________________________________________________________________
              is not available or the write failed.    
                           
              Contact the z/OS Storage Administrator and provide additional documentation via the 
-	     znsq_last_result report.	     
+	         znsq_last_result report.	     
 ____________________________________________________________________________________________________________
 0029(X'1D')  CF cache structure failure. While accessing a EzNoSQL database, the Coupling Facility (CF) 
              cache failed during the open of the database.    
                           
              Contact the z/OS Storage Administrator and provide additional documentation via the
-	     znsq_last_result report.	    
+	         znsq_last_result report.	    
 ____________________________________________________________________________________________________________
 0030(X'1E')  CF cache structure is unavailable. While accessing a EzNoSQL database, the Coupling Facility
              (CF) cache structure associated with the database's storage class is unavaliable during the 
 	     open ofthe database.    
                           
              Contact the z/OS Storage Administrator and provide additional documentation via the 
-	     znsq_last_result report.	   
+	         znsq_last_result report.	   
 ____________________________________________________________________________________________________________
 0031(X'1F')  CF cache set is unavailable. While accessing a EzNoSQL database, the Coupling Facility
              (CF) cache set is not found in the database's storage class during the open ofthe database.    
                           
              Contact the z/OS Storage Administrator and provide additional documentation via the 
-	     znsq_last_result report.	  	     
+	         znsq_last_result report.	  	     
 ____________________________________________________________________________________________________________
 0051(X'33')  The JSON/BSON primary keyname field was not found in the catalog when accessing the database.
              The database does not appear to be a valid noSLQ DATABASE. 
