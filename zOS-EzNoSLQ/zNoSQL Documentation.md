@@ -1654,7 +1654,7 @@ ________________________________________________________________________________
 0029(X'1D')  CF cache structure failure. While accessing a EzNoSQL database, the Coupling Facility (CF) 
              cache failed during the open of the database.    
                           
-             Contact the z/OS Storage Administrator and provide additional documentation via the 
+             Contact the z/OS Storage Administrator and provide additional documentation via the
 	     znsq_last_result report.	    
 ____________________________________________________________________________________________________________
 0030(X'1E')  CF cache structure is unavailable. While accessing a EzNoSQL database, the Coupling Facility
