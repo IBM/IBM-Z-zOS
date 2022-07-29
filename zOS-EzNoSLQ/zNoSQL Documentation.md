@@ -1564,14 +1564,14 @@ ________________________________________________________________________________
 Return Code 04(X'04) 
 Reason Code Meaning
 ___________________________________________________________________________________________________________	     
-0027('1B')  Undo log write failed. While accessing a EzNoSQL database, the undo logi s not available or
+0027('1B')  Undo log write failed. While accessing a EzNoSQL database, the undo log is not available or
             the write failed.    
                           
              Contact the z/OS Storage Administrator and provide additional documentation via the 
 	     znsq_last_result report.	  
 ____________________________________________________________________________________________________________
 
-## Return Code  8
+## Return Code 8
 ____________________________________________________________________________________________________________
 Return Code 08(X'08') 
 Reason Code Meaning
