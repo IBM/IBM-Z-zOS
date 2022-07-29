@@ -2107,7 +2107,7 @@ ________________________________________________________________________________
              in the database's storage class during the open of the database.    
                           
              Contact the z/OS Storage Administrator and provide additional documentation via the 
-	     znsq_last_result report.	
+	         znsq_last_result report.	
 ________________________________________________________________________________________________________________________________
 0297(X'1298') - 
 4095(X'FFF') Reserved.
