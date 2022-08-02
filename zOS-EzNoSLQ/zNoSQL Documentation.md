@@ -770,8 +770,7 @@ of znsq_close_result APIs.  For non-recoverable databases, the lock will be rele
    contains a buffer to receive the JSON document following a success read.
 
 `buff_len` 
-   contains the length of the buffer to receive the document.  If the buffer is to small to contain the document, a x'51' error is 
-   returned to the caller along with the required buffer length.  
+   contains the length of the buffer to receive the document.  The buffer may be larger than the returned document, however, if the buffer is to small to contain the document, a x'51' error is returned to the caller along with the required buffer length. For successful reads, the actual length of the document is returned.  
 
 `key` 
    C-string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
