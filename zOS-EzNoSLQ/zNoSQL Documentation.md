@@ -24,9 +24,8 @@ Performance Considerations:
 Getting Started:
 * [Getting Started with EzNoSQL](#Getting-Started) 
 * [EzNoSQL Executables and Side Decks](#Executables-and-Side-Files)
-* [Sample IBM XL C/C++ Procedure](#Sample-Application-Program)
-* [Sample Application Program](#Compile-and-Link)
-* [Sample IBM XL C/C++ Procedure](#Sample-Application-rogram)
+* [Sample Application Program](#Sample-Application-Program)
+* [Compile and Link Procedure](#Compile-and-Link-Procedure)
 
 Application Programming Interfaces (APIs)
 * [Application Programming Tiers](#Application-Programming-Tiers)
@@ -271,7 +270,7 @@ Sample user program: /samples/ibm/igwznsqsamp1.c, is a 31-bit user program which
 7)  Disconnect (close) the data base.
 8)  Destroy the database.
 
-## Compile and Link
+## Compile and Link Procedure
 
 To compile and link the sample program `/samples/ibm/igwznsqsamp1.c`:  
 xlc -c -qDLL -qcpluscmt -qLSEARCH="//'SYS1.SCUNHF'" igwznsqsamp1.c   
