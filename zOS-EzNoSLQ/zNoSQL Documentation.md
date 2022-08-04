@@ -1447,10 +1447,9 @@ Use the znsq_last_result API to obtain a text report containing additional diagn
 `buf`                  The buf parameter is a required input parameter which will point to a buffer to receive the generated text report.  
 
 `buff_len`             The buff_len is a required input/output parameter pointing to the length of the buffer, and on return the length of the report.  
-
+```
 Example call to znsq_last_result:
-
- size_t buffer_size = 32*1024;
+    size_t buffer_size = 32*1024;
     char *buffer = (char *) malloc(buffer_size);
     int z;
     char c;
@@ -1470,7 +1469,7 @@ Example call to znsq_last_result:
          printf("%c",c);                     
     }                                        
     free(buffer);
-                                                           
+  ```                                                         
 #### Example Report 1  
 znsq_last_result report following a RC=8 RSN=x'38' (security violation).  The additional diagnostic message (ACBMSGAR) indicates a system IEC161I 040-0257 message was issued for an open error ACBERFLG = 98:  
 ```                      
