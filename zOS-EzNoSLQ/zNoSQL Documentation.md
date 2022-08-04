@@ -1444,11 +1444,34 @@ Use the znsq_last_result API to obtain a text report containing additional diagn
 `int znsq_last_result(const char *buf, size_t buff_len);`
 
 #### Parameters
-`buf`                  The buf parameter is a required output parameter which will point to a buffer containing the generated text report.  The memory for the 
-                       the report is managed by EzNoSQL for program task.                                             
-`buff_len`             The buff_len is a required output parameter pointing to the length of the report.  The minimum size buffer is 20,000 (x'4E20') bytes.
+`buf`                  The buf parameter is a required input parameter which will point to a buffer to receive the generated text report.  
 
-#### Example 1  
+`buff_len`             The buff_len is a required input/output parameter pointing to the length of the buffer, and on return the length of the report.  
+
+Example call to znsq_last_result:
+
+`size_t buffer_size = 32*1024;
+    char *buffer = (char *) malloc(buffer_size);
+    int z;
+    char c;
+    if (!buffer) {
+        printf("FATAL ERROR - malloc()\n");
+        return;
+    }
+    int err = znsq_last_result(&buffer_size, buffer);
+    if (err) {
+        printf("FATAL ERROR - znsq_last_result, rc=%08X\n", err);
+        return;
+    }
+    
+    printf("buffer addr %p, buffer size %d\n", buffer, buffer_size);
+    for (z = 0; z <= buffer_size; z++) { 
+         c = buffer[z];                    
+         printf("%c",c);                     
+    }                                        
+    free(buffer);`
+                                                           
+#### Example Report 1  
 znsq_last_result report following a RC=8 RSN=x'38' (security violation).  The additional diagnostic message (ACBMSGAR) indicates a system IEC161I 040-0257 message was issued for an open error ACBERFLG = 98:  
 ```                      
    znsq.last.result Report  2022.042 15:48:52  
@@ -1457,7 +1480,7 @@ znsq_last_result report following a RC=8 RSN=x'38' (security violation).  The ad
    ACBMSGAR: 40025798                                                                                    
 ```
 
-#### Example 2  
+#### Example Report 2  
 znsq_last_result report following a RC=8 RSN=x'44' (duplicate document insert error).  The additional diagnostic error (RPLFDWRD) indicates a RC=8 RSN=0801 RPLDUP error: 
 ```
    znsq.last.result Report  2022.042 15:48:52  
@@ -1466,7 +1489,7 @@ znsq_last_result report following a RC=8 RSN=x'44' (duplicate document insert er
    RPLFDWRD: 01080008 
 ```
 
-#### Example 3  
+#### Example Report 3  
 znsq_last_result report following a RC=8 RSN=x'01' (database not found error).  The additional diagnostic error (CATPROB) indicates a RC=8 RSN=0801 RPLDUP error: 
 
 ```
@@ -1476,7 +1499,7 @@ znsq_last_result report following a RC=8 RSN=x'01' (database not found error).  
    CATPROB: C5C7002A
 ```
 
-#### Example 4  
+#### Example Report 4  
 znsq_last_result report for a no space create failure.  The additional diagnostic error is the system ouptut from the IDCAMS utility to create the database:
 ```
    znsq.last.result Report  2022.042 15:48:52      
