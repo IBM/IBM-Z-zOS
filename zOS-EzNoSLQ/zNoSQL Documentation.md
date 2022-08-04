@@ -1489,7 +1489,8 @@ znsq_last_result report following a RC=8 RSN=x'44' (duplicate document insert er
 ```
 
 #### Example Report 3  
-znsq_last_result report following a RC=8 RSN=x'01' (database not found error).  The additional diagnostic error (CATPROB) indicates a RC=8 RSN=0801 RPLDUP error: 
+znsq_last_result report following a RC=8 RSN=x'01' (database not found error).  The additional diagnostic error (CATPROB) indicates a RC=8 RSN=42(x'2A') data set not
+found error: 
 
 ```
    znsq.last.result Report  2022.042 15:48:52  
