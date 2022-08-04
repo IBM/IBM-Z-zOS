@@ -1450,7 +1450,7 @@ Use the znsq_last_result API to obtain a text report containing additional diagn
 
 Example call to znsq_last_result:
 
-`size_t buffer_size = 32*1024;
+ `size_t buffer_size = 32*1024;
     char *buffer = (char *) malloc(buffer_size);
     int z;
     char c;
@@ -1462,7 +1462,7 @@ Example call to znsq_last_result:
     if (err) {
         printf("FATAL ERROR - znsq_last_result, rc=%08X\n", err);
         return;
-    }
+    }`
     
     printf("buffer addr %p, buffer size %d\n", buffer, buffer_size);
     for (z = 0; z <= buffer_size; z++) { 
