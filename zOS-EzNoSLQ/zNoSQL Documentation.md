@@ -1446,7 +1446,7 @@ Use the znsq_last_result API to obtain a text report containing additional diagn
 #### Parameters
 `buf`                  The buf parameter is a required output parameter which will point to a buffer containing the generated text report.  The memory for the 
                        the report is managed by EzNoSQL for program task.                                             
-`buff_len`             The buff_len is a required output parameter pointing to the length of the report. 
+`buff_len`             The buff_len is a required output parameter pointing to the length of the report.  The minimum size buffer is 20,000 (x'4E20') bytes.
 
 #### Example 1  
 znsq_last_result report following a RC=8 RSN=x'38' (security violation).  The additional diagnostic message (ACBMSGAR) indicates a system IEC161I 040-0257 message was issued for an open error ACBERFLG = 98:  
