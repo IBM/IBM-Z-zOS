@@ -252,7 +252,7 @@ The following table shows the names and locations of the EzNoSQL executables, si
 
 | Member              | Location              | Description                           |
 | ------------------- | --------------------- | ------------------------------------- |
-| `libigwznsqd.so`    | `/usr/lib/`           | 31-bit API Library DLL |    
+| `libigwznsqd31.so`  | `/usr/lib/`           | 31-bit API Library DLL |    
 | `libigwznsqd31.x`   | `/usr/lib/`           | 31-bit x side deck |   
 | `libigwznsqd64.so`  | `/usr/lib/`           | 64-bit API Library DLL |   
 | `libigwznsqd64.x`   | `/usr/lib/`           | 64-bit APIs | 
