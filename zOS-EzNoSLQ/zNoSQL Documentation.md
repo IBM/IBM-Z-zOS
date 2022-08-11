@@ -19,7 +19,7 @@ System Requirements
 * [Application Requirements](#Application-Requirements)
  
 Performance Considerations: 
-* [In Memory Caching](#In-Memory-Caching)
+* [In-Memory Caching](#In-Memory-Caching)
 
 Getting Started:
 * [Getting Started with EzNoSQL](#Getting-Started) 
@@ -73,7 +73,7 @@ Return and Reason Codes:
 
 EzNoSQL for z/OS provides a comprehensive set of C based Application Progammer Interfaces (APIs), which enable applications to store JSON (UTF-8) documents while utilizing the full data sharing capabilities of IBM's Parallel Sysplex technology and System z operating system (z/OS). The JSON data can be accessed as either non-recoverable, or with recoverable (transactional) consistency across the sysplex. The APIs also allow for the creation of secondary indexes, which provide for faster queries to specific key fields within the JSON data.  
 
-IBM's Parallel Sysplex Coupling Facility (CF) technology, enables separate processors to share a single instance of a database (collection of documents), without the need for data sharding, replicating the updates, or programming for eventual consistency. Additionally, Sysplex allows for easy horizontal scalability by adding additional processors (or z/OS instances) as required.  Implementing EzNoSQL on z/OS will inherit many of the desired functions provided by z/OS such as in memory caching, system managed storage, data encryption, and compression.  EzNoSLQ databases can be shared with other exploiters of VSAM databases defined as DATABASE(JSON).  Refer to the following link for more information on native access to DATABASE(JSON) databases: https://www-40.ibm.com/servers/resourcelink/svc00100.nsf/pages/zOSV2R4sc236855?OpenDocument (Chapter 14).  
+IBM's Parallel Sysplex Coupling Facility (CF) technology, enables separate processors to share a single instance of a database (collection of documents), without the need for data sharding, replicating the updates, or programming for eventual consistency. Additionally, sysplex allows for easy horizontal scalability by adding additional processors (or z/OS instances) as required.  Implementing EzNoSQL on z/OS will inherit many of the desired functions provided by z/OS such as in-memory caching, system managed storage, data encryption, and compression.  EzNoSLQ databases can be shared with other exploiters of VSAM databases defined as DATABASE(JSON).  Refer to the following link for more information on native access to DATABASE(JSON) databases: https://www-40.ibm.com/servers/resourcelink/svc00100.nsf/pages/zOSV2R4sc236855?OpenDocument (Chapter 14).  
 
 # Image of EzNoSQL Sysplex Design
 
@@ -229,7 +229,7 @@ Contact your system administrator for requirements when creating EzNoSQL databas
 
 # Performance Considerations
 
-## In Memory Caching
+## In-Memory Caching
 
 EzNoSQL databases are accessed via the Record Level Sharing (RLS) function on the z/OS servers. RLS provides a 3 tier storage hierarchy which includes: 
  1. local real memory buffering
