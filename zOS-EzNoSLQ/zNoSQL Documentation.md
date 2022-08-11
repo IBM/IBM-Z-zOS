@@ -1691,7 +1691,7 @@ ________________________________________________________________________________
              Contact the z/OS Storage Administrator and provide additional documentation via the 
 	         znsq_last_result report.	  	     
 ____________________________________________________________________________________________________________
-0051(X'33')  The JSON/BSON primary keyname field was not found in the catalog when accessing the database.
+0051(X'33')  The JSON primary keyname field was not found in the catalog when accessing the database.
              The database does not appear to be a valid noSLQ DATABASE. 
                                                  
              Verify database was created with the znsq_create API, or was defined with LOG and DATABASE 
@@ -2417,7 +2417,7 @@ ________________________________________________________________________________
                                                  
              If the index was added contact the z/OS Storage Administrator.
 _________________________________________________________________________________________________________________________________________
-0274(X'112') The BSON key value was not found. While accessing the database using the znsq_write with the write_force option, The APi
+0274(X'112') The JSON key value was not found. While accessing the database using the znsq_write with the write_force option, The APi
              could not locate the key value in the document.  This maybe the result of an interal parsing error.
                                                  
              If the index was added contact the z/OS Storage Administrator.
