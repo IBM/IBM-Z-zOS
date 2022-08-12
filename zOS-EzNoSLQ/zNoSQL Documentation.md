@@ -2256,7 +2256,12 @@ ________________________________________________________________________________
                                                    
               If the error is due to a create for a database greater than 4 gigabytes, ensure a SMS DATACLAS is assigned with the
 	      Extended Format and Extended Addressability options.  If this is not the reason for the inconsistent parameter error, 
-	      contact the z/OS Storage Aministrator and provide the output from the znsq_last_result error.  	     
+	      contact the z/OS Storage Aministrator and provide the output from the znsq_last_result error.  
+__________________________________________________________________________________________________________________________________
+0298(X'12A')  Catalog unavailable.  The z/OS ICF catalog, associated with the high level qualifier representing the EzNoSQL
+              database name is not available.  
+                                                   
+              Report the error to the z/OS Storage Aministrator and provide the output from the znsq_last_result error.  	      
 __________________________________________________________________________________________________________________________________
 
 ## Return Code 16
