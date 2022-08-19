@@ -2127,8 +2127,14 @@ ________________________________________________________________________________
 0296(X'128')  CF cache set is not found. While accessing a EzNoSQL database, the Coupling Facility (CF) cache set was not found	
              in the database's storage class during the open of the database.    
                           
-             Contact the z/OS Storage Administrator and provide additional documentation via the 
-	         znsq_last_result report.	
+             Contact the z/OS Storage Administrator and provide additional documentation via the	         
+	     znsq_last_result report.	
+________________________________________________________________________________________________________________________________
+0299(X'12B') Access to ICSF keylabel failed.  The open for an EzNoSQL failed because the user does not have access to the ICSF
+             encryption keylabel.
+                                                    
+             Contact your z/OS Security Administrator to gain access to the keylabel, or provide the correct keylabel in the 
+	     database's SMS DATACLAS.		     
 ________________________________________________________________________________________________________________________________
 0297(X'1298') - 
 4095(X'FFF') Reserved.
