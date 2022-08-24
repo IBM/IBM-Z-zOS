@@ -23,7 +23,7 @@ Performance Considerations:
 
 Getting Started:
 * [Getting Started with EzNoSQL](#Getting-Started) 
-* [EzNoSQL Executables and Side Decks](#Executables-and-Side-Files)
+* [Executables and Side Decks](#Executables-and-Side-Decks)
 * [Sample Application Program](#Sample-Application-Program)
 * [Compile and Link Procedure](#Compile-and-Link-Procedure)
 
