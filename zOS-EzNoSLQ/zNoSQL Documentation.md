@@ -256,7 +256,7 @@ The following table shows the names and locations of the EzNoSQL executables, si
 | `libigwznsqd31.x`   | `/usr/lib/`           | 31-bit x side deck |   
 | `libigwznsqd64.so`  | `/usr/lib/`           | 64-bit API Library DLL |   
 | `libigwznsqd64.x`   | `/usr/lib/`           | 64-bit APIs | 
-| `igwznsqdb.h`       | `/usr/include/zos/`   | EzNoSQL Header File |    
+| `igwznsq.h`         | `/usr/include/zos/`   | EzNoSQL Header File |    
 | `igwznsqsamp1.c`    | `/samples/`           | Sample 31-bit application program |    
 
 ## Sample Application Program
@@ -849,7 +849,7 @@ Example of reading a document from an EzNoSQL database:
 	    
 			
 #### Position to a key within the EzNoSQL database 
-Issues a request to locate a specific key value (or a key value greater than or equal to) the desired key range. When the key value length is zero, positioning will be to the first or last document in the database based on the search order parameter specifed with the znsq_open API.  A forward search (default) will position to the first document, while backward search will position to the last document. Following a successful position, a result_set token is returned which is then used as input for subsequent sequential retrieves or updates/deletes.  Positioning is therefore required prior to issuing the znsq_next_result, znsq_update_result, or the znsq_delete_result APIs.  Postioning should be terminated by using the znsq_close_result API in order to release the result_set.
+Issues a request to locate a specific key value (or a key value greater than or equal to) the desired key range. When the key value length is zero, positioning will be to the first or last document in the database based on the search order parameter specifed on the znsq_open API.  A forward search (default) will position to the first document, while backward search will position to the last document. Following a successful position, a result_set token is returned which is then used as input for subsequent sequential retrieves or updates/deletes.  Positioning is therefore required prior to issuing the znsq_next_result, znsq_update_result, or the znsq_delete_result APIs.  Postioning should be terminated by using the znsq_close_result API in order to release the result_set.
             
 #### Parameters
 
