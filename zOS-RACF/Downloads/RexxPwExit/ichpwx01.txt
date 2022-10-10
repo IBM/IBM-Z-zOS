@@ -1,0 +1,1169 @@
+ICHPWX01 TITLE 'ICHPWX01 - SAMPLE NEW PASSWORD EXIT'                            
+***********************************************************************         
+***********************************************************************         
+*/*                                                                  */         
+*/* Copyright 2008, 2022 IBM Corp.                                   */         
+*/*                                                                  */         
+*/* Licensed under the Apache License, Version 2.0 (the "License");  */         
+*/* you may not use this file except in compliance with the License. */         
+*/* You may obtain a copy of the License at                          */         
+*/*                                                                  */         
+*/* http://www.apache.org/licenses/LICENSE-2.0                       */         
+*/*                                                                  */         
+*/* Unless required by applicable law or agreed to in writing,       */         
+*/* software distributed under the License is distributed on an      */         
+*/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,     */         
+*/* either express or implied. See the License for the specific      */         
+*/* language governing permissions and limitations under the License.*/         
+*/*                                                                  */         
+***-----------------------------------------------------------------***         
+***                                                                 ***         
+***  MODULE - ICHPWX01                                              ***         
+***                                                                 ***         
+***      This sample exit uses the System REXX facility to invoke   ***         
+***      a REXX exec for the purpose of applying customer-specific  ***         
+***      quality rules to a new password.  A sample REXX exec       ***         
+***      corresponding to this sample ICHPWX01 exit is provided     ***         
+***      as IRRPWREX.                                               ***         
+***                                                                 ***         
+***  VERSION - V4                                                   ***         
+***                                                                 ***         
+***  INPUT: Registers at entry                                      ***         
+***                                                                 ***         
+***        0 Not applicable                                         ***         
+***        1 Pointer to parameter list (PWXPL)                      ***         
+***        2-12 Not applicable                                      ***         
+***        13 Pointer to register save area                         ***         
+***        14 Return address                                        ***         
+***        15 Entry point address of the exit routine               ***         
+***                                                                 ***         
+***  RETURN CODES:                                                  ***         
+***     0 - Accept the new password value                           ***         
+***     4 - Reject the new password value                           ***         
+***                                                                 ***         
+***  Register usage:                                                ***         
+***   R11 - Autodata base register                                  ***         
+***   R12 - Base register                                           ***         
+***   R13 - Savearea address                                        ***         
+***  Further register usage is documented in the code below.        ***         
+***                                                                 ***         
+***  NOTES:                                                         ***         
+***   - ICHPWX01 passes all of its input parameters to IRRPWREX,    ***         
+***     plus some supplemental arguments. It also passes the name   ***         
+***     of a return and reason code variable, and of an output      ***         
+***     message variable, which IRRPWREX sets as output arguments.  ***         
+***     See the code below, and see IRRPWREX, for information       ***         
+***     on the arguments which are passed.                          ***         
+***                                                                 ***         
+***********************************************************************         
+***********************************************************************         
+         EJECT                                                                  
+***********************************************************************         
+***********************************************************************         
+***                                                                 ***         
+***      THIS CODE HAS NOT BEEN SUBMITTED TO ANY FORMAL IBM TEST    ***         
+***      AND IS DISTRIBUTED ON AN "AS IS" BASIS WITHOUT ANY         ***         
+***      WARRANTY EITHER EXPRESS OR IMPLIED. THE IMPLEMENTATION     ***         
+***      OF ANY OF THE TECHNIQUES DESCRIBED OR USED HEREIN IS A     ***         
+***      CUSTOMER RESPONSIBILITY AND DEPENDS ON THE CUSTOMER'S      ***         
+***      OPERATIONAL ENVIRONMENT. WHILE EACH ITEM MAY HAVE BEEN     ***         
+***      REVIEWED FOR ACCURACY IN A SPECIFIC SITUATION AND MAY      ***         
+***      RUN IN A SPECIFIC ENVIRONMENT, THERE IS NO GUARANTEE       ***         
+***      THAT THE SAME OR SIMILAR RESULTS WILL BE OBTAINED ELSE-    ***         
+***      WHERE. CUSTOMERS ATTEMPTING TO ADAPT THESE TECHNIQUES TO   ***         
+***      THEIR OWN ENVIRONMENTS DO SO AT THEIR OWN RISK.            ***         
+***                                                                 ***         
+***********************************************************************         
+***********************************************************************         
+         EJECT                                                                  
+* The following eyecatcher identifies ICHPWX01 and its version number.          
+* The string also identifies it as a caller of IRRPWREX. This string            
+* is consumed by IRRPWREX and displayed by its LIST function to aid             
+* in determining compatibility between ICHPWX01 and IRRPWREX.                   
+*                                                                               
+&EYECATCHER  SETC ' ICHPWX01 V4 IRRPWREX '                                      
+*                                   caller of IRRPWREX via Sysrexx              
+ICHPWX01 CSECT ,                                                                
+ICHPWX01 AMODE 31                                                               
+ICHPWX01 RMODE 31                                                               
+ICHPWX01 CSECT                                                                  
+         SAVE  (14,12),,&EYECATCHER-&SYSDATE-&SYSTIME-                          
+         LR    R12,R15             Program addressability                       
+         USING ICHPWX01,R12        Set base register                            
+         LR    R10,R1              Save input PWXPL address                     
+         USING PWXPL,R10           Basing for input plist                       
+*                                                                               
+* need dynamic storage                                                          
+*                                                                               
+         L     R0,DYNSIZE          Dynamic area size to R0                      
+         GETMAIN RU,LV=(0),SP=229  Getmain dynamic area                         
+         LR    R11,R1              Dynamic area addressability                  
+         LR    R2,R1               Dynamic address to R2 for MVCL               
+         L     R3,DYNSIZE          Get length to initialize                     
+         LA    R4,0                Source                                       
+         LA    R5,0                Source length of 0 + pad byte of 0           
+         MVCL  R2,R4               Clear the dynamic area storage               
+         USING DATD,R11            Get addressability to dynamic area           
+         ST    R13,SAVEAREA+4      Save caller's savearea address               
+         ST    R11,8(R13)          Save our savearea address                    
+         LR    R13,R11             Our savearea address to R13                  
+         EJECT                                                                  
+***********************************************************************         
+* Set up arguments and pass control to a REXX exec named IRRPWREX.    *         
+* Start by setting up AXREXX plist header.                            *         
+***********************************************************************         
+         LA    R5,RxArgLst          Establish arg list header                   
+         USING AXRARGLst,R5          addressability                             
+         MVC   AXRARGLSTID,=C'ARGL' Set eyecatcher to arg list                  
+         MVC   AXRARGLSTNUMBER,=AL2(RxNumArg) Set number of args                
+         LA    R5,RxArgs            Establish arg entry                         
+         USING AXRARGEntry,R5        addressability                             
+***********************************************************************         
+* Now set up each argument. Some notes on the arguments:              *         
+*                                                                     *         
+* - Not all ICHPWX01 parameters have values for all functions, but    *         
+* we must pass all parameters as arguments to REXX in order to        *         
+* maintain a 1-to-1 correspondence, with order preserved, to the      *         
+* arguments defined to the REXX exec.                                 *         
+*                                                                     *         
+* - For character arguments, if there is no applicable value, we      *         
+* will set the length to 0. The REXX exec can use this convention     *         
+* to detect a "null" value.                                           *         
+*                                                                     *         
+* - For address fields, there is always a value, and it is sometimes  *         
+* zero.                                                               *         
+*                                                                     *         
+* - Address arguments are of limited use, since, at the time of       *         
+* this writing, the REXX STORAGE function does not support cross-     *         
+* memory storage references.                                          *         
+* However, all address parameters are being passed anyway, in the     *         
+* hope that they will be useful in the future, and minimal changes    *         
+* to this exit will be necessary at that time.                        *         
+*                                                                     *         
+*   - Because of this limitation, the user name and installation      *         
+*     data from the ACEE (or the USER profile, as the case may be),   *         
+*     are passed in as separate character arguments. Likewise, the    *         
+*     command image from within the CPPL is passed as well.           *         
+***********************************************************************         
+***********************************************************************         
+* Output argument: return code ("RexxRc")                             *         
+***********************************************************************         
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg1Nm)    Addr of Arg name               
+         LA    R3,L'RxArg1Nm                                                    
+         STC   R3,AXRARGNAMELENGTH       Length of Arg name                     
+         MVC   AXRARGLENGTH,=A(L'RexxRc) Set length of Arg 4 value              
+         LA    R2,RexxRc           Get addr of rc variable                      
+         ST    R2,AXRARGADDRLOW    Set address of rc variable                   
+         MVC   AXRARGType,=AL1(AXRARGTypeUnsigned)   Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGOutput         Output arg                 
+***********************************************************************         
+* Output argument: reason code ("RexxReason")                         *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg2Nm)   Addr of Arg name                
+         LA    R3,L'RxArg2Nm                                                    
+         STC   R3,AXRARGNAMELENGTH              Length of Arg name              
+         MVC   AXRARGLENGTH,=A(L'RexxReason)    Set length of Arg value         
+         LA    R2,RexxReason       Get addr of reason code variable             
+         ST    R2,AXRARGADDRLOW    Set address of reason code variable          
+         MVC   AXRARGType,=AL1(AXRARGTypeUnsigned)   Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGOutput         Output arg                 
+***********************************************************************         
+* Input argument: Exit caller ("ExitCaller")                          *         
+*   - This is a 1-byte field in PWXPL, but REXX requires 4 or 8 byte  *         
+*     numeric arguments. So, place it in a local fullword first.      *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg3Nm) Addr of Arg name                  
+         LA    R3,L'RxArg3Nm                                                    
+         STC   R3,AXRARGNAMELENGTH            Length of Arg name                
+         MVC   AXRARGLENGTH,=A(L'CallerID)    Fullword                          
+         LA    R2,CallerID           Get addr of fullword ID variable           
+         ST    R2,AXRARGADDRLOW               Set addr of ID variable           
+         L     R2,PWXCALLR                    Get addr of input ID              
+         IC    R3,0(R2)                       Get ICHPWX01 caller ID            
+         ST    R3,CallerID                    Put it in fullword var            
+         MVC   AXRARGType,=AL1(AXRARGTypeUnsigned)   Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: CPPL address ("CPPLaddr")                           *         
+*   - The address of the Command Processor Parameter List. Relevant   *         
+*     to ALTUSER and PASSWORD.                                        *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg4Nm)   Addr of Arg name                
+         LA    R3,L'RxArg4Nm                                                    
+         STC   R3,AXRARGNAMELENGTH     Length of Arg name                       
+         MVC   AXRARGLENGTH,=A(4)      Set CPPL address length value            
+         LA    R2,PWXCPPL              Get CPPL address pointer                 
+         ST    R2,AXRARGADDRLOW        Set CPPL address pointer                 
+         MVC   AXRARGType,=AL1(AXRARGTypeUnsigned)   Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: Command image ("CmdImage")                          *         
+*   - The command image from the CPPL.                                *         
+*   - System REXX allows a maximum string size of 512, so the         *         
+*     command image may get truncated.                                *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg5Nm)   Addr of Arg name                
+         LA    R3,L'RxArg5Nm                                                    
+         STC   R3,AXRARGNAMELENGTH Length of Arg name                           
+         MVC   AXRARGLENGTH,=A(0)  Set null cmd length value                    
+         ICM   R2,B'1111',PWXCPPL  Get CPPL address                             
+         BZ    SKIPCPPL            No CPPL, must be RACINIT                     
+         USING CPPL,R2             CPPL adressability                           
+         ICM   R2,B'1111',CPPLCBUF Get command buffer pointer                   
+         BZ    SKIPCPPL            Don't think this can happen, but...          
+         DROP  R2                  Drop CPPL                                    
+         LH    R3,0(R2)            Get command image length                     
+         S     R3,=A(4)            Subtract header length                       
+         C     R3,=A(512)          Greater than max arg length?                 
+         BH    USEMAX              Yes, truncate it at 512                      
+         ST    R3,AXRARGLENGTH     Set fullword length of Arg value             
+         B     SETADDR             Skip ahead                                   
+USEMAX   DS    0H                                                               
+         MVC   AXRARGLENGTH,=A(512) Store max length value                      
+SETADDR  DS    0H                                                               
+         LA    R2,4(R2)            Bump past header                             
+         ST    R2,AXRARGADDRLOW    Set address of cmd image arg                 
+SKIPCPPL DS    0H                  Addr may be invalid; len will tell           
+         MVC   AXRARGType,=AL1(AXRARGTypeChar)       Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: new password ("newPwd")                             *         
+*   - For PASSWORD, this parameter is not received if only the        *         
+*     interval is being changed.                                      *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg6Nm)    Addr of Arg name               
+         LA    R3,L'RxArg6Nm                                                    
+         STC   R3,AXRARGNAMELENGTH Length of Arg name                           
+         MVC   AXRARGLENGTH,=A(0)  Initialize null arg length                   
+         ICM   R2,B'1111',PWXNEWPW Get addr of new password structure           
+         BZ    SKIPNEW             No new password                              
+         IC    R3,0(R2)            New password length from exit plist          
+         ST    R3,AXRARGLENGTH     Set fullword length of Arg value             
+SKIPNEW  DS    0H                                                               
+         LA    R2,1(R2)            Bump ptr past 1-byte password length         
+         ST    R2,AXRARGADDRLOW    Set address of new password arg              
+         MVC   AXRARGType,=AL1(AXRARGTypeChar)       Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: password interval ("pwdInterval")                   *         
+*   - This argument will be passed in by the PASSWORD command if it   *         
+*     was specified. We will pass a numeric value to REXX, with a     *         
+*     value of zero if not specified, or if caller is not PASSWORD.   *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg7Nm)    Addr of Arg name               
+         LA    R3,L'RxArg7Nm                                                    
+         STC   R3,AXRARGNAMELENGTH Length of Arg name                           
+         MVC   AXRARGLENGTH,=A(4)  Set interval length value                    
+         ICM   R2,B'1111',PWXINTVL Get addr of interval value                   
+         BNZ   USEINT              Interval is specified                        
+         LA    R2,PWXINTVL         Point to 0 address as value!                 
+USEINT   DS    0H                                                               
+         ST    R2,AXRARGADDRLOW    Set address of new password arg              
+         MVC   AXRARGType,=AL1(AXRARGTypeUnsigned)   Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: user ID ("userID")                                  *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg8Nm)    Addr of Arg name               
+         LA    R3,L'RxArg8Nm                                                    
+         STC   R3,AXRARGNAMELENGTH Length of Arg name                           
+         L     R2,PWXUSRID         Get addr of user ID structure                
+         IC    R3,0(R2)            User ID length from exit plist               
+         ST    R3,AXRARGLENGTH     Set fullword length of Arg value             
+         LA    R2,1(R2)            Bump ptr past 1-byte user length             
+         ST    R2,AXRARGADDRLOW    Set address of user ID arg                   
+         MVC   AXRARGType,=AL1(AXRARGTypeChar)       Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: RACINIT work area address ("workAddr")              *         
+*   - The address of the work area that RACINIT passes to the RACINIT *         
+*     pre- (ICHRIX01) and post- (ICHRIX02) processing exits.          *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg9Nm)   Addr of Arg name                
+         LA    R3,L'RxArg9Nm                                                    
+         STC   R3,AXRARGNAMELENGTH Length of Arg name                           
+         MVC   AXRARGLENGTH,=A(4)  Set work area address length value           
+         LA    R2,PWXWA                Get work area address pointer            
+         ST    R2,AXRARGADDRLOW        Set work area address pointer            
+         MVC   AXRARGType,=AL1(AXRARGTypeUnsigned)   Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: old password ("oldPwd")                             *         
+*   - This is only available when the caller is the PASSWORD command, *         
+*     or RACROUTE REQUEST=VERIFY/X.                                   *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg10Nm)   Addr of Arg name               
+         LA    R3,L'RxArg10Nm                                                   
+         STC   R3,AXRARGNAMELENGTH Length of Arg name                           
+         MVC   AXRARGLENGTH,=A(0)  Initialize null arg length                   
+         ICM   R2,B'1111',PWXCURPW Get addr of old password structure           
+         BZ    SKIPOLD             No old password                              
+         IC    R3,0(R2)            Old password length from exit plist          
+         ST    R3,AXRARGLENGTH     Set fullword length of Arg value             
+SKIPOLD  DS    0H                                                               
+         LA    R2,1(R2)            Bump ptr past 1-byte password length         
+         ST    R2,AXRARGADDRLOW    Set address of old password arg              
+         MVC   AXRARGType,=AL1(AXRARGTypeChar)       Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: last-change date ("chgDate")                        *         
+*   - This is the date when the password was last changed. It is only *         
+*     available for RACINIT and PASSWORD. It is a packed decimal      *         
+*     fullword. We'll send it to REXX as a 7-byte character string    *         
+*     if it exists.                                                   *         
+*   - ICHPWX01 gets two different parameters containing the last      *         
+*     change date. We only send the newer, 4-byte version.            *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg11Nm)    Addr of Arg name              
+         LA    R3,L'RxArg11Nm                                                   
+         STC   R3,AXRARGNAMELENGTH Length of Arg name                           
+         MVC   AXRARGLENGTH,=A(0)  Set null date length value                   
+         ICM   R2,B'1111',PWXPLCD4 Get addr of date from exit plist             
+         BZ    SKIPDATE            Date addr not provided                       
+         UNPK  CHARDATE(7),0(4,R2) Unpack all four bytes into 8 bytes           
+         OI    CHARDATE+6,X'F0'    Massage the sign nibble                      
+         MVC   AXRARGLENGTH,=A(7)  Set date length value                        
+SKIPDATE DS    0H                                                               
+         LA    R2,CHARDATE         Point at EBCDIC field                        
+         ST    R2,AXRARGADDRLOW    Set address of date arg                      
+         MVC   AXRARGType,=AL1(AXRARGTypeChar)       Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: ACEE address ("ACEEaddr")                           *         
+*   - For ALTUSER and PASSWORD, this is the address of the            *         
+*     command issuer's ACEE.                                          *         
+*   - For RACINIT, the ACEE is for the user logging on. In this       *         
+*     case, the ACEE is not fully initialized, and is of limited      *         
+*     usefulness (for example, the user name field is not present).   *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg12Nm)   Addr of Arg name               
+         LA    R3,L'RxArg12Nm                                                   
+         STC   R3,AXRARGNAMELENGTH Length of Arg name                           
+         MVC   AXRARGLENGTH,=A(4)  Set ACEE address length value                
+         LA    R2,PWXACEE              Get address of ACEE address              
+         ST    R2,AXRARGADDRLOW        Set ACEE address pointer                 
+         MVC   AXRARGType,=AL1(AXRARGTypeUnsigned)   Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* At this point, we are about to set up the installation data and     *         
+* user name arguments. These would typically exist in the ACEE that   *         
+* is passed in.  However, in the case of RACINIT, the ACEE is not     *         
+* fully initialized, and is all but useless. Further, for PASSWORD,   *         
+* we cannot assume that the command issuer is the target of the       *         
+* operation. We now call the GETDATA subroutine to sort this out and  *         
+* set up a common local area with data taken from the appropriate     *         
+* location. Sebsequent setup for these two args will grab the data    *         
+* from this local location.                                           *         
+***********************************************************************         
+         BAL   R9,GETDATA          Get data/name from ACEE or profile           
+***********************************************************************         
+* Input argument: user name ("userName")                              *         
+*   - The GETDATA routine has set up the user name for us in NAMEAREA.*         
+*   - Note that the user name is always 20 bytes long and is padded   *         
+*     at the end with blanks. Let REXX truncate it. It's easier there.*         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg13Nm)    Addr of Arg name              
+         LA    R3,L'RxArg13Nm                                                   
+         STC   R3,AXRARGNAMELENGTH Length of Arg name                           
+         MVC   AXRARGLENGTH,=A(0)  Set null name length value                   
+         ICM   R3,B'1111',NAMELEN  Get name length                              
+         BZ    SKIPNAME            No name field                                
+         ST    R3,AXRARGLENGTH     Set fullword length of Arg value             
+SKIPNAME DS    0H                                                               
+         LA    R2,NAMESTR          Get address of name string                   
+         ST    R2,AXRARGADDRLOW    Set address of user name arg                 
+         MVC   AXRARGType,=AL1(AXRARGTypeChar)       Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: installation data ("instData")                      *         
+*   - The GETDATA routine has set up the inst data for us in DATAAREA.*         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg14Nm)    Addr of Arg name              
+         LA    R3,L'RxArg14Nm                                                   
+         STC   R3,AXRARGNAMELENGTH Length of Arg name                           
+         MVC   AXRARGLENGTH,=A(0)  Set null data length value                   
+         ICM   R3,B'1111',DATALEN  Get data length                              
+         BZ    SKIPDATA            No data field                                
+         ST    R3,AXRARGLENGTH     Set fullword length of Arg value             
+SKIPDATA DS    0H                                                               
+         LA    R2,DATASTR          Get address of data string                   
+         ST    R2,AXRARGADDRLOW    Set address of inst data arg                 
+         MVC   AXRARGType,=AL1(AXRARGTypeChar)       Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: group name ("groupName")                            *         
+*   - This is only passed in by RACINIT, and only when GROUP= is      *         
+*     specified, so make sure it exists.                              *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg15Nm)    Addr of Arg name              
+         LA    R3,L'RxArg15Nm                                                   
+         STC   R3,AXRARGNAMELENGTH Length of Arg name                           
+         MVC   AXRARGLENGTH,=A(0)  Set null group length value                  
+         ICM   R2,B'1111',PWXGROUP Get addr of group name structure             
+         BZ    SKIPGRP             Group not provided                           
+         IC    R3,0(R2)            Group name length from exit plist            
+         ST    R3,AXRARGLENGTH     Set fullword length of Arg value             
+SKIPGRP  DS    0H                                                               
+         LA    R2,1(R2)            Bump ptr past 1-byte group length            
+         ST    R2,AXRARGADDRLOW    Set address of group name arg                
+         MVC   AXRARGType,=AL1(AXRARGTypeChar)       Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: Installation-specified data ("instAddr")            *         
+*   - Not to be confused with installation data, this argument is     *         
+*     the address which is passed to RACROUTE REQUEST=VERIFY/X by     *         
+*     the caller in the INSTLN= parameter. Thus, this is only         *         
+*     relevant for RACINIT.                                           *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg16Nm)   Addr of Arg name               
+         LA    R3,L'RxArg16Nm                                                   
+         STC   R3,AXRARGNAMELENGTH     Length of Arg name                       
+         MVC   AXRARGLENGTH,=A(4)      Set INSTLN= address length value         
+         LA    R2,PWXINSTL             Get INSTLN= address pointer              
+         ST    R2,AXRARGADDRLOW        Set INSTLN= address pointer              
+         MVC   AXRARGType,=AL1(AXRARGTypeUnsigned)   Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: password history ("pwdHist")                        *         
+*   - This is provided for RACINIT, and sometimes for PASSWORD        *         
+*   - The passwords are encrypted.  Not sure how useful this will     *         
+*     be. We'll just pass in the address, as opposed to taking the    *         
+*     input structure apart and passing in strings.                   *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg17Nm)   Addr of Arg name               
+         LA    R3,L'RxArg17Nm                                                   
+         STC   R3,AXRARGNAMELENGTH     Length of Arg name                       
+         MVC   AXRARGLENGTH,=A(4)      Set history address length value         
+         LA    R2,PWXINSTL             Get history address pointer              
+         ST    R2,AXRARGADDRLOW        Set history address pointer              
+         MVC   AXRARGType,=AL1(AXRARGTypeUnsigned)   Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: password format ("pwdFormat")                       *         
+*   - This is a 1-byte field in PWXPL, but REXX requires 4 or 8 byte  *         
+*     numeric arguments. So, place it in a local fullword first.      *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg18Nm) Addr of Arg name                 
+         LA    R3,L'RxArg18Nm                                                   
+         STC   R3,AXRARGNAMELENGTH            Length of Arg name                
+         MVC   AXRARGLENGTH,=A(L'FlagWord)    Fullword                          
+         LA    R2,FlagWord           Get addr of fullword flag variable         
+         ST    R2,AXRARGADDRLOW               Set addr of flag variable         
+         MVC   FlagWord,=A(256)               Set default "N/A" value           
+         ICM   R2,B'1111',PWXFLAG             Get addr of input flag            
+         BZ    SKIPFLAG                       No flag value specified           
+         IC    R3,0(R2)                       Get ICHPWX01 flag value           
+         ST    R3,FlagWord                    Put it in fullword var            
+SKIPFLAG DS    0H                                                               
+         MVC   AXRARGType,=AL1(AXRARGTypeUnsigned)   Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+***********************************************************************         
+* Input argument: SETROPTS MIXEDCASE indicator ("mixedCase")          *         
+*   - This is a bit in the RCVT, and will be passed as a numeric      *         
+*     value of 1 or 0.                                                *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg19Nm) Addr of Arg name                 
+         LA    R3,L'RxArg19Nm                                                   
+         STC   R3,AXRARGNAMELENGTH            Length of Arg name                
+         MVC   AXRARGLENGTH,=A(L'MixCase)     Fullword                          
+         LA    R2,MixCase            Get addr of fullword flag variable         
+         ST    R2,AXRARGADDRLOW               Set addr of flag variable         
+         XC    MixCase,MixCase                Set default NO value              
+         L     R3,16                          Obtain address of CVT             
+         L     R3,CVTRAC(,R3)                 Obtain address of RCVT            
+         USING RCVT,R3                        Addressability to RCVT            
+         TM    RCVTFLG3,RCVTPLC               MIXEDCASE active?                 
+         BZ    SKIPMIX                        No, value already set             
+         LA    R3,1                           Indicate MIXED active             
+         ST    R3,MixCase                     Put it in fullword var            
+SKIPMIX  DS    0H                                                               
+         MVC   AXRARGType,=AL1(AXRARGTypeUnsigned)   Set arg type               
+         OI    AXRARGInputFlgs1,AXRARGInput          Input arg                  
+         DROP  R3                             Forget RACF CVT mapping           
+***********************************************************************         
+* Output argument: output message ("outputMsg")                       *         
+*   - If a message is returned, we will issue it using the TPUT       *         
+*     macro if we are in a foreground TSO environment.                *         
+***********************************************************************         
+         LA    R5,AXRARGENTRY_LEN(R5) Set basing for next entry                 
+         MVC   AXRARGNAMEADDRLOW,=A(RxArg20Nm) Addr of Arg name                 
+         LA    R3,L'RxArg20Nm                                                   
+         STC   R3,AXRARGNAMELENGTH            Length of Arg name                
+         MVC   AXRARGLENGTH,=A(MAXMSGLEN)     Set max message length            
+         LA    R2,outMsg                  Get addr of output msg buffer         
+         ST    R2,AXRARGADDRLOW           Set address of message buffer         
+         MVC   AXRARGType,=AL1(AXRARGTypeChar) Set arg type                     
+         OI    AXRARGInputFlgs1,AXRARGOutput   Output arg                       
+* Set output message buffer to blanks so returned value is padded.              
+         MVI   outMsg,C' '                    Set first byte to blank           
+         MVC   outMsg+1(MAXMSGLEN-1),outMsg   Ripple the first blank            
+***********************************************************************         
+* Invoke a REXX exec using the AXREXX macro. Some considerations:     *         
+*  - A five second time limit is enforced on the execution of the     *         
+*    REXX exec. If this is exceeded, the exit will fail the           *         
+*    password change request.                                         *         
+*  - TSO=NO forces the execution of the REXX to occur in the shared   *         
+*    Sysrexx address space.  Note that PMR 29043,621,760 describes    *         
+*    a deadlock during a console logon with a password change         *         
+*    when this exit was coded with TSO=YES. I am told the only way    *         
+*    to guarantee avoiding this is to code TSO=NO and to specify      *         
+*    MAXWORKERTASKS(4) in AXRxx. However, this limits the amount      *         
+*    of concurrency available for TSO=NO execs, and this value is     *         
+*    configurable in AXRxx starting with z/OS V1R13.                  *         
+*  - SECURITY=BYAXRUSER runs the exec under the identity of the       *         
+*    user ID defined as the value of AXRUSER in the AXR00 PARMLIB     *         
+*    member. This provides a predictable value under which to run,    *         
+*    in the event you modify IRRPWREX to open data sets, for          *         
+*    example, in which case the invoker will require RACF access.     *         
+*    There is no default for AXRUSER, so you must define it, or       *         
+*    change this sample to not specify it (not recommended).          *         
+*    If this user ID is not defined to RACF, and permitted to         *         
+*    SYSREXX.userid (where userid is the user you are defining),      *         
+*    in the SURROGAT class, then the AXREXX macro, and hence          *         
+*    ICHPWX01, will fail (subject to the override as described        *         
+*    below the AXREXX call).                                          *         
+*  - REXXDIAG= is specified so that additional diagnostic data is     *         
+*    obtained in the event of an AXREXX failure. While the data       *         
+*    is not actually used by this sample, addressability is           *         
+*    established to the data, thus providing a convenient trace       *         
+*    point.                                                           *         
+***********************************************************************         
+         AXREXX REQUEST=EXECUTE,   Execute a REXX exec                 *        
+               CONSDATA=NO,        Not invoked by operator command     *        
+               TIMELIMIT=YES,      Enforce a time limit                *        
+               TIMEINT=5,          Of five seconds                     *        
+               NAME=RxName,        8-character name of REXX exec       *        
+               REXXARGS=RxArgLst,  Point to argument list              *        
+               SYNC=YES,           Perform synchronous call            *        
+               RETCODE=RxRc,       AXREXX return code                  *        
+               RSNCODE=RxReason,   AXREXX reason code                  *        
+               PLISTVER=MAX,       Largest possible AXREXX plist size  *        
+               TSO=NO,             Execute in Sysrexx address space    *        
+               SECURITY=BYAXRUSER, Run under PARMLIB-specified user ID *        
+               REXXDIAG=MyAxrDiag, Additional diagnostics on failure   *        
+               MF=(E,RXPLIST,COMPLETE)                                          
+         LTR   R15,R15             AXREXX return code zero?                     
+         BZ    GETRXRC             Yes, use REXX exec rc                        
+***********************************************************************         
+* The AXREXX macro (as opposed to the target REXX exec) failed.       *         
+* The diagnostic data in MyAxrDiag is addressed here, but not used.   *         
+***********************************************************************         
+         USING AxrDiag,R4          Addressability, if desired                   
+         LA    R4,MyAxrDiag        Load address of diagnostics                  
+         DROP  R4                  Drop addressability                          
+***********************************************************************         
+* Before we fail the request, check if the user has authority to      *         
+* override the exit failure. The motivation for this check is to      *         
+* provide an escape mechanism in case the system is in serious        *         
+* trouble, and the only one who can fix it is a system programmer     *         
+* who can't LOGON because his password is expired, and this exit      *         
+* failure is preventing him or her from logging on and fixing it.     *         
+* The override is only valid for RACROUTE REQUEST=VERIFY/X            *         
+* requests.                                                           *         
+***********************************************************************         
+         L     R1,PWXCALLR         Get caller code                              
+         CLI   0(R1),PWXRINIT      Is it "RACINIT"?                             
+         BNE   SETBADRC            No, no override                              
+         BAL   R9,GETACEE          Create ACEE for user                         
+         LTR   R15,R15             Successful?                                  
+         BNZ   SETBADRC            Override not possible                        
+         BAL   R9,CHKAUTH          Check override authority                     
+         LTR   R15,R15             Successful?                                  
+         BNZ   SETBADRC            No, override not allowed                     
+         ST    R15,EXITRC          Yes, store 0 rc in exit rc                   
+         B     CLEANUP             Clean up and return                          
+***********************************************************************         
+* Set return code to fail the password change.                        *         
+***********************************************************************         
+SETBADRC DS    0H                                                               
+         MVC   EXITRC,=A(4)        Set failing rc                               
+***********************************************************************         
+* Issue a WTO identifying the AXREXX return and reason code.          *         
+***********************************************************************         
+         MVC   DYNTXT(L'ERRTXT2),ERRTXT2 Move stat err text to dyn              
+         LA    R1,DYNTXT           Point to dynamic text                        
+         USING TXTMAP,R1           Addressability for substitution              
+         UNPK  CHARCODE,RxRc(5)    Unpack return code field/fudge sign          
+         LA    R3,TRTAB-X'F0'      Get address of sneaky translate tbl          
+         TR    CHARCODE,0(R3)      Convert letters to ECBDIC                    
+         MVC   TXTRC(8),CHARCODE+1 Skip 1st fudged zero                         
+         UNPK  CHARCODE,RxReason(5) Unpack reason code field/fudge sign         
+         TR    CHARCODE,0(R3)      Convert letters to ECBDIC                    
+         MVC   TXTREAS(8),CHARCODE+1 Skip 1st fudged zero                       
+         LA    R2,L'ERRTXT2        Get length of line 2 text                    
+         STH   R2,DYNLEN2          Store it in length prefix                    
+         MVC   DYNWTO(WTOLEN),STATWTO Move static WTO plist to dynamic          
+         XR    R0,R0               Clear R0                                     
+         WTO   TEXT=((ERRTXT1,),                                       *        
+               (DYNLEN2,)),                                            *        
+               MF=(E,DYNWTO)                                                    
+         DROP  R1                                                               
+***********************************************************************         
+* If there was a RACROUTE REQUEST=VERIFY error, issue a WTO           *         
+* identifying the SAF return code and RACF return/reason codes        *         
+***********************************************************************         
+         OC    SafRc,SafRc         Was there a VERIFY error?                    
+         BZ    CLEANUP             No                                           
+         MVC   DYNTXT(L'ERRTXT4),ERRTXT4 Move stat err text to dyn              
+         LA    R1,DYNTXT           Point to dynamic text                        
+         USING TXT2MAP,R1          Addressability for substitution              
+         UNPK  CHARCODE,SafRc(5)   Unpack SAF rc field/fudge sign               
+         LA    R3,TRTAB-X'F0'      Get address of sneaky xlate tbl              
+         TR    CHARCODE,0(R3)      Convert letters to ECBDIC                    
+         MVC   TXT2SRC(8),CHARCODE+1 Skip 1st fudged zero                       
+         UNPK  CHARCODE,RacfRc(5)  Unpack RACF rc field/fudge sign              
+         TR    CHARCODE,0(R3)      Convert letters to ECBDIC                    
+         MVC   TXT2RRC(8),CHARCODE+1 Skip 1st fudged zero                       
+         UNPK  CHARCODE,RacfRs(5)  Unpack RACF rs field/fudge sign              
+         TR    CHARCODE,0(R3)      Convert letters to ECBDIC                    
+         MVC   TXT2RRS(8),CHARCODE+1 Skip 1st fudged zero                       
+         LA    R2,L'ERRTXT4        Get length of line 2 text                    
+         STH   R2,DYNLEN2          Store it in length prefix                    
+         MVC   DYNWTO(WTOLEN),STATWTO Move static WTO plist to dyn              
+         XR    R0,R0               Clear R0                                     
+         WTO   TEXT=((ERRTXT3,),                                       *        
+               (DYNLEN2,)),                                            *        
+               MF=(E,DYNWTO)                                                    
+         DROP  R1                                                               
+***********************************************************************         
+*               !!! !!! !!! IMPORTANT !!! !!! !!!                     *         
+* At this point, we've encountered two unexpected errors, the         *         
+* combination of which seems quite unlikely. Rather than fail the     *         
+* request outright, we will allow the change to succeed. As with      *         
+* the override attempt above, the rationale here is to not lock       *         
+* out a system programmer who needs to fix a sick system.             *         
+*                                                                     *         
+* If you would rather fail the request at this point, just delete     *         
+* the following line of code, leaving the unconditional branch to     *         
+* the CLEANUP label.                                                  *         
+***********************************************************************         
+         MVC   EXITRC,=A(0)        Set successful return code                   
+         B     CLEANUP                                                          
+***********************************************************************         
+* The AXREXX macro succeeded. Get the return code set by the called   *         
+* REXX exec (as an output argument). This will be propagated back as  *         
+* ICHPWX01's return code.                                             *         
+*                                                                     *         
+* Note that the variable RexxReason contains a reason code set by     *         
+* IRRPWREX. The IRRPWREX sample uses it to indicate which quality     *         
+* check failed. It is not used here in ICHPWX01. Its original intent  *         
+* was to enable you to update ICHPWX01 to issue a meaningful message. *         
+* That capability is now supported using the outputMsg argument.      *         
+***********************************************************************         
+GETRXRC  DS    0H                  Set exit rc from REXX rc                     
+         MVC   EXITRC,RexxRc                                                    
+         CLC   EXITRC,=A(4)        RC4? (a quality check failed)                
+         BNE   CLEANUP             No, continue with cleanup                    
+         BAL   R9,ISSUEMSG         Go issue returned message                    
+         EJECT                                                                  
+***********************************************************************         
+* Free up the module dynamic area, the RACROUTE REQUEST=EXTRACT       *         
+* results buffer if EXTRACT was called, and the ACEE if we created    *         
+* one for the auth check.                                             *         
+***********************************************************************         
+CLEANUP  DS    0H                                                               
+         ICM   R9,B'1111',EXITACEE Did we create ACEE for this request?         
+         BZ    NOACEE              No, continue                                 
+         BAL   R9,DELACEE          Delete ACEE                                  
+NOACEE   DS    0H                                                               
+         L     R5,EXITRC           Save return code                             
+         ICM   R1,B'1111',XTRBUFF  Did we call EXTRACT?                         
+         BZ    CLEANUP2            No, continue                                 
+         USING EXTWKEA,R1          EXTRACT results addressability               
+         XR    R0,R0               Clear R0                                     
+         ICM   R0,B'0111',EXTWLN   Get length                                   
+         XR    R2,R2               Clear R2                                     
+         IC    R2,EXTWSP           Get subpool                                  
+         DROP  R1                                                               
+         FREEMAIN RU,LV=(R0),A=(R1),SP=(R2) Freemain EXTRACT area               
+CLEANUP2 DS    0H                                                               
+         L     R0,DYNSIZE          Dynamic area size to R0                      
+         L     R13,SAVEAREA+4      Restore R13                                  
+         LR    R1,R11              Dynamic data address to R1                   
+         LA    R2,229              Get subpool                                  
+         FREEMAIN RU,LV=(R0),A=(R1),SP=(R2)  Freemain dynamic area              
+***********************************************************************         
+* Return to caller.                                                   *         
+***********************************************************************         
+GETOUT   DS    0H                                                               
+         LR    R15,R5              Get rc in R15                                
+         RETURN (14,12),T,RC=(15)  Restore registers and return                 
+         EJECT                                                                  
+*---------------------------------------------------------------------*         
+* GETDATA:                                                            *         
+*                                                                     *         
+* Get the user name and installation data from the appropriate        *         
+* source and put it in an area in the module's dynamic area for       *         
+* reference by the mainline.                                          *         
+*   ALTUSER  - The info is obtained from the target's USER profile,   *         
+*              except where an administrator is changing his own      *         
+*              password, in which case we may as well get it from     *         
+*              the ACEE.                                              *         
+*   RACINIT  - The info is obtained from the target's USER profile    *         
+*   PASSWORD - The info is obtained from the input ACEE, except in    *         
+*              the case where an administrator is changing someone's  *         
+*              interval, in which case we must get the info from the  *         
+*              target's USER profile.                                 *         
+*                                                                     *         
+* Note: Only 254 bytes max of installation data is chained off the    *         
+*       ACEE (as opposed to the full 255 which can be obtained from   *         
+*       the USER profile).                                            *         
+*                                                                     *         
+* Note: There *could* be name/data specified on the ALTUSER command   *         
+*       and the CPPL address *is* passed as input to ICHPWX01. This   *         
+*       routine, however, will get the fields as they currently exist *         
+*       in the USER profile before ALTUSER actually updates it.       *         
+*       The REXX exec would have an easier time processing the        *         
+*       command image, if desired.                                    *         
+*                                                                     *         
+* Input:  R9 = return address                                         *         
+*                                                                     *         
+* Output: NAMEAREA contains the user name                             *         
+*         NAMELEN = 0 if there is no user name                        *         
+*         DATAAREA contains the user's installation data              *         
+*         DATALEN = 0 if there is no installation data                *         
+*                                                                     *         
+* Register usage:                                                     *         
+*        R1,R2,R3,R4,R8,R14,R15 are destroyed                         *         
+*                                                                     *         
+*---------------------------------------------------------------------*         
+GETDATA  DS    0H                                                               
+         CLC   CallerID,=A(RACINIT)  Is caller RACINIT?                         
+         BE    USEPROF               Yes, use the USER profile                  
+         L     R2,PWXUSRID           Get input user ID address                  
+         LA    R2,1(R2)              Bump past length to user ID                
+         L     R3,PWXACEE            Get ACEE address                           
+         LA    R3,ACEEUSRI-ACEE(R3)  Get ACEE user ID address                   
+         CLC   0(8,R3),0(R2)         User IDs equal?                            
+         BE    USEACEE               Yes, use ACEE                              
+USEPROF  DS    0H                                                               
+         MVC   DYNXTR(DYNLEN),STATXTR  Move static EXTRACT plist to dyn         
+         L     R2,PWXUSRID         Get user ID address                          
+         LA    R2,1(R2)            Bump past length byte                        
+         LA    R4,WORKAREA         Get work area address                        
+* Note: CLASS and SEGMENT are hardcoded in the static plist                     
+         RACROUTE REQUEST=EXTRACT,                                     +        
+               TYPE=EXTRACT,                                           +        
+               ENTITY=(R2),                                            +        
+               FIELDS=FIELDS,                                          +        
+               WORKA=(R4),                                             +        
+               SUBPOOL=229,                                            +        
+               RELEASE=7730,                                           +        
+               MF=(E,DYNXTR)                                                    
+         LTR   R15,R15             Zero return code?                            
+         BNZ   GDEXIT              No, strange and unexpected                   
+         ST    R1,XTRBUFF          Save return buffer address                   
+         USING EXTWKEA,R1          Addressability to EXTRACT buffer             
+         AH    R1,EXTWOFF          Bump past header to returned data            
+         DROP  R1                                                               
+         USING XTRMAP,R1           Addressability to data buffer                
+         ICM   R3,15,XTRNMLEN      Get length of Data                           
+         BZ    GETINST             No name                                      
+         ST    R3,NAMELEN          Set local name length                        
+         LA    R2,XTRNMSTR         Source: address of name                      
+         LA    R8,NAMESTR          Target: local name buffer                    
+         BCTR  R3,0                Decrement length for move                    
+         EX    R3,MOVEIT           Move name to local storage                   
+GETINST  DS    0H                                                               
+         ICM   R3,15,XTRDTLEN      Get length of Data                           
+         BZ    GDEXIT              No data                                      
+         ST    R3,DATALEN          Set local data length                        
+         LA    R2,XTRDTSTR         Source: address of data                      
+         LA    R8,DATASTR          Target: local data buffer                    
+         BCTR  R3,0                Decrement length for move                    
+         EX    R3,MOVEIT           Move data to local storage                   
+         B     GDEXIT                                                           
+USEACEE  DS    0H                                                               
+         L     R2,PWXACEE          Get input ACEE address                       
+         USING ACEE,R2                                                          
+         ICM   R2,B'1111',ACEEUNAM Get addr of user name in ACEE                
+         BZ    GETINST2            No name field                                
+         XR    R3,R3               Clear for insert                             
+         IC    R3,0(R2)            User name length                             
+         BCTR  R3,0                Length byte included in length               
+         ST    R3,NAMELEN          Set local name length                        
+         LA    R2,1(R2)            Source: address of name                      
+         LA    R8,NAMESTR          Target: local name buffer                    
+         BCTR  R3,0                Decrement length for move                    
+         EX    R3,MOVEIT           Move name to local storage                   
+GETINST2 DS    0H                                                               
+         L     R2,PWXACEE          Get input ACEE address                       
+         ICM   R2,B'1111',ACEEINST Get addr of user data in ACEE                
+         BZ    GDEXIT              No data field                                
+         IC    R3,0(R2)            User data length                             
+         BCTR  R3,0                Length byte included in length               
+         ST    R3,DATALEN          Set local data length                        
+         LA    R2,1(R2)            Source: address of data                      
+         LA    R8,DATASTR          Target: local data buffer                    
+         BCTR  R3,0                Decrement length for move                    
+         EX    R3,MOVEIT           Move data to local storage                   
+GDEXIT   DS    0H                                                               
+         BR    R9                  Return to caller                             
+         DROP  R1                  Drop EXTRACT data mapping                    
+         DROP  R2                  Drop ACEE                                    
+MOVEIT   MVC   0(*-*,R8),0(R2)                                                  
+         EJECT                                                                  
+*---------------------------------------------------------------------*         
+* GETACEE:                                                            *         
+*                                                                     *         
+* Build an ACEE for the target user of the password change and        *         
+* anchor it in a local variable for use by CHKAUTH.                   *         
+*                                                                     *         
+* Input:  R9 = return address                                         *         
+*                                                                     *         
+* Output: R15 contains a return code:                                 *         
+*           - 0: Verify successful                                    *         
+*              : EXITACEE will contain a pointer to the ACEE          *         
+*           - 4: Verify unsuccessful                                  *         
+*              : SafRc, RacfRc, and RacfRs set to failing rc's        *         
+*                                                                     *         
+* Register usage:                                                     *         
+*        R0,R1,R2,R14,R15 are destroyed                               *         
+*                                                                     *         
+* Notes:  If GROUP= was specified on the RACROUTE REQUEST=VERIFY/X    *         
+*         for which ICHPWX01 is getting control, then specify it      *         
+*         here as well, just to avoid the unlikely possibility that   *         
+*         there is an error with the user's default group (e.g.       *         
+*         connection revoked), but not with the group specified.      *         
+*         The TSO LOGON panel allows specification of a group, for    *         
+*         example. A similar consideration exists for the SECLABEL,   *         
+*         but that is not passed into ICHPWX01. It would need to      *         
+*         be communicated by ICHRIX01 using the work area which is    *         
+*         passed to ICHPWX01.                                         *         
+*                                                                     *         
+*---------------------------------------------------------------------*         
+GETACEE  DS    0H                                                               
+         MVC   DYNVER(DYNVLEN),STATVER  Move static VERIFY plist to dyn         
+         ICM   R2,B'1111',PWXGROUP Get addr of group name structure             
+         BZ    GETNOGRP            Group not specified                          
+         RACROUTE REQUEST=VERIFY,                                      +        
+               GROUP=(R2),                                             +        
+               RELEASE=7730,                                           +        
+               MF=(M,DYNVER)       Specify group                                
+GETNOGRP DS    0H                                                               
+         L     R2,PWXUSRID        Get addr of user ID structure                 
+         RACROUTE REQUEST=VERIFY,                                      +        
+               ENVIR=CREATE,                                           +        
+               WORKA=WORKAREA,                                         +        
+               PASSCHK=NO,                                             +        
+               USERID=(R2),                                            +        
+               ACEE=EXITACEE,                                          +        
+               LOG=NONE,                                               +        
+               RELEASE=7730,                                           +        
+               MF=(E,DYNVER)                                                    
+         LTR   R15,R15             Zero return code?                            
+         BZ    GAEXIT              Yes, all is well                             
+         ST    R15,SafRc           Save SAF return code                         
+         LA    R1,DYNVER           Get address of RACROUTE p-list               
+         USING SAFP,R1             Addressability to SAF p-list                 
+         MVC   RacfRc,SAFPRRET     Save RACF return code                        
+         MVC   RacfRs,SAFPRREA     Save RACF reason code                        
+         DROP  R1                                                               
+         LA    R15,4               Oh well, we tried. Fail the exit             
+GAEXIT   DS    0H                                                               
+         BR    R9                  Return to caller                             
+         EJECT                                                                  
+*---------------------------------------------------------------------*         
+* DELACEE:                                                            *         
+*                                                                     *         
+* Delete the ACEE that we created earlier.                            *         
+*                                                                     *         
+* Input:  R9 = return address                                         *         
+*         EXITACEE contains a pointer to the ACEE to free             *         
+*                                                                     *         
+* Output: None.                                                       *         
+*                                                                     *         
+* Register usage:                                                     *         
+*        R0,R1,R14,R15 are destroyed                                  *         
+*                                                                     *         
+*---------------------------------------------------------------------*         
+DELACEE  DS    0H                                                               
+         MVC   DYNVER(DYNVLEN),STATVER  Move static VERIFY plist to dyn         
+         RACROUTE REQUEST=VERIFY,                                      +        
+               ENVIR=DELETE,                                           +        
+               RELEASE=7730,                                           +        
+               WORKA=WORKAREA,                                         +        
+               ACEE=EXITACEE,                                          +        
+               MF=(E,DYNVER)                                                    
+         BR    R9                    Return to caller                           
+         EJECT                                                                  
+*---------------------------------------------------------------------*         
+* CHKAUTH:                                                            *         
+*                                                                     *         
+* Check authority to a FACILITY class resource to see if the user     *         
+* is authorized to bypass AXREXX failures. The FACILITY class         *         
+* resource is named IRR.ICHPWX01.OVERRIDE and READ access is          *         
+* required. If the resource is not defined, override is not allowed.  *         
+*                                                                     *         
+* Input:  R9 = return address                                         *         
+*         EXITACEE contains a pointer to the ACEE to use              *         
+*                                                                     *         
+* Output: R15 contains a return code:                                 *         
+*           - 0: Exit may be bypassed                                 *         
+*           - 4: Exit may not be bypassed                             *         
+*                                                                     *         
+* Register usage:                                                     *         
+*        R0,R1,R2,R3,R14 are destroyed                                *         
+*                                                                     *         
+*---------------------------------------------------------------------*         
+CHKAUTH  DS    0H                                                               
+         B     DOCHECK                                                          
+CLASSNM  DC    AL1(8),CL8'FACILITY'                                             
+ENTITYNM DC    AL2(0),AL2(21),CL21'IRR.ICHPWX01.OVERRIDE'                       
+DOCHECK  DS    0H                                                               
+         MVC   DYNAUTH(DYNALEN),STATAUTH Move static AUTH plist to dyn          
+         L     R2,EXITACEE         Get addr of ACEE for user                    
+         LA    R3,CLASSNM          Get class name structure                     
+         RACROUTE REQUEST=AUTH,                                        +        
+               WORKA=WORKAREA,                                         +        
+               ACEE=(R2),                                              +        
+               CLASS=(R3),                                             +        
+               ENTITYX=ENTITYNM,                                       +        
+               ATTR=READ,                                              +        
+               LOG=NOFAIL,         Audit successful accesses only      +        
+               RELEASE=7730,                                           +        
+               MF=(E,DYNAUTH)                                                   
+         LTR   R15,R15             Authorized?                                  
+         BZ    AUTHEXIT            Yes, we are finished                         
+         LA    R15,4               No, set failing return code                  
+AUTHEXIT DS    0H                                                               
+         BR    R9                  Return to caller                             
+         EJECT                                                                  
+*---------------------------------------------------------------------*         
+* ISSUEMSG:                                                           *         
+*                                                                     *         
+* Issue message to user using the TPUT macro.                         *         
+*                                                                     *         
+* Input:  R9 = return address                                         *         
+*         outMsg contains the message returned by IRRPWREX. It was    *         
+*           initialized to blanks, and if IRRPWREX opts not to        *         
+*           return a message, it will remain blanks.                  *         
+*                                                                     *         
+* Output: Message issued to foregound TSO user if an output message   *         
+*         was returned by IRRPWREX                                    *         
+*                                                                     *         
+* Register usage:                                                     *         
+*        R0,R1,R2,R4,R14,R15 are destroyed                            *         
+*                                                                     *         
+*---------------------------------------------------------------------*         
+ISSUEMSG DS    0H                                                               
+         CLC   outMsg(1),=C' '     First character blank?                       
+         BE    MSGEXIT             Yes, no return message arg                   
+         USING PSA,0                                                            
+         ICM   R1,B'1111',PSAAOLD  Get ASCB address                             
+         BZ    MSGEXIT             Not expected                                 
+         USING ASCB,R1                                                          
+         ICM   R1,B'1111',ASCBTSB  Is there a TSB address?                      
+         BZ    MSGEXIT             Not a foreground TSO user. Exit.             
+* TPUT requires below-the-line storage, so obtain a message buffer              
+* and copy the returned message into it.                                        
+         LA    R0,MAXMSGLEN        Get length of storage to obtain              
+         STORAGE OBTAIN,LENGTH=(0),SP=131,LOC=24,CALLRKY=YES                    
+         LR    R4,R1               Save storage address                         
+         USING TPUTD,R1                                                         
+         MVC   TPUTDMSG(MAXMSGLEN),outMsg Move output msg into 24-bit           
+* Issue TPUT. It will remove trailing blanks.                                   
+         TPUT  TPUTDMSG,MAXMSGLEN,EDIT    Issue message                         
+         LA    R0,MAXMSGLEN        Get length of storage to obtain              
+         LA    R2,131              Get subpool                                  
+         LR    R1,R4               Restore storage address                      
+         STORAGE RELEASE,LENGTH=(0),SP=131,ADDR=(R1),CALLRKY=YES                
+MSGEXIT  DS    0H                                                               
+         BR    R9                  Return to caller                             
+         DROP  R1                                                               
+         EJECT                                                                  
+***********************************************************************         
+* Static data                                                         *         
+***********************************************************************         
+         DS    0D                                                               
+DYNSIZE  DC    AL4(SIZEDATD)       dynamic area size                            
+RxName   DC    CL8'IRRPWREX'       Name of REXX exec to call                    
+RxArg1Nm  DC   CL6'RexxRc'         Name of REXX exec return code                
+RxArg2Nm  DC   CL10'RexxReason'    Name of REXX exec reason code                
+RxArg3Nm  DC   CL10'ExitCaller'    Name of ICHPWX01 caller identifier           
+RxArg4Nm  DC   CL8'CPPLaddr'       Name of CPPL address                         
+RxArg5Nm  DC   CL8'CmdImage'       Name of command image                        
+RxArg6Nm  DC   CL6'newPwd'         Name of new password                         
+RxArg7Nm  DC   CL11'pwdInterval'   Name of password interval                    
+RxArg8Nm  DC   CL6'userID'         Name of target user ID                       
+RxArg9Nm  DC   CL8'workAddr'       Name of work area address                    
+RxArg10Nm DC   CL6'oldPwd'         Name of old (current) password               
+RxArg11Nm DC   CL7'chgDate'        Name of last-changed date                    
+RxArg12Nm DC   CL8'ACEEaddr'       Name of ACEE address                         
+RxArg13Nm DC   CL8'userName'       Name of user name arg                        
+RxArg14Nm DC   CL8'instData'       Name of installation data arg                
+RxArg15Nm DC   CL9'groupName'      Name of connect group name arg               
+RxArg16Nm DC   CL8'instAddr'       Name of INSTLN= address                      
+RxArg17Nm DC   CL7'pwdHist'        Name of password history address             
+RxArg18Nm DC   CL9'pwdFormat'      Name of pwd format (flag byte) value         
+RxArg19Nm DC   CL9'mixedCase'      Name of SETROPTS MIXEDCASE ind.              
+RxArg20Nm DC   CL9'outputMsg'      Name of output message arg                   
+RxNumArg  EQU  20                  Number of arguments for REXX                 
+STATXTR  RACROUTE REQUEST=EXTRACT,TYPE=EXTRACT,RELEASE=7730,           +        
+               CLASS='USER',SEGMENT='BASE',MF=L                                 
+FIELDS   DC    0CL20               RACROUTE REQUEST=EXTRACT field data          
+FLDCNT   DC    AL4(2)              Number of fields                             
+FLDNAM1  DC    CL8'PGMRNAME'       Field name 1                                 
+FLDNAM2  DC    CL8'INSTDATA'       Field name 2                                 
+*                                  WTO stuff                                    
+STATAUTH RACROUTE REQUEST=AUTH,RELEASE=7730,MF=L                                
+STATVER  RACROUTE REQUEST=VERIFY,RELEASE=7730,MF=L                              
+ERRTXT1  DC    AL2(59)             Length of following line                     
+         DC    CL59'NEW PASSWORD EXIT ICHPWX01 ENCOUNTERED AN UNEXPECTEx        
+               D ERROR:'                                                        
+ERRTXT2  DC    CL50'  AXREXX RETURN CODE XXXXXXXX REASON CODE XXXXXXXX'         
+ERRTXT3  DC    AL2(56)             Length of following line                     
+         DC    CL56'NEW PASSWORD EXIT ICHPWX01 ENCOUNTERED A RACROUTE Ex        
+               RROR:'                                                           
+ERRTXT4  DC    CL57'  VERIFY SAFRC XXXXXXXX RACFRC XXXXXXXX RACFREAS XXx        
+               XXXXXX'                                                          
+TRTAB    DC    CL16'0123456789ABCDEF' Translate from binary to EBCDIC           
+STATWTO  WTO   MF=L,DESC=(6),ROUTCDE=(9),TEXT=((,D),(,DE))                      
+         DS    0D                                                               
+         LTORG                                                                  
+         EJECT                                                                  
+***********************************************************************         
+* DSECT for this routine's dynamic area                               *         
+***********************************************************************         
+DATD     DSECT                                                                  
+         DS    0D                                                               
+SAVEAREA DS    18F                 Register save area                           
+DYNWTO   WTO   MF=L,DESC=(6),ROUTCDE=(9),TEXT=((,D),(,DE))                      
+WTOLEN   EQU   *-DYNWTO                                                         
+DYNLEN2  DS    AL2                 Length of following text                     
+DYNTXT   DS    CL53                2nd line of WTO error message                
+WORKAREA DS    CL512               RACROUTE REQUEST=EXTRACT work area           
+NAMEAREA DS    0C                  Area for user name                           
+NAMELEN  DS    A                   Length of user name                          
+NAMESTR  DS    CL20                Storage for max name                         
+DATAAREA DS    0C                  Area for installation data                   
+DATALEN  DS    A                   Length of data                               
+DATASTR  DS    CL255               Storage for max data                         
+XTRBUFF  DS    F                   Addr of data buffer from EXTRACT             
+EXITRC   DS    F                   Exit return code                             
+EXITACEE DS    F                   ACEE address for auth check                  
+CHARDATE DS    CL7                 Contains unpacked change-date                
+CHARCODE DS    CL10                Contains unpacked AXREXX rc/reason           
+RxRc     DS    F                   Return code from AXREXX macro                
+         DS    XL1                 Fudge byte for sign during UNPK              
+RxReason DS    F                   Reason code from AXREXX macro                
+         DS    XL1                 Fudge byte for sign during UNPK              
+SafRc    DS    F                   SAF return code from RACROUTE                
+         DS    XL1                 Fudge byte for sign during UNPK              
+RacfRc   DS    F                   RACF return code from RACROUTE               
+         DS    XL1                 Fudge byte for sign during UNPK              
+RacfRs   DS    F                   RACF reason code from RACROUTE               
+         DS    XL1                 Fudge byte for sign during UNPK              
+RexxRc   DS    F                   Return code from called REXX program         
+RexxReason DS  F                   Reason code from called REXX program         
+CallerID DS    F                   Fwd for ICHPWX01 caller id (1-byte)          
+FlagWord DS    F                   Fwd for ICHPWX01 flag byte (1-byte)          
+MixCase  DS    F                   Fwd for SETROPTS MIXEDCASE ind.              
+outMsg   DS    CL(MAXMSGLEN)       Output message buffer                        
+MyAxrDiag DS   CL(AXRDIAG_LEN)     Diagnostic data                              
+RxArgLst DS    CL(AXRARGLST_LEN)   Argument list header                         
+RxArgs   DS    CL(RxNumArg*AXRARGENTRY_LEN) Argument list entries               
+         AXREXX PLISTVER=MAX,MF=(L,RXPLIST)                                     
+DYNXTR   RACROUTE REQUEST=EXTRACT,TYPE=EXTRACT,RELEASE=7730,MF=L                
+DYNLEN   EQU   *-DYNXTR            Length of EXTRACT plist                      
+DYNAUTH  RACROUTE REQUEST=AUTH,RELEASE=7730,MF=L                                
+DYNALEN  EQU   *-DYNAUTH           Length of AUTH plist                         
+DYNVER   RACROUTE REQUEST=VERIFY,RELEASE=7730,MF=L                              
+DYNVLEN  EQU   *-DYNVER            Length of VERIFY plist                       
+SIZEDATD EQU   *-DATD              Length of DSECT                              
+*                                                                               
+***********************************************************************         
+* DSECT for RACROUTE REQUEST=EXTRACT result area                      *         
+***********************************************************************         
+XTRMAP   DSECT                     Mapping of EXTRACT results                   
+XTRNMLEN DS    AL4                 Length of name                               
+XTRNMSTR DS    CL20                Name                                         
+XTRDTLEN DS    AL4                 Length of data                               
+XTRDTSTR DS    0C                  Variable length data                         
+*                                                                               
+***********************************************************************         
+* DSECT for WTO message text/insertions                               *         
+***********************************************************************         
+TXTMAP   DSECT                     Mapping of WTO error message                 
+         DS    CL21                "  AXREXX RETURN CODE "                      
+TXTRC    DS    CL8                 AXREXX return code substitution              
+         DS    CL13                " REASON CODE "                              
+TXTREAS  DS    CL8                 AXREXX reason code substitution              
+*                                                                               
+***********************************************************************         
+* DSECT for VERIFY WTO message text/insertions                        *         
+***********************************************************************         
+TXT2MAP  DSECT                     Mapping of WTO error message                 
+         DS    CL15                "  VERIFY SAFRC "                            
+TXT2SRC  DS    CL8                 SAF return code substitution                 
+         DS    CL8                 " RACFRC "                                   
+TXT2RRC  DS    CL8                 RACF return code substitution                
+         DS    CL10                " RACFREAS "                                 
+TXT2RRS  DS    CL8                 RACF reason code substitution                
+*                                                                               
+***********************************************************************         
+* DSECT for TPUT variables                                            *         
+***********************************************************************         
+TPUTD    DSECT                                                                  
+         DS    0D                                                               
+TPUTDMSG DS    CL255                                                            
+***********************************************************************         
+* Equates                                                             *         
+***********************************************************************         
+RACINIT  EQU   1                   ID of RACINIT  in PWXCALLR                   
+R0       EQU   0                                                                
+R1       EQU   1                                                                
+R2       EQU   2                                                                
+R3       EQU   3                                                                
+R4       EQU   4                                                                
+R5       EQU   5                                                                
+R6       EQU   6                                                                
+R7       EQU   7                                                                
+R8       EQU   8                                                                
+R9       EQU   9                                                                
+R10      EQU   10                                                               
+R11      EQU   11                                                               
+R12      EQU   12                                                               
+R13      EQU   13                                                               
+R14      EQU   14                                                               
+R15      EQU   15                                                               
+*                                                                               
+* Note that AXREXX supports a maximum length of 512. If this EQU is             
+* changed to anything greater than 256, make sure to update the code            
+* that initializes outMsg to blanks, and the code in ISSUEMSG that              
+* copies the value into 24-bit storage.                                         
+MAXMSGLEN EQU  255                 Max length of output message                 
+         EJECT                                                                  
+***********************************************************************         
+* Included control block mappings                                     *         
+***********************************************************************         
+         ICHPRCVT                     RACF Comm. Vector Table                   
+CVTRAC   EQU   X'3E0'                 Ptr to RCVT from CVT                      
+         IHAPSA                       Prefix Save Area                          
+         IHAASCB                      Address Space Control Block               
+         IHAACEE                      Accessor Environment Element              
+         ICHPWXP                      ICHPWX01 parameter list                   
+         IRRPRXTW                     RACROUTE REQUEST=EXTRACT results          
+         ICHSAFP                      RACROUTE parameter list                   
+         IKJCPPL                      TSO Command Processor Parm List           
+         AXRZARG                      AXREXX argument list mapping              
+         EJECT                                                                  
+         END   ICHPWX01                                                         
