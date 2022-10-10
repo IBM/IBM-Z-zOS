@@ -10,25 +10,23 @@ The RACF development team has numerous tools that can assist you in managing you
 
 4. [DBSYNC](http://ibm.biz/racf-dbsync): REXX exec to find differences between two RACF databases and create commands to synchronize them. 
 
-5. [IRRHFSU](http://ibm.biz/racf-irrhfsu): A utility which unloads your z/OS UNIX System Services hierarchical file system data (HFZ, TFS, or z/FS) in a manner which is complimentary to the RACF Data Base Unload Utility (IRRDBU00). d
 
-6. [IRRXUTIL](http://ibm.biz/racf-irrxutil): RACF IRRXUTIL Sample prgrams.
+5. [IRRXUTIL](http://ibm.biz/racf-irrxutil): RACF IRRXUTIL Sample prgrams.
 
-7. [JESNODES](http://ibm.biz/racf-jesnodes): A REXX exec which displays the names of trusted NODES profiles (those with a UACC greater than READ) and cover a defined node name in the context of inbound jobs and displays the local nodes defined in the &RACLNODE profile. 
+6. [JESNODES](http://ibm.biz/racf-jesnodes): A REXX exec which displays the names of trusted NODES profiles (those with a UACC greater than READ) and cover a defined node name in the context of inbound jobs and displays the local nodes defined in the &RACLNODE profile. 
 
-8. [LISTCDT](http://ibm.biz/racf-listcdt): A utility which lists the contents of your RACF Class Descriptor Table.
+7. [LISTCDT](http://ibm.biz/racf-listcdt): A utility which lists the contents of your RACF Class Descriptor Table.
 
-9. [PWDCOPY](http://ibm.biz/racf-pwdcopy): A utility which copies passwords from one RACF database to another. 
+8. [PWDCOPY](http://ibm.biz/racf-pwdcopy): A utility which copies passwords from one RACF database to another. 
 
-10. [PWDPHRONLY](http://ibm.biz/racf-pwdphronly): RACF sample ICHRIX02 exit which forces users to use password phrases.
+9. [PWDPHRONLY](http://ibm.biz/racf-pwdphronly): RACF sample ICHRIX02 exit which forces users to use password phrases.
 
-11. [RACFICE2](http://ibm.biz/racf-racfice2): RACFICE examples, beyond those which are shipped in 'SYS1.SAMPLIB(IRRICE)'
+10. [RACFICE2](http://ibm.biz/racf-racfice2): RACFICE examples, beyond those which are shipped in 'SYS1.SAMPLIB(IRRICE)'
 
-12. [RACKILL](http://ibm.biz/racf-rackill): A utility deletes profiles from the RACF database that otherwise might not be deletable.  
+11. [RACKILL](http://ibm.biz/racf-rackill): A utility deletes profiles from the RACF database that otherwise might not be deletable.  
 
-13. [RACSEQ](http://ibm.biz/racf-racseq): A TSO command which invokes the extract function of R_admin (IRRSEQ00) and displays every profile field to the display using PUTLINE.    
+12. [RACSEQ](http://ibm.biz/racf-racseq): A TSO command which invokes the extract function of R_admin (IRRSEQ00) and displays every profile field to the display using PUTLINE.    
 
-14. [REXXPWEXIT](http://ibm.biz/racf-rexxpwexit): A system-REXX based new password exit.
 
 There are no warranties of any kind, and there is no service or technical support available for these materials from IBM. As a recommended practice, review carefully any materials that you download from this site before using them on a live system.
 

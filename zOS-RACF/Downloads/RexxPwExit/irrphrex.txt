@@ -1,0 +1,1499 @@
+/*rexx                                                               */         
+/*********************************************************************/         
+/* Get the variables passed to us from ICHPWX11. Note that the order */         
+/* is important, and matches the order in which ICHPWX11 builds its  */         
+/* parameter list for the AXREXX macro.                              */         
+/*********************************************************************/         
+parse ARG RexxRc,RexxReason,ExitCaller,CPPLaddr,CmdImage,newPhrase,  ,          
+          userID,workAddr,oldPhrase,chgDate,ACEEaddr,userName,       ,          
+          instData,groupName,instAddr,outputMsg                                 
+                                                                                
+/*********************************************************************/         
+/*********************************************************************/         
+/*                                                                   */         
+/* Copyright 2007, 2022 IBM Corp.                                    */         
+/*                                                                   */         
+/* Licensed under the Apache License, Version 2.0 (the "License");   */         
+/* you may not use this file except in compliance with the License.  */         
+/* You may obtain a copy of the License at                           */         
+/*                                                                   */         
+/* http://www.apache.org/licenses/LICENSE-2.0                        */         
+/*                                                                   */         
+/* Unless required by applicable law or agreed to in writing,        */         
+/* software distributed under the License is distributed on an       */         
+/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      */         
+/* either express or implied. See the License for the specific       */         
+/* language governing permissions and limitations under the License. */         
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/*                                                                   */         
+/* IRRPHREX: A sample REXX exec which works in concert with a sample */         
+/*           new-phrase-exit ICHPWX11 to check the quality           */         
+/*           of a new password phrase.                               */         
+/*                                                                   */         
+irrphrex_version = "V5"                                                         
+/*                                                                   */         
+/* Function:                                                         */         
+/* --------                                                          */         
+/*   IRRPHREX gets control from ICHPWX11 using System REXX. It       */         
+/*   receives every parameter that ICHPWX11 itself receives from     */         
+/*   RACF, as well as a few others.                                  */         
+/*                                                                   */         
+/* Input arguments:                                                  */         
+/* ---------------                                                   */         
+/*   See the RACF System Programmer's Guide for detail on the        */         
+/*   parameters passed to ICHPWX11.                                  */         
+/*                                                                   */         
+/*   Not all parameters are meaningful for all functions (i.e. all   */         
+/*   values of ExitCaller). When a string value is not applicable,   */         
+/*   its length is passed in as 0. All address fields could have     */         
+/*   a value of 0.                                                   */         
+/*                                                                   */         
+/*  ExitCaller - Code for PASSWORD, ADDUSER, ALTUSER, or RACINIT.    */         
+/*  CPPLaddr   - Address of TSO Command Processor Parameter List     */         
+/*  CmdImage   - Command image from the CPPL, truncated at 512       */         
+/*               characters.                                         */         
+/*  newPhrase  - The new value of the password phrase.               */         
+/*  userID     - The user ID whose password phrase is being changed. */         
+/*  workAddr   - The address of the RACINIT exit work area.          */         
+/*  oldPhrase  - The current (old) value of the password phrase.     */         
+/*  chgDate    - The date of last phrase change in string form.      */         
+/*               This is in the format yyyyddd. If the phrase is     */         
+/*               expired, PASSWORD will set the value to '1900000',  */         
+/*               but RACINIT will set the value to '0000000'.        */         
+/*               Neither ADDUSER nor ALTUSER pass in this argument.  */         
+/*  ACEEaddr   - The address of the ACEE of the command issuer (for  */         
+/*               ADDUSER/ALTUSER/PASWORD) or of the user being       */         
+/*               verified (RACINIT). For RACINIT, the ACEE is not    */         
+/*               initialized.                                        */         
+/*  userName   - The name of the user whose password phrase is being */         
+/*               changed. Not available for ADDUSER. See the user    */         
+/*               name check below for additional considerations.     */         
+/*  instData   - The installation data of the user whose password    */         
+/*               phrase is being changed. Not available for ADDUSER. */         
+/*               Note that this is the data which currently exists   */         
+/*               in the target user's ACEE or USER profile. If we    */         
+/*               are being called for an ADDUSER or ALTUSER command  */         
+/*               which specifies the DATA operand in addition to     */         
+/*               PHRASE, and you wish to use the new value, you can  */         
+/*               parse it from the supplied command image in the     */         
+/*               CmdImage parameter.                                 */         
+/*  groupName  - The connect group, if specified, from RACINIT only. */         
+/*  instAddr   - The address, if supplied on the INSTLN= keyword,    */         
+/*               from RACINIT only.                                  */         
+/*                                                                   */         
+/*   A note on input addresses: At the time of this writing, the     */         
+/*     REXX STORAGE function does not support ALETs, and so input    */         
+/*     addresses may not be very useful (unless you call an          */         
+/*     assembler routine which can do something with them. In this   */         
+/*     case, you may as well alter ICHPWX11). The addresses are      */         
+/*     being passed to IRRPHREX so that, should the STORAGE function */         
+/*     become more useful in the future, the ICHPWX11 changes will   */         
+/*     be minimal. Meanwhile, if you want some specific piece of     */         
+/*     data located by the address, then you'll need to update the   */         
+/*     sample ICHPWX11 to pass in the data as a character argument.  */         
+/*                                                                   */         
+/* Output arguments:                                                 */         
+/* ----------------                                                  */         
+/*   RexxRc -     The return code from this exec. It will be set as  */         
+/*                ICHPWX11's return code, so it must adhere to the   */         
+/*                specifications of the exit. Namely:                */         
+/*                                                                   */         
+/*                0 - New value is acceptable                        */         
+/*                4 - New value is not acceptable                    */         
+/*                                                                   */         
+/*   RexxReason - The reason code from this exec. This is not        */         
+/*                used by the ICHPWX11 sample. It is used by this    */         
+/*                exec to indicate which rule rejected a new         */         
+/*                password phrase value.  The reason code, and an    */         
+/*                accompanying message, will be displayed to the     */         
+/*                console when debug = 'on'.                         */         
+/*                                                                   */         
+/*                The messages are defined in the Error_text.n       */         
+/*                variables declared below.  If desired, you could   */         
+/*                use these as the basis for the outputMsg output    */         
+/*                argument (described next).                         */         
+/*                                                                   */         
+/*                When RexxRc=4, RexxReason can have one of the      */         
+/*                following values:                                  */         
+/*                                                                   */         
+/*                1  - Minimum length violation                      */         
+/*                2  - Maximum length violation                      */         
+/*                3  - Phrase contains disallowed characters         */         
+/*                4  - Phrase contains leading blanks                */         
+/*                5  - Phrase contains trailing blanks               */         
+/*                6  - Phrase contains part of user's name           */         
+/*                7  - Phrase is only trivially different from       */         
+/*                     previous value                                */         
+/*                8  - Phrase does not contain enough character      */         
+/*                     differences from previous value               */         
+/*                9  - Phrase does not contain enough unique word    */         
+/*                     differences from previous value               */         
+/*                10 - Phrase contains a word from the restricted    */         
+/*                     dictionary                                    */         
+/*                11 - Phrase does not contain at least one          */         
+/*                     character from a specified number of          */         
+/*                     character types (numbers, letters, special)   */         
+/*                12 - Phrase contains the user ID, or some          */         
+/*                     subset of the user ID                         */         
+/*                13 - Phrase contains too many repeating            */         
+/*                     characters                                    */         
+/*                                                                   */         
+/*   outputMsg  - A message to be returned to ICHPWX11.  See         */         
+/*                outputMsg below for additional considerations.     */         
+/*                                                                   */         
+/* Limitations and restrictions:                                     */         
+/* ----------------------------                                      */         
+/*                                                                   */         
+/*   - System REXX requires that this exec live in the REXXLIB       */         
+/*     concatenation (Prior to REXXLIB support, the exec had to      */         
+/*     reside in SYS1.SAXREXEC).                                     */         
+/*                                                                   */         
+/*   - ICHPWX11 is coded to call an exec named IRRPHREX, so the name */         
+/*     cannot be changed without a corresponding change to ICHPWX11. */         
+/*                                                                   */         
+/*   - ICHPWX11 is coded to give this exec 5 seconds to complete.    */         
+/*     Otherwise, the phrase change will be rejected. ICHPWX11 can   */         
+/*     be modified to set a different value, if desired.             */         
+/*                                                                   */         
+/* Configuration variables:                                          */         
+/* -----------------------                                           */         
+/*                                                                   */         
+/*   Following are some configurable values used in the checking     */         
+/*   performed by this exec. The default settings of these variables */         
+/*   result in no functional difference in the way RACF checks       */         
+/*   the validity of a new password phrase.                          */         
+/*                                                                   */         
+/*   The types of checks implemented herein should not be construed  */         
+/*   as enforcing "best practice" quality checks, but serve to       */         
+/*   demonstrate a number of quality checks which some customers     */         
+/*   may find useful.                                                */         
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/*   Debug mode. If 'on', the input arguments and final return       */         
+/*   and reason code are dumped to the console using WTO.            */         
+/*                                                                   */         
+/*   Note that System REXX provides additional functions from the    */         
+/*   AXREXX macro which could be useful for debugging. ICHPWX11      */         
+/*   would need to be modified to exploit these.                     */         
+/*                                                                   */         
+debug = 'off'                                                                   
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/*   Message to be returned to ICHPWX11.  When RexxRc = 4 (a         */         
+/*   quality check failed), and the outputMsg variable is not        */         
+/*   null, ICHPWX11 will issue the message to a foreground TSO       */         
+/*   user using the TPUT macro.                                      */         
+/*                                                                   */         
+/*   The maximum length is 255 characters (or whatever value you     */         
+/*   have set the MAXMSGLEN constant to in ICHPWX11).  Any message   */         
+/*   longer than this will cause the AXREXX macro, and thus          */         
+/*   ICHPWX11, to fail.  That is, the password change will still     */         
+/*   be rejected, but it will be because of an internal AXREXX       */         
+/*   error, and the user will not see the intended message.          */         
+/*                                                                   */         
+/*   You could, for example, change the variable to contain a        */         
+/*   description of your password quality rules.                     */         
+/*                                                                   */         
+/*   Another possibility is to state which rule was specifically     */         
+/*   violated. Consider modifying the Error_text.n values            */         
+/*   defined below, and uncommenting the code before the return      */         
+/*   statement that sets outputMsg to Error_text.RexxReason.         */         
+/*                                                                   */         
+/*   You must be IPLed with version 4 of ICHPWX11 to use this        */         
+/*   feature (its eyecatcher in storage will contain the string      */         
+/*   "IRRPHREX V4").                                                 */         
+/*     - If ICHPWX11 is at a level less than V4, the returned        */         
+/*       message will simply be ignored.                             */         
+/*     - If ICHPWX11 is at least at version V4 but IRRPHREX is not,  */         
+/*       or simply does not define the outputMsg variable, then      */         
+/*       ICHPWX11 will FAIL (AXREXX return code 8, reason code       */         
+/*       xxxx082C: An output argument was not set in the exec).      */         
+/*       !!!! So, never delete this default variable setting, even   */         
+/*            if you have no intention of exploiting the function!   */         
+/*                                                                   */         
+outputMsg = ''                                                                  
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/*   STIG compliance.                                                */         
+/*                                                                   */         
+/*   This check automatically enables the other checks that enforce  */         
+/*   compliance with the United States Defense Information Systems   */         
+/*   Agency's (DISA) Security Technical Implementation Guide (STIG)  */         
+/*   V7R1 with regard to RACF password quality rules, to the extent  */         
+/*   possible, taking some liberties on the content of the user ID   */         
+/*   and user name that are checked.                                 */         
+/*                                                                   */         
+/*   Not all the subsequent checks are relevant to the STIG, and     */         
+/*   they may also be enabled as desired. A STIG-relevant check      */         
+/*   will be identified with an asterisk to the left of the first    */         
+/*   line of its description.                                        */         
+/*                                                                   */         
+/*   Changing the value of STIG_Compliant to 'yes' will result in    */         
+/*   the relevant checks being enabled, regardless of any changes    */         
+/*   made to the explicit checks immediately below.                  */         
+/*                                                                   */         
+STIG_Compliant = 'no'             /* Enforce DISA STIG compliance    */         
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/* * Minimum length. This is set to whatever value RACF will         */         
+/*   enforce, which is 14 when a legacy password encryption          */         
+/*   algorithm is active, and 9 when KDFAES is active. We will       */         
+/*   determine the active algorithm from the contents of the         */         
+/*   RCVT and set the default minimum length accordingly.            */         
+/*                                                                   */         
+/*   This check may be disabled by deleting or commenting out the    */         
+/*   following code.                                                 */         
+/*                                                                   */         
+cvt_addr  = c2d(Storage(10,4))                 /*  CVT address       */         
+rcvt_addr = c2d(Storage(d2x(cvt_addr + 992),4))/* RCVT address       */         
+pwalg     = Storage(d2x(rcvt_addr+635),1)      /* Get RCVTPALG field */         
+pwalg     = c2d(pwalg)                         /* Convert to decimal */         
+                                                                                
+If pwalg = 0 Then                 /* If legacy algorithm in effect   */         
+  Phr_minlen = 14                 /* Minimum length is 14            */         
+Else                              /* But when KDFAES is active       */         
+  Phr_minlen = 9                  /* Minimum length is 9             */         
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/*   Maximum length. This is set to RACF's default of 100.           */         
+/*                                                                   */         
+/*   This check may be disabled by deleting or commenting out the    */         
+/*   following line.                                                 */         
+/*                                                                   */         
+Phr_maxlen = 100                  /* Maximum password phrase length  */         
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/*   Allowable characters.                                           */         
+/*                                                                   */         
+/*   In theory, any character is allowable in a password phrase.     */         
+/*   However, some characters will cause trouble in some environ-    */         
+/*   ments (e.g. the semi-colon on the TSO command line, or the      */         
+/*   forward slash on z/VM).                                         */         
+/*                                                                   */         
+/*   Also, if you are synchronizing passwords/phrases across a       */         
+/*   heterogeneous environment, you probably want to restrict the    */         
+/*   allowable characters to the least common denominator accepted   */         
+/*   by all of the systems.                                          */         
+/*                                                                   */         
+/*   Enable this check by uncommenting and modifying the following   */         
+/*   lines as appropriate.                                           */         
+/*                                                                   */         
+/*   Note that the 'type' variables are used in the Phr_req_types    */         
+/*   check below.                                                    */         
+/*                                                                   */         
+numbers = '0123456789'                                                          
+Lower_letters = 'abcdefghijklmnopqrstuvwxyz'                                    
+Upper_letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'                                    
+special = '$@#.<+ |&!*-%_>?:='                                                  
+/*Phr_allowed_chars = numbers||Lower_letters||Upper_letters||special */         
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/* * Minimum number of character types represented in the phrase.    */         
+/*   The types are defined above (numbers, upper and lower case      */         
+/*   letters, and special characters).  For example, setting         */         
+/*   Phr_req_types to 4 requires the user to specify at least one    */         
+/*   number, one lower case letter, one upper case letter, and       */         
+/*   one special character. Setting the value to 3 would require     */         
+/*   at least one character from 3 of the 4 character types.         */         
+/*                                                                   */         
+/*   By default, the built-in phrase syntax rules require at least   */         
+/*   2 alphabetic and 2 non-alphabetic characters.                   */         
+/*                                                                   */         
+Phr_req_types = 2                                                               
+                                                                                
+/*-------------------------------------------------------------------*/         
+/* * Leading and trailing blanks allowed or not. These can cause     */         
+/*   problems in some environments, like z/VM. So, if you are        */         
+/*   sharing a RACF database between z/OS and z/VM, you might want   */         
+/*   to change these to 'no'.                                        */         
+/*                                                                   */         
+/*   This check may be enabled setting the value(s) to 'no'.         */         
+/*                                                                   */         
+Phr_leading_blanks = 'yes'                                                      
+Phr_trailing_blanks = 'yes'                                                     
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/* * User name allowed or not. This checks if any word in the user   */         
+/*   name is contained anywhere in the new phrase. It does not have  */         
+/*   to be a separate word; it could be a substring of another word, */         
+/*   and would still be detected. This check is case insensitive.    */         
+/*                                                                   */         
+/*   The NAME operand of the ADDUSER or ALTUSER command is used to   */         
+/*   specify the user name. Note that this exec receives the user    */         
+/*   name as it currently exists in the RACF database. If we are     */         
+/*   being called for an ADDUSER or ALTUSER command in which the     */         
+/*   NAME operand has been specified in addition to PHRASE, this     */         
+/*   new value is *not* what is passed to us in the userName         */         
+/*   parameter. If you wish to perform processing for this new       */         
+/*   value of NAME, you can add logic to parse it from the input     */         
+/*   command image, contained in the CmdImage variable.              */         
+/*                                                                   */         
+/*   A minimum 'word' length is also defined, and defaults to 3.     */         
+/*   This is so that, for example,  a name such as "BRUCE R WELLS"   */         
+/*   doesn't cause a rejection for any instance of "R" in the new    */         
+/*   phrase.                                                         */         
+/*                                                                   */         
+/*   This check may be enabled by setting the value to 'no'.         */         
+/*                                                                   */         
+Phr_name_allowed = 'yes'                                                        
+Phr_name_minlen = 3                                                             
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/*   Triviality checks with respect to old password phrase. This     */         
+/*   checks that the new phrase does not differ from the old         */         
+/*   phrase only by spaces or by case. It also checks that the       */         
+/*   shorter of the two is not simply a substring of the longer one. */         
+/*                                                                   */         
+/*   These checks are only performed for PASSWORD and RACINIT, since */         
+/*   ADDUSER and ALTUSER do not provide the old password phrase.     */         
+/*                                                                   */         
+/*   This check may be enabled by setting the value to 'yes'.        */         
+/*                                                                   */         
+Phr_triviality = 'no'                                                           
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/*   Minimum unique characters by position. This check prevents      */         
+/*   a new phrase which differs by only a few character positions    */         
+/*   from the old phrase. For example, changing the phrase from      */         
+/*     'The name of my cat is Ben'                                   */         
+/*   to                                                              */         
+/*     'The name of my rat is Ben'                                   */         
+/*                                                                   */         
+/*   An associated variable controls whether the phrases are first   */         
+/*   normalized (upper-cased and spaces removed) before the check is */         
+/*   performed. The check is performed for the length of the smaller */         
+/*   string, so even if the new phrase is many characters longer     */         
+/*   than the old, this rule could still fail the change if there    */         
+/*   aren't enough unique characters in the beginning part.          */         
+/*                                                                   */         
+/*   This check is only performed for PASSWORD and RACINIT, since    */         
+/*   ADDUSER and ALTUSER do not provide the old password phrase.     */         
+/*                                                                   */         
+/*   This check may be enabled by changing the setting to a non-zero */         
+/*   value.                                                          */         
+/*                                                                   */         
+Phr_min_unique = 0                                                              
+Phr_min_unique_norm = 'yes'                                                     
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/*   Minimum unique words. This check prevents a new phrase          */         
+/*   which simply scrambles the words of the current phrase.         */         
+/*   For example, changing the phrase                                */         
+/*     'Ontogeny recapitulates phylogeny'                            */         
+/*   to                                                              */         
+/*     'Phylogeny recapitulates ontogeny'                            */         
+/*                                                                   */         
+/*   An associated variable controls whether the phrases are first   */         
+/*   upper-cased before the check is performed.                      */         
+/*                                                                   */         
+/*   Another associated variable controls the minimum word length    */         
+/*   checked, so that the user does not satisfy the rule by virtue   */         
+/*   of insignificant words like I, a, an, and, the, it, etc.        */         
+/*                                                                   */         
+/*   This check is only performed for PASSWORD and RACINIT, since    */         
+/*   ADDUSER and ALTUSER do not provide the old password phrase.     */         
+/*                                                                   */         
+/*   This check may be enabled by changing the setting of            */         
+/*   Phr_word_unique to a non-zero value.                            */         
+/*                                                                   */         
+Phr_word_unique = 0                                                             
+Phr_word_unique_upper = 'yes'                                                   
+Phr_word_minlen = 4                                                             
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/* * User ID allowed or not. This checks if the user ID is           */         
+/*   contained anywhere in the new phrase. This check is             */         
+/*   case insensitive.                                               */         
+/*                                                                   */         
+/*   An associated variable allows you to specify the length         */         
+/*   of a user ID substring to check. this check will fail for       */         
+/*   any user ID substring of the specified length in the new        */         
+/*   phrase.                                                         */         
+/*                                                                   */         
+/*   Note that the user ID check in the built-in phrase syntax       */         
+/*   checks for an all uppercase and all lowercase user ID value,    */         
+/*   but does not check mixed case.                                  */         
+/*                                                                   */         
+/*   This check may be enabled by setting the value to 'no'.         */         
+/*                                                                   */         
+Phr_userID_allowed = 'yes'                                                      
+Phr_userID_chars = 4                                                            
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/* * Repeated character check.  This checks that only n sets of      */         
+/*   repeated characters are allowed.                                */         
+/*                                                                   */         
+/*   For example: If the value is 2, then 'I like Massachusetts' is  */         
+/*   OK but 'I like Mississippi' is not. If the value is 0, then     */         
+/*   no repeating characters are allowed.                            */         
+/*                                                                   */         
+/*   An associated variable controls whether the phrase is first     */         
+/*   upper-cased before the check is performed.  By default, "aA"    */         
+/*   will be considered repeating characters, but this can be        */         
+/*   changed by setting Phr_repeat_upper to 'no'.                    */         
+/*                                                                   */         
+/*   This check may be enabled by setting Phr_repeat_chars_chk to    */         
+/*   'yes' and adjusting the associated variables as desired.        */         
+/*                                                                   */         
+Phr_repeat_chars_chk = 'no'                                                     
+Phr_repeat_chars = 1                                                            
+Phr_repeat_upper = 'no'                                                         
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/*   Dictionary check. Defines a stem containing words which are not */         
+/*   allowed in a new phrase. This check is case insensitive. This   */         
+/*   check detects the word strings anywhere within the phrase,      */         
+/*   not just if it appears as an isolated, blank-separated word.    */         
+/*                                                                   */         
+/*   Keep in mind that there is a time limit enforced by ICHPWX11    */         
+/*   on the execution of this exec.                                  */         
+/*                                                                   */         
+/*   This check may be enabled by setting the value of Phr_dict.0    */         
+/*   to the number of words in the stem.                             */         
+/*                                                                   */         
+/*   Words defined in this list will be upper-cased prior to the     */         
+/*   check.                                                          */         
+/*                                                                   */         
+Phr_dict.0  = 0        /* Change this as words are added and deleted */         
+Phr_dict.1  = 'IBM'                                                             
+Phr_dict.2  = 'RACF'                                                            
+Phr_dict.3  = 'PASSWORD'                                                        
+Phr_dict.4  = 'PHRASE'                                                          
+Phr_dict.5  = 'PASSPHRAS'        /* STIG omits trailing "E"          */         
+Phr_dict.6  = 'SECRET'                                                          
+Phr_dict.7  = 'IBMUSER'                                                         
+Phr_dict.8  = 'SYS1'                                                            
+Phr_dict.9  = 'PASSPHRASE'       /* STIG now includes trailing "E"   */         
+                                                                                
+/*********************************************************************/         
+/* If STIG_Compliant = 'yes' then we now override the configuration  */         
+/* variables above in order to enforce STIG checks.                  */         
+/*********************************************************************/         
+If STIG_Compliant = 'yes' Then Do                                               
+  Phr_minlen = 15                 /* Minimum length of 15            */         
+  Phr_triviality = 'yes'          /* Trivial differences check       */         
+  Phr_min_unique = Phr_minlen % 2 /* 'Half' of chars must be unique  */         
+  rem = Phr_minlen  // 2          /* Get remainder                   */         
+  Phr_min_unique = Phr_min_unique + rem /* Add remainder for 'half'  */         
+  Phr_req_types = 4              /* Upper, lower, digit, and special */         
+  special = ' $@#.|&!*-%_:="'    /* The STIG set, plus blank. Note   */         
+                                 /* that order is significant for    */         
+                                 /* the display to satisfy STIG.     */         
+  Phr_leading_blanks = 'no'                                                     
+  Phr_trailing_blanks = 'no'                                                    
+  Phr_name_allowed = 'no'                                                       
+  Phr_name_minlen = 3                                                           
+  Phr_userID_allowed = 'no'      /* Fail on 4 consecutive characters */         
+    Phr_userID_chars = 4         /* of the user ID.                  */         
+  Phr_dict.0 = 9                 /* Enforce restricted word check    */         
+  Phr_repeat_chars_chk = 'yes'   /* Retrict repeating characters     */         
+  Phr_repeat_chars = 1           /* Allow only 1 set                 */         
+End                                                                             
+                                                                                
+/*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/*   These variables associate descriptive text with each value of   */         
+/*   RexxReason so that a more helpful message can be issued upon    */         
+/*   failure in debug mode.  You might also choose to return these   */         
+/*   messages to ICHPWX01 in the outputMsg output argument. If so,   */         
+/*   modify the messages as desired, and uncomment the lines         */         
+/*   immediately before the return statement (search for             */         
+/*   "outputMsg").                                                   */         
+/*                                                                   */         
+Error_text.0  = 'No rules violated!'                                            
+Error_text.1  = 'Minimum length violation'                                      
+Error_text.2  = 'Maximum length violation'                                      
+Error_text.3  = 'Contains disallowed characters'                                
+Error_text.4  = 'Contains leading blanks'                                       
+Error_text.5  = 'Contains trailing blanks'                                      
+Error_text.6  = 'Contains part of user''s name'                                 
+Error_text.7  = 'Only trivially different from previous'                        
+Error_text.8  = 'Not enough character differences from previous'                
+Error_text.9  = 'Not enough unique word differences from previous'              
+Error_text.10 = 'Contains restricted word'                                      
+Error_text.11 = 'Not enough different character types'                          
+Error_text.12 = 'Contains part of the user ID'                                  
+Error_text.13 = 'Too many repeating characters'                                 
+/*                                                                   */         
+/* ----------------------------------------------------------------- */         
+/*                                                                   */         
+/*                                                                   */         
+/*   This ought to get you started. Now go ahead and add checks      */         
+/*   which make sense for your particular installation. It sure      */         
+/*   beats programming in assembler!                                 */         
+/*                                                                   */         
+/*********************************************************************/         
+                                                                                
+/*********************************************************************/         
+/* Exit processing starts here:                                      */         
+/*********************************************************************/         
+                                                                                
+/*********************************************************************/         
+/* If this is a LIST request, report on the active configuration     */         
+/* variables. A LIST is accomplished with the following sysrexx      */         
+/* operator command:                                                 */         
+/*           F AXR,IRRPHREX LIST                                     */         
+/* In this case, IRRPHREX receives a single argument ("LIST"),       */         
+/* which arrives in the "RexxRc" variable, since that is the first   */         
+/* argument that was originally defined for this exec when invoked   */         
+/* by ICHPWX11.                                                      */         
+/*********************************************************************/         
+Upper RexxRc    /* In case user enclosed mixed case string in quotes */         
+If Substr(RexxRc,1,4) = "LIST" Then                                             
+  do                                                                            
+    call Perform_list(RexxRc)                                                   
+    return               /* Exit the exec */                                    
+  end                                                                           
+                                                                                
+/*********************************************************************/         
+/* Initialize the return and reason code to 0                        */         
+/*********************************************************************/         
+RexxRc = 0                                                                      
+RexxReason = 0                                                                  
+                                                                                
+/*********************************************************************/         
+/* Set the arithmetic precision to 10 digits (from the default of 9) */         
+/* so that D2X (used below) can convert larger hex addresses.        */         
+/*********************************************************************/         
+NUMERIC DIGITS 10                                                               
+                                                                                
+/*********************************************************************/         
+/* Convert numeric ExitCaller parm into a string value for later use.*/         
+/*********************************************************************/         
+Select                                                                          
+  When ExitCaller = 1 Then                                                      
+    CallerName = "RACINIT"                                                      
+  When ExitCaller = 2 Then                                                      
+    CallerName = "PASSWORD"                                                     
+  When ExitCaller = 3 Then                                                      
+    CallerName = "ALTUSER"                                                      
+  When ExitCaller = 4 Then                                                      
+    CallerName = "ADDUSER"                                                      
+  Otherwise                                                                     
+    CallerName = "INVALID"                                                      
+end                                                                             
+                                                                                
+/*********************************************************************/         
+/* Dump arguments if debug is on.                                    */         
+/*                                                                   */         
+/* Note:                                                             */         
+/*  - The args are dumped in the order in which they are received.   */         
+/*  - The old/new phrase and the command image are not dumped, as    */         
+/*    they contain sensitive data which will be logged. Uncomment    */         
+/*    these lines only when testing on a test system.                */         
+/*  - AXRWTO has a limit of 126 characters, and will truncate        */         
+/*    strings if necessary.                                          */         
+/*********************************************************************/         
+if debug = 'on' then do                                                         
+  WtoRc = AXRWTO("In IRRPHREX called by ICHPWX11. Dumping args:")               
+                                                                                
+  WtoRc = AXRWTO("Caller name is:" CallerName)                                  
+                                                                                
+  /* WtoRc = AXRWTO("CPPL address: X'"D2X(CPPLaddr)"'") */                      
+                                                                                
+  /*******************************************************************/         
+  /* Remove leading, trailing, and repeated embedded spaces first,   */         
+  /* just to get as much meaningful text as possible. This isn't     */         
+  /* foolproof as it might compress meaningful spaces, e.g. in       */         
+  /* installation data. You can break the command image into smaller */         
+  /* pieces if you really want to display it all.                    */         
+  /*******************************************************************/         
+  If Length(CmdImage) = 0 Then                                                  
+    WtoRc = AXRWTO("Command image not provided.")                               
+  Else do                                                                       
+    CmdImage = Space(CmdImage)                                                  
+    WtoRc = AXRWTO("Command image length:" LENGTH(CmdImage))                    
+    /* Be very careful about uncommenting this! It contains a phrase.           
+    WtoRc = AXRWTO("Command image:" CmdImage)                                   
+    */                                                                          
+  End                                                                           
+                                                                                
+  /* Be very careful about uncommenting this!                                   
+  WtoRc = AXRWTO("New password phrase length:" LENGTH(newPhrase))               
+  WtoRc = AXRWTO("New password phrase:" newPhrase)                              
+  */                                                                            
+                                                                                
+  WtoRc = AXRWTO("User ID:" userID)                                             
+                                                                                
+  /* WtoRc = AXRWTO("Work area address: X'"D2X(workAddr)"'") */                 
+                                                                                
+  /*                                                                            
+  If Length(oldPhrase) = 0 Then                                                 
+    WtoRc = AXRWTO("Old password phrase not provided.")                         
+  Else do                                                                       
+    WtoRc = AXRWTO("Old password phrase length:" LENGTH(oldPhrase))             
+    WtoRc = AXRWTO("Old password phrase:" oldPhrase)                            
+  End                                                                           
+  */                                                                            
+                                                                                
+  If Length(chgDate) = 0 Then                                                   
+    WtoRc = AXRWTO("Last-change date not provided.")                            
+  Else                                                                          
+    WtoRc = AXRWTO("Last-change date:" chgDate)                                 
+                                                                                
+  /* WtoRc = AXRWTO("ACEE address: X'"D2X(ACEEaddr)"'") */                      
+                                                                                
+  If Length(userName) = 0 Then                                                  
+    WtoRc = AXRWTO("User name not provided.")                                   
+  Else do                                                                       
+    userName = Strip(userName,trailing)                                         
+    WtoRc = AXRWTO("User name:" userName)                                       
+  End                                                                           
+                                                                                
+  If Length(instData) = 0 Then                                                  
+    WtoRc = AXRWTO("Installation data not provided.")                           
+  Else do                                                                       
+    WtoRc = AXRWTO("Installation data length:" Length(instData))                
+    WtoRc = AXRWTO("Installation data:" instData)                               
+  End                                                                           
+                                                                                
+  If Length(groupName) = 0 Then                                                 
+    WtoRc = AXRWTO("Group name not provided.")                                  
+  Else                                                                          
+    WtoRc = AXRWTO("Group name:" groupName)                                     
+                                                                                
+  /* WtoRc = AXRWTO("INSTLN= address: X'"D2X(instAddr)"'") */                   
+                                                                                
+  /*******************************************************************/         
+  /* If a given WTO doesn't work, the following lines can print out  */         
+  /* error information provided the variable WtoRc was used in the   */         
+  /* WTO. For example:                                               */         
+  /*    WtoRc = AXRWTO("text")                                       */         
+  /* AXRDIAG is a built-in variable provided by System REXX.         */         
+  /*******************************************************************/         
+  /*                                                                            
+  WtoRc = AXRWTO("AXRWTO rc: " WtoRc)                                           
+  WtoRc = AXRWTO("AXRDIAG: " AXRDIAG)                                           
+  */                                                                            
+End /* debug on */                                                              
+                                                                                
+/*********************************************************************/         
+/* If the new phrase was not specified, then just exit. This can     */         
+/* happen when the exec is invoked from the console with an invalid  */         
+/* option. We may as well avoid a confusing "Minimum length          */         
+/* violation" message.                                               */         
+/*********************************************************************/         
+If Length(newPhrase) = 0 Then                                                   
+  signal phrexit                                                                
+                                                                                
+/*********************************************************************/         
+/* Enforce minimum length                                            */         
+/*********************************************************************/         
+If Phr_minlen /= 'PHR_MINLEN' &,                                                
+   length(newPhrase) < Phr_minlen then do                                       
+  RexxReason = 1                                                                
+  signal phrexit                                                                
+End                                                                             
+                                                                                
+/*********************************************************************/         
+/* Enforce maximum length                                            */         
+/*********************************************************************/         
+If Phr_maxlen /= 'PHR_MAXLEN' &,                                                
+   length(newPhrase) > Phr_maxlen then do                                       
+  RexxReason = 2                                                                
+  signal phrexit                                                                
+End                                                                             
+                                                                                
+/*********************************************************************/         
+/* Enforce allowable characters.                                     */         
+/*********************************************************************/         
+If Phr_allowed_chars /= 'PHR_ALLOWED_CHARS',/* If variable defined   */         
+ & Length(Phr_allowed_chars) > 0 Then       /* And not null          */         
+  If verify(newPhrase,Phr_allowed_chars) > 0 then do                            
+    RexxReason = 3                                                              
+    signal phrexit                                                              
+  End                                                                           
+                                                                                
+/*********************************************************************/         
+/* Enforce minimum character type check.                             */         
+/*********************************************************************/         
+If Phr_req_types /= 'PHR_REQ_TYPES' Then    /* If variable defined   */         
+  Do                                                                            
+    numtypes = 0                     /* Number of types encountered */          
+    If verify(newPhrase,numbers,Match) /= 0 Then                                
+      numtypes = numtypes + 1                                                   
+    If verify(newPhrase,Upper_letters,Match) /= 0 Then                          
+      numtypes = numtypes + 1                                                   
+    If verify(newPhrase,special,Match) /= 0 Then                                
+      numtypes = numtypes + 1                                                   
+    If verify(newPhrase,Lower_letters,Match) /= 0 Then                          
+      numtypes = numtypes + 1                                                   
+                                                                                
+    If numtypes < Phr_req_types Then do                                         
+      RexxReason = 11                                                           
+      signal phrexit                                                            
+    End                                                                         
+  End                                                                           
+                                                                                
+/*********************************************************************/         
+/* Enforce leading blanks.                                           */         
+/*********************************************************************/         
+If Phr_leading_blanks = 'no' then                                               
+  If Substr(newPhrase,1,1) = ' ' then do                                        
+    RexxReason = 4                                                              
+    signal phrexit                                                              
+  End                                                                           
+                                                                                
+/*********************************************************************/         
+/* Enforce trailing blanks.                                          */         
+/*********************************************************************/         
+If Phr_trailing_blanks = 'no' then                                              
+  If Substr(newPhrase,Length(newPhrase),1) = ' ' then do                        
+    RexxReason = 5                                                              
+    signal phrexit                                                              
+  End                                                                           
+                                                                                
+/*********************************************************************/         
+/* For subsequent checking, we will create a normalized copy of the  */         
+/* phrases in which blanks are removed and the string is folded to   */         
+/* upper case. The old (current) phrase is only provided for RACINIT */         
+/* and PASSWORD. Note there is a case where RACINIT does not have    */         
+/* the old phrase (when a PassTicket was used to authenticate).      */         
+/*********************************************************************/         
+NormNewPhrase = ''                                                              
+Do I = 1 to Words(newPhrase)                                                    
+  NormNewPhrase = NormNewPhrase||Word(newPhrase,I)                              
+End                                                                             
+Upper NormNewPhrase                                                             
+                                                                                
+NormOldPhrase = ''                                                              
+If Length(oldPhrase) > 0 Then do                                                
+  Do I = 1 to Words(oldPhrase)                                                  
+    NormOldPhrase = NormOldPhrase||Word(oldPhrase,I)                            
+  End                                                                           
+  Upper NormOldPhrase                                                           
+End                                                                             
+                                                                                
+/*********************************************************************/         
+/* Enforce user name restriction. The user's name is not available   */         
+/* on an ADDUSER command. The user name is not required in a RACF    */         
+/* profile, and ICHPWX11 will have set a parm length value of 0      */         
+/* if there is no name. Note that the RACF user name is always in    */         
+/* upper case. We are using a copy of the new phrase value which     */         
+/* has been upper-cased (above).                                     */         
+/*********************************************************************/         
+If Phr_name_allowed = 'no' &,                                                   
+   CallerName /= 'ADDUSER' &,                                                   
+   Length(userName) > 0 Then                                                    
+  Do I = 1 to Words(userName)                                                   
+    If Pos(Word(userName,I),NormNewPhrase) /= 0 &,                              
+       Length(Word(userName,I)) >= Phr_name_minlen Then do                      
+      RexxReason = 6                                                            
+      signal phrexit                                                            
+    End                                                                         
+  End                                                                           
+                                                                                
+/*********************************************************************/         
+/* Reject trivial differences between new and old password phrase.   */         
+/*********************************************************************/         
+If Phr_triviality = 'yes' & Length(NormOldPhrase) > 0 Then                      
+  If NormOldPhrase = NormNewPhrase |,                                           
+     Pos(NormNewPhrase,NormOldPhrase) /= 0 |,                                   
+     Pos(NormOldPhrase,NormNewPhrase) /= 0 Then do                              
+    RexxReason = 7                                                              
+    signal phrexit                                                              
+  End                                                                           
+                                                                                
+/*********************************************************************/         
+/* Enforce minimum unique characters by position, from the old       */         
+/* value.                                                            */         
+/*********************************************************************/         
+If Phr_min_unique /= 'PHR_MIN_UNIQUE' &,      /* Variable is defined */         
+   Phr_min_unique > 0                 &,      /* And greater than 0  */         
+   Length(NormOldPhrase) > 0 Then do          /* And old available   */         
+                                                                                
+  If Phr_min_unique_norm = 'yes' Then do                                        
+    old_string = NormOldPhrase                                                  
+    new_string = NormNewPhrase                                                  
+  End                                                                           
+  Else do                                                                       
+    old_string = oldPhrase                                                      
+    new_string = newPhrase                                                      
+  End                                                                           
+                                                                                
+  MinDiff = 0                                                                   
+  Do I = 1 to Min(Length(old_string),Length(new_string))                        
+    If Substr(old_string,I,1) /= Substr(new_string,I,1) Then                    
+      MinDiff = MinDiff + 1                                                     
+  End                                                                           
+                                                                                
+  If MinDiff < Phr_min_unique Then do                                           
+    RexxReason = 8                                                              
+    signal phrexit                                                              
+  End                                                                           
+End                                                                             
+                                                                                
+/*********************************************************************/         
+/* Enforce minimum unique words in the new password phrase as        */         
+/* compared to the old value.                                        */         
+/*********************************************************************/         
+MinWords = 0                                                                    
+If Phr_word_minlen = 'PHR_WORD_MINLEN' Then /* Variable not defined  */         
+  Phr_word_minlen = 0                       /* All words count       */         
+                                                                                
+If Phr_word_unique /= 'PHR_WORD_UNIQUE' &,  /* Variable defined      */         
+   Phr_word_unique > 0                  &,  /* And greater than 0    */         
+   Length(OldPhrase) > 0 Then do            /* And old available     */         
+                                                                                
+  old_string = oldPhrase                                                        
+  new_string = newPhrase                                                        
+  If Phr_word_unique_upper = 'yes' Then do                                      
+    Upper old_string                                                            
+    Upper new_string                                                            
+  End                                                                           
+                                                                                
+  Do I = 1 to Words(new_string)                                                 
+    If Length(Word(new_string,I)) >= Phr_word_minlen &,                         
+       Wordpos(Word(new_string,I),old_string) = 0 Then                          
+      MinWords = MinWords + 1                                                   
+  End                                                                           
+                                                                                
+  If MinWords < Phr_word_unique Then do                                         
+    RexxReason = 9                                                              
+    signal phrexit                                                              
+  End                                                                           
+End                                                                             
+                                                                                
+UpperNew = newPhrase                                                            
+Upper UpperNew                                                                  
+                                                                                
+/*********************************************************************/         
+/* Check that the user ID is not part of the phrase.                 */         
+/*********************************************************************/         
+If Phr_userID_allowed = 'no' Then                                               
+  Do                                                                            
+    /*****************************************************************/         
+    /* If no subset is specified, then it is a simple matter of      */         
+    /* checking if the entire user ID is contained in the phrase.    */         
+    /*****************************************************************/         
+    If Phr_userID_chars = 0 Then                                                
+      Do                                                                        
+        If Pos(userID,UpperNew) /= 0 Then                                       
+          RexxReason = 12                                                       
+      End                                                                       
+    /*****************************************************************/         
+    /* If a subset is specified, then we need to loop through the    */         
+    /* positions of the user ID checking for each possible           */         
+    /* substring of the specified length in the new phrase. If       */         
+    /* the user ID is shorter than the specified length, then        */         
+    /* don't check for it.                                           */         
+    /*****************************************************************/         
+    Else                                                                        
+      If Phr_userID_chars /= 'PHR_USERID_CHARS' &, /* Var defined    */         
+         Length(userID) >= Phr_userID_chars Then                                
+        Do I = 1 to Length(userID)-Phr_userID_chars+1,                          
+           Until RexxReason = 12                                                
+          sub_string = Substr(userID,I,Phr_userID_chars)                        
+          If Pos(sub_string,UpperNew) /= 0 Then                                 
+            RexxReason = 12                                                     
+        End                                                                     
+                                                                                
+    If RexxReason = 12 Then                                                     
+      signal phrexit                                                            
+  End                                                                           
+                                                                                
+/*********************************************************************/         
+/* Check phrase for repeated characters                              */         
+/*********************************************************************/         
+If Phr_repeat_chars_chk = 'yes' Then Do                                         
+  If Phr_repeat_upper = 'yes' Then                                              
+    chk_string = UpperNew                                                       
+  Else                                                                          
+    chk_string = newPhrase                                                      
+                                                                                
+                                                                                
+  If Phr_repeat_chars /= 'PHR_REPEAT_CHARS' Then do                             
+    rchrs = 0                                                                   
+    Do I = 1 to Length(chk_string)-1                                            
+      If substr(chk_string,I,1) = substr(chk_string,I+1,1) then                 
+        rchrs = rchrs + 1                                                       
+    End                                                                         
+    If rchrs > Phr_repeat_chars Then do                                         
+      RexxReason = 13                                                           
+      signal phrexit                                                            
+    End                                                                         
+  End                                                                           
+End                                                                             
+                                                                                
+/*********************************************************************/         
+/* Enforce dictionary check.                                         */         
+/*********************************************************************/         
+If Phr_dict.0 /= 'PHR_DICT.0' &,          /* Stem defined and        */         
+   Phr_dict.0 > 0 Then                    /* Count field > zero      */         
+  Do I = 1 to Phr_dict.0                                                        
+    UpperWord = Phr_dict.I                                                      
+    Upper UpperWord                                                             
+    If Pos(UpperWord,UpperNew) > 0 Then do                                      
+      RexxReason = 10                                                           
+      signal phrexit                                                            
+    End                                                                         
+  End                                                                           
+                                                                                
+/*********************************************************************/         
+/* Return to ICHPWX11.                                               */         
+/*********************************************************************/         
+phrexit:                                                                        
+If RexxReason /= 0 Then                                                         
+  RexxRc = 4                                                                    
+                                                                                
+/*********************************************************************/         
+/* If debug is on, display failure reason message.                   */         
+/*********************************************************************/         
+If debug = 'on' then do                                                         
+  WtoRc = AXRWTO("RexxRc =" RexxRc)                                             
+  WtoRc = AXRWTO("RexxReason =" RexxReason": "Error_text.RexxReason)            
+End                                                                             
+                                                                                
+/*********************************************************************/         
+/* If desired, you can use the same debug message (feel free to      */         
+/* tailor them) as your returned message by uncommenting the         */         
+/* statements below.                                                 */         
+/*********************************************************************/         
+/*                                                                              
+If RexxRc = 4 Then                                                              
+  outputMsg = Error_text.RexxReason                                             
+*/                                                                              
+                                                                                
+return                                                                          
+                                                                                
+/*******************************************************************/           
+/* Perform_list:                                                   */           
+/*                                                                 */           
+/* Use the AXRMLWTO function to display the values of the active   */           
+/* configuration variables.  This is a Sysrexx front-end to a      */           
+/* multiline WTO.  We issue it this way so that our output lines   */           
+/* stay together on the console.                                   */           
+/*                                                                 */           
+/* Input:                                                          */           
+/*   list_type - Type of listing to perform                        */           
+/*     LISTVAR: List each configuration variable and its value,    */           
+/*              separated by a colon.  This is appropriate for     */           
+/*              consumption by a program.                          */           
+/*     LISTxxx: Anything else displays the output in English,      */           
+/*              for consumption by a human being.                  */           
+/*                                                                 */           
+/* When new checks are added, this routine should be updated.      */           
+/*                                                                 */           
+/*******************************************************************/           
+Perform_list:                                                                   
+                                                                                
+ arg list_type                                                                  
+ Select                                                                         
+  When Substr(list_type,1,5) = "LISTC" Then                                     
+    format = "c"  /* List configuration variables/values */                     
+  Otherwise                                                                     
+    format = "e"  /* List settings in English */                                
+ End                                                                            
+                                                                                
+ /******************************************************************/           
+ /* Issue a blank line just to get the output started on a clean   */           
+ /* line.                                                          */           
+ /******************************************************************/           
+ displayed_an_option = 'no'            /* No rules displayed yet   */           
+ ConnectId = 'firstline'                                                        
+ Out_line = ' '                                                                 
+ rc = AXRMLWTO(Out_line,'ConnectId','d')                                        
+                                                                                
+ /******************************************************************/           
+ /* See if the ICHPWX11 exit is active. If not, then this          */           
+ /* part of the exit is not even being called, and the config      */           
+ /* variables don't matter in the slightest.  Only issue a         */           
+ /* message line if the exit is not active, or its eyecatcher      */           
+ /* does not confirm intent to call IRRPHREX.                      */           
+ /******************************************************************/           
+ ichpwx11_version = "???"      /* Initialize version to 'unknown'  */           
+ cvt_addr = c2d(Storage(10,4))                    /* CVT address   */           
+ rcvt_addr = c2d(Storage(d2x(cvt_addr + 992),4))  /* RCVT address  */           
+ pwx11hex = Storage(D2x(rcvt_addr + 476),4)       /* ICHPWX11 addr */           
+ RCVTPHRX = C2d(BITAND(pwx11hex,'7FFFFFFF'x))                                   
+ If RCVTPHRX = 0 Then Do                                                        
+   Out_line = 'The ICHPWX11 exit is not active. IRRPHREX is not',               
+              'being called!'                                                   
+   rc = AXRMLWTO(Out_line,'ConnectId','d')                                      
+ End                                                                            
+ Else Do                                                                        
+   /* Look for 'IRRPHREX' eyecatcher in ICHPWX11 string */                      
+   icatcher = Storage(D2X(RCVTPHRX),48)                                         
+   If POS('IRRPHREX',icatcher) = 0 Then Do                                      
+     Out_line = 'Expected eyecatcher *not* detected in ICHPWX11'                
+     rc = AXRMLWTO(Out_line,'ConnectId','d')                                    
+     Out_line = '  Unable to confirm intent to call IRRPHREX'                   
+     rc = AXRMLWTO(Out_line,'ConnectId','d')                                    
+   End                                                                          
+   Else                                                                         
+     /***************************************************************/          
+     /* The eyecatcher does contain "IRRPHREX". Starting with V4,   */          
+     /* the eyecatcher is in a different format that also contains  */          
+     /* the version number in the blank-delimited word preceding    */          
+     /* "IRRPHREX". If we find a string there that starts with "V", */          
+     /* report that as the version.  Otherwise, the version         */          
+     /* remains unknown.                                            */          
+     /***************************************************************/          
+     Do i = 1 to Words(icatcher)                                                
+       thisWord = Word(icatcher,i)                                              
+       If thisWord = "IRRPHREX" & i > 1 Then Do                                 
+         If Substr(Word(icatcher,i-1),1,1) = "V" Then Do                        
+           ichpwx11_version = Word(icatcher,i-1)                                
+           Leave                                                                
+         End                                                                    
+       End                                                                      
+     End                                                                        
+ End                                                                            
+                                                                                
+ /******************************************************************/           
+ /* Display the IRRPHREX and ICHPWX11 version values.              */           
+ /******************************************************************/           
+ Select                                                                         
+  When format = 'c' Then Do                                                     
+    Out_line = 'ICHPWX11_VERSION:'ichpwx11_version                              
+    rc = AXRMLWTO(Out_line,'ConnectId','d')                                     
+    Out_line = 'IRRPHREX_VERSION:'irrphrex_version                              
+    rc = AXRMLWTO(Out_line,'ConnectId','d')                                     
+  End                                                                           
+  Otherwise                                                                     
+    Out_line = 'ICHPWX11 version is' ichpwx11_version                           
+    rc = AXRMLWTO(Out_line,'ConnectId','d')                                     
+    Out_line = 'IRRPHREX version is' irrphrex_version                           
+    rc = AXRMLWTO(Out_line,'ConnectId','d')                                     
+ End                                                                            
+                                                                                
+ /* Display the supported characters, breaking them into numbers,   */          
+ /* letters, and specials (to satisfy STIG expectations, as well as */          
+ /* to avoid truncation of a long string).  For specials, omit the  */          
+ /* blank (again, to match STIG dcumentation). Since nobody is      */          
+ /* likely to restrict any numbers or letters, we will suppress     */          
+ /* that output unless the STIG switch is enabled.                  */          
+ /*                                                                 */          
+ /* We do not set displayed_an_option = 'yes'. Although specifying  */          
+ /* a special character set by definition limits what RACF will     */          
+ /* allow, we don't want that to obscure the 'no rules active'      */          
+ /* message.                                                        */          
+ If STIG_Compliant = 'yes' Then Do                                              
+   /*numbers not null*/                                                         
+   If numbers /= 'NUMBERS' Then Do                                              
+     Select                                                                     
+      When format = 'c' Then                                                    
+        Out_line = 'numbers = '||numbers                                        
+      Otherwise                                                                 
+        Out_line = '  The allowable numeric characters are' numbers             
+     End                                                                        
+     rc = AXRMLWTO(Out_line,'ConnectId','d')                                    
+   End                                                                          
+   /*Lower_letters and Upper_letters not null*/                                 
+   letters = ''                                                                 
+   If Lower_letters /= 'LOWER_LETTERS' Then                                     
+     letters = Lower_letters                                                    
+   If Upper_letters /= 'UPPER_LETTERS' Then                                     
+     letters = letters||Upper_letters                                           
+   If Length(letters) > 0 Then Do                                               
+     Select                                                                     
+      When format = 'c' Then                                                    
+        Out_line = 'letters = '||letters                                        
+      Otherwise                                                                 
+        Out_line = '  The allowable alphabetic characters are' letters          
+     End                                                                        
+     rc = AXRMLWTO(Out_line,'ConnectId','d')                                    
+   End                                                                          
+ End   /* STIG switch enabled */                                                
+ /*special not null*/                                                           
+ If special /= 'SPECIAL' Then Do                                                
+   Sspecial = Substr(special,2)    /* Skip past blank               */          
+   Select                                                                       
+    When format = 'c' Then                                                      
+      Out_line = 'special = '||Sspecial                                         
+    Otherwise                                                                   
+      Out_line = '  The allowable special characters are' Sspecial              
+   End                                                                          
+   rc = AXRMLWTO(Out_line,'ConnectId','d')                                      
+ End                                                                            
+                                                                                
+ /******************************************************************/           
+ /* Now issue a header line for IRRPHREX settings.                 */           
+ /* We will then issue a message for each configuration variable   */           
+ /* that has been enabled (where we consider "enabled" to mean     */           
+ /* that it is set to a value that RACF does not already enforce   */           
+ /* natively).                                                     */           
+ /******************************************************************/           
+ Select                                                                         
+  When format = 'c' Then                                                        
+    Out_line = 'The following IRRPHREX',                                        
+                'configuration variables are defined:'                          
+  Otherwise                                                                     
+    Out_line = 'The following IRRPHREX',                                        
+               'password exit rules are in place:'                              
+ End                                                                            
+ rc = AXRMLWTO(Out_line,'ConnectId','d')                                        
+                                                                                
+                                                                                
+ /*STIG_Compliant = 'no'                       */                               
+ If STIG_Compliant /= 'STIG_COMPLIANT' Then Do                                  
+   Select                                                                       
+    When format = 'c' Then                                                      
+      Out_line = 'STIG_COMPLIANT:'||STIG_Compliant                              
+    Otherwise                                                                   
+      If STIG_Compliant = 'yes' Then                                            
+        Out_line = '  STIG compliance is explicitly specified'                  
+      Else                                                                      
+        Out_line = ''                                                           
+   End                                                                          
+   If Out_line /= '' Then                                                       
+     rc = AXRMLWTO(Out_line,'ConnectId','d')                                    
+ End                                                                            
+                                                                                
+                                                                                
+ /*Phr_minlen = 9  when KDFAES is active    */                                  
+ /*Phr_minlen = 14 when KDFAES is not active*/                                  
+ If Phr_minlen /= 'PHR_MINLEN' Then Do                                          
+   Select                                                                       
+    When format = 'c' Then                                                      
+      Out_line = 'PHR_MINLEN:'||Phr_minlen                                      
+    Otherwise                                                                   
+      If pwalg = 0 & Phr_minlen > 14 |,                                         
+         pwalg = 1 & Phr_minlen > 9 Then Do                                     
+        Out_line = '  The minimum word length checked is ' || Phr_minlen        
+        displayed_an_option = 'yes'                                             
+      End                                                                       
+      Else                                                                      
+        Out_line = ''                                                           
+   End                                                                          
+   If Out_line /= '' Then                                                       
+     rc = AXRMLWTO(Out_line,'ConnectId','d')                                    
+ End                                                                            
+                                                                                
+                                                                                
+ /*Phr_maxlen = 100*/                                                           
+ If Phr_maxlen /= 'PHR_MAXLEN' Then Do                                          
+   Select                                                                       
+    When format = 'c' Then                                                      
+      Out_line = 'PHR_MAXLEN:'||Phr_maxlen                                      
+    Otherwise                                                                   
+      If Phr_maxlen < 100 Then Do                                               
+        Out_line = '  The maximum password length is ' || Phr_maxlen            
+        displayed_an_option = 'yes'                                             
+      End                                                                       
+      Else                                                                      
+        Out_line = ''                                                           
+   End                                                                          
+   If Out_line /= '' Then                                                       
+     rc = AXRMLWTO(Out_line,'ConnectId','d')                                    
+ End                                                                            
+                                                                                
+                                                                                
+ /*Phr_req_types = 2*/                                                          
+ If Phr_req_types /= 'PHR_REQ_TYPES' Then Do                                    
+   Select                                                                       
+    When format = 'c' Then                                                      
+      Out_line = 'PHR_REQ_TYPES:'||Phr_req_types                                
+    Otherwise                                                                   
+      If Phr_req_types > 2 Then Do                                              
+        Out_line = '  The number of required character types is ' ||,           
+                     Phr_req_types                                              
+        displayed_an_option = 'yes'                                             
+      End                                                                       
+      Else                                                                      
+        Out_line = ''                                                           
+   End                                                                          
+   If Out_line /= '' Then                                                       
+     rc = AXRMLWTO(Out_line,'ConnectId','d')                                    
+ End                                                                            
+                                                                                
+                                                                                
+ /*Phr_leading_blanks = 'yes'*/                                                 
+ If Phr_leading_blanks /= 'PHR_LEADING_BLANKS' Then Do                          
+   Select                                                                       
+    When format = 'c' Then                                                      
+      Out_line = 'PHR_LEADING_BLANKS:'||Phr_leading_blanks                      
+    Otherwise                                                                   
+      If Phr_leading_blanks = 'no' Then Do                                      
+        Out_line = '  Leading blanks are not allowed.'                          
+        displayed_an_option = 'yes'                                             
+      End                                                                       
+      Else                                                                      
+        Out_line = ''                                                           
+   End                                                                          
+   If Out_line /= '' Then                                                       
+     rc = AXRMLWTO(Out_line,'ConnectId','d')                                    
+ End                                                                            
+                                                                                
+                                                                                
+ /*Phr_trailing_blanks = 'yes'*/                                                
+ If Phr_trailing_blanks /= 'PHR_TRAILING_BLANKS' Then Do                        
+   Select                                                                       
+    When format = 'c' Then                                                      
+      Out_line = 'PHR_TRAILING_BLANKS:'||Phr_trailing_blanks                    
+    Otherwise                                                                   
+      If Phr_trailing_blanks = 'no' Then Do                                     
+        Out_line = '  Trailing blanks are not allowed.'                         
+        displayed_an_option = 'yes'                                             
+      End                                                                       
+      Else                                                                      
+        Out_line = ''                                                           
+   End                                                                          
+   If Out_line /= '' Then                                                       
+     rc = AXRMLWTO(Out_line,'ConnectId','d')                                    
+ End                                                                            
+                                                                                
+                                                                                
+ /*Phr_name_allowed = 'yes'*/                                                   
+ /*Phr_name_minlen = 3 */                                                       
+ If Phr_name_allowed /= 'PHR_NAME_ALLOWED' Then Do                              
+  Select                                                                        
+    When format = 'c' Then                                                      
+      Do                                                                        
+        Out_line = 'PHR_NAME_ALLOWED:'||Phr_name_allowed                        
+        rc = AXRMLWTO(Out_line,'ConnectId','d')                                 
+        If Phr_name_minlen /= 'PHR_NAME_MINLEN' Then                            
+          Do                                                                    
+            Out_line = '  PHR_NAME_MINLEN:'||Phr_name_minlen                    
+            rc = AXRMLWTO(Out_line,'ConnectId','d')                             
+          End                                                                   
+      End                                                                       
+    Otherwise                                                                   
+      If Phr_name_allowed = 'no' Then Do                                        
+        Out_line = '  The user''s name cannot be contained',                    
+                   'in the password phrase'                                     
+        rc = AXRMLWTO(Out_line,'ConnectId','d')                                 
+        displayed_an_option = 'yes'                                             
+                                                                                
+        If Phr_name_minlen /= 'PHR_NAME_MINLEN' Then Do                         
+          Out_line = "    Only" Phr_name_minlen "consecutive " ||,              
+                     "characters of the user's name are allowed"                
+          rc = AXRMLWTO(Out_line,'ConnectId','d')                               
+        End                                                                     
+      End                                                                       
+  End                                                                           
+ End                                                                            
+                                                                                
+                                                                                
+/*Phr_repeat_chars_chk = no */                                                  
+/*Phr_repeat_chars = 2 */                                                       
+/*Phr_repeat_upper = 'yes' */                                                   
+If Phr_repeat_chars_chk /= 'PWD_REPEAT_CHARS_CHK' Then Do                       
+  Select                                                                        
+   When format = 'c' Then                                                       
+     Do                                                                         
+       Out_line = 'PHR_REPEAT_CHARS_CHK:'||Phr_repeat_chars_chk                 
+       rc = AXRMLWTO(Out_line,'ConnectId','d')                                  
+       If Phr_repeat_chars /= 'PHR_REPEAT_CHARS' Then Do                        
+         Out_line = '  PHR_REPEAT_CHARS:'||Phr_repeat_chars                     
+         rc = AXRMLWTO(Out_line,'ConnectId','d')                                
+       End                                                                      
+       If Phr_repeat_upper /= 'PHR_REPEAT_UPPER' Then Do                        
+         Out_line = '  PHR_REPEAT_UPPER:'||Phr_repeat_upper                     
+         rc = AXRMLWTO(Out_line,'ConnectId','d')                                
+       End                                                                      
+     End                                                                        
+   Otherwise                                                                    
+     If Phr_repeat_chars_chk = 'yes' Then Do                                    
+       Out_line = '  No more than '||Phr_repeat_chars||' pairs of',             
+                  'repeating characters are allowed'                            
+       rc = AXRMLWTO(Out_line,'ConnectId','d')                                  
+       displayed_an_option = 'yes'                                              
+                                                                                
+       If Phr_repeat_upper = 'yes' Then                                         
+         Out_line = '    This check is not case sensitive'                      
+       Else                                                                     
+         Out_line = '    This check is case sensitive'                          
+       rc = AXRMLWTO(Out_line,'ConnectId','d')                                  
+     End                                                                        
+  End                                                                           
+End                                                                             
+                                                                                
+                                                                                
+ /*Phr_userID_allowed = 'yes'*/                                                 
+ /*Phr_userID_chars = 4 */                                                      
+ If Phr_userID_allowed /= 'PHR_USERID_ALLOWED' Then Do                          
+   Select                                                                       
+    When format = 'c' Then                                                      
+      Do                                                                        
+        Out_line = 'PHR_USERID_ALLOWED:'||Phr_userID_allowed                    
+        rc = AXRMLWTO(Out_line,'ConnectId','d')                                 
+        If Phr_userID_chars /= 'PHR_USERID_CHARS' Then Do                       
+          Out_line = '  PHR_USERID_CHARS:'||Phr_userID_chars                    
+          rc = AXRMLWTO(Out_line,'ConnectId','d')                               
+        End                                                                     
+      End                                                                       
+    Otherwise                                                                   
+      If Phr_userID_allowed = 'no' Then Do                                      
+        Out_line = '  The user ID cannot be contained in',                      
+                   'the password phrase'                                        
+        rc = AXRMLWTO(Out_line,'ConnectId','d')                                 
+        displayed_an_option = 'yes'                                             
+                                                                                
+        If Phr_userID_chars /= 'PHR_USERID_CHARS' Then Do                       
+          Out_line = '    Only '||Phr_userID_chars-1||' consecutive',           
+                     'characters of the user ID are allowed'                    
+          rc = AXRMLWTO(Out_line,'ConnectId','d')                               
+        End                                                                     
+      End                                                                       
+   End                                                                          
+ End                                                                            
+                                                                                
+                                                                                
+ /*Phr_triviality = 'no' */                                                     
+ If Phr_triviality /= 'PHR_TRIVIALITY' Then Do                                  
+   Select                                                                       
+    When format = 'c' Then                                                      
+      Out_line = 'PHR_TRIVIALITY:'||Phr_triviality                              
+    Otherwise                                                                   
+      If Phr_triviality = 'yes' Then Do                                         
+        Out_line = '  Phrase must be non-trivially different',                  
+                     'from the current value'                                   
+        displayed_an_option = 'yes'                                             
+      End                                                                       
+      Else                                                                      
+        Out_line = ''                                                           
+   End                                                                          
+   If Out_line /= '' Then                                                       
+     rc = AXRMLWTO(Out_line,'ConnectId','d')                                    
+ End                                                                            
+                                                                                
+                                                                                
+ /*Phd_min_unique = 0 */                                                        
+ /*Phd_min_unique_norm = 'yes' */                                               
+ If Phr_min_unique /= 'PHR_MIN_UNIQUE' Then Do                                  
+   Select                                                                       
+    When format = 'c' Then                                                      
+      Do                                                                        
+        Out_line = 'PHR_MIN_UNIQUE:'||Phr_min_unique                            
+        rc = AXRMLWTO(Out_line,'ConnectId','d')                                 
+        If Phr_min_unique_norm /= 'PHR_MIN_UNIQUE_NORM' Then Do                 
+          Out_line = '  PHR_MIN_UNIQUE_NORM:'||Phr_min_unique_norm              
+          rc = AXRMLWTO(Out_line,'ConnectId','d')                               
+        End                                                                     
+      End                                                                       
+    Otherwise                                                                   
+      If Phr_min_unique > 0 Then do                                             
+        Out_line = '  At least '||Phr_min_unique||' positions must be',         
+                     'unique from the current value'                            
+        rc = AXRMLWTO(Out_line,'ConnectId','d')                                 
+        displayed_an_option = 'yes'                                             
+                                                                                
+        If Phr_min_unique_norm = 'yes' Then                                     
+          Out_line = '    This check is not case sensitive'                     
+        Else                                                                    
+          Out_line = '    This check is case sensitive'                         
+        rc = AXRMLWTO(Out_line,'ConnectId','d')                                 
+      End                                                                       
+   End                                                                          
+ End                                                                            
+                                                                                
+                                                                                
+ /*Phr_word_unique = 0             */                                           
+ /*Phr_word_unique_upper = 'yes'   */                                           
+ /*Phr_word_minlen = 4             */                                           
+ If Phr_word_unique /= 'PHR_WORD_UNIQUE' Then Do                                
+  Select                                                                        
+    When format = 'c' Then                                                      
+      Do                                                                        
+        Out_line = 'PHR_WORD_UNIQUE:'||Phr_word_unique                          
+        rc = AXRMLWTO(Out_line,'ConnectId','d')                                 
+        If Phr_word_unique_upper /= 'PHR_WORD_UNIQUE_UPPER' Then                
+          Do                                                                    
+            Out_line = '  PHR_WORD_UNIQUE_UPPER:'||,                            
+                       Phr_word_unique_upper                                    
+            rc = AXRMLWTO(Out_line,'ConnectId','d')                             
+          End                                                                   
+        If Phr_word_minlen /= 'PHR_WORD_MINLEN' Then                            
+          Do                                                                    
+            Out_line = '  PHR_WORD_MINLEN:'||,                                  
+                        Phr_word_minlen                                         
+            rc = AXRMLWTO(Out_line,'ConnectId','d')                             
+          End                                                                   
+      End                                                                       
+    Otherwise                                                                   
+      If Phr_word_unique > 0 Then Do                                            
+        Out_line = '  There must be at least '||Phr_word_unique ,               
+                   'unique words in the new phrase'                             
+        rc = AXRMLWTO(Out_line,'ConnectId','d')                                 
+        displayed_an_option = 'yes'                                             
+                                                                                
+        If Phr_word_unique_upper = 'yes' Then                                   
+          Out_line = '    This check is not case sensitive'                     
+        Else                                                                    
+          Out_line = '    This check is case sensitive'                         
+        rc = AXRMLWTO(Out_line,'ConnectId','d')                                 
+                                                                                
+        If Phr_word_minlen /= 'PHR_WORD_MINLEN' Then Do                         
+          Out_line = '    The minimum word length checked is ' ||,              
+                          Phr_word_minlen                                       
+          rc = AXRMLWTO(Out_line,'ConnectId','d')                               
+        End                                                                     
+      End                                                                       
+  End                                                                           
+ End                                                                            
+                                                                                
+                                                                                
+ /*Phr_dict.0 = 0    */                                                         
+ /* Note: The following code was taken from IRRPWREX, which neatly   */         
+ /* processes several stems with this common code. Here in IRRPHREX, */         
+ /* we only have one stem: the dictionary. However, to keep the code */         
+ /* similar, and in case it facilitates future updates, I retain the */         
+ /* code structure.                                                  */         
+ Do pass = 1 to 1                                                               
+   If pass = 1 Then                                                             
+     Do                                                                         
+       stem = 'PHR_DICT.'                                                       
+       stem_things = 'prefix strings'                                           
+     End                                                                        
+   num_words = Value(stem||'0')                                                 
+                                                                                
+   If Value(stem||'0') /= stem||'0' Then Do                                     
+     Select                                                                     
+      When format = 'c' Then                                                    
+        Do                                                                      
+          Out_line = stem||'0:'||num_words                                      
+          rc = AXRMLWTO(Out_line,'ConnectId','d')                               
+          Do i = 1 to num_words                                                 
+            Out_Line = '  '||stem||i||':'||Value(stem||i)                       
+            rc = AXRMLWTO(Out_line,'ConnectId','d')                             
+          End                                                                   
+        End                                                                     
+      Otherwise                                                                 
+        If num_words > 0 Then Do                                                
+          Out_line = '  A minimum list of '||num_words||,                       
+                     ' restricted '||stem_things||' is being checked:'          
+          rc = AXRMLWTO(Out_line,'ConnectId','d')                               
+          displayed_an_option = 'yes'                                           
+                                                                                
+          ml = 71     /* Max line size is 71 characters */                      
+          lp = '    ' /* line prefix for indentation    */                      
+          i = 1       /* Start with first word in stem  */                      
+          Do Until i > num_words                                                
+            Out_line = lp   /* Start a fresh line */                            
+            ll = Length(lp) /* Line length initialized to prefix len */         
+            Do Until ll = ml/* Add words until the line is full      */         
+              If i > num_words Then  /* If no more words, bail out   */         
+                Leave                                                           
+              If ll + Length(Value(stem||i)) + 1 <= ml Then Do                  
+                Out_Line = Out_line||' 'Value(stem||i)                          
+                ll = ll + Length(Value(stem||i)) + 1                            
+                i = i + 1 /* Bump to next word */                               
+              End                                                               
+              Else        /* Next word won't fit */                             
+                ll = ml   /* Terminate the line  */                             
+            End           /* We have a full line */                             
+            rc = AXRMLWTO(Out_line,'ConnectId','d')                             
+          End             /* We printed all the words    */                     
+        End               /* There was at least one word */                     
+     End                  /* End Select */                                      
+   End /* There is a stem */                                                    
+ End /* All stems processed */                                                  
+                                                                                
+                                                                                
+ /******************************************************************/           
+ /* If there were no enabled checks, issue a message stating this. */           
+ /******************************************************************/           
+ If format = 'e' & displayed_an_option = 'no' Then Do                           
+   Out_line = '  There are no rules active that RACF does not already',         
+              'enforce'                                                         
+   rc = AXRMLWTO(Out_line,'ConnectId','d')                                      
+ End                                                                            
+                                                                                
+ /******************************************************************/           
+ /* Complete the multi-line WTO.                                   */           
+ /******************************************************************/           
+ rc = AXRMLWTO(,'ConnectId','e')                                                
+                                                                                
+return                                                                          
