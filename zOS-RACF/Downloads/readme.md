@@ -22,10 +22,15 @@ The RACF development team has numerous tools that can assist you in managing you
 
 10. [RACFICE2](http://ibm.biz/racf-racfice2): RACFICE examples, beyond those which are shipped in 'SYS1.SAMPLIB(IRRICE)'
 
-11. [RACKILL](http://ibm.biz/racf-rackill): A utility deletes profiles from the RACF database that otherwise might not be deletable.  
+11.[RacfUnixCommands](https://github.com/IBM/IBM-Z-zOS/tree/main/zOS-RACF/Downloads/RacfUnixCommands): REXX execs that mimic RALTER, PERMIT, and RLIST to manage and display UNIX file security attributes
 
-12. [RACSEQ](https://github.com/IBM/IBM-Z-zOS/tree/main/zOS-RACF/Downloads/RACSEQ): A TSO command which invokes the extract function of R_admin (IRRSEQ00) and displays every profile field to the display using PUTLINE.    
+12. [RACKILL](http://ibm.biz/racf-rackill): A utility deletes profiles from the RACF database that otherwise might not be deletable.  
 
+13. [RACSEQ](https://github.com/IBM/IBM-Z-zOS/tree/main/zOS-RACF/Downloads/RACSEQ): A TSO command which invokes the extract function of R_admin (IRRSEQ00) and displays every profile field to the display using PUTLINE.    
+
+14. [RexxPwExit](https://github.com/IBM/IBM-Z-zOS/tree/main/zOS-RACF/Downloads/RexxPwExit): Sample REXX-based new password and phrase exits.  Code your quality rules in REXX! Contains one-stop STIG support.
+
+15. [ZfsUnload](https://github.com/IBM/IBM-Z-zOS/tree/main/zOS-RACF/Downloads/ZFSUnload): Unload zFS file security information in a manner consistent with RACF's Database Unload (IRRDBU00) and SMF Unload (IRRADU00) utilities.
 
 There are no warranties of any kind, and there is no service or technical support available for these materials from IBM. As a recommended practice, review carefully any materials that you download from this site before using them on a live system.
 
