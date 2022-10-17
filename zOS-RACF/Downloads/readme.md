@@ -6,26 +6,31 @@ The RACF development team has numerous tools that can assist you in managing you
 
 3. [CUTPWHIS](http://ibm.biz/racf-cutpwhis): A utility which trims the orphaned passwords created by decreasing the SETROPTS password history value.
 
-3. [DSNT2PRM](http://ibm.biz/racf-db2prm): A REXX exec which converts your  RACF data set names table (ICHRDSNT) or RACF range table (ICHRRNG) into a RACF PARMLIB member. 
+4. [DSNT2PRM](http://ibm.biz/racf-db2prm): A REXX exec which converts your  RACF data set names table (ICHRDSNT) or RACF range table (ICHRRNG) into a RACF PARMLIB member. 
 
-4. [DBSYNC](http://ibm.biz/racf-dbsync): REXX exec to find differences between two RACF databases and create commands to synchronize them. 
+5. [DBSYNC](http://ibm.biz/racf-dbsync): REXX exec to find differences between two RACF databases and create commands to synchronize them. 
 
-5. [IRRXUTIL](http://ibm.biz/racf-irrxutil): RACF IRRXUTIL Sample prgrams.
+6. [IRRXUTIL](http://ibm.biz/racf-irrxutil): RACF IRRXUTIL Sample prgrams.
 
-6. [JESNODES](http://ibm.biz/racf-jesnodes): A REXX exec which displays the names of trusted NODES profiles (those with a UACC greater than READ) and cover a defined node name in the context of inbound jobs and displays the local nodes defined in the &RACLNODE profile. 
+7. [JESNODES](http://ibm.biz/racf-jesnodes): A REXX exec which displays the names of trusted NODES profiles (those with a UACC greater than READ) and cover a defined node name in the context of inbound jobs and displays the local nodes defined in the &RACLNODE profile. 
 
-7. [LISTCDT](http://ibm.biz/racf-listcdt): A utility which lists the contents of your RACF Class Descriptor Table.
+8. [LISTCDT](http://ibm.biz/racf-listcdt): A utility which lists the contents of your RACF Class Descriptor Table.
 
-8. [PWDCOPY](http://ibm.biz/racf-pwdcopy): A utility which copies passwords from one RACF database to another. 
+9. [PWDCOPY](http://ibm.biz/racf-pwdcopy): A utility which copies passwords from one RACF database to another. 
 
-9. [PWDPHRONLY](http://ibm.biz/racf-pwdphronly): RACF sample ICHRIX02 exit which forces users to use password phrases.
+10. [PWDPHRONLY](http://ibm.biz/racf-pwdphronly): RACF sample ICHRIX02 exit which forces users to use password phrases.
 
-10. [RACFICE2](http://ibm.biz/racf-racfice2): RACFICE examples, beyond those which are shipped in 'SYS1.SAMPLIB(IRRICE)'
+11. [RACFICE2](http://ibm.biz/racf-racfice2): RACFICE examples, beyond those which are shipped in 'SYS1.SAMPLIB(IRRICE)'
 
-11. [RACKILL](http://ibm.biz/racf-rackill): A utility deletes profiles from the RACF database that otherwise might not be deletable.  
+12. [RacfUnixCommands](https://github.com/IBM/IBM-Z-zOS/tree/main/zOS-RACF/Downloads/RacfUnixCommands): REXX execs that mimic RALTER, PERMIT, and RLIST to manage and display UNIX file security attributes
 
-12. [RACSEQ](https://github.com/IBM/IBM-Z-zOS/tree/main/zOS-RACF/Downloads/RACSEQ): A TSO command which invokes the extract function of R_admin (IRRSEQ00) and displays every profile field to the display using PUTLINE.    
+13. [RACKILL](http://ibm.biz/racf-rackill): A utility deletes profiles from the RACF database that otherwise might not be deletable.  
 
+14. [RACSEQ](https://github.com/IBM/IBM-Z-zOS/tree/main/zOS-RACF/Downloads/RACSEQ): A TSO command which invokes the extract function of R_admin (IRRSEQ00) and displays every profile field to the display using PUTLINE.    
+
+15. [RexxPwExit](https://github.com/IBM/IBM-Z-zOS/tree/main/zOS-RACF/Downloads/RexxPwExit): Sample REXX-based new password and phrase exits.  Code your quality rules in REXX! Contains one-stop STIG support.
+
+16. [ZfsUnload](https://github.com/IBM/IBM-Z-zOS/tree/main/zOS-RACF/Downloads/ZFSUnload): Unload zFS file security information in a manner consistent with RACF's Database Unload (IRRDBU00) and SMF Unload (IRRADU00) utilities.
 
 There are no warranties of any kind, and there is no service or technical support available for these materials from IBM. As a recommended practice, review carefully any materials that you download from this site before using them on a live system.
 
