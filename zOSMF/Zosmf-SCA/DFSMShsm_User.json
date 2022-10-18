@@ -1,0 +1,368 @@
+{
+  "ServiceId": "5695DF17001",
+  "ServiceName": "DFSMS Hierarchical Storage Management (DFSMShsm) User Commands",
+  "MetaValidationItemVersion": 1.0,
+  "Vendor": "IBM",
+  "SecurityValidationItems": [
+    {
+      "ItemID": "5695DF17060I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HALTERDS",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HALTERDS",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HALTERDS command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HALTERDS command."
+    },
+    {
+      "ItemID": "5695DF17061I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKDS",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKDS command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HBACKDS command."
+    },
+    {
+      "ItemID": "5695DF17061I00002000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKDS",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS.NEWNAME",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKDS command protection. A RACF FACILITY class under which the user who is associated with userid can issue HBACKDS commands when NEWNAME was specified. "
+    },
+    {
+      "ItemID": "5695DF17061I00003000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKDS",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS.RETAINDAYS",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKDS command protection. A RACF FACILITY class under which the user who is associated with userid can issue HBACKDS commands when RETAINDAYS was specified. "
+    },
+    {
+      "ItemID": "5695DF17061I00004000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKDS",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS.TARGET",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKDS command protection. A RACF FACILITY class under which the user who is associated with userid can issue HBACKDS commands when TARGET was specified. "
+    },
+    {
+      "ItemID": "5695DF17061I00005000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKDS",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS.DELETE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKDS command protection. A RACF FACILITY class under which the user who is associated with userid can issue HBACKDS commands when DELETE was specified. "
+    },
+    {
+      "ItemID": "5695DF17061I00006000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKDS",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS.RCRS.CM",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKDS command protection. A RACF FACILITY class under which the user who is associated with userid can issue HBACKDS commands when RECURSE(CROSSMOUNTS) was specified. "
+    },
+    {
+       "ItemID": "5695DF17061I00007000",
+       "ItemType": "PROGRAMMABLE",
+       "ItemCategory": "HBACKDS",
+       "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS.RCRS.NCM",
+       "ResourceClass": "FACILITY",
+       "WhoNeedsAccess": "<User of the Command>",
+       "LevelOfAccessRequired": "READ",
+       "ItemDescription": "DFSMShsm user HBACKDS command protection. A RACF FACILITY class under which the user who is associated with userid can issue HBACKDS commands when RECURSE(NOCROSSMOUNTS) was specified. "
+    }, 
+    {
+      "ItemID": "5695DF17062I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKDSU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKDSU command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HBACKDSU command."
+    },
+    {
+      "ItemID": "5695DF17062I00002000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKDSU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS.NEWNAME",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKDSU command protection. A RACF FACILITY class under which the user who is associated with userid can issue HBACKDSU commands when NEWNAME was specified. "
+    },
+    {
+      "ItemID": "5695DF17062I00003000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKDSU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS.RETAINDAYS",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKDSU command protection. A RACF FACILITY class under which the user who is associated with userid can issue HBACKDSU commands when RETAINDAYS was specified. "
+    },
+    {
+      "ItemID": "5695DF17062I00004000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKDSU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS.TARGET",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKDSU command protection. A RACF FACILITY class under which the user who is associated with userid can issue HBACKDSU commands when TARGET was specified. "
+    },
+    {
+      "ItemID": "5695DF17062I00005000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKDSU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS.DELETE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKDSU command protection. A RACF FACILITY class under which the user who is associated with userid can issue HBACKDSU commands when DELETE was specified. "
+    },
+    {
+      "ItemID": "5695DF17063I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKU command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HBACKU command."
+    },
+    {
+      "ItemID": "5695DF17063I00002000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS.NEWNAME",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKU command protection. A RACF FACILITY class under which the user who is associated with userid can issue HBACKU commands when NEWNAME was specified. "
+    },
+    {
+      "ItemID": "5695DF17063I00003000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS.RETAINDAYS",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKU command protection. A RACF FACILITY class under which the user who is associated with userid can issue HBACKU commands when RETAINDAYS was specified. "
+    },
+    {
+      "ItemID": "5695DF17063I00004000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS.TARGET",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKU command protection. A RACF FACILITY class under which the user who is associated with userid can issue HBACKU commands when TARGET was specified. "
+    },
+    {
+      "ItemID": "5695DF17063I00005000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBACKU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBACKDS.DELETE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBACKU command protection. A RACF FACILITY class under which the user who is associated with userid can issue HBACKU commands when DELETE was specified. "
+    },
+    {
+      "ItemID": "5695DF17064I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBDELETE",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBDELETE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBDELETE command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HBDELETE command."
+    },
+    {
+      "ItemID": "5695DF17065I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBDELETU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBDELETE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBDELETU command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HBDELETU command."
+    },
+    {
+      "ItemID": "5695DF17066I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HBDELU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HBDELETE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HBDELU command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HBDELU command."
+    },
+    {
+      "ItemID": "5695DF17067I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HCANCEL",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HCANCEL",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HCANCEL command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HCANCEL command."
+    },
+    {
+      "ItemID": "5695DF17068I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HCANCELU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HCANCEL",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HCANCELU command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HCANCELU command."
+    },
+    {
+      "ItemID": "5695DF17069I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HCANU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HCANCEL",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HCANU command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HCANU command."
+    },
+    {
+      "ItemID": "5695DF17070I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HDELETE",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HDELETE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HDELETE command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HDELETE command."
+    },
+    {
+      "ItemID": "5695DF17071I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HLIST",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HLIST",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HLIST command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HLIST command."
+    },
+    {
+      "ItemID": "5695DF17072I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HLISTU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HLIST",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HLISTU command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HLISTU command."
+    },
+    {
+      "ItemID": "5695DF17073I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HLU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HLIST",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HLU command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HLU command."
+    },
+    {
+      "ItemID": "5695DF17074I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HMIGRATE",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HMIGRATE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HMIGRATE command protection. A RACF FACILITY class under which the person who is associated with userid can issue the HMIGRATE command."
+    },
+    {
+      "ItemID": "5695DF17075I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HQUERY",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HQUERY",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HQUERY command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the HQUERY command."
+    },
+    {
+      "ItemID": "5695DF17076I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HQUERYU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HQUERY",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HQUERYU command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the HQUERYU command."
+    },
+    {
+      "ItemID": "5695DF17077I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HQU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HQUERY",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HQU command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the HQU command."
+    },
+    {
+      "ItemID": "5695DF17078I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HRECALL",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HRECALL",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HRECALL command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the HRECALL command."
+    },
+    {
+      "ItemID": "5695DF17078I00002000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HRECALL",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HRECALL.MASK",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HRECALL command protection. A RACF FACILITY class under which the user who is associated with userid can issue HRECALL commands when dsname contains one or more '*' or more than two '%' symbols. "
+    },
+    {
+      "ItemID": "5695DF17079I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HRECOVER",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HRECOVER",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HRECOVER command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the HRECOVER command."
+    },
+    {
+      "ItemID": "5695DF17080I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HRECOVERU",
+      "ResourceProfile": "STGADMIN.ARC.ENDUSER.HRECOVER",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm user HRECOVERU command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the HRECOVERU command."
+    }
+  ]
+}

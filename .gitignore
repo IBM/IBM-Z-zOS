@@ -1,0 +1,5 @@
+# This is a list of files you wan to tell Git to explicitly ignore.
+
+# OS generated files #
+######################
+.DS_Store

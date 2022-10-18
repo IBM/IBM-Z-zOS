@@ -196,5 +196,5 @@ As mentioned before, the sample plug-in needs to communicate with the sample ser
 ### Try the plug-in
 Now, after all these configurations, the imported task should be able to run. You can retrieve data of jobs from z/OS and save the parameters to the sample remote server.
 
-For questions or comments about this example external plug-in, contact: caoy@cn.ibm.com.
+For questions or comments about this example external plug-in, contact: yunyyang@cn.ibm.com, bjdongm@cn.ibm.com.
 

@@ -1,0 +1,498 @@
+{
+  "ServiceId": "5695DF17000",
+  "ServiceName": "DFSMS Hierarchical Storage Management (DFSMShsm)",
+  "MetaValidationItemVersion": 1.0,
+  "Vendor": "IBM",
+  "SecurityValidationItems": [
+    {
+      "ItemID": "5695DF17000I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "ABACKUP",
+      "ResourceProfile": "STGADMIN.ARC.ABACKUP",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator ABACKUP command protection.  A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the ABACKUP command."
+    },
+    {
+      "ItemID": "5695DF17000I00002000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "ABACKUP",
+      "ResourceProfile": "STGADMIN.ARC.ABACKUP.<agname>",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator ABACKUP command protection. A restricted RACF FACILITY class under which the person who is associated with userid can issue the ABACKUP command for the aggregate group specified in the facility class profile name."
+    },
+    {
+      "ItemID": "5695DF17001I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "ARECOVER",
+      "ResourceProfile": "STGADMIN.ARC.ARECOVER",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator ARECOVER command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the ARECOVER command."
+    },
+    {
+      "ItemID": "5695DF17001I00002000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "ARECOVER",
+      "ResourceProfile": "STGADMIN.ARC.ARECOVER.<agname>",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator ARECOVER command protection. A restricted RACF FACILITY class under which the user who is associated with userid can issue ARECOVER commands for only the aggregate group name associated with aggregate when REPLACE was not specified. "
+    },
+    {
+      "ItemID": "5695DF17001I00003000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "ARECOVER",
+      "ResourceProfile": "STGADMIN.ARC.ARECOVER.<agname>.REPLACE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator ARECOVER command protection. A restricted RACF FACILITY class under which the user who is associated with userid can issue ARECOVER commands for only the aggregate group name associated with aggregate when REPLACE was specified."
+    },
+    {
+      "ItemID": "5695DF17002I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "ADDVOL",
+      "ResourceProfile": "STGADMIN.ARC.ADDVOL",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator ADDVOL command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the ADDVOL command."
+    },
+    {
+      "ItemID": "5695DF17003I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "ALTERDS",
+      "ResourceProfile": "STGADMIN.ARC.ALTERDS",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator ALTERDS command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the ALTERDS command."
+    },
+    {
+      "ItemID": "5695DF17004I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "ALTERPRI",
+      "ResourceProfile": "STGADMIN.ARC.ALTERPRI",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator ALTERPRI command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the ALTERPRI command."
+    },
+    {
+      "ItemID": "5695DF17005I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "AUDIT",
+      "ResourceProfile": "STGADMIN.ARC.AUDIT",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator AUDIT command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the AUDIT command."
+    },
+    {
+      "ItemID": "5695DF17006I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "AUTH",
+      "ResourceProfile": "STGADMIN.ARC.AUTH",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator AUTH command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the AUTH command."
+    },
+    {
+      "ItemID": "5695DF17007I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "BACKDS",
+      "ResourceProfile": "STGADMIN.ARC.BACKDS",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator BACKDS command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the BACKDS command."
+    },
+    {
+      "ItemID": "5695DF17007I00002000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "BACKDS",
+      "ResourceProfile": "STGADMIN.ARC.BACKDS.NEWNAME",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator BACKDS command protection. A restricted RACF FACILITY class under which the user who is associated with userid can issue BACKDS commands when NEWNAME was specified. "
+    },
+    {
+      "ItemID": "5695DF17007I00003000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "BACKDS",
+      "ResourceProfile": "STGADMIN.ARC.BACKDS.RETAINDAYS",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator BACKDS command protection. A restricted RACF FACILITY class under which the user who is associated with userid can issue BACKDS commands when RETAINDAYS was specified. "
+    },
+    {
+      "ItemID": "5695DF17007I00004000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "BACKDS",
+      "ResourceProfile": "STGADMIN.ARC.BACKDS.DELETE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator BACKDS command protection. A restricted RACF FACILITY class under which the user who is associated with userid can issue BACKDS commands when DELETE was specified. "
+    },
+    {
+      "ItemID": "5695DF17008I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "BACKVOL",
+      "ResourceProfile": "STGADMIN.ARC.BACKVOL",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator BACKVOL command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the BACKVOL command."
+    },
+    {
+      "ItemID": "5695DF17009I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "BDELETE",
+      "ResourceProfile": "STGADMIN.ARC.BDELETE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator BDELETE command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the BDELETE command."
+    },
+    {
+      "ItemID": "5695DF17010I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "CANCEL",
+      "ResourceProfile": "STGADMIN.ARC.CANCEL",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator CANCEL command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the CANCEL command."
+    },
+    {
+      "ItemID": "5695DF17011I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "DEFINE",
+      "ResourceProfile": "STGADMIN.ARC.DEFINE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator DEFINE command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the DEFINE command."
+    },
+    {
+      "ItemID": "5695DF17012I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "DELETE",
+      "ResourceProfile": "STGADMIN.ARC.DELETE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator DELETE command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the DELETE command."
+    },
+    {
+      "ItemID": "5695DF17013I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "DELVOL",
+      "ResourceProfile": "STGADMIN.ARC.DELVOL",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator DELVOL command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the DELVOL command."
+    },
+    {
+      "ItemID": "5695DF17014I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "DISPLAY",
+      "ResourceProfile": "STGADMIN.ARC.DISPLAY",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator DISPLAY command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the DISPLAY command."
+    },
+    {
+      "ItemID": "5695DF17015I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "EXPIREBV",
+      "ResourceProfile": "STGADMIN.ARC.EXPIREBV",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator EXPIREBV command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the EXPIREBV command."
+    },
+    {
+      "ItemID": "5695DF17016I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "FIXCDS",
+      "ResourceProfile": "STGADMIN.ARC.FIXCDS",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator FIXCDS command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the FIXCDS command."
+    },
+    {
+      "ItemID": "5695DF17017I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "FREEVOL",
+      "ResourceProfile": "STGADMIN.ARC.FREEVOL",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator FREEVOL command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the FREEVOL command."
+    },
+    {
+      "ItemID": "5695DF17018I00001000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "FRBACKUP",
+      "ResourceProfile": "STGADMIN.ARC.FB.<cpname>",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator FRBACKUP command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the FRBACKUP command for the specified copypool name."
+    },
+    {
+      "ItemID": "5695DF17019I00001000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "FRDELETE",
+      "ResourceProfile": "STGADMIN.ARC.FD.<cpname>",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator FRDELETE command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the FRDELETE command for the specified copypool name."
+    },
+    {
+      "ItemID": "5695DF17020I00001000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "FRRECOV",
+      "ResourceProfile": "STGADMIN.ARC.FR.<cpname>",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator FRRECOV command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the FRRECOV command for the specified copypool name."
+    },
+    {
+      "ItemID": "5695DF17020I00002000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "FRRECOV",
+      "ResourceProfile": "STGADMIN.ARC.FR.NEWNAME",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator FRRECOV command protection. A restricted RACF FACILITY class under which the user who is associated with userid can issue FRRECOV commands when NEWNAME was specified. "
+    },
+    {
+      "ItemID": "5695DF17021I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "HOLD",
+      "ResourceProfile": "STGADMIN.ARC.HOLD",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator HOLD command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the HBACKDS command."
+    },
+    {
+      "ItemID": "5695DF17022I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "LIST",
+      "ResourceProfile": "STGADMIN.ARC.LIST",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator LIST command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the LIST command."
+    },
+    {
+      "ItemID": "5695DF17023I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "LOG",
+      "ResourceProfile": "STGADMIN.ARC.LOG",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator LOG command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the LOG command."
+    },
+    {
+      "ItemID": "5695DF17024I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "MIGRATE",
+      "ResourceProfile": "STGADMIN.ARC.MIGRATE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator MIGRATE command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the MIGRATE command."
+    },
+    {
+      "ItemID": "5695DF17025I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "PATCH",
+      "ResourceProfile": "STGADMIN.ARC.PATCH",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator PATCH command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the PATCH command."
+    },
+    {
+      "ItemID": "5695DF17026I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "QUERY",
+      "ResourceProfile": "STGADMIN.ARC.QUERY",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator QUERY command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the QUERY command."
+    },
+    {
+      "ItemID": "5695DF17027I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "RECALL",
+      "ResourceProfile": "STGADMIN.ARC.RECALL",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator RECALL command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the RECALL command."
+    },
+    {
+      "ItemID": "5695DF17028I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "RECOVER",
+      "ResourceProfile": "STGADMIN.ARC.RECOVER",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator RECOVER command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the RECOVER command."
+    },
+    {
+      "ItemID": "5695DF17028I00002000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "RECOVER",
+      "ResourceProfile": "STGADMIN.ARC.RECOVER.NEWNAME",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator RECOVER command protection. A restricted RACF FACILITY class under which the user who is associated with userid can issue RECOVER commands when NEWNAME was specified. "
+    },
+    {
+      "ItemID": "5695DF17029I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "RECYCLE",
+      "ResourceProfile": "STGADMIN.ARC.RECYCLE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator RECYCLE command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the RECYCLE command."
+    },
+    {
+      "ItemID": "5695DF17030I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "RELEASE",
+      "ResourceProfile": "STGADMIN.ARC.RELEASE",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator RELEASE command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the RELEASE command."
+    },
+    {
+      "ItemID": "5695DF17031I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "REPORT",
+      "ResourceProfile": "STGADMIN.ARC.REPORT",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator REPORT command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the REPORT command."
+    },
+    {
+      "ItemID": "5695DF17032I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "SETMIG",
+      "ResourceProfile": "STGADMIN.ARC.SETMIG",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator SETMIG command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the SETMIG command."
+    },
+    {
+      "ItemID": "5695DF17033I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "SETSYS",
+      "ResourceProfile": "STGADMIN.ARC.SETSYS",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator SETSYS command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the SETSYS command."
+    },
+    {
+      "ItemID": "5695DF17034I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "STOP",
+      "ResourceProfile": "STGADMIN.ARC.STOP",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator STOP command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the STOP command."
+    },
+    {
+      "ItemID": "5695DF17035I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "SWAPLOG",
+      "ResourceProfile": "STGADMIN.ARC.SWAPLOG",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator SWAPLOG command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the SWAPLOG command."
+    },
+    {
+      "ItemID": "5695DF17036I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "TAPECOPY",
+      "ResourceProfile": "STGADMIN.ARC.TAPECOPY",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator TAPECOPY command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the TAPECOPY command."
+    },
+    {
+      "ItemID": "5695DF17037I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "TAPEREPL",
+      "ResourceProfile": "STGADMIN.ARC.TAPEREPL",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator TAPEREPL command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the TAPEREPL command."
+    },
+    {
+      "ItemID": "5695DF17038I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "TRAP",
+      "ResourceProfile": "STGADMIN.ARC.TRAP",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator TRAP command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the TRAP command."
+    },
+    {
+      "ItemID": "5695DF17039I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "UPDATEC",
+      "ResourceProfile": "STGADMIN.ARC.UPDATEC",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator UPDATEC command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the UPDATEC command."
+    },
+    {
+      "ItemID": "5695DF17040I00001000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "UPDTCDS",
+      "ResourceProfile": "STGADMIN.ARC.UPDTCDS",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "<User of the Command>",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "DFSMShsm storage administrator UPDTCDS command protection. A comprehensive RACF FACILITY class under which the person who is associated with userid can issue the UPDTCDS command."
+    }
+  ]
+}
