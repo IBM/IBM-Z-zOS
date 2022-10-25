@@ -10,7 +10,7 @@ The RACF development team has numerous tools that can assist you in managing you
 
 5. [DBSYNC](http://ibm.biz/racf-dbsync): REXX exec to find differences between two RACF databases and create commands to synchronize them. 
 
-6. [IRRXUTIL](https://github.com/IBM/IBM-Z-zOS/tree/main/zOS-RACF/Downloads/IRRXUTIL): RACF IRRXUTIL Sample prgrams.
+6. [IRRXUTIL](https://github.com/IBM/IBM-Z-zOS/tree/main/zOS-RACF/Downloads/IRRXUTIL): RACF IRRXUTIL Sample programs.
 
 7. [JESNODES](http://ibm.biz/racf-jesnodes): A REXX exec which displays the names of trusted NODES profiles (those with a UACC greater than READ) and cover a defined node name in the context of inbound jobs and displays the local nodes defined in the &RACLNODE profile. 
 
