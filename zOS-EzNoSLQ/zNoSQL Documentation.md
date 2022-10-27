@@ -818,9 +818,7 @@ Example of reading a document from an EzNoSQL database:
     
      #define FLAG_READ_UPDATE       (1 << 1)                           //  Read for update                    
      read_flags = FLAG_READ_UPDATE;                                    //  Set flag to read for no update 
-      
-     read_options.result_set                                           //  Result_set token    
-           
+                 
      return_code = znsq_read(
         connection,
         read_buf_ptr,
