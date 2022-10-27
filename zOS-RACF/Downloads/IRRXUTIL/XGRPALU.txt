@@ -1,0 +1,66 @@
+/* rexx */                                                                      
+/*********************************************************************/         
+/*                                                                   */         
+/* Copyright 2022 IBM Corp.                                          */         
+/*                                                                   */         
+/* Licensed under the Apache License, Version 2.0 (the "License");   */         
+/* you may not use this file except in compliance with the License.  */         
+/* You may obtain a copy of the License at                           */         
+/*                                                                   */         
+/* http://www.apache.org/licenses/LICENSE-2.0                        */         
+/*                                                                   */         
+/* Unless required by applicable law or agreed to in writing,        */         
+/* software distributed under the License is distributed on an       */         
+/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      */         
+/* either express or implied. See the License for the specific       */         
+/* language governing permissions and limitations under the License. */         
+/*                                                                   */         
+/*********************************************************************          
+  Name:    XGRPALU                                                              
+                                                                                
+  Author:  Bruce Wells - brwells@us.ibm.com                                     
+                                                                                
+  Purpose: Issues ALTUSER against every member of a group with the              
+           keywords specified.  This is a generalized version of                
+           XLGRES, in whihc any old keyword(s) may be specified.                
+                                                                                
+  Input: - A RACF group name                                                    
+         - ALTUSER command operands                                             
+                                                                                
+  Authorization required:                                                       
+                                                                                
+   This exec requires:                                                          
+     - READ access to IRR.RADMIN.LISTGRP in the FACILITY class.                 
+       Lack thereof results in error code 12 12 8 8 24.                         
+                                                                                
+       RDEFINE FACILITY IRR.RADMIN.LISTGRP UACC(READ)                           
+       SETROPTS CLASSACT(FACILITY) REFRESH                                      
+                                                                                
+     - authority to issue ALTUSER with the specified operands                   
+       against each user                                                        
+                                                                                
+  Example:                                                                      
+                                                                                
+   Invoke by: ex 'dataset containing rexx' 'group operands'                     
+   For example:                                                                 
+                                                                                
+       EX 'SYS1.RACF.REXX' 'ADMINS EXPIRED'                                     
+                                                                                
+    will expire the password of every member of the group ADNMINS.              
+                                                                                
+**********************************************************************/         
+parse arg group operands                                                        
+Upper group                                                                     
+myrc=IRRXUTIL("EXTRACT","GROUP",group,"GRP")                                    
+if (word(myrc,1)<>0) then do                                                    
+   say "MYRC="myrc                                                              
+   say "An error occurred extracting group" group                               
+   exit 1                                                                       
+end                                                                             
+do i = 1 to GRP.BASE.CONNECTS.REPEATCOUNT                                       
+  cmd = 'ALTUSER ' || GRP.BASE.GUSERID.i || ' ' || operands                     
+  say 'Issuing:' cmd                                                            
+  cmd                                                                           
+  If rc /= 0 then                                                               
+   say 'Error' rc 'issuing ALTUSER for' GRP.BASE.GUSERID.i                      
+end                                                                             

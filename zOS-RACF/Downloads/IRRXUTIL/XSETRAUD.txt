@@ -1,0 +1,154 @@
+/* REXX */                                                                      
+/*********************************************************************/         
+/*                                                                   */         
+/* Copyright 2022 IBM Corp.                                          */         
+/*                                                                   */         
+/* Licensed under the Apache License, Version 2.0 (the "License");   */         
+/* you may not use this file except in compliance with the License.  */         
+/* You may obtain a copy of the License at                           */         
+/*                                                                   */         
+/* http://www.apache.org/licenses/LICENSE-2.0                        */         
+/*                                                                   */         
+/* Unless required by applicable law or agreed to in writing,        */         
+/* software distributed under the License is distributed on an       */         
+/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      */         
+/* either express or implied. See the License for the specific       */         
+/* language governing permissions and limitations under the License. */         
+/*                                                                   */         
+/*********************************************************************          
+                                                                                
+ Name:    XSETRAUD                                                              
+                                                                                
+ Author: Bruce Wells - brwells@us.ibm.com                                       
+                                                                                
+ Purpose: Displays only the auditing-related SETROPTS settings                  
+                                                                                
+ Input:   None                                                                  
+                                                                                
+ Example: ex 'MYHLQ.RACF.CLISTS(XSETRAUD)'                                      
+                                                                                
+ Authorization required:                                                        
+   - READ access to IRR.RADMIN.SETROPTS.LIST in FACILITY plus                   
+     authority to list the SETROPTS auditing options:                           
+     - AUDITOR attribute                                                        
+     - group-AUDITOR attribute in the current connect group or                  
+       if GRPLIST is active in any group to which you are                       
+       connected                                                                
+     - ROAUDIT attribute                                                        
+                                                                                
+**********************************************************************/         
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* - Extract the SETROPTS settings using IRRXUTIL.                   */         
+/* ----------------------------------------------------------------- */         
+myrc=IRRXUTIL("EXTRACT","_SETROPTS","_SETROPTS","RES")                          
+say ""                                                                          
+say ""                                                                          
+say ""                                                                          
+if (word(myrc,1)<>0) then do                                                    
+   say "MYRC="myrc                                                              
+   say "An IRRXUTIL or R_admin error occurred "                                 
+   exit 1                                                                       
+end                                                                             
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* Dump out the SETROPTS settings.                                   */         
+/*                                                                   */         
+/* ----------------------------------------------------------------- */         
+say "The following audit options are in effect:"                                
+                                                                                
+if RES.BASE.APPLAUDT.1 = "TRUE" then                                            
+  say " Logging of APPC transactions is enabled"                                
+else                                                                            
+  say " Logging of APPC transactions is not enabled"                            
+                                                                                
+if RES.BASE.CMDVIOL.1 = "TRUE" then                                             
+  say " Logging of command violations is enabled"                               
+else                                                                            
+  say " Logging of command violations is not enabled"                           
+                                                                                
+if RES.BASE.SAUDIT.1 = "TRUE" then                                              
+  say " Logging of commands issued by SPECIAL users is enabled"                 
+else                                                                            
+  say " Logging of commands issued by SPECIAL users is not enabled"             
+                                                                                
+if RES.BASE.OPERAUDT.1 = "TRUE" then                                            
+  say " Logging of actions of OPERATIONS users is enabled"                      
+else                                                                            
+  say " Logging of actions of OPERATIONS users is not enabled"                  
+                                                                                
+if RES.BASE.SLABAUDT.1 = "TRUE" then                                            
+  say " SECLABEL logging is enabled"                                            
+else                                                                            
+  say " SECLABEL logging is not enabled"                                        
+                                                                                
+if RES.BASE.SLEVAUDT.1 = "TRUE" then                                            
+  say " SECLEVEL logging is enabled"                                            
+else                                                                            
+  say " SECLEVEL logging is not enabled"                                        
+                                                                                
+say " "                                                                         
+                                                                                
+/* ----------------------------------------------------------------- */         
+/* List out the class-related logging options.                       */         
+/* ----------------------------------------------------------------- */         
+if RES.BASE.AUDIT.0 /= "" then do                                               
+  say "Changes to profiles in the following classes are being logged:"          
+  audClasses = ""                                                               
+  do i = 1 to RES.BASE.AUDIT.0                                                  
+    audClasses = audClasses || RES.BASE.AUDIT.i || " "                          
+  end                                                                           
+  say audClasses                                                                
+  say " "                                                                       
+end                                                                             
+                                                                                
+if RES.BASE.LOGALWYS.0 /= "" then do                                            
+  say "Access attempts to the following classes are always logged:"             
+  audClasses = ""                                                               
+  do i = 1 to RES.BASE.LOGALWYS.0                                               
+    audClasses = audClasses || RES.BASE.LOGALWYS.i || " "                       
+  end                                                                           
+  say audClasses                                                                
+  say " "                                                                       
+end                                                                             
+                                                                                
+if RES.BASE.LOGNEVER.0 /= "" then do                                            
+  say "Access attempts to the following classes are never logged:"              
+  audClasses = ""                                                               
+  do i = 1 to RES.BASE.LOGNEVER.0                                               
+    audClasses = audClasses || RES.BASE.LOGNEVER.i || " "                       
+  end                                                                           
+  say audClasses                                                                
+  say " "                                                                       
+end                                                                             
+                                                                                
+if RES.BASE.LOGSUCC.0 /= "" then do                                             
+  say "Successful accesses to the following classes are being logged:"          
+  audClasses = ""                                                               
+  do i = 1 to RES.BASE.LOGSUCC.0                                                
+    audClasses = audClasses || RES.BASE.LOGSUCC.i || " "                        
+  end                                                                           
+  say audClasses                                                                
+  say " "                                                                       
+end                                                                             
+                                                                                
+if RES.BASE.LOGFAIL.0 /= "" then do                                             
+  say "Failed access attempts to the following classes are being logged:"       
+  audClasses = ""                                                               
+  do i = 1 to RES.BASE.LOGSUCC.0                                                
+    audClasses = audClasses || RES.BASE.LOGSUCC.i || " "                        
+  end                                                                           
+  say audClasses                                                                
+  say " "                                                                       
+end                                                                             
+                                                                                
+if RES.BASE.LOGDEFLT.0 /= "" then do                                            
+  say "The profile determines logging of the following classes:"                
+  audClasses = ""                                                               
+  do i = 1 to RES.BASE.LOGDEFLT.0                                               
+    audClasses = audClasses || RES.BASE.LOGDEFLT.i || " "                       
+  end                                                                           
+  say audClasses                                                                
+  say " "                                                                       
+end                                                                             
+                                                                                
