@@ -1,10 +1,10 @@
 The RACF development team has numerous tools that can assist you in managing your RACF environment. These tools include:
 
-1. [BPXCHECK](http://ibm.biz/racf-bpxcheck): A REXX exec which uses the RACF IRRXUTIL REXX interface to report the status of various UNIX- related settings in RACF.  
+1. [BPXCHECK](https://github.com/IBM/IBM-Z-zOS/tree/main/zOS-RACF/Downloads/BpxCheck): A REXX exec which uses the RACF IRRXUTIL REXX interface to report the status of various UNIX-related settings in RACF.  
 
 2. [CDT2DYN](http://ibm.biz/racf-cdt2dyn): A REXX exec which examine the contents of the current classes in the RACF static class descriptor table and creates the commands to put those installation-defined classes into the ynamic CDT.
 
-3. [CUTPWHIS](http://ibm.biz/racf-cutpwhis): A utility which trims the orphaned passwords created by decreasing the SETROPTS password history value.
+3. [CUTPWHIS](http://ibm.biz/racf-cutpwhis): A utility which trims the orphaned passwords created by decreasing the SETROPTS password history value.  Note: This download is no longer necessary.  This function has been added to the RACF product in the form of the PWCLEAN keyword of the ALTUSER command.
 
 4. [DSNT2PRM](http://ibm.biz/racf-db2prm): A REXX exec which converts your  RACF data set names table (ICHRDSNT) or RACF range table (ICHRRNG) into a RACF PARMLIB member. 
 
