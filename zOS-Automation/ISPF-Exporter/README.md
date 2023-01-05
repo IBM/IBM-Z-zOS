@@ -31,12 +31,12 @@ ispf2j pds-name table-name directory-name '(' options
 ```
 
 The three positional parameters have the following meaning:
-- pds-name: The name of a PDS(E) data set containing ISPF-tables. The data set can be fully qualified enclosed in single quotes or not fully qualified.  
-- table-name: The name of a member in the data set denoted by the previous parameter.
-- directory-name: The name of an existing UNIX System Services directory where the JSON-files are stored.
+- **pds-name**: The name of a PDS(E) data set containing ISPF-tables. The data set can be fully qualified enclosed in single quotes or not fully qualified.  
+- **table-name**: The name of a member in the data set denoted by the previous parameter.
+- **directory-name**: The name of an existing UNIX System Services directory where the JSON-files are stored.
 
 The following options are supported (marginally right now):
-- LOGLVL=<u>ERROR</u>|INFO
+- LOGLVL=ERROR | INFO 
 
 **Examples**
 
@@ -49,7 +49,7 @@ If errors occur, the reason is shown in form of a TSO/ISPF message or in form of
 ```
 12:48:45.217146 - [ERROR] Output file >u/bhol/ispftemp/AOFTADF.json< not opened, error codes 81 594003D
 ```
-The first error code is the hexadecimal return code (errno). The second part is the hexadecimal reason code (errnojrs) of which the last 4 digits are of most interest. Above message indicates errno ENOENT (No such file, directory, or IPC member exists.) and errnojr JRDirNotFound.
+The first error code (`81`) is the hexadecimal return code (errno). The second part (`594003D`) is the hexadecimal reason code (errnojrs) of which the last 4 digits are of most interest. Above message indicates errno ENOENT (No such file, directory, or IPC member exists.) and errnojr JRDirNotFound.
 
 ### Export a complete data set
 To export all ISPF-tables in a library, use the REXX-script `exppdb`. The syntax is as follows:
@@ -58,8 +58,8 @@ exppdb pds-name directory-name '(' options
 ```
 
 The two positional parameters have the following meaning:
-- pds-name: The name of a PDS(E) data set containing ISPF-tables. The data set can be fully qualified enclosed in single quotes or not fully qualified.
-- directory-name: The name of a UNIX System Services directory where the JSON-files are stored. If this directory doesn't exist, it will be created with read and execute permission for everyone and write access for the owner of the file (0755).
+- **pds-name**: The name of a PDS(E) data set containing ISPF-tables. The data set can be fully qualified enclosed in single quotes or not fully qualified.
+- **directory-name**: The name of a UNIX System Services directory where the JSON-files are stored. If this directory doesn't exist, it will be created with read and execute permission for everyone and write access for the owner of the file (0755).
 
 Currently, `options` are not used.
 
@@ -74,8 +74,8 @@ exppdb ispf.pdb ispftemp
 # Useful references
 For information regarding ISPF-service usage, refer to the following publication:
 
-- _z/OS 2.5 ISPF Services Guide_ 
+- _z/OS 2.5 ISPF Services Guide_ ([link](https://www.ibm.com/docs/en/zos/2.5.0?topic=ispf-zos-services-guide))
 
 For information about the specific meaning of error codes, refer to the publication below.
 
-- _z/OS 2.5 UNIX System Services Messages and Codes_  
+- _z/OS 2.5 UNIX System Services Messages and Codes_ ([link](https://www.ibm.com/docs/en/zos/2.5.0?topic=services-zos-unix-system-messages-codes))
