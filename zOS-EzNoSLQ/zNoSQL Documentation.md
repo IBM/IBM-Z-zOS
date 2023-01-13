@@ -83,7 +83,7 @@ IBM's Parallel Sysplex Coupling Facility (CF) technology, enables separate proce
 ## JSON Documents
 
 EzNoSQL is a document oriented data store which accepts UTF-8 JSON documents (analogous to records or rows in other databases). The JSON documents must meet the format as described by [JavaScript Object Notation (JSON)](https://www.json.org/json-en.html). JSON documents consist of an unordered set of `key:value` elements enclosed in brackets, and can be up to 2 gigabytes in size. The document may contain arrays and other imbedded documents:
-```
+```json
 {
  "Customer_id":"4084",
  "Address": {
@@ -102,7 +102,7 @@ The EzNoSQL database can be defined with a user supplied primary key, where the 
 The primary keyname must be less than 256 characters; however, the value size is unrestricted. In the above example, the `"Customer_id"` keyname may be a good choice for a unique primary key. The value in this case of `"4084"` becomes the primary key value used to retrieve the document.
 
 If a unique keyname is not available, the database can be defined without a keyname.  In this case EzNoSQL will auto generate a unique `key:value` for the document and insert the additional element at the beginning of the document.  The additional element will use a reserved keyname of `"znsq_id"` and paired with a 120 byte unique character value:
-```
+```json
 {
  "znsq_id":"..generatedkeyvalue..",
  "Address": {
@@ -125,7 +125,7 @@ Documents may also be retrieved or updated through the use of secondary (alterna
 When creating a secondary index, the application developer assigns the alternate keyname which contains the value to be used as the alternate key. Although the alternate keynames must be less than 256 characters, the paired values are not restricted. Secondary indexes must be physically created while the database is fully disconnected (closed); however, the activation or deactivation can ocur dynamically while the database is connected (open) and in use. Consideration should be given when creating secondary indexes, as each additional active index will incur overhead when updating the database.
 
 Assume an EzNoSQL database is created with a primary keyname of `"Customer_id"` and a secondary index with an alternate keyname of `"Address"`. It contains the following document:
-```
+```json
 {
  "Customer_id":"4084",
  "Address": {
@@ -157,7 +157,7 @@ Secondary indexes can be defined as unique or non-unique.  For unique indexes, e
 ## Multi Level Keys
 
 Both the primary and secondary indexes can have a single level keyname, or can have a multiple level keyname (referred to as a multikey). The individual levels are connected by the reverse solidus character `\`.  For example, a secondary keyname of `"Address\Steet"` would allow the following document to be retrieved using a value of `"1 Main Street"`.
-```
+```json
 {
  "Customer_id":"4084",
  "Address": {
@@ -170,7 +170,7 @@ Both the primary and secondary indexes can have a single level keyname, or can h
 ```
 
 Multikey names can also span into imbedded documents or an array of imbedded documents.  For example, creating a secondary index with a keyname of `"Employee\Name"` will allow the following document to be retrieved by either a value of `"John Smith"` or `"Fred Jones"`:
-```
+```json
 {
  "_id:":'0001',
  "Employee":[{"Name":"John Smith"},
@@ -273,7 +273,7 @@ Sample user program: /samples/ibm/igwznsqsamp1.c, is a 31-bit user program which
 ## Compile and Link Procedure
 
 To compile and link the sample program `/samples/ibm/igwznsqsamp1.c`:
-```
+```shell
 xlc -c -qDLL -qcpluscmt -qLSEARCH="//'SYS1.SCUNHF'" igwznsqsamp1.c
 xlc -o igwznsqsamp1 igwznsqsamp1.o -W l,DLL /usr/lib/libigwznsqd31.x
 ```
@@ -296,16 +296,16 @@ APIs in the Data Management section must run in task mode and non cross-memory m
 ### znsq_create
 
 ```C
-int znsq_create(const char * dsname, const znsq_create_options * options);
+int znsq_create(const char *dsname, const znsq_create_options *options);
 ```
 
 #### Create EzNoSQL Database
 Creates an EzNoSQL primary index database with the name specified in parameter `dsname` using the attributes that are specified by the `options` parameter. Note that EzNoSQL databases can also be created through other system APIs and are compatible and sharable with the EzNoSQL APIs.
 ​
 #### Parameters
-`dsname`: C-string containing the name of the database. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $).  The remaining seven characters are either alphabetic, numeric (0 - 9), national, a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.DATA.​
+**`dsname`**: C-string containing the name of the database. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $).  The remaining seven characters are either alphabetic, numeric (0 - 9), national, a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.DATA.​
 
-`options`: Pointer to an object of type [`znsq_create_options`](#znsq_create_options), where the database attributes are provided.
+**`options`**: Pointer to an object of type [`znsq_create_options`](#znsq_create_options), where the database attributes are provided.
 ​
 #### Return value
 The return code of the function.
@@ -366,20 +366,16 @@ Creates a secondary index with for the name specified in parameters *altname*, u
 
 #### Parameters
 
- `alternate_key`:
+ **`alternate_key`**: C-string containing the name of the UTF-8 JSON C-string providing the secondary keyname for the index. The string must be < 256 bytes including quotes and end in one byte of x'00'.  The keyname may consists of a multi level name.  Refer to section Multi Level Keynames for more information on this option.
 
-   C-string containing the name of the UTF-8 JSON C-string providing the secondary keyname for the index. The string must be < 256 bytes including quotes and end in one byte of x'00'.  The keyname may consists of a multi level name.  Refer to section Multi Level Keynames for more information on this option.
+ **`flags`**:
 
- `flags`:
+1 (= (1 << 0)) indicates the creation of a unique index. Non-Unique indexes may contain alternate keys representing one or more documents, while unique indexes ensure only one document is represented by each key.  Attempting to insert duplicate documents with the same alternate key into a unique index will result in a duplicate document error. Refer to section entitled Unique vs Non-Unique Indexes for more information on this topic.
 
-   1 (= (1 << 0)) indicates the creation of a unique index. Non-Unique indexes may contain alternate keys representing one or more documents, while unique indexes ensure only one document is represented by each key.  Attempting to insert duplicate documents with the same alternate key into a unique index will result in a duplicate document error. Refer to section entitled Unique vs Non-Unique Indexes for more information on this topic.
-
-   2 (=(1 << 1))  indicates descending sequential access when retrieving documents through this index. Refer to section Direct vs Sequential Document Retrieval for more information on this topic.
+2 (=(1 << 1))  indicates descending sequential access when retrieving documents through this index. Refer to section Direct vs Sequential Document Retrieval for more information on this topic.
 
    ​
-`options`:
-
-   Pointer to an object of type [`znsq_add_index_options`](#znsq_add_index_options), where the database attributes are provided.
+**`options`**: Pointer to an object of type [`znsq_add_index_options`](#znsq_add_index_options), where the database attributes are provided.
 
 #### Return value
 The return code of the function.
