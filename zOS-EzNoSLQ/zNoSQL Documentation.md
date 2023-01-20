@@ -7,10 +7,10 @@ Introduction and Concepts:
 * [Primary Keys](#Primary-keys)
 * [Secondary Indexes](#Secondary-Indexes)
 * [Active Secondary Indexes](#Active-Secondary-Indexes)
-* [Non-Unique Secondary Indexes](#NonUniqueSecondaryIndexes)
-* [Multi Level Keys](#MultiLevelKeys)
+* [Non-Unique Secondary Indexes](#non-unique-secondary-indexes)
+* [Multi Level Keys](#Multi-Level-Keys)
 * [Document Retrieval](#Document-Retrieval)
-* [Recoverable Databases](#Recoverable-Data-Sets)
+* [Recoverable Databases](#Recoverable-Databases)
 
 System Requirements:
 * [System Requirements](#System-Requirements)
@@ -187,7 +187,7 @@ In order to iterate in an ordered fashion over the primary key, and optionally u
 While the alternate key value size is not restricted, the keys will be truncated after 251 bytes. Truncated keys may result in non-unique keys with other keys containing the same first 251 bytes.  Sequentially reading truncated keys may return the documents out of order and require further sorting by the application. EzNoSQL will return a reason code alerting the application if a truncated key is retrieved.
 
 
-## Recoverable Data Sets
+## Recoverable Databases
 
 The recoverability of a database determines the duration of the locking and the transactional (atomic) capabilities when accessing documents in and across an EzNoSQL database. EzNoSQL will obtain a document level exclusive lock for any type of update (write, update, or delete) of a document, and an optional shared lock for reads:
 
