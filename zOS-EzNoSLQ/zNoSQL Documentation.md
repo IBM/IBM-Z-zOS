@@ -12,7 +12,7 @@ Introduction and Concepts:
 * [Document Retrieval](#Document-Retrieval)
 * [Recoverable Databases](#Recoverable-Data-Sets)
 
-System Requirements
+System Requirements:
 * [System Requirements](#System-Requirements)
 * [Hardware/Software Requirements](#Hardware-Software-Requirements)
 * [Storage Administration Requirements](#Storage-Administration-Requirements)
@@ -27,7 +27,7 @@ Getting Started:
 * [Sample Application Program](#Sample-Application-Program)
 * [Compile and Link Procedure](#Compile-and-Link-Procedure)
 
-Application Programming Interfaces (APIs)
+Application Programming Interfaces (APIs):
 * [Application Programming Tiers](#Application-Programming-Tiers)
 
 Data Management APIs:
@@ -35,7 +35,7 @@ Data Management APIs:
 * [znsq_create_index](#znsq_create_index)
 * [znsq_destroy](#znsq_destroy)
 * [znsq_add_index](#znsq_add_index)
-* [znsq_drop_index](#znsq_drop_-index)
+* [znsq_drop_index](#znsq_drop_index)
 * [znsq_report_stats](#znsq_report_stats)
 
 Connection Management APIs:
@@ -219,7 +219,7 @@ EzNoSQL is provided with z/OS and does not require any additional software licen
 6. Optionally, create SMS data classes (DATACLAS) to enable additional system functions such as encryption, data compression, SMSVSAM 64-bit buffering, and control of space allocation amounts.  Provide the name of the DATACLAS to the application architect for use when defining the database, or it can be assigned dynamically by the system through the use of SMS Access Control System (ACS). Refer to [Defining Shareoptions and RLS attributes for data class](https://www.ibm.com/docs/en/zos/2.5.0?topic=attributes-defining-shareoptions-rls-data-class#dorlsadc).
 7. Optionally, create SMS management classes (MGMTCLAS) to provide backup and data retention requirements for the EzNoSQL data. Provide the name of the MGMTCLAS to the application architect for use when defining the database, or it can be assigned dynamically by the system through the use of SMS Access Control System (ACS) (link).
 
-## Application Requirements:
+## Application Requirements
 
 Contact your system administrator for requirements when creating EzNoSQL databases:
 1. High level qualifier(s) for database names
@@ -303,9 +303,9 @@ int znsq_create(const char *dsname, const znsq_create_options *options);
 Creates an EzNoSQL primary index database with the name specified in parameter `dsname` using the attributes that are specified by the `options` parameter. Note that EzNoSQL databases can also be created through other system APIs and are compatible and sharable with the EzNoSQL APIs.
 ​
 #### Parameters
-**`dsname`**: C-string containing the name of the database. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $).  The remaining seven characters are either alphabetic, numeric (0 - 9), national, a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.DATA.​
+-`dsname`: C-string containing the name of the database. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $).  The remaining seven characters are either alphabetic, numeric (0 - 9), national, a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.DATA.​
 
-**`options`**: Pointer to an object of type [`znsq_create_options`](#znsq_create_options), where the database attributes are provided.
+-`options`: Pointer to an object of type [`znsq_create_options`](#znsq_create_options), where the database attributes are provided.
 ​
 #### Return value
 The return code of the function.
@@ -321,11 +321,11 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | member            | type                          | description                                                                                                          |
 | ----------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | version           | `int`                         | API version.                                                                                                         |
-| znsq_format       | `format`                      | Database format. Specify 0 (default) for JSON. Currently, only JSON is supported.                                    |
-| max_space         | `int`                         | Maximum space of database in megabytes (required). Additional space will be added per document for system metadata and generated keys:</br>Keyed:.....................................x'AC' bytes</br>Auto generated Keyed:....x'132' bytes</br>Refer to section Primary keyed vs Auto-generated keyed databases for information on this option. |
+| znsq_format       | `format`                      | Database format. Specify `0` (default) for JSON. Currently, only JSON is supported.                                    |
+| max_space         | `int`                         | Maximum space of database in megabytes (required). Additional space will be added per document for system metadata and generated keys:</br>```Keyed:.....................................x'AC' bytes```<br>```Auto generated Keyed:....x'132' bytes```</br>Refer to section Primary keyed vs Auto-generated keyed databases for information on this option. |
 | avg_doc_size      | `int`                         | Average size of all documents in the database.  Providing an accurate size as close as possible may improve                     performance when reading/writing to the database.  A zero value will result in a default physical blocksize of 32768.|
 | update_percent    | `int`                         | Percentage of actual update requests compared to writes (inserts) and deletes.  Used in conjuntion with a non-zero                          avg_doc_size will further aid in read/write performace by optimizing the physical blocksize by EzNoSQL. |
-| znsq_log_options  | `enum`                        | Database recovery option: </br>0 indicates the database is non-recoverable (NONE). This is the default option.</br>2 indicates the database is recoverable (UNDO) and supports backout logging only.</br>3 indicates the database is recoverable (ALL) and supports both backout and forward recovery logging.</br>Refer to section Non-Recoverable vs Recoverable Database for information on this option.</br>Note that IBM's forward recovery utility (CICSVR) currently does not support EzNoSQL databases, therefore using the ALL option may not be useful at this time.
+| znsq_log_options  | `enum`                        | Database recovery option: </br>`0` indicates the database is non-recoverable (NONE). This is the default option.</br>`2` indicates the database is recoverable (UNDO) and supports backout logging only.</br>`3` indicates the database is recoverable (ALL) and supports both backout and forward recovery logging.</br>Refer to section Non-Recoverable vs Recoverable Database for information on this option.</br>Note that IBM's forward recovery utility (CICSVR) currently does not support EzNoSQL databases, therefore using the ALL option may not be useful at this time.
 | primary_key       | `char`                        | UTF-8 JSON C-string providing the primary keyname for the database. The string must be < 256 bytes including quotes, and end with one byte of x'00'.  The keyname may consist of a multi level name.  Omitting the keyname results in auto-generated keys. Refer to sections Multi Level Keynames and Primary Keyed vs Auto Generated Keys for more information on these options. |
 | storclas          | `char`                        | C-string in EBCDIC (maximum of 8 characters) for the required system storage class name (STORCLAS). </br>Refer to section System Administration Requirements for more information on this option. |
 | mgmtclas          | `char`                        | C-string in EBCDIC (maximum of 8 character) for the optional system management class name (MGMTCLAS).</br>Refer to section System Administration Requirements for more information on this option. |
@@ -362,13 +362,13 @@ int znsq_create_index(const char *alternate_key, unsigned int flags, const znsq_
 ```
 
 #### Create EzNoSQL Secondary Index
-Creates a secondary index with for the name specified in parameters *altname*, using a keyname of *altkey*.  The database to be associated with this index is specifed in the *dsname* parameter.  Together, the secondary index and database are assoicated by the *pathname* parameter.  The pathname is used internally by EzNoSQL to identify the correct association of the secondary index to its base database. The secondary index is created in an inactive state, and must activated via the `znsq_add_index` API before attempting to access documents via the specified altkeys. For EzNoSQL databases created as recoverable (znsq_log_options=UNDO/ALL), a commit will be issued for any active transation following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.
+Creates a secondary index with for the name specified in parameters `aix_name`, using a keyname of `alternate_key`. The database to be associated with this index is specifed in the `base_name` parameter. Together, the secondary index and database are assoicated by the `path_name` parameter. The `path_name` is used internally by EzNoSQL to identify the correct association of the secondary index to its base database. The secondary index is created in an inactive state, and must be activated via the `znsq_add_index` API before attempting to access documents via the specified `alternate_key`. For EzNoSQL databases created as recoverable (znsq_log_options=UNDO/ALL), a commit will be issued for any active transation following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.
 
 #### Parameters
 
- **`alternate_key`**: C-string containing the name of the UTF-8 JSON C-string providing the secondary keyname for the index. The string must be < 256 bytes including quotes and end in one byte of x'00'.  The keyname may consists of a multi level name.  Refer to section Multi Level Keynames for more information on this option.
+ -`alternate_key`: C-string containing the name of the UTF-8 JSON C-string providing the secondary keyname for the index. The string must be < 256 bytes including quotes and end in one byte of x'00'.  The keyname may consists of a multi level name.  Refer to section [Multi Level Keynames](#Multi-Level-Keys) for more information on this option.
 
- **`flags`**:
+ -`flags`:
 
 1 (= (1 << 0)) indicates the creation of a unique index. Non-Unique indexes may contain alternate keys representing one or more documents, while unique indexes ensure only one document is represented by each key.  Attempting to insert duplicate documents with the same alternate key into a unique index will result in a duplicate document error. Refer to section entitled Unique vs Non-Unique Indexes for more information on this topic.
 
