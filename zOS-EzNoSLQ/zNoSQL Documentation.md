@@ -172,7 +172,7 @@ Both the primary and secondary indexes can have a single level keyname, or can h
 Multikey names can also span into imbedded documents or an array of imbedded documents.  For example, creating a secondary index with a keyname of `"Employee\Name"` will allow the following document to be retrieved by either a value of `"John Smith"` or `"Fred Jones"`:
 ```json
 {
- "_id:":'0001',
+ "_id:":"0001",
  "Employee":[{"Name":"John Smith"},
              {"Name":"Fred Jones"}]
 }
@@ -432,8 +432,9 @@ Example of creating a non unique secondary index with descending access:
 ```
 
 ### znsq_destroy
-
-`int znsq_destroy(const char *dsname);`
+```C
+int znsq_destroy(const char *dsname);
+```
 
 #### Destroy EzNoSQL Database
 Destroys an EzNoSQL primary and/or secondary index databases previously created with the name specified in parameter *dsname*.  A znsq_close must be issued for all previous opens whether issued via EzNoSQL or other API's sharing the database.
@@ -450,7 +451,7 @@ If the database was destroyed, the return code is 0.
 If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
 
 Example of destroying an EzNoSQL:
-```
+```C
       char* dsname = "MY.JSON.DATA";                          //  Database name, "MY" qualifer assigned by the system administrator
 
       return_code = znsq_destroy(
@@ -466,8 +467,9 @@ Example of destroying an EzNoSQL:
 ```
 
 ### znsq_add_index
-
-`int znsq_add_index(const znsq_add_index_options *options);`
+```C
+int znsq_add_index(const znsq_add_index_options *options);
+```
 
 #### Add EzNoSQL Secondary Index
 Builds and activates a previously inactive EzNoSQL secondary index for the name specified in parameter *aix_name* and for base database specified in parameter *name*. Note that the length of time to complete the build phase is directly related to the size of the primary index. For databases created as recoverable (znsq_log_options=UNDO/ALL), a commit will be issued for any active transaction following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.
@@ -491,7 +493,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 |                                                                                                                                                                          |
 
 Example of creating a non unique secondary index with descending access:
-```
+```C
       struct znsq_add_index_options add__index_options;
       char* base_name = "MY.JSON.DATA";                            //  Database name for primary index created with znsq_create
       char* aix_name = "MY.JSON.AIX1 ";                            //  Database name for secondary index
@@ -511,8 +513,9 @@ Example of creating a non unique secondary index with descending access:
       }
 ```
 ### znsq_drop_index
-
-`int znsq_drop_index(const znsq_drop_index_options *options);`
+```C
+int znsq_drop_index(const znsq_drop_index_options *options);
+```
 
 #### Disable a secondary index
 Disables (drops) an EzNoSQL secondary index across the sysplex.  When disabled, access is prevented for reads and writes until such a time as the index is re-enabled via the znsq_add_index command.  Note that disabling an index will effect all sharers of the database including those accessed by EzNoSQL and other system APIs.
@@ -540,7 +543,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 
 Example of dropping an EzNoSQL index:
-```
+```C
       char* dsname = "MY.JSON.AIX1";                         //  Seconday index name from znsq_add_index
       char* base_name = "MY.JSON.DATA;                       //  Associated database name for the primary index
 
@@ -560,8 +563,9 @@ Example of dropping an EzNoSQL index:
 ```
 
 ### znsq_report_stats
-
-`int znsq_report_stats(znsq_connection_t con, const char *buf, size_t buff_len);`
+```C
+int znsq_report_stats(znsq_connection_t con, const char *buf, size_t buff_len);
+```
 
 #### Create EzNoSQL usage report
 
@@ -579,7 +583,7 @@ Use the znsq_report_stats API to generate a JSON document containing the attribu
   The buff_len is a required input/output parameter pointing to the length of the buf area.  The initial size of the buffer can be calculated as 453 bytes for the primary index, and 346 bytes for each secondary index added to the EzNoSQL database.  If the buffer is too small, a reason code of x'119' is returned along with the required size in this parameter.
 
 Example call to `znsq_report_stats`:
-```
+```C
       return_code = znsq_report_stats(
         connection,
         &buf_len,
@@ -595,7 +599,7 @@ Example call to `znsq_report_stats`:
 ```
 
 Example format of the returned JSON report document:
-```
+```C
                        {"name":"MY.JSON.DATA",                                  <== Name of the EzNoSQL primary index
                         "version":1,                                            <== Version number for JSON document format
                         "documentFormat":"JSON",                                <== Document format is JSON
@@ -651,8 +655,9 @@ Example format of the returned JSON report document:
 APIs in the Connection Management section, must run in task mode and non cross memory mode.
 
 ### znsq_open
-
-`int znsq_open(znsq_connection_t *con, const char *dsname, unsigned int flags, const struct znsq_open_options *options);`
+```C
+int znsq_open(znsq_connection_t *con, const char *dsname, unsigned int flags, const struct znsq_open_options *options);
+```
 
 #### Establishes an open connection to an EzNoSQL database
 Opens an EzNoSQL database by establishing a connection between the user's task and the database.  Additionally, the open API establishes the optional parameters to be used on behalf of this connection, such as read integrity, lock timeout, auto commit, read only, write force, and read access direction for the primary index:
@@ -697,7 +702,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 |                                                                                                                                                                          |
 
 Example of opening an EzNoSQL database:
-```
+```C
       char* base_name = "MY.JSON.DATA";                            //  Database name for primary index created with znsq_create
       znsq_connection_t connection = 0;                            //  Initialize returned connection token
       unsigned int open_flags = 0;                                 //  Initialize open flags
@@ -728,15 +733,16 @@ Example of opening an EzNoSQL database:
 ### znsq_close
 
 Closes the connection to the EzNoSQL database previously established by a znsq_open.
-
-`int znsq_close(znsq_connection_t con);`
+```C
+int znsq_close(znsq_connection_t con);
+```
 
 #### Parameters
 
 znsq_connection_t      The znsq_connection_t represents the connection token previously returned by the znsq_open API.
 
 Example of closing an EzNoSQL database:
-```
+```C
       return_code = znsq_close(connection);                        // Connection token returned by znsq_open
 
       if (return_code != 0) {
@@ -752,8 +758,9 @@ Example of closing an EzNoSQL database:
 APIs in the Data Retrieval section provide direct and sequential retrievals/updates/deletes of EzNoSQL documents.
 
 ### znsq_read
-
-`int znsq_read(znsq_connection_t con, const char *buf, size_t *buf_len, const char *key, const char *key_value, unsigned int flags, znsq_read_options *options);`
+```C
+int znsq_read(znsq_connection_t con, const char *buf, size_t *buf_len, const char *key, const char *key_value, unsigned int flags, znsq_read_options *options);
+```
 
 #### direct read documents
 Issues a direct read for a previously added document using the key name and key_value specified on the read request.  The key name must match the name on a previously issued znsq_create, znsq_create_index, or a generated "znsq_id" element. The value must match a previously added key_value paired with the specified
@@ -803,7 +810,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 |                                                                                                                                                                          |
 
 Example of reading a document from an EzNoSQL database:
-```
+```C
      struct znsq_read_options read_options;
      unsigned int read_flags = 0;                                      //  Initialize read flags
      char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};            // "_id" in utf-8  225F696422
@@ -842,11 +849,11 @@ Example of reading a document from an EzNoSQL database:
 ```
 
 ### znsq_position
-
-`int znsq_position(znsq_connection_t con, znsq_result_set_t *result_set, const char *key,
+```C
+int znsq_position(znsq_connection_t con, znsq_result_set_t *result_set, const char *key,
             const char *key_value, enum znsq_search_method search_method,
-			unsigned int flags);`
-
+			unsigned int flags);
+```
 
 #### Position to a key within the EzNoSQL database
 Issues a request to locate a specific key value (or a key value greater than or equal to) the desired key range. When the key value length is zero, positioning will be to the first or last document in the database based on the search order parameter: a search order (specifed with the znsq_open API)Ez of forward (default) will position to the first document, while backward will position to the last document. Following a successful position, a result_set token is returned which is then used as input for subsequent sequential retrieves or updates/deletes.  Positioning is therefore required prior to issuing the znsq_next_result, znsq_update_result, or the znsq_delete_result APIs.  Postioning should be terminated by using the znsq_close_result API in order to release the result_set.
@@ -881,7 +888,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 2 and 3 of the return code.
 
 Example of positioning to document from an EzNoSQL database:
-```
+```C
      char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};                 //  "_id" in utf-8  225F696422
      char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                     //  "01"
      int32_t position_keyname_len = strlen(keyname);                        //  Key name length
@@ -911,7 +918,9 @@ Example of positioning to document from an EzNoSQL database:
 ```
 
 ### znsq_next_result
-`int znsq_next_result(znsq_connection_t con, znsq_result_set_t *result_set, const char *buf, size_t *buf_len, unsigned int flags);`
+```C
+int znsq_next_result(znsq_connection_t con, znsq_result_set_t *result_set, const char *buf, size_t *buf_len, unsigned int flags);
+```
 
 #### sequential retrieval of documents by ascending/descending key value
 Issues a sequential read for the next key value based on the search order specified in the znsq_open API. Prior to reading sequentially, a znsq_position must be issued to create the result_set token representing the starting key value.  The result_set token is used as input for each sequential read in order to receive the document in the user provided buffer. The znsq_close_result API is used to end the positioning into the key range. Note that depending on the read integrity option specified in the znsq_open API, shared locks maybe obtained for each retrievel, and for CRE held until a commit is issued.
@@ -948,7 +957,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 2 and 3 of the return code.
 
 Example of reading documents sequentially from an EzNoSQL database:
-```
+```C
      unsigned int next_result_flags = 0;
      char *read_buf = calloc(200, 1);                                  //  Buffer for returned document
      size_t read_buf_len = strlen(read_buf);                           //  Buffer length
@@ -976,7 +985,9 @@ Example of reading documents sequentially from an EzNoSQL database:
 ```
 
 ### znsq_close_result
-`int znsq_close_result(znsq_connection_t con, znsq_result_set_t result);`
+```C
+int znsq_close_result(znsq_connection_t con, znsq_result_set_t result);
+```
 
 #### Close Result
 Ends positioning into the EzNoSQL database previously established by the znsq_position API.  The result_set (provided as input) is invalidated, and for non-recoverable databases, any document level locks will be released.  A new znsq_position must be issued to restart seqential retrievals following the close result.
@@ -998,7 +1009,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 2 and 3 of the return code.
 
 Example of ending positioning with znsq_close_result:
-```
+```C
      return_code = znsq_next_result(
         connection,
 	&rs);
@@ -1015,15 +1026,17 @@ Example of ending positioning with znsq_close_result:
 APIs in the Document Management section must run in non cross memory mode.
 
 ### znsq_write
-`int znsq_write(znsq_connection_t con, const char *buf, size_t buff_len,
-             znsq_write_options *options);`
+```C
+int znsq_write(znsq_connection_t con, const char *buf, size_t buff_len,
+             znsq_write_options *options);
+```
 
 #### Write new documents
 Writes (inserts) new documents into the EzNoSQL database using the keyname (optionally) specified on the write.  Whether the keyname represents the primary or a secondary index, all indexes are updated to reflect the new values found in the document. For a keyed EzNoSQL database, the keyname on the write must match the
 keyname specifed on the create.  If the key value was previously added to the database, then a duplicate document error is returned, unless the write force option
 was specified on the znsq_open API.
 
-I the keyname option is ommitted, the database is assumed to be an auto-generated keyed database, and will generate a new key:value element for the document (refer to the section Primary keyed vs Auto-generated keyed databases for more information on this topic).  If the document contains an auto-generated key element from a
+If the keyname option is omitted, the database is assumed to be an auto-generated keyed database, and will generate a new key:value element for the document (refer to the section Primary keyed vs Auto-generated keyed databases for more information on this topic).  If the document contains an auto-generated key element from a
 prior write request, a duplicate document error will be returned unless the write force option was specified on the znsq_open API.
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful write.
@@ -1061,7 +1074,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | autokey_length    | 'char'                        | Length of the returned auto generated key.                                                                           |                                                                                                                                                                  |
 
 Example of writing a document to a keyed EzNoSQL database:
-```
+```C
       char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};  // "_id" in utf-8  225F696422
       char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};      // "01"
 
@@ -1097,8 +1110,9 @@ Example of writing a document to a keyed EzNoSQL database:
 ```
 
 ### znsq_delete
-
-`int znsq_delete(znsq_connection_t, const char *key, const char *key_value);`
+```C
+int znsq_delete(znsq_connection_t, const char *key, const char *key_value);
+```
 
 #### Delete Documents
 Deletes (erases) existing documents from an EzNoSQL database using the provided primary or secondary key name and paired key_value.  An exclusive document level lock will be obtained for the delete request.  For non-recoverable datasets, the lock will be released immediately following the request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends. All secondary indexes will be updated to relect any alternate key deletions when the document is deleted.
@@ -1124,7 +1138,7 @@ If the database was created, the return code is 0.
 If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
 
 Example of deleting a document from an EzNoSQL database:
-```
+```C
       char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};            // "_id" in utf-8  225F696422
       char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                // "01"
       int32_t delete_keyname_len = strlen(keyname);                     //  key name length
@@ -1151,8 +1165,9 @@ Example of deleting a document from an EzNoSQL database:
 ```
 
 ### znsq_delete_result
-
-`int znsq_delete_result(znsq_connection_t con, znsq_result_set_t result);`
+```C
+int znsq_delete_result(znsq_connection_t con, znsq_result_set_t result);
+```
 
 #### Delete Result
 Deletes (erases) existing documents previously retrieved by a (direct) znsq_read or a (sequential) znsq_next_result with the update options specified. An exclusive document level lock was obtained by the read requests.  For non-recoverable datasets, the lock will be released immediately following the delete result request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends.
@@ -1175,7 +1190,7 @@ If the database was created, the return code is 0.
 If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
 
 Example of a delete result for a document from an EzNoSQL database:
-```
+```C
        return_code = znsq_delete_result(
         connection,
 	&rs
@@ -1192,8 +1207,9 @@ Example of a delete result for a document from an EzNoSQL database:
 ```
 
 ### znsq_update
-
-`int znsq_update(znsq_connection_t con, const char *newbuf,const char *key, const char *key_value);`
+```C
+int znsq_update(znsq_connection_t con, const char *newbuf,const char *key, const char *key_value);
+```
 
 #### direct update documents
 Issues a direct update for a previously added document using the requested keyname and key_value, and providing the updated version of the document.  The keyname must match the keyname on a previously issued znsq_create, znsq_create_index, or a generated "znsq_id" element. The value must match a previously added value paired with the specified
@@ -1226,7 +1242,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 2 and 3 of the return code.
 
 Example of updating a document in an EzNoSQL database:
-
+```C
       char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};            // "_id" in utf-8  225F696422
       char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                // "01"
       char update_buf[13] = {                                           //  Updated document (adds new element)
@@ -1258,11 +1274,12 @@ Example of updating a document in an EzNoSQL database:
         free(update_keyname_ptr);
         break;
       }
-``
+```
 
 ### znsq_update_result
-
-`int znsq_update_result(znsq_connection_t con, znsq_result_set_t result, const char *buf, size_t buf_len);`
+```C
+int znsq_update_result(znsq_connection_t con, znsq_result_set_t result, const char *buf, size_t buf_len);
+```
 
 #### Update Documents after Reads for Update
 Updates existing documents previously retrieved by a (direct) znsq_read or a (sequential) znsq_next_result with the update options specified. An exclusive document level lock was obtained by the read requests.  For non-recoverable databases, the lock will be released immediately following the update result request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends.
@@ -1292,7 +1309,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 2 and 3 of the return code.
 
 Example of updating a document in an EzNoSQL database:
-
+```C
       char update_buf[13] = {                                           //  Updated document (adds new element)
         0x7B, 0x22, 0x5f, 0x69, 0x64, 0x22, 0x3A, 0x22, 0x30, 0x31, 0x22, 0x2C,
 	0x22, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3A, 0x22, 0x4a, 0x6f, 0x68, 0x6e,0x22, 0x7D, 0x00
@@ -1315,10 +1332,12 @@ Example of updating a document in an EzNoSQL database:
         free(update_buf_ptr);
         break;
       }
-``` `
+```
 
 ### znsq_commit
-`int znsq_commit(znsq_connection_t con);`
+```C
+int znsq_commit(znsq_connection_t con);
+```
 
 #### Commit Updates
 Issues a commit to end the current transaction and release document level locks.  The next write, delete, or update request will start a new transaction.
@@ -1337,7 +1356,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 2 and 3 of the return code.
 
 Example of commiting transactions for an EzNoSQL database:
-```
+```C
 
      return_code = znsq_commit(
         connection
@@ -1352,7 +1371,9 @@ Example of commiting transactions for an EzNoSQL database:
 ```
 
 ### znsq_set_autocommit
-`int znsq_set_autocommit(znsq_connection_t con, const znsq_commit_options *options);`
+```C
+int znsq_set_autocommit(znsq_connection_t con, const znsq_commit_options *options);
+```
 
 #### Enable/Disable Auto Commit
 Updates the connection to the database to enable or disable the auto commit option.  When enabled, EzNoSQL will issue a commit after every update. Commits after every update request can incur overhead compared to optimizing commits for larger groups of updates. Conversely, commiting to infrequently can impact other sharers of the database from accessing the locked documents.
@@ -1384,7 +1405,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 |
 
 Example of enabling auto commit for an EzNoSQL database:
-```
+```C
      commit_options.znsq_autocommit = 1;                            //  Enables auto commit
 
      return_code = znsq_set_autocommit(
@@ -1400,7 +1421,9 @@ Example of enabling auto commit for an EzNoSQL database:
 ```
 
 ### znsq_abort
-`int znsq_abort(znsq_connection_t con);`
+```C
+int znsq_abort(znsq_connection_t con);
+```
 
 #### Abort Updates
 Issues an abort to end the current transaction, restore updated documents to their original versions prior to the start of the transaction, and release the document level locks.  The next write, delete, or update request will start a new transaction.
@@ -1419,7 +1442,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 2 and 3 of the return code.
 
 Example of commiting transactions for an EzNoSQL database:
-```
+```C
 
      return_code = znsq_abort(
         connection
@@ -1449,6 +1472,7 @@ Use the znsq_last_result API to obtain a text report containing additional diagn
 `buff_len`             The buff_len is a required input/output parameter pointing to the length of the buffer, and on return the length of the report.
 ```
 Example call to znsq_last_result:
+```C
     size_t buffer_size = 32*1024;
     char *buffer = (char *) malloc(buffer_size);
     int z;
@@ -1469,7 +1493,8 @@ Example call to znsq_last_result:
          printf("%c",c);
     }
     free(buffer);
-  ```
+```
+
 #### Example Report 1
 znsq_last_result report following a RC=8 RSN=x'38' (security violation).  The additional diagnostic message (ACBMSGAR) indicates a system IEC161I 040-0257 message was issued for an open error ACBERFLG = 98:
 ```
