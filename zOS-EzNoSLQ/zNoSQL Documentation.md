@@ -7,8 +7,8 @@ Introduction and Concepts:
 * [Primary Keys](#Primary-keys)
 * [Secondary Indexes](#Secondary-Indexes)
 * [Active Secondary Indexes](#Active-Secondary-Indexes)
-* [Non-Unique Secondary Indexes](#NonUnique-Secondary-Indexes)
-* [Multi Level Keys](#Multi-Level-Keys)
+* [Non-Unique Secondary Indexes](#NonUniqueSecondaryIndexes)
+* [Multi Level Keys](#MultiLevelKeys)
 * [Document Retrieval](#Document-Retrieval)
 * [Recoverable Databases](#Recoverable-Data-Sets)
 
