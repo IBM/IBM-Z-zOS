@@ -31,35 +31,35 @@ Application Programming Interfaces (APIs):
 * [Application Programming Tiers](#Application-Programming-Tiers)
 
 Data Management APIs:
-* [znsq_create](#znsq_create)
-* [znsq_create_index](#znsq_create_index)
-* [znsq_destroy](#znsq_destroy)
-* [znsq_add_index](#znsq_add_index)
-* [znsq_drop_index](#znsq_drop_index)
-* [znsq_report_stats](#znsq_report_stats)
+* [znsq_create()](#znsq_create)
+* [znsq_create_index()](#znsq_create_index)
+* [znsq_destroy()](#znsq_destroy)
+* [znsq_add_index()](#znsq_add_index)
+* [znsq_drop_index()](#znsq_drop_index)
+* [znsq_report_stats()](#znsq_report_stats)
 
 Connection Management APIs:
-* [znsq_open](#znsq_open)
-* [znsq_close](#znsq_close)
+* [znsq_open()](#znsq_open)
+* [znsq_close()](#znsq_close)
 
 Document Retrieval APIs:
-* [znsq_read](#znsq_read)
-* [znsq_position](#znsq_position)
-* [znsq_next_result](#znsq_next_result)
-* [znsq_close_result](#znsq_close_result)
+* [znsq_read()](#znsq_read)
+* [znsq_position()](#znsq_position)
+* [znsq_next_result()](#znsq_next_result)
+* [znsq_close_result()](#znsq_close_result)
 
 Document Management APIs:
-* [znsq_write](#znsq_write)
-* [znsq_delete](#znsq_delete)
-* [znsq_delete_result](#znsq_delete_result)
-* [znsq_update](#znsq_update)
-* [znsq_update_result](#znsq_update_result)
-* [znsq_commit](#znsq_commit)
-* [znsq_set_autocommit](#znsq_set_autocommit)
-* [znsq_abort](#znsq_abort)
+* [znsq_write()](#znsq_write)
+* [znsq_delete()](#znsq_delete)
+* [znsq_delete_result()](#znsq_delete_result)
+* [znsq_update()](#znsq_update)
+* [znsq_update_result()](#znsq_update_result)
+* [znsq_commit()](#znsq_commit)
+* [znsq_set_autocommit()](#znsq_set_autocommit)
+* [znsq_abort()](#znsq_abort)
 
 Diagnostic Management APIs:
-* [znsq_last_result](#znsq_last_result)
+* [znsq_last_result()](#znsq_last_result)
 
 Return and Reason Codes:
 * [Return Code 0](#Return-Code-0)
@@ -156,7 +156,7 @@ Secondary indexes can be defined as unique or non-unique.  For unique indexes, e
 
 ## Multi Level Keys
 
-Both the primary and secondary indexes can have a single level keyname, or can have a multiple level keyname (referred to as a multikey). The individual levels are connected by the reverse solidus character `\`.  For example, a secondary keyname of `"Address\Steet"` would allow the following document to be retrieved using a value of `"1 Main Street"`.
+Both the primary and secondary indexes can have a single level keyname, or can have a multiple level keyname (referred to as a multikey). The individual levels are connected by the reverse solidus character `\`.  For example, a secondary keyname of `"Address\Street"` would allow the following document to be retrieved using a value of `"1 Main Street"`.
 ```json
 {
  "Customer_id":"4084",
@@ -180,9 +180,9 @@ Multikey names can also span into imbedded documents or an array of imbedded doc
 
 ## Document Retrieval
 
-Documents can be directly read, updated, or erased by specifying the desired keyname and value of the specific document to be retrieved/updated.  Additionally, documents can be retrieved in an ordered fashion through the use of secondary indexes.  The application can position (`znsq_position`) into the secondary index to a specific key value, or for any value greater than or equal to the desired key range. The documents can then be retrieved in a (sequential) ascending or descending order, and optionally updated (`znsq_update_result`) or deleted (`znsq_delete_result`) following the retrieval. When using sequential access to update or erase documents, the documents will not be visible on disk and to other sharers until either: the end of the buffer is reached, a `znsq_close_result` is issued, or a successful close of the data base.  When a `znsq_close_result` is issued, positioning is ended and a new `znsq_position` must be issued to re-establish position within the secondary index.  EzNoSQL will return a reason code when reading alternate (non-unique) duplicate keys.
+Documents can be directly read, updated, or erased by specifying the desired keyname and value of the specific document to be retrieved/updated.  Additionally, documents can be retrieved in an ordered fashion through the use of secondary indexes.  The application can position (`znsq_position()`) into the secondary index to a specific key value, or for any value greater than or equal to the desired key range. The documents can then be retrieved in a (sequential) ascending or descending order, and optionally updated (`znsq_update_result()`) or deleted (`znsq_delete_result()`) following the retrieval. When using sequential access to update or erase documents, the documents will not be visible on disk and to other sharers until either: the end of the buffer is reached, a `znsq_close_result()` is issued, or a successful close of the data base.  When a `znsq_close_result()` is issued, positioning is ended and a new `znsq_position()` must be issued to re-establish position within the secondary index.  EzNoSQL will return a reason code when reading alternate (non-unique) duplicate keys.
 
-In order to iterate in an ordered fashion over the primary key, and optionally update/delete the document(s), use a direct read (`znsq_read`) with the update option for the primary key.  Then optionally update (`znsq_update_result`), delete (`znsq_delete_result`), or end the update (`znsq_close_result`).
+In order to iterate in an ordered fashion over the primary key, and optionally update/delete the document(s), use a direct read (`znsq_read()`) with the update option for the primary key.  Then optionally update (`znsq_update_result()`), delete (`znsq_delete_result()`), or end the update (`znsq_close_result()`).
 
 While the alternate key value size is not restricted, the keys will be truncated after 251 bytes. Truncated keys may result in non-unique keys with other keys containing the same first 251 bytes.  Sequentially reading truncated keys may return the documents out of order and require further sorting by the application. EzNoSQL will return a reason code alerting the application if a truncated key is retrieved.
 
@@ -212,20 +212,20 @@ EzNoSQL is provided with z/OS and does not require any additional software licen
 ## Storage Administration Requirements
 
 1. Enable the SMSVSAM address space on each LPAR which will access the EzNoSQL databases. If recoverable EzNoSQL databases will be accessed, the DFSMS Transaction VSAM (TVS) manager must be enabled and configured including the availability of forward recovery logstreams if required by the application. Refer to [Administering VSAM record-level sharing](https://www.ibm.com/docs/en/zos/2.5.0?topic=administration-administering-vsam-record-level-sharing), or [VSAM Demystified](https://www.redbooks.ibm.com/abstracts/sg246105.html_-) (Chapters 5 and 6).
-2. Configure one or more SMS storage classes (STORCLAS) containing a CACHESET (see [Defining storage classes for VSAM RLS](https://www.ibm.com/docs/en/zos/2.5.0?topic=sharing-defining-storage-classes-vsam-rls#dscrls)). The CACHESET identifies the name of one or more CF cache structures for use by the EzNoSQL databases (see [Defining VSAM RLS attributes in data classes](https://www.ibm.com/docs/en/zos/2.5.0?topic=sharing-defining-vsam-rls-attributes-in-data-classes)).
-3. If SMS guaranteed space (GS) storage classes are implemented, the associated storage group (STORGRP) must contain 59 candidate volumes.
-4. Provide the name of the SMS STORCLAS name to the application architect for use in creating the databases, or it can be assigned dynamically by the system through the use of SMS Access Control System (ACS). Refer to [DFSMSdfp Storage Administration](https://www-40.ibm.com/servers/resourcelink/svc00100.nsf/pages/zOSV2R5SC236860/$file/idas200_v2r5.pdf) (Chapter 13).
+2. Configure one or more SMS storage classes (`STORCLAS`) containing a `CACHESET` (see [Defining storage classes for VSAM RLS](https://www.ibm.com/docs/en/zos/2.5.0?topic=sharing-defining-storage-classes-vsam-rls#dscrls)). The `CACHESET` identifies the name of one or more CF cache structures for use by the EzNoSQL databases (see [Defining VSAM RLS attributes in data classes](https://www.ibm.com/docs/en/zos/2.5.0?topic=sharing-defining-vsam-rls-attributes-in-data-classes)).
+3. If SMS guaranteed space (GS) storage classes are implemented, the associated storage group (`STORGRP`) must contain 59 candidate volumes.
+4. Provide the name of the SMS `STORCLAS` name to the application architect for use in creating the databases, or it can be assigned dynamically by the system through the use of SMS Access Control System (ACS). Refer to [DFSMSdfp Storage Administration](https://www-40.ibm.com/servers/resourcelink/svc00100.nsf/pages/zOSV2R5SC236860/$file/idas200_v2r5.pdf) (Chapter 13).
 5. Create or assign a database high level qualifer to the application developer for use in assigning database names for the EzNoSQL databases.
-6. Optionally, create SMS data classes (DATACLAS) to enable additional system functions such as encryption, data compression, SMSVSAM 64-bit buffering, and control of space allocation amounts.  Provide the name of the DATACLAS to the application architect for use when defining the database, or it can be assigned dynamically by the system through the use of SMS Access Control System (ACS). Refer to [Defining Shareoptions and RLS attributes for data class](https://www.ibm.com/docs/en/zos/2.5.0?topic=attributes-defining-shareoptions-rls-data-class#dorlsadc).
-7. Optionally, create SMS management classes (MGMTCLAS) to provide backup and data retention requirements for the EzNoSQL data. Provide the name of the MGMTCLAS to the application architect for use when defining the database, or it can be assigned dynamically by the system through the use of SMS Access Control System (ACS) (link).
+6. Optionally, create SMS data classes (`DATACLAS`) to enable additional system functions such as encryption, data compression, SMSVSAM 64-bit buffering, and control of space allocation amounts.  Provide the name of the DATACLAS to the application architect for use when defining the database, or it can be assigned dynamically by the system through the use of SMS Access Control System (ACS). Refer to [Defining Shareoptions and RLS attributes for data class](https://www.ibm.com/docs/en/zos/2.5.0?topic=attributes-defining-shareoptions-rls-data-class#dorlsadc).
+7. Optionally, create SMS management classes (`MGMTCLAS`) to provide backup and data retention requirements for the EzNoSQL data. Provide the name of the `MGMTCLAS` to the application architect for use when defining the database, or it can be assigned dynamically by the system through the use of SMS Access Control System (ACS) (link).
 
 ## Application Requirements
 
 Contact your system administrator for requirements when creating EzNoSQL databases:
 1. High level qualifier(s) for database names
-2. STORCLAS name if not assigned by the system.  A STORCLAS name is required to be assigned or the creation of the database will fail
-3. DATACLAS name if not assigned by the system for optional features (i.e. encryption, compression, storing data in the CF global cache) if required by the application
-4. MGMTCLAS name if not assigned by the system for application requirements related to data backup frequency and data retention
+2. `STORCLAS` name if not assigned by the system.  A `STORCLAS` name is required to be assigned or the creation of the database will fail
+3. `DATACLAS` name if not assigned by the system for optional features (i.e. encryption, compression, storing data in the CF global cache) if required by the application
+4. `MGMTCLAS` name if not assigned by the system for application requirements related to data backup frequency and data retention
 
 # Performance Considerations
 
@@ -240,7 +240,7 @@ When a JSON document is read from the database, the local buffer pool is initial
 
 When a JSON document is written to the database, the buffer potentially containing the document is first located as described by the read logic above. Once a buffer is located or created new, the JSON document is inserted into the buffer, (optionally) written to the CF, then always written to disk.  Updated/inserted documents are always written to disk, or a non-zero return code is returned to the application indicating the write did not complete.  The write to the CF and to disk is serialized by RLS, and the buffer is cross-invalidated to any sharing LPARs.
 
-Optionally, loading data into the CF cache may be bypassed and reduce overhead if global caching is not required (for example in a single LPAR configuration).  The RLSCFCACHE option in the SMS DATACLAS controls which buffers are loaded into the CF on behalf of the database.  When electing to cache data in the CF, separate cache structures can be assigned to different groups of databases.  Separate cache sturctures can provide more consistent performance by providing isolation from other RLS data.  Contact the z/OS Storage Administrator for caching requirements.
+Optionally, loading data into the CF cache may be bypassed and reduce overhead if global caching is not required (for example in a single LPAR configuration).  The `RLSCFCACHE` option in the SMS `DATACLAS` controls which buffers are loaded into the CF on behalf of the database.  When electing to cache data in the CF, separate cache structures can be assigned to different groups of databases.  Separate cache sturctures can provide more consistent performance by providing isolation from other RLS data.  Contact the z/OS Storage Administrator for caching requirements.
 
 # Getting Started
 
@@ -250,13 +250,13 @@ The EzNoSQL APIs can be called from application user programs running in either 
 
 The following table shows the names and locations of the EzNoSQL executables, side decks, and sample program:
 
-| Member              | Location              | Description                           |
-| ------------------- | --------------------- | ------------------------------------- |
+| Member              | Location              | Description            |
+| ------------------- | --------------------- | ---------------------- |
 | `libigwznsqd31.so`  | `/usr/lib/`           | 31-bit API Library DLL |
-| `libigwznsqd31.x`   | `/usr/lib/`           | 31-bit x side deck |
+| `libigwznsqd31.x`   | `/usr/lib/`           | 31-bit x side deck     |
 | `libigwznsqd64.so`  | `/usr/lib/`           | 64-bit API Library DLL |
-| `libigwznsqd64.x`   | `/usr/lib/`           | 64-bit APIs |
-| `igwvznsq.h`        | `/usr/include/zos/`   | EzNoSQL Header File |
+| `libigwznsqd64.x`   | `/usr/lib/`           | 64-bit APIs            |
+| `igwvznsq.h`        | `/usr/include/zos/`   | EzNoSQL Header File    |
 | `igwznsqsamp1.c`    | `/samples/`           | Sample 31-bit application program |
 
 ## Sample Application Program
@@ -300,37 +300,38 @@ int znsq_create(const char *dsname, const znsq_create_options *options);
 ```
 
 #### Create EzNoSQL Database
-Creates an EzNoSQL primary index database with the name specified in parameter `dsname` using the attributes that are specified by the `options` parameter. Note that EzNoSQL databases can also be created through other system APIs and are compatible and sharable with the EzNoSQL APIs.
+Creates an EzNoSQL primary index database with the name specified in parameter `dsname` using the attributes that are specified by the `options` parameter. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.
 ​
 #### Parameters
--`dsname`: C-string containing the name of the database. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $).  The remaining seven characters are either alphabetic, numeric (0 - 9), national, a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.DATA.​
+`dsname`: C-string containing the name of the database. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segments. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $).  The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.).
+> Example: MY.JSON.DATA.​
 
--`options`: Pointer to an object of type [`znsq_create_options`](#znsq_create_options), where the database attributes are provided.
+`options`: Pointer to an object of type `znsq_create_options`, where the database attributes are provided.
 ​
 #### Return value
 The return code of the function.
 
 If the database was created, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes 2 and 3 of the return code.
 ​​
 #### struct znsq_create_options
 `znsq_create_options;`
 ​
 #### Member attributes
-| member            | type                          | description                                                                                                          |
-| ----------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| version           | `int`                         | API version.                                                                                                         |
-| znsq_format       | `format`                      | Database format. Specify `0` (default) for JSON. Currently, only JSON is supported.                                    |
-| max_space         | `int`                         | Maximum space of database in megabytes (required). Additional space will be added per document for system metadata and generated keys:</br>```Keyed:.....................................x'AC' bytes```<br>```Auto generated Keyed:....x'132' bytes```</br>Refer to section Primary keyed vs Auto-generated keyed databases for information on this option. |
-| avg_doc_size      | `int`                         | Average size of all documents in the database.  Providing an accurate size as close as possible may improve                     performance when reading/writing to the database.  A zero value will result in a default physical blocksize of 32768.|
-| update_percent    | `int`                         | Percentage of actual update requests compared to writes (inserts) and deletes.  Used in conjuntion with a non-zero                          avg_doc_size will further aid in read/write performace by optimizing the physical blocksize by EzNoSQL. |
-| znsq_log_options  | `enum`                        | Database recovery option: </br>`0` indicates the database is non-recoverable (NONE). This is the default option.</br>`2` indicates the database is recoverable (UNDO) and supports backout logging only.</br>`3` indicates the database is recoverable (ALL) and supports both backout and forward recovery logging.</br>Refer to section Non-Recoverable vs Recoverable Database for information on this option.</br>Note that IBM's forward recovery utility (CICSVR) currently does not support EzNoSQL databases, therefore using the ALL option may not be useful at this time.
-| primary_key       | `char`                        | UTF-8 JSON C-string providing the primary keyname for the database. The string must be < 256 bytes including quotes, and end with one byte of x'00'.  The keyname may consist of a multi level name.  Omitting the keyname results in auto-generated keys. Refer to sections Multi Level Keynames and Primary Keyed vs Auto Generated Keys for more information on these options. |
-| storclas          | `char`                        | C-string in EBCDIC (maximum of 8 characters) for the required system storage class name (STORCLAS). </br>Refer to section System Administration Requirements for more information on this option. |
-| mgmtclas          | `char`                        | C-string in EBCDIC (maximum of 8 character) for the optional system management class name (MGMTCLAS).</br>Refer to section System Administration Requirements for more information on this option. |
-| dataclas          | `char`                        | C-string in EBCDIC (maximum of 8 characters) for the optional system data class name (DATACLAS).</br>Refer to the section System Administration Requirements for more information on this option. |
-| logstreamId       | `char`                        | C-string in EBCDIC (maximum of 26 characters) for the optional forwards recovery log stream.  Required when znsq_log_option = 3 (ALL) is specified. |
+| member           | type     | description |
+| ---------------- | -------- | ----------- |
+| version          | `int`    | API version. |
+| znsq_format      | `format` | Database format. Specify `0` (default) for JSON. Currently, only JSON is supported. |
+| max_space        | `int`    | Maximum space of database in megabytes (required). Additional space will be added per document for system metadata and generated keys: <br> ```Keyed:.....................................x'AC' bytes``` <br> ```Auto generated Keyed:....x'132' bytes```</br> Refer to section Primary keyed vs Auto-generated keyed databases for information on this option. |
+| avg_doc_size     | `int`    | Average size of all documents in the database.  Providing an accurate size as close as possible may improve performance when reading/writing to the database.  A zero value will result in a default physical blocksize of 32768. |
+| update_percent   | `int`    | Percentage of actual update requests compared to writes (inserts) and deletes. Used in conjunction with a non-zero avg_doc_size will further aid in read/write performance by optimizing the physical blocksize by EzNoSQL. |
+| znsq_log_options | `enum`   | Database recovery option: </br>`0` indicates the database is non-recoverable (`NONE`). This is the default option.</br>`2` indicates the database is recoverable (`UNDO`) and supports backout logging only.</br>`3` indicates the database is recoverable (`ALL`) and supports both backout and forward recovery logging.</br>Refer to section Non-Recoverable vs Recoverable Database for information on this option.</br>Note that IBM's forward recovery utility (CICSVR) currently does not support EzNoSQL databases, therefore using the `ALL` option may not be useful at this time. |
+| primary_key      | `char`   | UTF-8 JSON C-string providing the primary key name for the database. The string must be < 256 bytes including quotes, and end with one byte of x'00'.  The key name may consist of a multi level name.  Omitting the key name results in auto-generated keys. Refer to sections Multi Level Keynames and Primary Keyed vs Auto Generated Keys for more information on these options. |
+| storclas         | `char`   | C-string in EBCDIC (maximum of 8 characters) for the required system storage class name (`STORCLAS`). </br>Refer to section System Administration Requirements for more information on this option. |
+| mgmtclas         | `char`   | C-string in EBCDIC (maximum of 8 character) for the optional system management class name (`MGMTCLAS`).</br>Refer to section System Administration Requirements for more information on this option. |
+| dataclas         | `char`   | C-string in EBCDIC (maximum of 8 characters) for the optional system data class name (`DATACLAS`).</br>Refer to the section System Administration Requirements for more information on this option. |
+| logstreamId      | `char`   | C-string in EBCDIC (maximum of 26 characters) for the optional forwards recovery log stream.  Required when znsq_log_option = 3 (`ALL`) is specified. |
 
 Example of creating a keyed EzNoSQL database:
 ```c
@@ -362,41 +363,41 @@ int znsq_create_index(const char *alternate_key, unsigned int flags, const znsq_
 ```
 
 #### Create EzNoSQL Secondary Index
-Creates a secondary index with for the name specified in parameters `aix_name`, using a keyname of `alternate_key`. The database to be associated with this index is specifed in the `base_name` parameter. Together, the secondary index and database are assoicated by the `path_name` parameter. The `path_name` is used internally by EzNoSQL to identify the correct association of the secondary index to its base database. The secondary index is created in an inactive state, and must be activated via the `znsq_add_index` API before attempting to access documents via the specified `alternate_key`. For EzNoSQL databases created as recoverable (znsq_log_options=UNDO/ALL), a commit will be issued for any active transation following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.
+Creates a secondary index with for the name specified in parameters `aix_name`, using a keyname of `alternate_key`. The database to be associated with this index is specifed in the `base_name` parameter. Together, the secondary index and database are assoicated by the `path_name` parameter. The `path_name` is used internally by EzNoSQL to identify the correct association of the secondary index to its base database. The secondary index is created in an inactive state, and must be activated via the `znsq_add_index()` API before attempting to access documents via the specified `alternate_key`. For EzNoSQL databases created as recoverable (`znsq_log_options=UNDO/ALL`), a commit will be issued for any active transation following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.
 
 #### Parameters
 
- -`alternate_key`: C-string containing the name of the UTF-8 JSON C-string providing the secondary keyname for the index. The string must be < 256 bytes including quotes and end in one byte of x'00'.  The keyname may consists of a multi level name.  Refer to section [Multi Level Keynames](#Multi-Level-Keys) for more information on this option.
+`alternate_key`: C-string containing the name of the UTF-8 JSON C-string providing the secondary keyname for the index. The string must be < 256 bytes including quotes and end in one byte of x'00'.  The keyname may consists of a multi level name.  Refer to section [Multi Level Keynames](#Multi-Level-Keys) for more information on this option.
 
- -`flags`:
+`flags`:
+ + _`1 (= (1 << 0))`_ indicates the creation of a unique index. Non-Unique indexes may contain alternate keys representing one or more documents, while unique indexes ensure only one document is represented by each key.  Attempting to insert duplicate documents with the same alternate key into a unique index will result in a duplicate document error. Refer to section entitled Unique vs Non-Unique Indexes for more information on this topic.
 
-1 (= (1 << 0)) indicates the creation of a unique index. Non-Unique indexes may contain alternate keys representing one or more documents, while unique indexes ensure only one document is represented by each key.  Attempting to insert duplicate documents with the same alternate key into a unique index will result in a duplicate document error. Refer to section entitled Unique vs Non-Unique Indexes for more information on this topic.
+ + _`2 (=(1 << 1))`_ indicates descending sequential access when retrieving documents through this index. Refer to section Direct vs Sequential Document Retrieval for more information on this topic.
 
-2 (=(1 << 1))  indicates descending sequential access when retrieving documents through this index. Refer to section Direct vs Sequential Document Retrieval for more information on this topic.
-
-   ​
-**`options`**: Pointer to an object of type [`znsq_add_index_options`](#znsq_add_index_options), where the database attributes are provided.
+`options`: Pointer to an object of type `znsq_add_index_options`, where the database attributes are provided.
 
 #### Return value
 The return code of the function.
 
 If the database was created, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes 2 and 3 of the return code.
 
 #### struct znsq_create_index_options
 `znsq_create_index_options;`
 ​
 #### Member attributes
-| member            | type                          | description                                                                                                          |
-| ----------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| version           | `int`                         | API version.                                                                                                         |
-| base_name         | `char`                        | Primary index database name specified on the associated znsq_create.                                                 |
-| aix_name          | `char`                        | C-string containing the name of the secondary index. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0-9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.AIX1.|
-| path_name         | `char`                        | C-string containing the path name of the secondary index. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.PATH1. |
-| dataclas          | `char`                        | C-string in EBCDIC (maximum of 8 characters) for the optional system management data class name (DATACLAS).</br>Refer to the section System Administration Requirements for more information on this option. |
-| max_space         | `int`                         | Maximum space of database in mega bytes (required).                                                                             |
-| znsq_integrity    | `enum`                        | Read integrity option:</br>0 indicates no read integrity (NRI).</br>1 indicates consist read (CR).</br>2 indicates consistent read extended (CRE).</br>Refer to section Non-Recoverable vs Recoverable Databases for information on this option.|                                                                      |
+| member         | type   | description  |
+| -------------- | ------ | ------------ |
+| version        | `int`  | API version. |
+| base_name      | `char` | Primary index database name specified on the associated `znsq_create()`. |
+| aix_name       | `char` | C-string containing the name of the secondary index. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segments. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0-9), national, or a hyphen (-). Name segments are separated by a period (.) |
+|                |        | Example: _MY.JSON.AIX1_|
+| path_name      | `char` | C-string containing the path name of the secondary index. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.) |
+|                |        | Example: _MY.JSON.PATH1_|
+| dataclas       | `char` | C-string in EBCDIC (maximum of 8 characters) for the optional system management data class name (`DATACLAS`).</br>Refer to the section System Administration Requirements for more information on this option.|
+| max_space      | `int`                         | Maximum space of database in megabytes (required).|
+| znsq_integrity | `enum` | Read integrity option:</br>`0` indicates no read integrity (NRI).</br>`1` indicates consist read (CR).</br>`2` indicates consistent read extended (CRE).</br>Refer to section Non-Recoverable vs Recoverable Databases for information on this option.|
 
 
 Example of creating a non unique secondary index with descending access:
@@ -437,10 +438,10 @@ int znsq_destroy(const char *dsname);
 ```
 
 #### Destroy EzNoSQL Database
-Destroys an EzNoSQL primary and/or secondary index databases previously created with the name specified in parameter *dsname*.  A znsq_close must be issued for all previous opens whether issued via EzNoSQL or other API's sharing the database.
+Destroys an EzNoSQL primary and/or secondary index databases previously created with the name specified in parameter `dsname`. A `znsq_close()` must be issued for all previous opens whether issued via EzNoSQL or other APIs sharing the database.
 ​
 #### Parameters
-`dsname`
+`dsname`:
    C-string containing the name of the previously created EzNoSQL database.
 
 #### Return value
@@ -448,11 +449,11 @@ The return code of the function.
 
 If the database was destroyed, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes 2 and 3 of the return code.
 
 Example of destroying an EzNoSQL:
 ```C
-      char* dsname = "MY.JSON.DATA";                          //  Database name, "MY" qualifer assigned by the system administrator
+      char* dsname = "MY.JSON.DATA";           // Database name, "MY" qualifer assigned by the system administrator
 
       return_code = znsq_destroy(
         dsname
@@ -472,25 +473,26 @@ int znsq_add_index(const znsq_add_index_options *options);
 ```
 
 #### Add EzNoSQL Secondary Index
-Builds and activates a previously inactive EzNoSQL secondary index for the name specified in parameter *aix_name* and for base database specified in parameter *name*. Note that the length of time to complete the build phase is directly related to the size of the primary index. For databases created as recoverable (znsq_log_options=UNDO/ALL), a commit will be issued for any active transaction following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.
+Builds and activates a previously inactive EzNoSQL secondary index for the name specified in parameter `aix_name` and for a base database specified in parameter `base_name`. Note that the length of time to complete the build phase is directly related to the size of the primary index. For databases created as recoverable (`znsq_log_options=UNDO/ALL`), a commit will be issued for any active transaction following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.
 
 #### Return value
 The return code of the function.
 
 If the database was created, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes 2 and 3 of the return code.
 
 #### struct znsq_add_index_options
 `znsq_add_index_options;`
 
 #### Member attributes
-| member            | type                          | description                                                                                                          |
-| ----------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| version           | `int`                         | API version.                                                                                                         |
-| base_name         | `char`                        | C-string containing the name of the primary index. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.DATA. |
-| aix_name          | `char`                        | C-string containing the name of the secondary index. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.AIX1. |
-|                                                                                                                                                                          |
+| member    | type   | description |
+| --------- | ------ | ----------- |
+| version   | `int`  | API version.|
+| base_name | `char` | C-string containing the name of the primary index. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segments. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.) |
+|           |        |Example: _MY.JSON.DATA_|
+| aix_name  | `char` | C-string containing the name of the secondary index. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segments. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.) |
+|           |        |Example: _MY.JSON.AIX1_|
 
 Example of creating a non unique secondary index with descending access:
 ```C
@@ -517,34 +519,34 @@ Example of creating a non unique secondary index with descending access:
 int znsq_drop_index(const znsq_drop_index_options *options);
 ```
 
-#### Disable a secondary index
-Disables (drops) an EzNoSQL secondary index across the sysplex.  When disabled, access is prevented for reads and writes until such a time as the index is re-enabled via the znsq_add_index command.  Note that disabling an index will effect all sharers of the database including those accessed by EzNoSQL and other system APIs.
+#### Disable a Secondary Index
+Disables (drops) an EzNoSQL secondary index across the sysplex.  When disabled, access is prevented for reads and writes until such a time as the index is re-enabled via the `znsq_add_index()` command.  Note that disabling an index will effect all sharers of the database including those accessed by EzNoSQL and other system APIs.
 
 #### Parameters
-`dsname`
-   C-string containing the name of the previously added EzNoSQL index by the znsq_add_index API.
+`dsname`:
+   C-string containing the name of the previously added EzNoSQL index by the `znsq_add_index()` API.
 
 #### Return value
 The return code of the function.
 
 If the index was dropped, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes 2 and 3 of the return code.
 
 #### struct znsq_add_index_options
 `znsq_drop_index_options;`
 
 #### Member attributes
-| member            | type                          | description                                                                                                          |
-| ----------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| version           | `int`                         | API version.                                                                                                         |
-| base_name          | `char`                        | C-string containing the name of the database. The name consists of 1 to 44 ebcdic characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.). Example: MY.JSON.AIX1. |
-|                                                                                                                                                                          |
+| member    | type   | description |
+| --------- | ------ | ----------- |
+| version   | `int`  | API version.|
+| base_name | `char` | C-string containing the name of the database. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segments. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.) |
+|           |        | Example: _MY.JSON.AIX1_|
 
 
 Example of dropping an EzNoSQL index:
 ```C
-      char* dsname = "MY.JSON.AIX1";                         //  Seconday index name from znsq_add_index
+      char* dsname = "MY.JSON.AIX1";                         //  Secondary index name from znsq_add_index
       char* base_name = "MY.JSON.DATA;                       //  Associated database name for the primary index
 
       drop_index_options.base_name = base_name;
@@ -569,20 +571,20 @@ int znsq_report_stats(znsq_connection_t con, const char *buf, size_t buff_len);
 
 #### Create EzNoSQL usage report
 
-Use the znsq_report_stats API to generate a JSON document containing the attributes and usage information for all the indexes associated with the data set, along with information related to the specific connection by the application. A connection to the data set via the znsq_open API is required proir to calling this API.
+Use the `znsq_report_stats()` API to generate a JSON document containing the attributes and usage information for all the indexes associated with the data set, along with information related to the specific connection by the application. A connection to the data set via the `znsq_open()` API is required proir to calling this API.
 
 #### Parameters:
 
-`znsq_connection_t`
-  The znsq_connection_t represents the connection token previously returned by the znsq_open API.
+`znsq_connection_t`:
+  The znsq_connection_t represents the connection token previously returned by the `znsq_open()` API.
 
-`*buf`
+`buf`:
   The buf parameter is a required input parameter containing a pointer to a buffer which will contain the generated JSON report document.
 
-`buff_len`
+`buff_len`:
   The buff_len is a required input/output parameter pointing to the length of the buf area.  The initial size of the buffer can be calculated as 453 bytes for the primary index, and 346 bytes for each secondary index added to the EzNoSQL database.  If the buffer is too small, a reason code of x'119' is returned along with the required size in this parameter.
 
-Example call to `znsq_report_stats`:
+Example call to `znsq_report_stats()`:
 ```C
       return_code = znsq_report_stats(
         connection,
@@ -599,60 +601,60 @@ Example call to `znsq_report_stats`:
 ```
 
 Example format of the returned JSON report document:
-```C
-                       {"name":"MY.JSON.DATA",                                  <== Name of the EzNoSQL primary index
-                        "version":1,                                            <== Version number for JSON document format
-                        "documentFormat":"JSON",                                <== Document format is JSON
-                        "keyname":"_id",                                        <== Primary keyname
-                        "logOptions":"UNDO",                                    <== Recovery options of UNDO specified on create
-                        "readIntegrity":"NRI",                                  <== Read integrity used by this connection
-                        "readOnly":false,                                       <== Database opened for write access for this connection
-                        "writeForce":true,                                      <== Write force requested for this connection
-                        "autoCommit":false,                                     <== Auto commit feature option currently active for this connection
-                        "descendingKeys":false,                                 <== Sequential access if forward for this connection
-                        "timeout":5,                                            <== Lock timeout of 5 seconds requested for this connection
-                        "avgDocumentSize":1000,                                 <== Average document size
-                        "blockSize":26624,                                      <== Physical I/O blocksize (in bytes) selected by znsq_create
-			"avgElapseTime:150,                                     <== Average elapse (latency) time in microseconds per number requests executed
-                        "avgCPUTime:8,                                          <== Average TCB CPU time in microseconds per number requests executed
-                        "statistics":                                           <== Primary index statistics imbedded document
-                          {"numberBlocksAllocated":1234,                        <== Total number of blocks allocated to the primary index
-                           "numberBlocksUsed":124,                              <== Total number of blocks in use for the primary index
-                           "numberExtents":1,                                   <== Total number of physical extents for the primary index
-                           "numberRecords":2,                                   <== Total number of documents in the primary index
-                           "numberDeletes":5,                                   <== Total number of documents deleted since the primary index was created
-                           "numberInserts":10,                                  <== Total number of inserted documents since the primary index was created
-                           "numberUpdates":4,                                   <== Total number of updated documents since the primary index was created
-                           "numberRetrieves":13},                               <== Total number of documents retrieved since the primary index was created
-                        "numberIndices":1,                                      <== Total number of secondary indexes
-                        "indices":                                              <== Secondary index attributes and statistics
-                           [{"name":"HL1.JSON.AIX",                             <== Name of the secondary index
-                            "keyname":"Firstname",                              <== Keyname for this secondary index
-                            "pathname":"HL1.JSON.PATH",                         <== Pathname for this seconday index
-                            "active":true,                                      <== Index is synchronized and available for read/write access
-                            "unique":true,                                      <== Index contains only unique keys
-                            "descendingKeys":false,                             <== Sequential access was set to ascending when the index was added
-                            "blockSize":26624,                                  <== Physical I/O blocksize (in bytes) selected by znsq_add _index
-                            "statistics":                                       <== Seondary index statistics imbedded document
-                               {"numberBlocksAllocated":1234,                   <== Total number of blocks allocated to the secondary index
-                                 "numberBlocksUsed":124,                        <== Total number of blocks in use for the secondary index
-                                 "numberExtents":1,                             <== Total number of physical extents for the secondary index
-                                 "numberRecords":2,                             <== Total number of documents in the secondary index
-                                 "numberDeletes":5,                             <== Total number of inserted documents since the secondary index was added
-                                 "numberInserts":10,                            <== Total number of inserted documents since the secondary index was added
-                                 "numberUpdates":4,                             <== Total number of updated documents since the secondary index was added
-                                 "numberRetrieves":13},                         <== Total number of documents retrieved since the secondary index was added
-                            "numberCompoundKeys":1,                             <== Number of compound index keys for this secondary index
-                            "compoundKeys":                                     <== Compound keys array (API support will be added at a future date)
-                               [{"A":true,"name":"City"},                       <== Ascending sorting for compound keyname
-                                {}...]
-                           }]
-                         }
+```JSON
+       {"name":"MY.JSON.DATA",                             <== Name of the EzNoSQL primary index
+	"version":1,                                       <== Version number for JSON document format
+	"documentFormat":"JSON",                           <== Document format is JSON
+	"keyname":"_id",                                   <== Primary keyname
+	"logOptions":"UNDO",                               <== Recovery options of UNDO specified on create
+	"readIntegrity":"NRI",                             <== Read integrity used by this connection
+	"readOnly":false,                                  <== Database opened for write access for this connection
+	"writeForce":true,                                 <== Write force requested for this connection
+	"autoCommit":false,                                <== Auto commit feature option currently active for this connection
+	"descendingKeys":false,                            <== Sequential access if forward for this connection
+	"timeout":5,                                       <== Lock timeout of 5 seconds requested for this connection
+	"avgDocumentSize":1000,                            <== Average document size
+	"blockSize":26624,                                 <== Physical I/O blocksize (in bytes) selected by znsq_create()
+	"avgElapseTime":150,                               <== Average elapsed (latency) time in microseconds per number requests executed
+	"avgCPUTime":8,                                    <== Average TCB CPU time in microseconds per number requests executed
+	"statistics":                                      <== Primary index statistics imbedded document
+	  {"numberBlocksAllocated":1234,                   <== Total number of blocks allocated to the primary index
+	   "numberBlocksUsed":124,                         <== Total number of blocks in use for the primary index
+	   "numberExtents":1,                              <== Total number of physical extents for the primary index
+	   "numberRecords":2,                              <== Total number of documents in the primary index
+	   "numberDeletes":5,                              <== Total number of documents deleted since the primary index was created
+	   "numberInserts":10,                             <== Total number of inserted documents since the primary index was created
+	   "numberUpdates":4,                              <== Total number of updated documents since the primary index was created
+	   "numberRetrieves":13},                          <== Total number of documents retrieved since the primary index was created
+	"numberIndices":1,                                 <== Total number of secondary indexes
+	"indices":                                         <== Secondary index attributes and statistics
+	   [{"name":"HL1.JSON.AIX",                        <== Name of the secondary index
+	    "keyname":"Firstname",                         <== Keyname for this secondary index
+	    "pathname":"HL1.JSON.PATH",                    <== Pathname for this secondary index
+	    "active":true,                                 <== Index is synchronized and available for read/write access
+	    "unique":true,                                 <== Index contains only unique keys
+	    "descendingKeys":false,                        <== Sequential access was set to ascending when the index was added
+	    "blockSize":26624,                             <== Physical I/O blocksize (in bytes) selected by znsq_add_index()
+	    "statistics":                                  <== Secondary index statistics imbedded document
+	       {"numberBlocksAllocated":1234,              <== Total number of blocks allocated to the secondary index
+		 "numberBlocksUsed":124,                   <== Total number of blocks in use for the secondary index
+		 "numberExtents":1,                        <== Total number of physical extents for the secondary index
+		 "numberRecords":2,                        <== Total number of documents in the secondary index
+		 "numberDeletes":5,                        <== Total number of inserted documents since the secondary index was added
+		 "numberInserts":10,                       <== Total number of inserted documents since the secondary index was added
+		 "numberUpdates":4,                        <== Total number of updated documents since the secondary index was added
+		 "numberRetrieves":13},                    <== Total number of documents retrieved since the secondary index was added
+	    "numberCompoundKeys":1,                        <== Number of compound index keys for this secondary index
+	    "compoundKeys":                                <== Compound keys array (API support will be added at a future date)
+	       [{"A":true,"name":"City"},                  <== Ascending sorting for compound keyname
+		{}...]
+	   }]
+	 }
 ```
 
 ## Connection Management
 
-APIs in the Connection Management section, must run in task mode and non cross memory mode.
+APIs in the Connection Management section, must run in task mode and non cross-memory mode.
 
 ### znsq_open
 ```C
@@ -660,46 +662,45 @@ int znsq_open(znsq_connection_t *con, const char *dsname, unsigned int flags, co
 ```
 
 #### Establishes an open connection to an EzNoSQL database
-Opens an EzNoSQL database by establishing a connection between the user's task and the database.  Additionally, the open API establishes the optional parameters to be used on behalf of this connection, such as read integrity, lock timeout, auto commit, read only, write force, and read access direction for the primary index:
+Opens an EzNoSQL database by establishing a connection between the user's task and the database.  Additionally, the `znsq_open()` API establishes the optional parameters to be used on behalf of this connection, such as read integrity, lock timeout, auto commit, read only, write force, and read access direction for the primary index:
 
 Additional connections can be established as needed by the same user task, or other tasks executing across the sysplex. Additional connections allow for the use of different options, or to load balance the workload across different processors.  A successful open returns a connection token which must be provided on other APIs for reading and writing to the database.
 
 #### Parameters
 
-`znsq_connection_t`
+`znsq_connection_t`:
    C-constant which will contain the connection token after a successful open.
 
-`dsname`
+`dsname`:
    C-string containing the name of the primary database name specified on a prior create or other system API.
 
-`flags`
-   1 (= (1 << 0)) indicates read only access is requested for this connection.  Read level security access to the database will be checked, and all write requests will fail.
+`flags`:
+   + _`1 (= (1 << 0))`_ indicates read only access is requested for this connection.  Read level security access to the database will be checked, and all write requests will fail.
 
-   2 (=(1 << 1))  indicates write force is used when attempting to insert a document with a duplicate keyname either for the primary or a unique secondary index. The document is replaced instead of receiving a duplicate document error.
+   + _`2 (=(1 << 1))`_  indicates write force is used when attempting to insert a document with a duplicate keyname either for the primary or a unique secondary index. The document is replaced instead of receiving a duplicate document error.
 
-   3 (=(1 << 2))  indicates descending sequential access when retrieving documents through the primary index. Refer to section Direct vs Sequential Document Retrieval for more information on this topic.
-                     ​
-`options`
-   Pointer to an object of type [`znsq_open_options`](znsq_open_options), where the open options are provided.
+   + _`3 (=(1 << 2))`_  indicates descending sequential access when retrieving documents through the primary index. Refer to section Direct vs Sequential Document Retrieval for more information on this topic.
+
+`options`:
+   Pointer to an object of type `znsq_open_options`, where the open options are provided.
 
 #### Return value
 The return code of the function.
 
 If the database was created, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes 2 and 3 of the return code.
 
 #### struct znsq_open_options
 `znsq_open_options;`
 
 #### Member attributes
-| member            | type                          | description                                                                                                          |
-| ----------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| version           | `int`                         | API version.                                                                                                         |
-| znsq_integrity    | `enum`                        | The (read) integrity specifies whether shared locks will be obtained for retrieves and the duration the lock will be held. </br>Read integrity option:</br>0 indicates no read integrity (NRI) (default).</br>1 indicates consist read (CR).</br>2 indicates consistent read extended (CRE).</br>Refer to section Non-Recoverable vs Recoverable Databases for information on this option.                                                                |
-| znsq_timeout      | `int16_t`                     | Timeout specifies how long a lock request will wait (in seconds) for the lock before terminating.</br>Lock wait time out in seconds.  Default 0. |
-| znsq_boolean      | `enum`                        | The boolean auto commit option specifies if EzNoSQL will issue a commit after any type of update (write, update, erase), or a read integrity extended (CRE) request on behalf if the user. If this option is omitted, then commits will be performed by the system after each update or CRE read. Note that commits are required only for databases created with the log_options of undo or all, or for reads with the use of the CRE option. Commiting after every update request can incur overhead compared to optimizing commits for larger groups of updates. Conversely, commiting to infrequently can impact other sharers of the database from accessing the locked documents:</br>0 indicates auto commit (default)</br>1 indicates auto commit</br>2 indicates no auto commit</br>Refer to section Non-Recoverable vs Recoverable Databases for information on this option. |
-|                                                                                                                                                                          |
+| member         | type      | description |
+| -------------- | --------- | ----------- |
+| version        | `int`     | API version.|
+| znsq_integrity | `enum`    | The (read) integrity specifies whether shared locks will be obtained for retrieves and the duration the lock will be held. </br>Read integrity option:</br>`0` indicates no read integrity (NRI) (default).</br>`1` indicates consist read (CR).</br>`2` indicates consistent read extended (CRE).</br>Refer to section Non-Recoverable vs Recoverable Databases for information on this option.|
+| znsq_timeout   | `int16_t` | Timeout specifies how long a lock request will wait (in seconds) for the lock before terminating.</br>Lock wait time out in seconds.  Default 0. |
+| znsq_boolean   | `enum`    | The boolean auto commit option specifies if EzNoSQL will issue a commit after any type of update (write, update, erase), or a read integrity extended (CRE) request on behalf if the user. If this option is omitted, then commits will be performed by the system after each update or CRE read. Note that commits are required only for databases created with the log_options of undo or all, or for reads with the use of the CRE option. Commiting after every update request can incur overhead compared to optimizing commits for larger groups of updates. Conversely, commiting to infrequently can impact other sharers of the database from accessing the locked documents:</br>`0` indicates auto commit (default)</br>`1` indicates auto commit</br>`2` indicates no auto commit</br>Refer to section Non-Recoverable vs Recoverable Databases for information on this option.|
 
 Example of opening an EzNoSQL database:
 ```C
@@ -713,7 +714,7 @@ Example of opening an EzNoSQL database:
       #define FLAG_FORCE_WRITE     (1 << 1)                        //  Force writes
       #define FLAG_DESCENDING_KEYS (1 << 2)                        //  Descending access to primary index
 
-      open_flags = FLAG_FORCE_WRITE;                                //  Set flags to write force on
+      open_flags = FLAG_FORCE_WRITE;                               //  Set flags to write force on
 
       return_code = znsq_open(
                     &connection,
@@ -732,14 +733,15 @@ Example of opening an EzNoSQL database:
 
 ### znsq_close
 
-Closes the connection to the EzNoSQL database previously established by a znsq_open.
+Closes the connection to the EzNoSQL database previously established by a `znsq_open()`.
+
 ```C
 int znsq_close(znsq_connection_t con);
 ```
 
 #### Parameters
 
-znsq_connection_t      The znsq_connection_t represents the connection token previously returned by the znsq_open API.
+`znsq_connection_t`:      The znsq_connection_t represents the connection token previously returned by the `znsq_open()` API.
 
 Example of closing an EzNoSQL database:
 ```C
@@ -753,61 +755,59 @@ Example of closing an EzNoSQL database:
       }
 ```
 
-## Document Retrievel
+## Document Retrieval
 
 APIs in the Data Retrieval section provide direct and sequential retrievals/updates/deletes of EzNoSQL documents.
 
 ### znsq_read
 ```C
-int znsq_read(znsq_connection_t con, const char *buf, size_t *buf_len, const char *key, const char *key_value, unsigned int flags, znsq_read_options *options);
+int znsq_read(znsq_connection_t con, const char *buf, size_t *buf_len, const char *key, const char *key_value, 
+              unsigned int flags, znsq_read_options *options);
 ```
 
-#### direct read documents
-Issues a direct read for a previously added document using the key name and key_value specified on the read request.  The key name must match the name on a previously issued znsq_create, znsq_create_index, or a generated "znsq_id" element. The value must match a previously added key_value paired with the specified
-key, otherwise a document not found error is returned.
+#### Direct Read Documents
+Issues a direct read for a previously added document using the `key` name and `key_value` specified on the read request.  The key name must match the name on a previously issued `znsq_create()`, `znsq_create_index()`, or a generated `"znsq_id"` element. The value must match a previously added `key_value` paired with the specified key, otherwise a document not found error is returned.
 
-The read request can opt to retrieve the document for update which will obtain an exclusive lock and return a result set token representing ownership of the lock.  The result set token must then be used to issue an update, delete, or end result for the document via znsq_update_result, znsq_delete_result,
-of znsq_close_result APIs.  For non-recoverable databases, the lock will be released following the update or delete request.  For recoverable databases, the lock will be released by the znsq_commit or znsq_abort APIs.
+The read request can opt to retrieve the document for update which will obtain an exclusive lock and return a result set token representing ownership of the lock.  The result set token must then be used to issue an update, delete, or end result for the document via `znsq_update_result()`, `znsq_delete_result()`, or `znsq_close_result()` APIs.  For non-recoverable databases, the lock will be released following the update or delete request.  For recoverable databases, the lock will be released by the `znsq_commit()` or `znsq_abort()` APIs.
 
 #### Parameters
 
-`znsq_connection_t`
-   C-constant contains the connection token from a previous znsq_open.
+`znsq_connection_t`:
+   C-constant contains the connection token from a previous `znsq_open()`.
 
-`buf`
+`buf`:
    contains a buffer to receive the JSON document following a success read.
 
-`buff_len`
-   contains the length of the buffer to receive the document.  The buffer may be larger than the returned document, however, if the buffer is to small to contain the document, a x'51' error is returned to the caller along with the required buffer length. For successful reads, the actual length of the document is returned.
+`buff_len`:
+   contains the length of the buffer to receive the document.  The buffer may be larger than the returned document; however, if the buffer is too small to contain the document, a x'51' error is returned to the caller along with the required buffer length. For successful reads, the actual length of the document is returned.
 
-`key`
+`key`:
    C-string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
 
-`key_value`
+`key_value`:
    value for the specific document to be retrieved.
 
 `flags`
-   1 (= (1 << 0)) indicates read for update.  A read with the update option will obtain a document level lock exclusively and return a token in the result_set.
+   + _`1 (= (1 << 0))`_ indicates read for update.  A read with the update option will obtain a document level lock exclusively and return a token in the `result_set`.
 
-`options`
-   Pointer to an object of type [`znsq_read_options`](znsq_read_options), where the read options are provided.
+`options`:
+   Pointer to an object of type `znsq_read_options`, where the read options are provided.
 
 #### Return value
 The return code of the function.
 
 If successful read, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes
 2 and 3 of the return code.
 
 #### struct znsq_read_options
 `znsq_read_options;`
 
 #### Member attributes
-| member            | type                          | description                                                                                                          |
-| ----------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| result_set        | `znsq_result_set_t`           | Returned when the update option is set in flags and to be used for subsequent znsq_update_result or znsq_erase_result APIs.|
-|                                                                                                                                                                          |
+| member     | type                | description |
+| ---------- | ------------------- | ----------- |
+| result_set | `znsq_result_set_t` | Returned when the update option is set in flags and to be used for subsequent `znsq_update_result()` or `znsq_erase_result()` APIs.|
 
 Example of reading a document from an EzNoSQL database:
 ```C
@@ -850,41 +850,35 @@ Example of reading a document from an EzNoSQL database:
 
 ### znsq_position
 ```C
-int znsq_position(znsq_connection_t con, znsq_result_set_t *result_set, const char *key,
-            const char *key_value, enum znsq_search_method search_method,
-			unsigned int flags);
+int znsq_position(znsq_connection_t con, znsq_result_set_t *result_set, const char *key, const char *key_value, 
+		  enum znsq_search_method search_method, unsigned int flags);
 ```
 
 #### Position to a key within the EzNoSQL database
-Issues a request to locate a specific key value (or a key value greater than or equal to) the desired key range. When the key value length is zero, positioning will be to the first or last document in the database based on the search order parameter: a search order (specifed with the znsq_open API)Ez of forward (default) will position to the first document, while backward will position to the last document. Following a successful position, a result_set token is returned which is then used as input for subsequent sequential retrieves or updates/deletes.  Positioning is therefore required prior to issuing the znsq_next_result, znsq_update_result, or the znsq_delete_result APIs.  Postioning should be terminated by using the znsq_close_result API in order to release the result_set.
+Issues a request to locate a specific key value (or a key value greater than or equal to) the desired key range. When the key value length is zero, positioning will be to the first or last document in the database based on the search order parameter: a search order (specifed with the `znsq_open()` API) of forward (default) will position to the first document, while backward will position to the last document. Following a successful position, a `result_set` token is returned which is then used as input for subsequent sequential retrieves or updates/deletes.  Positioning is therefore required prior to issuing the `znsq_next_result()`, `znsq_update_result()`, or the `znsq_delete_result()` APIs.  Positioning should be terminated by using the `znsq_close_result()` API in order to release the `result_set`.
 
 #### Parameters
 
-`znsq_connection_t`
-   C-constant contains the connection token from a previous znsq_open.
+`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
 
-`znsq_result_set_t'
-`   int32_t token returned following the successful completion of the API and used for subsequent read, update, or delete result APIs.
+`znsq_result_set_t': int32_t token returned following the successful completion of the API and used for subsequent read, update, or delete result APIs.
 
-`key`
-   C-string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
+`key`: C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00'.
 
-`key_value`
-   C-string containing the value for the specific document to be retrieved.
+`key_value`: C-string containing the value for the specific document to be retrieved.
 
-`znsq_search_method`
-   1  indicates that the first (or last) document equal to specified key_value should be located for subsequent sequential retrieves/updates/deletes.
-   2  indicates that the first (or last) document greater than or equal to the specified key_value should be located for sequential retrieves/updates/deletes.
+`znsq_search_method`:
+   + _`1`_  indicates that the first (or last) document equal to specified `key_value` should be located for subsequent sequential retrieves/updates/deletes.
+   + _`2`_  indicates that the first (or last) document greater than or equal to the specified `key_value` should be located for sequential retrieves/updates/deletes.
 
-`flags`
-   Reserved for future use.
+`flags`: Reserved for future use.
 
 #### Return value
 The return code of the function.
 
-If successful position, the return code is 0.
+If successfully positioned, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes
 2 and 3 of the return code.
 
 Example of positioning to document from an EzNoSQL database:
@@ -919,34 +913,29 @@ Example of positioning to document from an EzNoSQL database:
 
 ### znsq_next_result
 ```C
-int znsq_next_result(znsq_connection_t con, znsq_result_set_t *result_set, const char *buf, size_t *buf_len, unsigned int flags);
+int znsq_next_result(znsq_connection_t con, znsq_result_set_t *result_set, const char *buf, size_t *buf_len, 
+		     unsigned int flags);
 ```
 
-#### sequential retrieval of documents by ascending/descending key value
-Issues a sequential read for the next key value based on the search order specified in the znsq_open API. Prior to reading sequentially, a znsq_position must be issued to create the result_set token representing the starting key value.  The result_set token is used as input for each sequential read in order to receive the document in the user provided buffer. The znsq_close_result API is used to end the positioning into the key range. Note that depending on the read integrity option specified in the znsq_open API, shared locks maybe obtained for each retrievel, and for CRE held until a commit is issued.
+#### Sequential retrieval of documents by ascending/descending key value
+Issues a sequential read for the next key value based on the search order specified in the `znsq_open()` API. Prior to reading sequentially, a `znsq_position()` must be issued to create the `result_set` token representing the starting key value.  The `result_set` token is used as input for each sequential read in order to receive the document in the user provided buffer. The `znsq_close_result()` API is used to end the positioning into the key range. Note that depending on the read integrity option specified in the `znsq_open()` API, shared locks maybe obtained for each retrieval, and for CRE held until a commit is issued.
 
-The read request can opt to retrieve the documents for update which will obtain an exclusive lock. The result set token must then be used to issue an update, delete, or end result for the document via znsq_update_result, znsq_delete_result, or znsq_close_result APIs.  For non-recoverable databasess, the lock will be released following the update or delete request.  For recoverable databases, the lock will be released by the znsq_commit, znsq_abort APIs, or the end of the task.
+The read request can opt to retrieve the documents for update which will obtain an exclusive lock. The result set token must then be used to issue an update, delete, or end result for the document via `znsq_update_result()`, `znsq_delete_result()`, or `znsq_close_result()` APIs.  For non-recoverable databases, the lock will be released following the update or delete request.  For recoverable databases, the lock will be released by the `znsq_commit()`, `znsq_abort()` APIs, or at the end of the task.
 
 #### Parameters
 
-`znsq_connection_t`
-   C-constant contains the connection token from a previous znsq_open.
+`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
 
-`znsq_result_set_t'
-`   int32_t token returned from a previous successful znsq_position or znsq_next_result.
+`znsq_result_set_t': int32_t token returned from a previous successful `znsq_position()` or `znsq_next_result()`.
 
-`buf`
-   contains a buffer to receive the JSON document following a success read.
+`buf`: contains a buffer to receive the JSON document following a successful read.
 
-`buff_len`
-   contains the length of the buffer to receive the document.  If the buffer is to small to contain the document, a x'51' error is
-   returned to the caller along with the required buffer length.
+`buff_len`: contains the length of the buffer to receive the document.  If the buffer is too small to contain the document, a x'51' error is returned to the caller along with the required buffer length.
 
-`flags`
-   1 (= (1 << 0)) indicates read for update.  A read with the update option will obtain a document level lock exclusively and return a token in the result_set.
+`flags`:
+   + _`1 (= (1 << 0))`_ indicates read for update.  A read with the update option will obtain a document level lock exclusively and return a token in the `result_set`.
 
-`options`
-   Pointer to an object of type [`znsq_next_result options`](znsq_next_result_options), where the next result options are provided.
+`options`: Pointer to an object of type `znsq_next_result_options`, where the next result options are provided.
 
 #### Return value
 The return code of the function.
@@ -990,25 +979,23 @@ int znsq_close_result(znsq_connection_t con, znsq_result_set_t result);
 ```
 
 #### Close Result
-Ends positioning into the EzNoSQL database previously established by the znsq_position API.  The result_set (provided as input) is invalidated, and for non-recoverable databases, any document level locks will be released.  A new znsq_position must be issued to restart seqential retrievals following the close result.
+Ends positioning into the EzNoSQL database previously established by the `znsq_position()` API.  The `result_set` (provided as input) is invalidated, and for non-recoverable databases, any document level locks will be released.  A new `znsq_position()` must be issued to restart sequential retrievals following the close result.
 
 #### Parameters
 
-`znsq_connection_t`
-   C-constant contains the connection token from a previous znsq_open.
+`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
 
-`znsq_result_set_t'
-`   int32_t token returned from previous znsq_position.
+`znsq_result_set_t': int32_t token returned from previous `znsq_position()`.
 
 #### Return value
 The return code of the function.
 
-If successful read, the return code is 0.
+If successfully closed, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes
 2 and 3 of the return code.
 
-Example of ending positioning with znsq_close_result:
+Example of ending positioning with `znsq_close_result()`:
 ```C
      return_code = znsq_next_result(
         connection,
@@ -1023,55 +1010,47 @@ Example of ending positioning with znsq_close_result:
 
 ## Document Management
 
-APIs in the Document Management section must run in non cross memory mode.
+APIs in the Document Management section must run in non cross-memory mode.
 
 ### znsq_write
 ```C
-int znsq_write(znsq_connection_t con, const char *buf, size_t buff_len,
-             znsq_write_options *options);
+int znsq_write(znsq_connection_t con, const char *buf, size_t buff_len, znsq_write_options *options);
 ```
 
 #### Write new documents
-Writes (inserts) new documents into the EzNoSQL database using the keyname (optionally) specified on the write.  Whether the keyname represents the primary or a secondary index, all indexes are updated to reflect the new values found in the document. For a keyed EzNoSQL database, the keyname on the write must match the
-keyname specifed on the create.  If the key value was previously added to the database, then a duplicate document error is returned, unless the write force option
-was specified on the znsq_open API.
+Writes (inserts) new documents into the EzNoSQL database using the key name (optionally) specified on the write.  Whether the key name represents the primary or a secondary index, all indexes are updated to reflect the new values found in the document. For a keyed EzNoSQL database, the key name on the write must match the key name specifed on the create. If the key value was previously added to the database, then a duplicate document error is returned, unless the write force option was specified on the `znsq_open()` API.
 
-If the keyname option is omitted, the database is assumed to be an auto-generated keyed database, and will generate a new key:value element for the document (refer to the section Primary keyed vs Auto-generated keyed databases for more information on this topic).  If the document contains an auto-generated key element from a
-prior write request, a duplicate document error will be returned unless the write force option was specified on the znsq_open API.
+If the key name option is omitted, the database is assumed to be an auto-generated keyed database, and will generate a new `"key:value"` element for the document (refer to the section Primary keyed vs Auto-generated keyed databases for more information on this topic).  If the document contains an auto-generated key element from a prior write request, a duplicate document error will be returned unless the write force option was specified on the `znsq_open()` API.
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful write.
 
 #### Parameters
 
-`znsq_connection_t`
-   C-constant contains the connection token from a previous znsq_open.
+`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
 
-`buf`
-   contains the JSON document followed by an ending delimter of x'00'.
+`buf`: contains the JSON document followed by an ending delimiter of x'00'.
 
-`buff_len`
-   contains the length of the document.
+`buff_len`: contains the length of the document.
 
-`options`
-   Pointer to an object of type [`znsq_write_options`](znsq_write_options), where the database attributes are provided.
+`options`: pointer to an object of type `znsq_write_options, where the database attributes are provided.
 
 #### Return value
 The return code of the function.
 
-If the database was created, the return code is 0.
+If the document was created, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes 2 and 3 of the return code.
 
 #### struct znsq_write_options
 `znsq_write_options;`
 
 #### Member attributes
-| member            | type                          | description                                                                                                          |
-| ----------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| version           | `int`                         | API version.                                                                                                         |
-| key_name          | `char`                        | C-string containing the keyname used on the znsq_create or znsq_create_index including an ending delimiter of x'00'; |
-| autokey_buffer    | `char`                        | Mimimum buffer of 120 bytes to receive the generated key for auto generated EzNoSQL databases.                       |
-| autokey_length    | 'char'                        | Length of the returned auto generated key.                                                                           |                                                                                                                                                                  |
+| member          | type   | description |
+| --------------- | ------ | ----------- |
+| version         | `int`  | API version.|
+| key_name        | `char` | C-string containing the keyname used on the `znsq_create()` or `znsq_create_index()` including an ending delimiter of x'00'.|
+| autokey_buffer  | `char` | Minimum buffer of 120 bytes to receive the generated key for auto generated EzNoSQL databases.|
+| autokey_length  | `char` | Length of the returned auto generated key.|                                                                                
 
 Example of writing a document to a keyed EzNoSQL database:
 ```C
@@ -1115,27 +1094,24 @@ int znsq_delete(znsq_connection_t, const char *key, const char *key_value);
 ```
 
 #### Delete Documents
-Deletes (erases) existing documents from an EzNoSQL database using the provided primary or secondary key name and paired key_value.  An exclusive document level lock will be obtained for the delete request.  For non-recoverable datasets, the lock will be released immediately following the request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends. All secondary indexes will be updated to relect any alternate key deletions when the document is deleted.
+Deletes (erases) existing documents from an EzNoSQL database using the provided primary or secondary key name and paired `key_value`.  An exclusive document level lock will be obtained for the delete request.  For non-recoverable datasets, the lock will be released immediately following the request, and for recoverable databases, the lock will be released by a `znsq_commit()`, `znsq_abort()`, or when the task ends. All secondary indexes will be updated to reflect any alternate key deletions when the document is deleted.
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful delete.
 
 #### Parameters
 
-`znsq_connection_t`
-   C-constant contains the connection token from a previous znsq_open.
+`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
 
-`key`
-   C-string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
+`key`: C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00'.
 
-`key_value`
-   value for the specific document to be retrieved.
+`key_value`: value for the specific document to be retrieved.
 
 #### Return value
 The return code of the function.
 
-If the database was created, the return code is 0.
+If the document was deleted, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes 2 and 3 of the return code.
 
 Example of deleting a document from an EzNoSQL database:
 ```C
@@ -1170,22 +1146,20 @@ int znsq_delete_result(znsq_connection_t con, znsq_result_set_t result);
 ```
 
 #### Delete Result
-Deletes (erases) existing documents previously retrieved by a (direct) znsq_read or a (sequential) znsq_next_result with the update options specified. An exclusive document level lock was obtained by the read requests.  For non-recoverable datasets, the lock will be released immediately following the delete result request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends.
+Deletes (erases) existing documents previously retrieved by a (direct) `znsq_read()` or a (sequential) `znsq_next_result()` with the update options specified. An exclusive document level lock is obtained by the read requests.  For non-recoverable datasets, the lock will be released immediately following the delete result request, and for recoverable databases, the lock will be released by a `znsq_commit()`, `znsq_abort()`, or when the task ends.
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful delete.
 
 #### Parameters
 
-`znsq_connection_t`
-   C-constant contains the connection token from a previous znsq_open.
+`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
 
-`znsq_result_set_t'
-`   int32_t token returned from a previous successful completion of a znsq_read or znsq_next_result with the update options specified.
+`znsq_result_set_t': int32_t token returned from a previous successful completion of a `znsq_read()` or `znsq_next_result()` with the update options specified.
 
 #### Return value
 The return code of the function.
 
-If the database was created, the return code is 0.
+If the document was deleted, the return code is 0.
 
 If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes 2 and 3 of the return code.
 
@@ -1211,34 +1185,29 @@ Example of a delete result for a document from an EzNoSQL database:
 int znsq_update(znsq_connection_t con, const char *newbuf,const char *key, const char *key_value);
 ```
 
-#### direct update documents
-Issues a direct update for a previously added document using the requested keyname and key_value, and providing the updated version of the document.  The keyname must match the keyname on a previously issued znsq_create, znsq_create_index, or a generated "znsq_id" element. The value must match a previously added value paired with the specified
-keyname, otherwise a document not found error is returned.
+#### Direct update documents
+Issues a direct update for a previously added document using the requested `key` name and `key_value`, and providing the updated version of the document. The `key` must match the key name on a previously issued `znsq_create()`, `znsq_create_index()`, or a generated `"znsq_id"` element. The value must match a previously added value paired with the specified key name, otherwise a document not found error is returned.
 
-An exclusive document level lock will be obtained for the update request.  For non-recoverable databases, the lock will be released immediately following the request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends.
+An exclusive document level lock will be obtained for the update request.  For non-recoverable databases, the lock will be released immediately following the request, and for recoverable databases, the lock will be released by a `znsq_commit()`, `znsq_abort()`, or when the task ends.
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful update.
 
 #### Parameters
 
-`znsq_connection_t`
-   C-constant contains the connection token from a previous znsq_open.
+`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
 
-`newbuf`
-   contains a copy of the updated document to replace the existing version of the document.  All secondary indexes will be updated to relect any alternate key changes found in the  new version of the document.
+`newbuf`: contains a copy of the updated document to replace the existing version of the document. All secondary indexes will be updated to reflect any alternate key changes found in the new version of the document.
 
-`key`
-   C-string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
+`key`: C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00'.
 
-`key_value`
-   value for the specific document to be retrieved.
+`key_value`: value for the specific document to be retrieved.
 
 #### Return value
 The return code of the function.
 
-If successful read, the return code is 0.
+If the document was updated, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes
 2 and 3 of the return code.
 
 Example of updating a document in an EzNoSQL database:
@@ -1282,30 +1251,26 @@ int znsq_update_result(znsq_connection_t con, znsq_result_set_t result, const ch
 ```
 
 #### Update Documents after Reads for Update
-Updates existing documents previously retrieved by a (direct) znsq_read or a (sequential) znsq_next_result with the update options specified. An exclusive document level lock was obtained by the read requests.  For non-recoverable databases, the lock will be released immediately following the update result request, and for recoverable databases, the lock will be released by a znsq_commit, znsq_abort, or when the task ends.
+Updates existing documents previously retrieved by a (direct) `znsq_read()` or a (sequential) `znsq_next_result()` with the update options specified. An exclusive document level lock is obtained by the read requests.  For non-recoverable databases, the lock will be released immediately following the update result request, and for recoverable databases, the lock will be released by a `znsq_commit()`, `znsq_abort()`, or when the task ends.
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful update.
 
 #### Parameters
 
-`znsq_connection_t`
-   C-constant contains the connection token from a previous znsq_open.
+`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
 
-`znsq_result_set_t'
-`   int32_t token returned by a previous znsq_read with the update option or znsq_next_result.
+`znsq_result_set_t': int32_t token returned by a previous `znsq_read()` with the update option or `znsq_next_result()`.
 
-`buf`
-   Contains a copy of the updated document to replace the existing version of the document.  All secondary indexes will be updated to relect any alternate key changes found in the  new version of the document.
+`buf`: contains a copy of the updated document to replace the existing version of the document. All secondary indexes will be updated to reflect any alternate key changes found in the new version of the document.
 
-`buf_len`
-   Length of buffer containing the updated document.
+`buf_len`: length of buffer containing the updated document.
 
 #### Return value
 The return code of the function.
 
-If successful read, the return code is 0.
+If the document was updated, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes
 2 and 3 of the return code.
 
 Example of updating a document in an EzNoSQL database:
@@ -1344,15 +1309,14 @@ Issues a commit to end the current transaction and release document level locks.
 
 #### Parameters
 
-`znsq_connection_t`
-   C-constant contains the connection token from a previous znsq_open.
+`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
 
 #### Return value
 The return code of the function.
 
-If successful commit, the return code is 0.
+If successfully committed, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes
 2 and 3 of the return code.
 
 Example of commiting transactions for an EzNoSQL database:
@@ -1376,37 +1340,34 @@ int znsq_set_autocommit(znsq_connection_t con, const znsq_commit_options *option
 ```
 
 #### Enable/Disable Auto Commit
-Updates the connection to the database to enable or disable the auto commit option.  When enabled, EzNoSQL will issue a commit after every update. Commits after every update request can incur overhead compared to optimizing commits for larger groups of updates. Conversely, commiting to infrequently can impact other sharers of the database from accessing the locked documents.
+Updates the connection to the database to enable or disable the auto commit option.  When enabled, EzNoSQL will issue a commit after every update. Commits after every update request can incur overhead compared to optimizing commits for larger groups of updates. Conversely, committing too infrequently can impact other sharers of the database from accessing the locked documents.
 
 #### Parameters
 
-`znsq_connection_t`
-   C-constant contains the connection token from a previous znsq_open.
+`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
 
-`options`
-   Pointer to an object of type [`znsq_commit_options`](znsq_commit_options), where the set autocommit options are provided.
+`options`: pointer to an object of type `znsq_commit_options`, where the set autocommit options are provided.
 
 #### Return value
 The return code of the function.
 
-If successful commit, the return code is 0.
+If successfully set, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes
 2 and 3 of the return code.
 
 #### struct znsq_commit_options
 `znsq_commit_options;`
 
 #### Member attributes
-| member            | type                          | description                                                                                                          |
-| ----------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| version           | `int`                         | API version.                                                                                                         |
-| znsq_autocommit   | `enum`                        | Enable or disable auto commits:</br>0 indicates the auto commit option is disabled.</br>1 indicates the auto commit option is enabled. |
-|
+| member          | type   | description |
+| --------------- | ------ | ----------- |
+| version         | `int`  | API version.|
+| znsq_autocommit | `enum` | Enable or disable auto commits:</br>0 indicates the auto commit option is disabled.</br>1 indicates the auto commit option is enabled.|
 
 Example of enabling auto commit for an EzNoSQL database:
 ```C
-     commit_options.znsq_autocommit = 1;                            //  Enables auto commit
+     commit_options.znsq_autocommit = 1;             // Enables auto commit
 
      return_code = znsq_set_autocommit(
         connection,
@@ -1430,15 +1391,14 @@ Issues an abort to end the current transaction, restore updated documents to the
 
 #### Parameters
 
-`znsq_connection_t`
-   C-constant contains the connection token from a previous znsq_open.
+`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
 
 #### Return value
 The return code of the function.
 
-If successful abort, the return code is 0.
+If successfully aborted, the return code is 0.
 
-If an error occurred, the return code contains the detailed error reason. The macro `znsq_err` can be used to mask the error reason in bytes
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes
 2 and 3 of the return code.
 
 Example of commiting transactions for an EzNoSQL database:
@@ -1462,16 +1422,16 @@ APIs in the Document Management section must run in non cross memory mode.
 
 ### znsq_last_result
 
-Use the znsq_last_result API to obtain a text report containing additional diagnostic information following an API failure.  The report is primarily intended for the system support staff.  The information can be logged by the application and referred to for problem determination.
+Use the `znsq_last_result()` API to obtain a text report containing additional diagnostic information following an API failure.  The report is primarily intended for the system support staff.  The information can be logged by the application and referred to for problem determination.
 
 `int znsq_last_result(const char *buf, size_t buff_len);`
 
 #### Parameters
-`buf`                  The buf parameter is a required input parameter which will point to a buffer to receive the generated text report.
+`buf`: the buf parameter is a required input parameter which will point to a buffer to receive the generated text report.
 
-`buff_len`             The buff_len is a required input/output parameter pointing to the length of the buffer, and on return the length of the report.
-```
-Example call to znsq_last_result:
+`buff_len`: the buff_len is a required input/output parameter pointing to the length of the buffer, and on return the length of the report.
+
+Example call to `znsq_last_result()`:
 ```C
     size_t buffer_size = 32*1024;
     char *buffer = (char *) malloc(buffer_size);
