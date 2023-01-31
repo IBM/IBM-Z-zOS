@@ -363,7 +363,7 @@ int znsq_create_index(const char *alternate_key, unsigned int flags, const znsq_
 ```
 
 #### Create EzNoSQL Secondary Index
-Creates a secondary index with for the name specified in parameters `aix_name`, using a keyname of `alternate_key`. The database to be associated with this index is specifed in the `base_name` parameter. Together, the secondary index and database are assoicated by the `path_name` parameter. The `path_name` is used internally by EzNoSQL to identify the correct association of the secondary index to its base database. The secondary index is created in an inactive state, and must be activated via the `znsq_add_index()` API before attempting to access documents via the specified `alternate_key`. For EzNoSQL databases created as recoverable (`znsq_log_options=UNDO/ALL`), a commit will be issued for any active transation following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.
+Creates a secondary index with the name specified in parameters `aix_name`, using a keyname of `alternate_key`. The database to be associated with this index is specifed in the `base_name` parameter. Together, the secondary index and database are associated by the `path_name` parameter. The `path_name` is used internally by EzNoSQL to identify the correct association of the secondary index to its base database. The secondary index is created in an inactive state, and must be activated via the `znsq_add_index()` API before attempting to access documents via the specified `alternate_key`. For EzNoSQL databases created as recoverable (`znsq_log_options=UNDO/ALL`), a commit will be issued for any active transation following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.
 
 #### Parameters
 
@@ -393,7 +393,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | base_name      | `char` | Primary index database name specified on the associated `znsq_create()`. |
 | aix_name       | `char` | C-string containing the name of the secondary index. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segments. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0-9), national, or a hyphen (-). Name segments are separated by a period (.) |
 |                |        | Example: _MY.JSON.AIX1_|
-| path_name      | `char` | C-string containing the path name of the secondary index. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segements. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.) |
+| path_name      | `char` | C-string containing the path name of the secondary index. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segments. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.) |
 |                |        | Example: _MY.JSON.PATH1_|
 | dataclas       | `char` | C-string in EBCDIC (maximum of 8 characters) for the optional system management data class name (`DATACLAS`).</br>Refer to the section System Administration Requirements for more information on this option.|
 | max_space      | `int`                         | Maximum space of database in megabytes (required).|
@@ -520,7 +520,7 @@ int znsq_drop_index(const znsq_drop_index_options *options);
 ```
 
 #### Disable a Secondary Index
-Disables (drops) an EzNoSQL secondary index across the sysplex.  When disabled, access is prevented for reads and writes until such a time as the index is re-enabled via the `znsq_add_index()` command.  Note that disabling an index will effect all sharers of the database including those accessed by EzNoSQL and other system APIs.
+Disables (drops) an EzNoSQL secondary index across the sysplex.  When disabled, access is prevented for reads and writes until such a time as the index is re-enabled via the `znsq_add_index()` command.  Note that disabling an index will affect all sharers of the database including those accessed by EzNoSQL and other system APIs.
 
 #### Parameters
 `dsname`:
@@ -926,7 +926,7 @@ The read request can opt to retrieve the documents for update which will obtain 
 
 `znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
 
-`znsq_result_set_t': int32_t token returned from a previous successful `znsq_position()` or `znsq_next_result()`.
+`znsq_result_set_t`: int32_t token returned from a previous successful `znsq_position()` or `znsq_next_result()`.
 
 `buf`: contains a buffer to receive the JSON document following a successful read.
 
@@ -1538,31 +1538,37 @@ znsq_last_result report for a no space create failure.  The additional diagnosti
 # Return and Reason Codes
 
 API reason codes (RS), consist of 4 bytes:
+
   xx/yy/zzzz
-  where: xx is subcomp (#rs.#cid) =x'82' (ARSC_ID_VRA),
-         yy is VSAM RLS API (VRA) module id (#rs.#mid),
-         zzzz is reason code (#rs.#reason), as listed below.
+  
+  where:
+  
+  	xx is subcomp (#rs.#cid) =x'82' (ARSC_ID_VRA),
+  	 
+	yy is VSAM RLS API (VRA) module id (#rs.#mid),
+	 
+	zzzz is reason code (#rs.#reason), as listed below.
 
 ## Return Code 0
 ________________________________________________________________________________________________________
 Return Code 00(X'00')
 Reason Code Meaning
 ________________________________________________________________________________________________________
-0052(X'34')  While accessing a non-unique index sequentially (e.g. using the znsq_next_result API) one
+**0052(X'34')**  While accessing a non-unique index sequentially (e.g. using the `znsq_next_result()` API), one
              or more duplicate keys still exist in the index.
-             <br/>The program may want to continue reading all the duplicate keys, or stop after a specific
-             key is found.
+             
+	     The program may want to continue reading all the duplicate keys, or stop after a specific key is found.
 ________________________________________________________________________________________________________
-0053(X'35')  While accessing an index a truncated key was turned to the program. Only the first
+**0053(X'35')**  While accessing an index, a truncated key was returned to the program. Only the first
              251 bytes of the key was stored in the index when the key was inserted.
 
-             The program may want locate the full key in the returned document before using the key.
+             The program may want to locate the full key in the returned document before using the key.
 ________________________________________________________________________________________________________
-0054(X'36')  While accessing a non-unique index sequentially (e.g. using the znsq_next_result API), one
-             or more duplicate keys still exist and a truncated key may have been turned. Only the first
+**0054(X'36')**  While accessing a non-unique index sequentially (e.g. using the znsq_next_result API), one
+             or more duplicate keys still exist and a truncated key may have been returned. Only the first
              251 bytes of the key was stored in the index when the key was inserted.
 
-             The program may want locate the full key in the returned document before using the key.
+             The program may want to locate the full key in the returned document before using the key.
 ____________________________________________________________________________________________________________
 
 ## Return Code 4
@@ -1570,11 +1576,11 @@ ________________________________________________________________________________
 Return Code 04(X'04)
 Reason Code Meaning
 ___________________________________________________________________________________________________________
-0027('1B')  Undo log write failed. While accessing a EzNoSQL database, the undo log is not available or
+**0027('1B')**  Undo log write failed. While accessing an EzNoSQL database, the undo log is not available or
             the write failed.
 
              Contact the z/OS Storage Administrator and provide additional documentation via the
-	         znsq_last_result report.
+	         `znsq_last_result()` report.
 ____________________________________________________________________________________________________________
 
 ## Return Code 8
@@ -1582,124 +1588,119 @@ ________________________________________________________________________________
 Return Code 08(X'08')
 Reason Code Meaning
 ____________________________________________________________________________________________________________
-0001(X'01')  The database is not found in the catalog.  The database name passed on the API was
+**0001(X'01')**  The database was not found in the catalog.  The database name passed on the API was
              not found and was required for the successful completion of this API.
 
-             Verify the database was successfully and has not been deleted created prior to issuing
-             this API.
+             Verify the database was created successfully and has not been deleted prior to issuing this API.
 ____________________________________________________________________________________________________________
-0009(X'09')  Database not found. A database was not found on the znsq_destroy API.
+**0009(X'09')**  Database not found. A database was not found on the `znsq_destroy()` API.
 
-             Ensure if the database to be destroyed was created.
+             Ensure that the database to be destroyed was created.
 ____________________________________________________________________________________________________________
-00010(X'0A') Error Buffer too small.  Internal error indicating the error buffer is not large enough to
+**00010(X'0A')** Error Buffer too small.  Internal error indicating the error buffer is not large enough to
              return additional error information.  Minumum size returned in error buffer size.
 
-             Reissue the request with the correct size buffer.
+             Reissue the request with the correct buffer size.
 ____________________________________________________________________________________________________________
-00011(X'0B') Missing parenthesis during znsq_create or znsq_add_index. Probable internal error when defining
-             a base, alterante index, or path database (IDC3209I).
+**00011(X'0B')** Missing parenthesis during `znsq_create()` or `znsq_add_index()`. Probable internal error when defining
+             a base, alternate index, or path database (IDC3209I).
 
-             Report the problem to the z/OS Storage Administrator and if availble, provide the output from
-             the znsq_last_result report.
+             Report the problem to the z/OS Storage Administrator; 
+	     and if available, provide the output from the znsq_last_result() report.
 ____________________________________________________________________________________________________________
-00012(X'0C') Duplicate keyname for unique index.  znsq_add_index encountered a document in the database
+**00012(X'0C')** Duplicate key name for unique index.  `znsq_add_index()` encountered a document in the database
              which would result in a duplicate alternate key and the alternate (secondary) index was defined
              as unique.
 
-             Define the secondary index as non-unique, or remove the duplicate keyname from the document.
+             Define the secondary index as non-unique, or remove the duplicate key name from the document.
 ____________________________________________________________________________________________________________
-00013(X'0D') Open failure while adding/enabling an alternate (secondary).  Most likely a znsq_add_index was
-             issued for a previously defined and active index which has not be disabled via the
-             znsq_drop_index.
+**00013(X'0D')** Open failure while adding/enabling an alternate (secondary) index.  Most likely a `znsq_add_index()` was
+             issued for a previously defined and active index which has not been disabled via the `znsq_drop_index()` API.
 
-             Issue a znsq_drop_index prior to re-enabling the alternate index.  Refer to the znsq_last_result
-             report for more informatin on the actual open error.
+             Issue a znsq_drop_index() prior to re-enabling the alternate index.  
+	     Refer to the znsq_last_result() report for more information on the actual open error.
 ____________________________________________________________________________________________________________
-00014(X'0E') SYSDSN Resource unavailable. The znsq_create_index could not obtain the SYSDSN databasename
-             was not available.  The most likely reason is the database is currently allocated (in use).
-             znsq_create_index can only be issued against fully disconnected databases.
+**00014(X'0E')** SYSDSN Resource unavailable. The `znsq_create_index()` API could not obtain the SYSDSN database name.  
+		The most likely reason is the database is currently allocated (in use). `znsq_create_index()` can only be issued against fully 				disconnected databases.
 
-             If the database is currently connected, disconnect the database before issuing a
-             znsq_create_index.
+             If the database is currently connected, disconnect the database before issuing a znsq_create_index().
 ____________________________________________________________________________________________________________
-00016(X'10') Release of the SYSDSN Resource failed. The znsq_create_index failed when releasing the SYSDSN
+**00016(X'10')** Release of the SYSDSN Resource failed. The `znsq_create_index()` failed when releasing the SYSDSN
              resource.  This is most likely an internal logic error.
 
              Contact the z/OS Storage Administration for help in resolving this error.
 ____________________________________________________________________________________________________________
-0017(X'11') - Reserved.
+**0017(X'11')** - Reserved.
 ____________________________________________________________________________________________________________
-0018(X'12')  Database not found.  The znsq_open or znsq_close API did not find the specified database.
+**0018(X'12')**  Database not found.  The `znsq_open()` or `znsq_close()` API did not find the specified database.
 
              Ensure the database has been created prior to opening or closing the database.
 ____________________________________________________________________________________________________________
-0019(X'13')  Database component not found.  The znsq_open or znsq_close API did not find one of the
-             components for the specified database.  A paritally created database has been detected.
+**0019(X'13')**  Database component not found.  The `znsq_open()` or `znsq_close()` API did not find one of the
+             components for the specified database.  A partially created database has been detected.
 
-             The database may need to be recataloged or recreated.  Contact the z/OS storage amdinistrator
+             The database may need to be recataloged or recreated.  Contact the z/OS storage administrator
              if help is required in repairing the database.
 ____________________________________________________________________________________________________________
-0020(X'14')  Path entry not found. The znsq_read, znsq_write APIs did not find the required path entry from
+**0020(X'14')**  Path entry not found. The `znsq_read()` or `znsq_write()` APIs did not find the required path entry from
              when the associated index was added.
 
-             The index and path need to be destroy and readded to correct the problem. Contact the z/OS
-             storage  amdinistrator if help is required in repairing the database.
+             The index and path need to be destroyed and readded to correct the problem. Contact the z/OS
+             storage administrator if help is required in repairing the database.
 ____________________________________________________________________________________________________________
-0021(X'15')  Alternate key not found. The znsq_open, znsq_close, znsq_read, and znsq_write APIs did not find
+**0021(X'15')**  Alternate key not found. The `znsq_open()`, `znsq_close()`, `znsq_read()`, and `znsq_write()` APIs did not find
              the required alternate key.
 
              Ensure a znsq_add_index was issued to build an index for the required alternate key.
 ____________________________________________________________________________________________________________
-0028('1C')  Forward recovery log write failed. While accessing a EzNoSQL database, the forward recovery log
-             is not available or the write failed.
+**0028('1C')**  Forward recovery log write failed. While accessing a EzNoSQL database, the forward recovery log
+             was not available or the write failed.
 
              Contact the z/OS Storage Administrator and provide additional documentation via the
-	         znsq_last_result report.
+	     znsq_last_result report.
 ____________________________________________________________________________________________________________
-0029(X'1D')  CF cache structure failure. While accessing a EzNoSQL database, the Coupling Facility (CF)
+**0029(X'1D')**  CF cache structure failure. While accessing a EzNoSQL database, the Coupling Facility (CF)
              cache failed during the open of the database.
 
              Contact the z/OS Storage Administrator and provide additional documentation via the
-	         znsq_last_result report.
+	     znsq_last_result report.
 ____________________________________________________________________________________________________________
-0030(X'1E')  CF cache structure is unavailable. While accessing a EzNoSQL database, the Coupling Facility
-             (CF) cache structure associated with the database's storage class is unavaliable during the
-	     open ofthe database.
+**0030(X'1E')**  CF cache structure is unavailable. While accessing a EzNoSQL database, the Coupling Facility
+             (CF) cache structure associated with the database's storage class was unavailable during the
+	     open of the database.
 
              Contact the z/OS Storage Administrator and provide additional documentation via the
-	         znsq_last_result report.
+	     znsq_last_result report.
 ____________________________________________________________________________________________________________
-0031(X'1F')  CF cache set is unavailable. While accessing a EzNoSQL database, the Coupling Facility
-             (CF) cache set is not found in the database's storage class during the open ofthe database.
+**0031(X'1F')**  CF cache set is unavailable. While accessing a EzNoSQL database, the Coupling Facility
+             (CF) cache set was not found in the database's storage class during the open of the database.
 
              Contact the z/OS Storage Administrator and provide additional documentation via the
-	         znsq_last_result report.
+	     znsq_last_result report.
 ____________________________________________________________________________________________________________
-0051(X'33')  The JSON primary keyname field was not found in the catalog when accessing the database.
-             The database does not appear to be a valid noSLQ DATABASE.
+**0051(X'33')**  The JSON primary key name field was not found in the catalog when accessing the database.
+             The database does not appear to be a valid NOSQL DATABASE.
 
              Verify database was created with the znsq_create API, or was defined with LOG and DATABASE
              parameters when using IDCAMS DEFINE CLUSTER.
 ____________________________________________________________________________________________________________
-0055(X'37')  The database is not found in the catalog.  The first access to the database will attempt to
+**0055(X'37')**  The database was not found in the catalog.  The first access to the database will attempt to
              open the database and open could not locate the database.
 
              Verify the database was successfully created prior to accessing the database.
-             this API.
 ____________________________________________________________________________________________________________
-0056(X'38')  User not authorized to database. The first access to the database will attempt to open the data
-             set for read and or write.  The user is not authorized for the requested access.
+**0056(X'38')**  User not authorized to access database. The first access to the database will attempt to open the data
+             set for read and/or write.  The user is not authorized for the requested access.
 
              Request access for the database if allowed.
 ____________________________________________________________________________________________________________
-0057(X'39')  Open for input and the database is empty. The first access to the database will attempt to open
+**0057(X'39')**  Open for input and the database is empty. The first access to the database will attempt to open
              the database.  An open for input fails if the database attempt is empty.
 
              Open the database for output to add at least one document prior to an open for read only.
 ____________________________________________________________________________________________________________
-0058(X'3A') - Reserved.
-0064(X'40')
+**0058(X'3A')** - Reserved.
+**0064(X'40')**
 ____________________________________________________________________________________________________________
 0065(X'41')  High used relative byte address (RBA) is higher than the high allocated RBA. The first access
              to the database will attempt to open the database.  The open discovered the high used RBA is
@@ -2260,21 +2261,21 @@ ________________________________________________________________________________
 Return Code 16(X'10')
 Reason Code Meaning
 __________________________________________________________________________________________________________________________________
-0121(X'79')  The system's znsq server (SMSVSAM) is not available or is a new instance. The server has terminated or recycled
+**0121(X'79')**  The system's znsq server (SMSVSAM) is not available or is a new instance. The server has terminated or recycled
              since the database was open.
 
-             Close the connenction and reopen the database after the znsq server is available.
+             Close the connection and reopen the database after the znsq server is available.
 __________________________________________________________________________________________________________________________________
-0124(X'7C')  The system's znsq trnsactional server (DFSMSTVS) is not available. DFSMSTVS either did not fully initialize or has
-             been quiesced. Accessing EzNoSQL databases as recoverable, require the availablity of DFSMSTVS.
+**0124(X'7C')**  The system's znsq transactional server (DFSMSTVS) is not available. DFSMSTVS either did not fully initialize or has
+             been quiesced. Accessing EzNoSQL databases as recoverable, requires the availablity of DFSMSTVS.
 
-             Report the issue to the z/OS Storage Aministrator.
+             Report the issue to the z/OS Storage Administrator.
 __________________________________________________________________________________________________________________________________
-0125(X'7D')  The system's znsq trnsactional server (DFSMSTVS) is not installed. DFSMSTVS is not specififed as enabled in the list
-             of optional product features for z/OS. Accessing EzNoSQL databases as recoverable, require the availablity of
+**0125(X'7D')**  The system's znsq transactional server (DFSMSTVS) is not installed. DFSMSTVS is not specififed as enabled in the list
+             of optional product features for z/OS. Accessing EzNoSQL databases as recoverable, requires the availablity of
 	     DFSMSTVS.
 
-             Report the issue to the z/OS Storage Aministrator.
+             Report the issue to the z/OS Storage Administrator.
 __________________________________________________________________________________________________________________________________
 
 ## Return Code 36
