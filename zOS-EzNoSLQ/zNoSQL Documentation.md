@@ -1557,8 +1557,8 @@ ________________________________________________________________________________
 **0052(X'34')**  While accessing a non-unique index sequentially (e.g. using the `znsq_next_result()` API), one
              or more duplicate keys still exist in the index.
              
-		The program may want to continue reading all the duplicate keys, or stop after a specific 
-		key is found.
+		The program may want to continue reading all the duplicate keys, 
+		or stop after a specific key is found.
 ________________________________________________________________________________________________________
 **0053(X'35')**  While accessing an index, a truncated key was returned to the program. Only the first
              251 bytes of the key was stored in the index when the key was inserted.
@@ -1592,8 +1592,7 @@ ________________________________________________________________________________
 **0001(X'01')**  The database was not found in the catalog.  The database name passed on the API was
              not found and was required for the successful completion of this API.
 
-		Verify the database was created successfully and has not been deleted prior to issuing this 
-		API.
+		Verify the database was created successfully and has not been deleted prior to issuing this API.
 ____________________________________________________________________________________________________________
 **0009(X'09')**  Database not found. A database was not found on the `znsq_destroy()` API.
 
