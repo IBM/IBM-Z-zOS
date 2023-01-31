@@ -1557,18 +1557,19 @@ ________________________________________________________________________________
 **0052(X'34')**  While accessing a non-unique index sequentially (e.g. using the `znsq_next_result()` API), one
              or more duplicate keys still exist in the index.
              
-	     The program may want to continue reading all the duplicate keys, or stop after a specific key is found.
+		The program may want to continue reading all the duplicate keys, or stop after a specific 
+		key is found.
 ________________________________________________________________________________________________________
 **0053(X'35')**  While accessing an index, a truncated key was returned to the program. Only the first
              251 bytes of the key was stored in the index when the key was inserted.
 
-             The program may want to locate the full key in the returned document before using the key.
+		The program may want to locate the full key in the returned document before using the key.
 ________________________________________________________________________________________________________
 **0054(X'36')**  While accessing a non-unique index sequentially (e.g. using the znsq_next_result API), one
              or more duplicate keys still exist and a truncated key may have been returned. Only the first
              251 bytes of the key was stored in the index when the key was inserted.
 
-             The program may want to locate the full key in the returned document before using the key.
+		The program may want to locate the full key in the returned document before using the key.
 ____________________________________________________________________________________________________________
 
 ## Return Code 4
@@ -1579,8 +1580,8 @@ ________________________________________________________________________________
 **0027('1B')**  Undo log write failed. While accessing an EzNoSQL database, the undo log is not available or
             the write failed.
 
-             Contact the z/OS Storage Administrator and provide additional documentation via the
-	         `znsq_last_result()` report.
+		Contact the z/OS Storage Administrator and provide additional documentation via the 
+		znsq_last_result() report.
 ____________________________________________________________________________________________________________
 
 ## Return Code 8
@@ -1591,123 +1592,124 @@ ________________________________________________________________________________
 **0001(X'01')**  The database was not found in the catalog.  The database name passed on the API was
              not found and was required for the successful completion of this API.
 
-             Verify the database was created successfully and has not been deleted prior to issuing this API.
+		Verify the database was created successfully and has not been deleted prior to issuing this 
+		API.
 ____________________________________________________________________________________________________________
 **0009(X'09')**  Database not found. A database was not found on the `znsq_destroy()` API.
 
-             Ensure that the database to be destroyed was created.
+		Ensure that the database to be destroyed was created.
 ____________________________________________________________________________________________________________
 **00010(X'0A')** Error Buffer too small.  Internal error indicating the error buffer is not large enough to
              return additional error information.  Minumum size returned in error buffer size.
 
-             Reissue the request with the correct buffer size.
+		Reissue the request with the correct buffer size.
 ____________________________________________________________________________________________________________
 **00011(X'0B')** Missing parenthesis during `znsq_create()` or `znsq_add_index()`. Probable internal error when defining
              a base, alternate index, or path database (IDC3209I).
 
-             Report the problem to the z/OS Storage Administrator; 
-	     and if available, provide the output from the znsq_last_result() report.
+		Report the problem to the z/OS Storage Administrator; and if available, provide the output 
+		from the znsq_last_result() report.
 ____________________________________________________________________________________________________________
 **00012(X'0C')** Duplicate key name for unique index.  `znsq_add_index()` encountered a document in the database
              which would result in a duplicate alternate key and the alternate (secondary) index was defined
              as unique.
 
-             Define the secondary index as non-unique, or remove the duplicate key name from the document.
+		Define the secondary index as non-unique, or remove the duplicate key name from the document.
 ____________________________________________________________________________________________________________
 **00013(X'0D')** Open failure while adding/enabling an alternate (secondary) index.  Most likely a `znsq_add_index()` was
              issued for a previously defined and active index which has not been disabled via the `znsq_drop_index()` API.
 
-             Issue a znsq_drop_index() prior to re-enabling the alternate index.  
-	     Refer to the znsq_last_result() report for more information on the actual open error.
+		Issue a znsq_drop_index() prior to re-enabling the alternate index. 
+		Refer to the znsq_last_result() report for more information on the actual open error.
 ____________________________________________________________________________________________________________
 **00014(X'0E')** SYSDSN Resource unavailable. The `znsq_create_index()` API could not obtain the SYSDSN database name.  
 		The most likely reason is the database is currently allocated (in use). `znsq_create_index()` can only be issued against fully 				disconnected databases.
 
-             If the database is currently connected, disconnect the database before issuing a znsq_create_index().
+		If the database is currently connected, disconnect the database before issuing a znsq_create_index().
 ____________________________________________________________________________________________________________
 **00016(X'10')** Release of the SYSDSN Resource failed. The `znsq_create_index()` failed when releasing the SYSDSN
              resource.  This is most likely an internal logic error.
 
-             Contact the z/OS Storage Administration for help in resolving this error.
+		Contact the z/OS Storage Administration for help in resolving this error.
 ____________________________________________________________________________________________________________
 **0017(X'11')** - Reserved.
 ____________________________________________________________________________________________________________
 **0018(X'12')**  Database not found.  The `znsq_open()` or `znsq_close()` API did not find the specified database.
 
-             Ensure the database has been created prior to opening or closing the database.
+		Ensure the database has been created prior to opening or closing the database.
 ____________________________________________________________________________________________________________
 **0019(X'13')**  Database component not found.  The `znsq_open()` or `znsq_close()` API did not find one of the
              components for the specified database.  A partially created database has been detected.
 
-             The database may need to be recataloged or recreated.  Contact the z/OS storage administrator
-             if help is required in repairing the database.
+		The database may need to be recataloged or recreated.  
+		Contact the z/OS storage administrator if help is required in repairing the database.
 ____________________________________________________________________________________________________________
 **0020(X'14')**  Path entry not found. The `znsq_read()` or `znsq_write()` APIs did not find the required path entry from
              when the associated index was added.
 
-             The index and path need to be destroyed and readded to correct the problem. Contact the z/OS
-             storage administrator if help is required in repairing the database.
+		The index and path need to be destroyed and readded to correct the problem. 
+		Contact the z/OS storage administrator if help is required in repairing the database.
 ____________________________________________________________________________________________________________
 **0021(X'15')**  Alternate key not found. The `znsq_open()`, `znsq_close()`, `znsq_read()`, and `znsq_write()` APIs did not find
              the required alternate key.
 
-             Ensure a znsq_add_index was issued to build an index for the required alternate key.
+		Ensure a znsq_add_index was issued to build an index for the required alternate key.
 ____________________________________________________________________________________________________________
 **0028('1C')**  Forward recovery log write failed. While accessing a EzNoSQL database, the forward recovery log
              was not available or the write failed.
 
-             Contact the z/OS Storage Administrator and provide additional documentation via the
-	     znsq_last_result report.
+		Contact the z/OS Storage Administrator and provide additional documentation via 
+		the znsq_last_result report.
 ____________________________________________________________________________________________________________
 **0029(X'1D')**  CF cache structure failure. While accessing a EzNoSQL database, the Coupling Facility (CF)
              cache failed during the open of the database.
 
-             Contact the z/OS Storage Administrator and provide additional documentation via the
-	     znsq_last_result report.
+		Contact the z/OS Storage Administrator and provide additional documentation via 
+		the znsq_last_result report.
 ____________________________________________________________________________________________________________
 **0030(X'1E')**  CF cache structure is unavailable. While accessing a EzNoSQL database, the Coupling Facility
              (CF) cache structure associated with the database's storage class was unavailable during the
 	     open of the database.
 
-             Contact the z/OS Storage Administrator and provide additional documentation via the
-	     znsq_last_result report.
+		Contact the z/OS Storage Administrator and provide additional documentation via 
+		the znsq_last_result report.
 ____________________________________________________________________________________________________________
 **0031(X'1F')**  CF cache set is unavailable. While accessing a EzNoSQL database, the Coupling Facility
              (CF) cache set was not found in the database's storage class during the open of the database.
 
-             Contact the z/OS Storage Administrator and provide additional documentation via the
-	     znsq_last_result report.
+		Contact the z/OS Storage Administrator and provide additional documentation via 
+		the znsq_last_result report.
 ____________________________________________________________________________________________________________
 **0051(X'33')**  The JSON primary key name field was not found in the catalog when accessing the database.
              The database does not appear to be a valid NOSQL DATABASE.
 
-             Verify database was created with the znsq_create API, or was defined with LOG and DATABASE
-             parameters when using IDCAMS DEFINE CLUSTER.
+		Verify database was created with the znsq_create API, or was defined with LOG and DATABASE 
+		parameters when using IDCAMS DEFINE CLUSTER.
 ____________________________________________________________________________________________________________
 **0055(X'37')**  The database was not found in the catalog.  The first access to the database will attempt to
              open the database and open could not locate the database.
 
-             Verify the database was successfully created prior to accessing the database.
+		Verify the database was successfully created prior to accessing the database.
 ____________________________________________________________________________________________________________
 **0056(X'38')**  User not authorized to access database. The first access to the database will attempt to open the data
              set for read and/or write.  The user is not authorized for the requested access.
 
-             Request access for the database if allowed.
+		Request access for the database if allowed.
 ____________________________________________________________________________________________________________
 **0057(X'39')**  Open for input and the database is empty. The first access to the database will attempt to open
              the database.  An open for input fails if the database attempt is empty.
 
-             Open the database for output to add at least one document prior to an open for read only.
+		Open the database for output to add at least one document prior to an open for read only.
 ____________________________________________________________________________________________________________
 **0058(X'3A')** - Reserved.
 **0064(X'40')**
 ____________________________________________________________________________________________________________
-0065(X'41')  High used relative byte address (RBA) is higher than the high allocated RBA. The first access
+**0065(X'41')**  High used relative byte address (RBA) is higher than the high allocated RBA. The first access
              to the database will attempt to open the database.  The open discovered the high used RBA is
              greater then the high allocated indicating the database is damaged.
 
-             The database may need to be recovered.  Contact the z/OS Storage Administrator for help
-             recovering the database.
+		The database may need to be recovered. 
+		Contact the z/OS Storage Administrator for help recovering the database.
 ____________________________________________________________________________________________________________
 0066(X'42')  Update failed during write force.  A znsq_write was issued with the write force open option
              specified.  The write was for a duplicate document, but the force write (update) failed.
