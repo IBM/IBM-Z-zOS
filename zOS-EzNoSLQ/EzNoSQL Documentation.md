@@ -2242,6 +2242,24 @@ ________________________________________________________________________________
 0137(X'89')  Cache failure.  The global cache structure for this database failed.  This may be a temporary eror.
 
              The program can try redriving the request. Report the issue to the z/OS Storage Administrator.
+__________________________________________________________________________________________________________________________________________
+0282(X'11A') Create, add or drop function terminated. An error occurred while creating a database, secondary index, or enabling/disabling
+             the index.
+
+             Contact the z/OS Storage and provide the output from the znsq_last_result error.	
+__________________________________________________________________________________________________________________________________________
+0282(X'11B') Create, add or drop function terminated due to z/OS catalog error. An error occurred while creating a database, secondary 
+             index, or enabling/disabling the index.
+
+             Contact the z/OS Storage and provide the output from the znsq_last_result error.			     
+__________________________________________________________________________________________________________________________________________
+0295(X'127') Storage or data class not found.  The znsq_create API could not find a valid storage or data class name, either from the user 
+             paramters on the znsq_create API or implicitly assigned by the server.  A valid storage or optional data class name must be
+	     available to the creation of the database.
+
+             Ensure a valid storage or optional data class name is provided to the znsq_create API, or contact the z/OS Storage 
+	     Administrator to configure the system's storage management policy to assign a Record Level Sharing (RLS) storage class and 
+	     optional data class for the database.  If necessary, provide the output from the znsq_last_result error.	     
 __________________________________________________________________________________________________________________________________
 0297(X'129')  Inconsistent parameters.  The znsq_create or znsq_create_index failed with inconsistent parameters.  This error is
               likely due to creating a database larger than 4 gigabytes and not specifing a SMS DATCLAS containing the Extended
@@ -2462,14 +2480,6 @@ ________________________________________________________________________________
 
              Ensure a valid connection token for the correct data set name was provided to the `znsq_report_stats` API. If the name is
              correct, contact the z/OS Storage Administrator.
-__________________________________________________________________________________________________________________________________________
-0295(X'127') Storage or data class not found.  The znsq_create API could not find a valid storage or data class name, either from the user 
-             paramters on the znsq_create API or implicitly assigned by the server.  A valid storage or optional data class name must be
-	     available to the creation of the database.
-
-             Ensure a valid storage or optional data class name is provided to the znsq_create API, or contact the z/OS Storage 
-	     Administrator to configure the system's storage management policy to assign a Record Level Sharing (RLS) storage class and 
-	     optional data class for the database.
 ________________________________________________________________________________________________________________________________________
 32767(x'7FFF') Unknown error.  An unknown error resulted in the termination of the API request.  Likely an abend occurred during the
                the request.
