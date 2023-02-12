@@ -1913,8 +1913,8 @@ ________________________________________________________________________________
 
              Fully close and reopen the database on this system.
 ________________________________________________________________________________________________________________________
-0106(X'6A')  Read next issued without prior position. A znsq_Next_result API was issued without a proceeding
-             znsq_position.
+0106(X'6A')  Read next or close result issued without prior position. A znsq_Next_result or znsq_close_result API was
+             issued without a proceeding znsq_position.
 
              Issue or reissue the znsq_position prior to issuing the znsq_next_result .
 ________________________________________________________________________________________________________________________
