@@ -303,8 +303,8 @@ int znsq_create(const char *dsname, const znsq_create_options *options);
 Creates an EzNoSQL primary index database with the name specified in parameter `dsname` using the attributes that are specified by the `options` parameter. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.
 ​
 #### Parameters
-`dsname`: C-string containing the name of the database. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segments. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $).  The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.).
-> Example: MY.JSON.DATA.​
+`dsname`: C-string containing the name of the database. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segments. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $).  The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.).  If the name is less than 44 characters, the remaining characters should be EBCDIC blanks (x'40').
+> Example: MY.JSON.DATA.
 
 `options`: Pointer to an object of type `znsq_create_options`, where the database attributes are provided.
 ​
@@ -1590,9 +1590,11 @@ Return Code 08(X'08')
 Reason Code Meaning
 ____________________________________________________________________________________________________________
 **0001(X'01')**  The database was not found in the catalog.  The database name passed on the API was
-             not found and was required for the successful completion of this API.
+                  not found and was required for the successful completion of this API.
 
-		Verify the database was created successfully and has not been deleted prior to issuing this API.
+		Verify the database was created successfully and has not been deleted prior to issuing this 
+		API.  In some cases, this reason code code indicate that an internal parmlist was overlaid.
+		If necessary, provide the addtional documentation via znsq_last_result() report.
 ____________________________________________________________________________________________________________
 **0009(X'09')**  Database not found. A database was not found on the `znsq_destroy()` API.
 
