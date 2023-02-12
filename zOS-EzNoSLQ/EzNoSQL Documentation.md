@@ -2463,12 +2463,13 @@ ________________________________________________________________________________
              Ensure a valid connection token for the correct data set name was provided to the `znsq_report_stats` API. If the name is
              correct, contact the z/OS Storage Administrator.
 __________________________________________________________________________________________________________________________________________
-0295(X'127') Storage class not found.  The znsq_create API could not find a valid storage class name, either from the user paramters on
-             the znsq_create API or implicitly assigned by the server.  A valid storage class name must be available to the creation of the
-             database.
+0295(X'127') Storage or data class not found.  The znsq_create API could not find a valid storage or data class name, either from the user 
+             paramters on the znsq_create API or implicitly assigned by the server.  A valid storage or optional data class name must be
+	     available to the creation of the database.
 
-             Ensure a valid storage class name is provided to the znsq_create API, or contact the z/OS Storage Administrator to configure
-             the system's storage management policy to assign a Record Lveel Sharing (RLS) storage class for the database.
+             Ensure a valid storage or optional data class name is provided to the znsq_create API, or contact the z/OS Storage 
+	     Administrator to configure the system's storage management policy to assign a Record Level Sharing (RLS) storage class and 
+	     optional data class for the database.
 ________________________________________________________________________________________________________________________________________
 32767(x'7FFF') Unknown error.  An unknown error resulted in the termination of the API request.  Likely an abend occurred during the
                the request.
