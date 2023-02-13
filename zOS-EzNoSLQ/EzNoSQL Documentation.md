@@ -99,7 +99,7 @@ EzNoSQL is a document oriented data store which accepts UTF-8 JSON documents (an
 
 The EzNoSQL database can be defined with a user supplied primary key, where the chosen key must be contained in each the document and paired with a unique value.
 
-The primary keyname must be less than 256 characters; however, the value size is unrestricted. In the above example, the `"Customer_id"` keyname may be a good choice for a unique primary key. The value in this case of `"4084"` becomes the primary key value used to retrieve the document.
+The primary keyname must be less than 256 characters; however, the value size is unrestricted. In the above example, the `"Customer_id"` keyname may be a good choice for a unique primary key. The value in this case of `"4084"` becomes the primary key value used to retrieve the document.  The primary key value cannot be part of an array, however, it can be an imbedded document less than 16 megabytes in size. 
 
 If a unique keyname is not available, the database can be defined without a keyname.  In this case EzNoSQL will auto generate a unique `key:value` for the document and insert the additional element at the beginning of the document.  The additional element will use a reserved keyname of `"znsq_id"` and paired with a 120 byte unique character value:
 ```json
@@ -1858,13 +1858,11 @@ ________________________________________________________________________________
              The damaged document may still be deleted from the data set.  Use recoverable data sets to avoid
              damaged data sets.  The logOptions attribute is returned on the `znsq_report_stats` API.
 ____________________________________________________________________________________________________________________
-0097(X'61')  No base record.  A read or write through an alternate index could not locate the document in the base
-             database.  This is likely an internal error or system failure that cause the alternate index to be out
-             of sync with the base database.
+0097(X'61')  No primary key value was found.  The primary key name or valid key value was found in the document to
+             be inserted or updated.  Or, when reading, the key value does not specify a valid primary key value.  
 
-             Rebuilding the index can correct the problem by issuing a znsq_drop_index (or znsq_destroy the index),
-             followed by a znsq_add_index).  Saving a copy of the primary and secondary indexes prior to rebuilding
-             the index may help diagnose the inconsistencey.
+             When a primary key value is not found while reading via a secondary index, try rebuilding the index
+	     in case the index has become out of sync with the primary index.  
 ____________________________________________________________________________________________________________________
 0098(X'62')  Maximum duplicate index keys. The maximum number of non-primary (alternate) keys has been reached. The
              maximum number of duplicate keys support is 4 gigabytes.
