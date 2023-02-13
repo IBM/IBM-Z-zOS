@@ -101,7 +101,7 @@ The EzNoSQL database can be defined with a user supplied primary key, where the 
 
 The primary keyname must be less than 256 characters; however, the value size is unrestricted. In the above example, the `"Customer_id"` keyname may be a good choice for a unique primary key. The value in this case of `"4084"` becomes the primary key value used to retrieve the document.  The primary key value cannot be part of an array, however, it can be an imbedded document less than 16 megabytes in size. 
 
-If a unique keyname is not available, the database can be defined without a keyname.  In this case EzNoSQL will auto generate a unique `key:value` for the document and insert the additional element at the beginning of the document.  The additional element will use a reserved keyname of `"znsq_id"` and paired with a 120 byte unique character value:
+If a unique keyname is not available, the database can be defined without a keyname.  In this case EzNoSQL will auto generate a unique `key:value` for the document and insert the additional element at the beginning of the document.  The additional element will use a reserved keyname of `"znsq_id"` and paired with a 122 byte unique character value:
 ```json
 {
  "znsq_id":"..generatedkeyvalue..",
@@ -779,7 +779,7 @@ The read request can opt to retrieve the document for update which will obtain a
    contains a buffer to receive the JSON document following a success read.
 
 `buff_len`:
-   contains the length of the buffer to receive the document.  The buffer may be larger than the returned document; however, if the buffer is too small to contain the document, a x'51' error is returned to the caller along with the required buffer length. For successful reads, the actual length of the document is returned.
+   contains the length of the buffer to receive the document.  The buffer may be larger than the returned document; however, if the buffer is too small to contain the document, a x'51' error is returned to the caller along with the required buffer length. For successful reads, the actual length of the document is returned.  When reading documents containing an auto-generated key, allow for an extra 134 (86x) bytes.
 
 `key`:
    C-string containing the keyname associated with either the primary or a secondary index and ending with one byte of x'00'.
@@ -1049,7 +1049,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | --------------- | ------ | ----------- |
 | version         | `int`  | API version.|
 | key_name        | `char` | C-string containing the keyname used on the `znsq_create()` or `znsq_create_index()` including an ending delimiter of x'00'.|
-| autokey_buffer  | `char` | Minimum buffer of 120 bytes to receive the generated key for auto generated EzNoSQL databases.|
+| autokey_buffer  | `char` | Minimum buffer of 122 bytes to receive the generated key for auto generated EzNoSQL databases.|
 | autokey_length  | `char` | Length of the returned auto generated key.|                                                                                
 
 Example of writing a document to a keyed EzNoSQL database:
