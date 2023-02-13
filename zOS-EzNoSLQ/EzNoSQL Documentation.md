@@ -227,6 +227,8 @@ Contact your system administrator for requirements when creating EzNoSQL databas
 3. `DATACLAS` name if not assigned by the system for optional features (i.e. encryption, compression, storing data in the CF global cache) if required by the application
 4. `MGMTCLAS` name if not assigned by the system for application requirements related to data backup frequency and data retention
 
+Programs intending to use EzNoSQL must not execute in XMODE, FRR mode, or non-primary ASC mode. 
+
 # Performance Considerations
 
 ## In-Memory Caching
@@ -1776,10 +1778,11 @@ ________________________________________________________________________________
              The program's memory may be exhausted.  If unexpected, report the problem to z/OS support for
              help diagnosing the problem.
 ______________________________________________________________________________________________________________
-0081(X'51')  Buffer too small. A read request provided a too small buffer to hold the requested document.  The
-             required size is returned in the buffer size field provided on the API.
+0081(X'51')  Buffer too small. A read or write request provided a too small buffer to hold the requested 
+             document.  The required size is returned in the buffer size field provided on the API.
 
-             Obtain the correct buffer size and redrive the request.
+             Obtain the correct buffer size and redrive the request.  For write requests the buffer would be
+	     the return buffer for auto-generated keys.
 _______________________________________________________________________________________________________________
 0082(X'52')  Request Parameter List (RPL) reuse error. Multiple requests to access the database are using the
              same RPL. This is an internal logic error in the system software.
