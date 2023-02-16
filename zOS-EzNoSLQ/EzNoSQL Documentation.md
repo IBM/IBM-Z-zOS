@@ -222,10 +222,10 @@ EzNoSQL is provided with z/OS and does not require any additional software licen
 ## Application Requirements
 
 Contact your system administrator for requirements when creating EzNoSQL databases:
-1. High level qualifier(s) for database names
-2. `STORCLAS` name if not assigned by the system.  A `STORCLAS` name is required to be assigned or the creation of the database will fail
-3. `DATACLAS` name if not assigned by the system for optional features (i.e. encryption, compression, storing data in the CF global cache) if required by the application
-4. `MGMTCLAS` name if not assigned by the system for application requirements related to data backup frequency and data retention
+1. High level qualifier(s) for database names.
+2. `STORCLAS` name if not assigned by the system.  A STORCLAS name is required either explicitly on the create API (znsq_create), or implicitly by the system.  If a STORCLAS name is not assigned by either method, the creation of the database will fail.
+3. `DATACLAS` name if not assigned by the system for optional features (i.e. encryption, compression, storing data in the CF global cache) if required by the application.
+4. `MGMTCLAS` name if not assigned by the system for application requirements related to data backup frequency and data retention.
 
 Programs intending to use EzNoSQL must not execute in XMODE, FRR mode, or non-primary ASC mode. 
 
@@ -867,11 +867,11 @@ Issues a request to locate a specific key value (or a key value greater than or 
 
 `key`: C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00'.
 
-`key_value`: C-string containing the value for the specific document to be retrieved.
+`key_value`: C-string containing the value for the specific document to be retrieved.  To position to the first document in the primary ir secondary index, pass an empty string as the key_value.
 
 `znsq_search_method`:
-   + _`1`_  indicates that the first (or last) document equal to specified `key_value` should be located for subsequent sequential retrieves/updates/deletes.
-   + _`2`_  indicates that the first (or last) document greater than or equal to the specified `key_value` should be located for sequential retrieves/updates/deletes.
+   + _`0`_  indicates that the first (or last) document equal to specified `key_value` should be located for subsequent sequential retrieves/updates/deletes.
+   + _`1`_  indicates that the first (or last) document greater than or equal to the specified `key_value` should be located for sequential retrieves/updates/deletes.
 
 `flags`: Reserved for future use.
 
