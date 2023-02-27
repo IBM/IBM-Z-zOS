@@ -1,0 +1,207 @@
+ /* REXX */                                                                     
+ /*********************************************************************/        
+ /*                                                                   */        
+ /* Copyright 2022 IBM Corp.                                          */        
+ /*                                                                   */        
+ /* Licensed under the Apache License, Version 2.0 (the "License");   */        
+ /* you may not use this file except in compliance with the License.  */        
+ /* You may obtain a copy of the License at                           */        
+ /*                                                                   */        
+ /* http://www.apache.org/licenses/LICENSE-2.0                        */        
+ /*                                                                   */        
+ /* Unless required by applicable law or agreed to in writing,        */        
+ /* software distributed under the License is distributed on an       */        
+ /* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      */        
+ /* either express or implied. See the License for the specific       */        
+ /* language governing permissions and limitations under the License. */        
+ /*                                                                   */        
+ /*********************************************************************         
+                                                                                
+  Name:    XCDT                                                                 
+                                                                                
+  Author:  Bruce Wells - brwells@us.ibm.com                                     
+                                                                                
+  Purpose: List all attributes of a RACF class, static or dynamic.              
+           The IRRXUTIL variable names are shown in parentheses for             
+           your convenience, especially if you want to use XCDTSRCH.            
+                                                                                
+           For example, "I wonder what classes issue ENF signals?"              
+           First, I need to know what the variable name for that is:            
+             XCDT FACILITY (or any class)                                       
+           "Ahh, the variable name is ENF_SIGNAL."  So now:                     
+             XCDTSRCH ENF_SIGNAL=1                                              
+                                                                                
+  Input:   A RACF class name.  No abbreviations! But you may                    
+           enter it in lower case. The default is FACILITY.                     
+                                                                                
+  Syntax:  XCDT class-name [anything | so]                                      
+                                                                                
+    - Specifying any character(s) after the class name requests the             
+      the active SETROPTS settings. This requires READ authority to             
+      IRR.RADMIN.SETROPTS.LIST.  For example:                                   
+                                                                                
+      RDEFINE FACILITY IRR.RADMIN.SETROPTS.LIST UACC(READ)                      
+      SETROPTS RACLIST(FACILITY) REFRESH'                                       
+                                                                                
+    - Specifying 'so' (SETROPTS only) after the class name requests             
+      *only* the active SETROPTS settings. Same authorization as                
+      above.                                                                    
+                                                                                
+ **********************************************************************/        
+ parse upper arg name setropts                                                  
+                                                                                
+ If name = '' Then name = "FACILITY"                                            
+                                                                                
+ /* If anything was specifed for the setropts parameter, request the */         
+ /* SETROPTS options.                                                */         
+ If setropts /= '' Then                                                         
+   IRRXUTIL_OPTION_CLASS_SETTINGS = 1                                           
+                                                                                
+ myRC=IRRXUTIL("EXTRACT","_CDT",name,"CLS","","FALSE")                          
+                                                                                
+ If myrc /= '0 0 0 0 0' Then Do                                                 
+   say "R_admin SETROPTS extract error:" myRC                                   
+   exit 666                                                                     
+ End                                                                            
+                                                                                
+ If setropts /= 'SO' Then Do  /* If class attributes are requested   */         
+   SAY "Returned class is:                       " CLS.CLASSNAME                
+ /*say length(cls.classname)*/                                                  
+   SAY "Posit number is (POSIT):                 " CLS.POSIT                    
+   If CLS.GROUPING_CLASS = '' Then                                              
+     CLS.GROUPING_CLASS = "- N/A -"                                             
+   SAY "Grouping class (GROUPING_CLASS)?         " CLS.GROUPING_CLASS           
+   If CLS.MEMBER_CLASS = '' Then                                                
+     CLS.MEMBER_CLASS = "- N/A -"                                               
+   SAY "Member class (MEMBER_CLASS)?             " CLS.MEMBER_CLASS             
+   SAY "Profiles allowed (PROFILES_ALLOWED)?     " CLS.PROFILES_ALLOWED         
+   SAY "Mixed case profiles allowed (MIXED_CASE)?" CLS.MIXED_CASE               
+   SAY "Key qualifiers (KEY_QUALIFIERS):         " CLS.KEY_QUALIFIERS           
+                                                                                
+   /******************************************************************/         
+   /* FIRST and OTHER are interesting in that a string is returned   */         
+   /* that indicates whether each category of symbol is supported:   */         
+   /* ALPHA, NATIONAL, NUMERIC, and SPECIAL. This maps to how        */         
+   /* a dynamic class is defined using the CDTINFO segment keywords. */         
+   /* However, if you are using this exec to verify the definition   */         
+   /* of a static class, it can get confusing. For example, if only  */         
+   /* "ALPHA" is returned, it means only letters are allowed. But    */         
+   /* in the ICHERCDE macro, ALPHA means that both letters and       */         
+   /* national characters are allowed. So, ALPHA, by itself, really  */         
+   /* maps to NONATABC in ICHERCDE semantics. So, we will display    */         
+   /* the exact string returned by IRRXUTIL, but we will then try    */         
+   /* to translate it to ICHERCDE semantics for those verifying      */         
+   /* documentation.                                                 */         
+   /******************************************************************/         
+   ichercde = staticOf(CLS.FIRSTCHAR)                                           
+   SAY "FIRST= (FIRSTCHAR)                       " ichercde                     
+   SAY "  The equivalent CDTINFO value is:       " CLS.FIRSTCHAR                
+   ichercde = staticOf(CLS.OTHERCHAR)                                           
+   SAY "OTHER= (OTHERCHAR)                       " ichercde                     
+   SAY "  The equivalent CDTINFO value is:       " CLS.OTHERCHAR                
+                                                                                
+   SAY "Default UACC (UACC):                     " CLS.UACC                     
+   SAY "OPER=YES (OPERATIONS)?                   " CLS.OPERATIONS               
+   SAY "ENF? (ENF_SIGNAL)                        " CLS.ENF_SIGNAL               
+   SAY "IBM class (IBM_CLASS)?                   " CLS.IBM_CLASS                
+   SAY "Dynamic class (DYNAMIC)?                 " CLS.DYNAMIC                  
+   SAY "Duplicate class (DUPLICATE)?             " CLS.DUPLICATE                
+   SAY "ID = (ID)                                " CLS.ID                       
+   SAY "Max length = (MAXLNTH)                   " CLS.MAXLNTH                  
+   SAY "Max length X = (MAXLENX)                 " CLS.MAXLENX                  
+   SAY "Default RC = (DEFAULT_RC)                " CLS.DEFAULT_RC               
+   SAY "RACLIST allowed (RACLIST_ALLOWED)?       " CLS.RACLIST_ALLOWED          
+   SAY "RACLIST required (RACLIST_REQUIRED)?     " CLS.RACLIST_REQUIRED         
+   SAY "Generic allowed (GENERIC_ALLOWED)?       " CLS.GENERIC_ALLOWED          
+   SAY "Genlist allowed? (GENLIST_ALLOWED)       " CLS.GENLIST_ALLOWED          
+   SAY "Seclabel required (SECLABEL_REQUIRED)?   " CLS.SECLABEL_REQUIRED        
+   SAY "Equal MAC (EQUAL_MAC)?                   " CLS.EQUAL_MAC                
+   SAY "Reverse MAC (REVERSE_MAC)?               " CLS.REVERSE_MAC              
+                                                                                
+ End                                                                            
+                                                                                
+ If IRRXUTIL_OPTION_CLASS_SETTINGS = 1 Then Do /* SETROPTS desired   */         
+   /* Operational (SETROPTS) settings */                                        
+   Say "------------ SETROPTS settings ------------"                            
+   Say "Class active   (CLASS_ACTIVE)?           " CLS.CLASS_ACTIVE             
+   Say "RACLIST active (RACLIST_ACTIVE)?         " CLS.RACLIST_ACTIVE           
+   Say "GENLIST active (GENLIST_ACTIVE)?         " CLS.GENLIST_ACTIVE           
+   Say "Generic active (GENERIC_ACTIVE)?         " CLS.GENERIC_ACTIVE           
+   Say "Gencmd active  (GENCMD_ACTIVE)?          " CLS.GENCMD_ACTIVE            
+   Say "Global active  (GLOBAL_ACTIVE)?          " CLS.GLOBAL_ACTIVE            
+   Say "Stats active   (STATISTICS_ACTIVE)?      " CLS.STATISTICS_ACTIVE        
+                                                                                
+   /* Audit variables only created if issuer has RO|AUDITOR */                  
+   If CLS.LOGOPTIONS = '' Then                                                  
+     CLS.LOGOPTIONS = '- Not Authorized -'                                      
+   Say "LOGOPTIONS     (LOGOPTIONS)              " CLS.LOGOPTIONS               
+   If CLS.AUDIT_ACTIVE = '' Then                                                
+     CLS.AUDIT_ACTIVE = '- Not Authorized -'                                    
+   Say "SETR(AUDIT)    (AUDIT_ACTIVE)?           " CLS.AUDIT_ACTIVE             
+ End                                                                            
+                                                                                
+ Exit                                                                           
+                                                                                
+staticOf:                                                                       
+/*********************************************************************/         
+/* function: staticOf                                                */         
+/*                                                                   */         
+/* input:  - A space-delimited string of the character types         */         
+/*           allowed.  Possible values are:                          */         
+/*                     ALPHA NATIONAL NUMERIC SPECIAL                */         
+/*                                                                   */         
+/* returns:  The ICHERCDE value of the FIRST= or OTHER= keyword      */         
+/*           that represents this combination.                       */         
+/*                                                                   */         
+/* notes:                                                            */         
+/* - First, construct a 4-character string indicating whether        */         
+/*   each character type is supported                                */         
+/* - Then map each string to the ICHERDCE keyword value              */         
+/* - There are plenty of combinations that don't map, because        */         
+/*   dynamic classes provide greater flexibility. For example,       */         
+/*   SPECIAL characters can be specified with any other type(s),     */         
+/*   but in ICHERCDE, the only way to support special characters     */         
+/*   is by using ANY, which also allows the other types.             */         
+/*                                                                   */         
+/*********************************************************************/         
+parse arg ctypes                                                                
+                                                                                
+/* Set defaults to "-", which indicates type not allowed.            */         
+alpha = "-" ; nat = "-" ; num = "-" ; spec = "-"                                
+                                                                                
+/* Loop for each word of the input, overriding "-" where the type    */         
+/* is allowed.                                                       */         
+Do i = 1 to Words(ctypes)                                                       
+  If Word(ctypes,i) = "ALPHA" Then                                              
+    alpha = "a"                                                                 
+  If Word(ctypes,i) = "NATIONAL" Then                                           
+    nat = "n"                                                                   
+  If Word(ctypes,i) = "NUMERIC" Then                                            
+    num = "n"                                                                   
+  If Word(ctypes,i) = "SPECIAL" Then                                            
+    spec = "s"                                                                  
+End                                                                             
+                                                                                
+/* Append the types together.                                        */         
+types = alpha||nat||num||spec                                                   
+                                                                                
+/* Map the combinations that directly correspond to an ICHERCDE      */         
+/* FIRST= and OTHER= keyword value.                                  */         
+Select                                                                          
+  When types="an--" Then                                                        
+    macString = "ALPHA"                                                         
+  When types="--n-" Then                                                        
+    macString = "NUMERIC"                                                       
+  When types="ann-" Then                                                        
+    macString = "ALPHANUM"                                                      
+  When types="anns" Then                                                        
+    macString = "ANY"                                                           
+  When types="a---" Then                                                        
+    macString = "NONATABC"                                                      
+  When types="a-n-" Then                                                        
+    macString = "NONATNUM"                                                      
+  Otherwise                                                                     
+    macString = "No ICHERCDE value match"                                       
+End                                                                             
+                                                                                
+Return macString                                                                
