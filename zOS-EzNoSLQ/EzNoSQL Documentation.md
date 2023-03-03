@@ -402,6 +402,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | dataclas       | `char` | C-string in EBCDIC (maximum of 8 characters) for the optional system management data class name (`DATACLAS`).</br>Refer to the section System Administration Requirements for more information on this option.|
 | max_space      | `int`                         | Maximum space of database in megabytes (required).|
 
+
 Example of creating a non unique secondary index with descending access:
 ```C
       struct znsq_create_index_options create__index_options;
