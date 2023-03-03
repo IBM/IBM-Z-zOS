@@ -186,6 +186,8 @@ In order to iterate in an ordered fashion over the primary key, and optionally u
 
 While the alternate key value size is not restricted, the keys will be truncated after 251 bytes. Truncated keys may result in non-unique keys with other keys containing the same first 251 bytes.  Sequentially reading truncated keys may return the documents out of order and require further sorting by the application. EzNoSQL will return a reason code alerting the application if a truncated key is retrieved.
 
+When using alternate keys, documents may be retrieved by specifying an exact match, or greater than or equal to (via a full or parital key value). If the key value is a string, then the parital key value should still contain an ending double quote character.
+
 
 ## Recoverable Databases
 
@@ -858,6 +860,8 @@ int znsq_position(znsq_connection_t con, znsq_result_set_t *result_set, const ch
 
 #### Position to a key within the EzNoSQL database
 Issues a request to locate a specific key value (or a key value greater than or equal to) the desired key range. When the key value length is zero, positioning will be to the first or last document in the database based on the search order parameter: a search order (specifed with the `znsq_open()` API) of forward (default) will position to the first document, while backward will position to the last document. Following a successful position, a `result_set` token is returned which is then used as input for subsequent sequential retrieves or updates/deletes.  Positioning is therefore required prior to issuing the `znsq_next_result()`, `znsq_update_result()`, or the `znsq_delete_result()` APIs.  Positioning should be terminated by using the `znsq_close_result()` API in order to release the `result_set`.
+
+When using alternate keys and search_method_option equal to one, key values may be generic (partial key value).  Documents which match the generic key or are greated than will be returned for subsequent retrieves.  When providing a generic key for a string, the key value should include the ending double quotes.  
 
 #### Parameters
 
