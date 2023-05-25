@@ -1,0 +1,92 @@
+#                                                                    
+#  Copyright 2023 IBM Corp.                                          
+#                                                                    
+#  Licensed under the Apache License, Version 2.0 (the "License");   
+#  you may not use this file except in compliance with the License.  
+#  You may obtain a copy of the License at                           
+#                                                                    
+#  http://www.apache.org/licenses/LICENSE-2.0                        
+#                                                                    
+#  Unless required by applicable law or agreed to in writing,        
+#  software distributed under the License is distributed on an       
+#  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      
+#  either express or implied. See the License for the specific       
+#  language governing permissions and limitations under the License. 
+#         
+#--------------------------------------------------------
+# Printer XFORMPCL - Transform to PCL and Send to Printer
+#--------------------------------------------------------
+create printer XFORMPCL
+   printer-codepage = ISO8859-1
+   filters = {
+      line -> afpxpcl.dll
+      modca -> afpxpcl.dll
+      text -> aopfiltr.so
+      xml -> afpxpcl.dll
+   }
+   printer-type = ip-printway
+   protocol-type = direct-sockets
+   port-number = 9100
+   destination = XPCL
+   output-class = J
+   document-formats-supported = {
+      line
+      modca
+      pcl
+      xml
+   }
+   response-timeout = 120
+   printer-ip-address = x.x.x.x
+   dcf-routing = yes
+   description = "Transform Output to PCL and Send to Printer"
+;
+
+create dcf-routing-key "XPCL  J"
+   printer = XFORMPCL
+;
+
+#-------------------------------------------------------
+# job-selection-rule XPCL
+#-------------------------------------------------------
+create job-selection-rule XPCL
+   output-class-list = {
+      J
+   }
+   destination-pattern = XPCL
+;
+
+#---------------------------------------------------------------------
+# Printer XA4PCL – Transform to PCL and LPR to Printer using A4 paper
+#---------------------------------------------------------------------
+create printer XA4PCL
+   printer-codepage = ISO8859-1
+   filters = {
+      line -> "afpxpcl.dll -c colornoa4"
+      modca -> "afpxpcl.dll -c colornoa4"
+      text -> aopfiltr.so
+      xml -> "afpxpcl.dll -c colornoa4"
+   }
+   printer-type = ip-printway
+   protocol-type = lpr
+   destination = XA4PCL
+   output-class = J
+   description = "Print to PCL Printer Using LPR"
+   print-queue-name = text
+   printer-ip-address = x.x.x.x
+   dcf-routing = yes
+;
+
+create dcf-routing-key "XA4PCL  J"
+   printer = XA4PCL
+;
+
+#-------------------------------------------------------
+# job-selection-rule XA4PCL
+#-------------------------------------------------------
+create job-selection-rule XA4PCL
+   output-class-list = {
+      J
+   }
+   destination-pattern = XA4PCL
+;
+
