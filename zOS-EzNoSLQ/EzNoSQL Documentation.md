@@ -32,35 +32,35 @@ Application Programming Interfaces (APIs):
 * [Application Programming Tiers](#Application-Programming-Tiers)
 
 Data Management APIs:
-* [znsq_create()](#znsqcreate)
-* [znsq_create_index()](#znsqcreateindex)
-* [znsq_destroy()](#znsqdestroy)
-* [znsq_add_index()](#znsqaddindex)
-* [znsq_drop_index()](#znsqdropindex)
-* [znsq_report_stats()](#znsqreportstats)
+* [znsq_create()](#znsq_create)
+* [znsq_create_index()](#znsq_create_index)
+* [znsq_destroy()](#znsq_destroy)
+* [znsq_add_index()](#znsq_add_index)
+* [znsq_drop_index()](#znsq_drop_index)
+* [znsq_report_stats()](#znsq_report_stats)
 
 Connection Management APIs:
-* [znsq_open()](#znsqopen)
-* [znsq_close()](#znsqclose)
+* [znsq_open()](#znsq_open)
+* [znsq_close()](#znsq_close)
 
 Document Retrieval APIs:
-* [znsq_read()](#znsqread)
-* [znsq_position()](#znsqposition)
-* [znsq_next_result()](#znsqnextresult)
-* [znsq_close_result()](#znsqcloseresult)
+* [znsq_read()](#znsq_read)
+* [znsq_position()](#znsq_position)
+* [znsq_next_result()](#znsq_next_result)
+* [znsq_close_result()](#znsq_close_result)
 
 Document Management APIs:
-* [znsq_write()](#znsqwrite)
-* [znsq_delete()](#znsqdelete)
-* [znsq_delete_result()](#znsqdeleteresult)
-* [znsq_update()](#znsqupdate)
-* [znsq_update_result()](#znsqupdateresult)
-* [znsq_commit()](#znsqcommit)
-* [znsq_set_autocommit()](#znsqsetautocommit)
-* [znsq_abort()](#znsqabort)
+* [znsq_write()](#znsq_write)
+* [znsq_delete()](#znsq_delete)
+* [znsq_delete_result()](#znsq_delete_result)
+* [znsq_update()](#znsq_update)
+* [znsq_update_result()](#znsq_update_result)
+* [znsq_commit()](#znsq_commit)
+* [znsq_set_autocommit()](#znsq_set_autocommit)
+* [znsq_abort()](#znsq_abort)
 
 Diagnostic Management APIs:
-* [znsq_last_result()](#znsqlastresult)
+* [znsq_last_result()](#znsq_last_result)
 
 Return and Reason Codes:
 * [Return Code 0](#Return-Code-0)
@@ -998,7 +998,7 @@ Ends positioning into the EzNoSQL database previously established by the `znsq_p
 
 `znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
 
-`znsq_result_set_t': int32_t token returned from previous `znsq_position()`.
+`znsq_result_set_t`: int32_t token returned from previous `znsq_position()`.
 
 #### Return value
 The return code of the function.
