@@ -1717,13 +1717,13 @@ ________________________________________________________________________________
 		The database may need to be recovered. 
 		Contact the z/OS Storage Administrator for help recovering the database.
 ____________________________________________________________________________________________________________
-0066(X'42')  Update failed during write force.  A znsq_write was issued with the write force open option
+**0066(X'42')**  Update failed during write force.  A znsq_write was issued with the write force open option
              specified.  The write was for a duplicate document, but the force write (update) failed.
 
              Refer to the return code and reason code from the znsq_write API for information on why the
              udpate failed.
 ____________________________________________________________________________________________________________
-0067(X'43')  While accessing the database sequentially (e.g. using the znsq_next_result API) the end of the
+**0067(X'43')**  While accessing the database sequentially (e.g. using the znsq_next_result API) the end of the
              database was reached.
 
              The program may want to treat this error as expected.  If the end of data was not expected, the
@@ -1733,33 +1733,33 @@ ________________________________________________________________________________
              Storage Administrator for help recovering the database.
 ____________________________________________________________________________________________________________
 
-0068(X'44')  A duplicate primary or alternate index key (for a non-unique index) was inserted.  The insert
+**0068(X'44')**  A duplicate primary or alternate index key (for a non-unique index) was inserted.  The insert
              is failed.
 
              The program may want to treat this error as expected.  If the program would like to update the
              document regardless, use the write force option on the znsq_open API.
 ____________________________________________________________________________________________________________
-0069(X'45')  No document found for the specified key.  A read request for a primary or alternate key was not
+**0069(X'45')**  No document found for the specified key.  A read request for a primary or alternate key was not
              found in the database.  The read request is failed.
 
              The program may want to treat this error as expected.  If the error is not expected, the data
              set maybe damaged and may need to be recovered.  Contact the z/OS Storage Administrator to help
              recover the database.
 ____________________________________________________________________________________________________________
-0070(X'46')  Incompatiable lock error.  The same unit of recovery requested the same key in an incompatible
+**0070(X'46')**  Incompatiable lock error.  The same unit of recovery requested the same key in an incompatible
              state (e.g. two exclusive lock updates).  The request is failed.
 
              The program may have a data access error trying to obtain the same document keys exclusively in
              the same unit of recovery record.  Correct the logic in the user program.
 _____________________________________________________________________________________________________________
-0071(X'47')  Deadlock time out occurred. Different units of recovery each are attemtping to lock two
+**0071(X'47')**  Deadlock time out occurred. Different units of recovery each are attemtping to lock two
              different document keys in reversed order.  The deadlock is resolved by failing one of the
              requests.
 
              The program may expect this situation and can redrive the failed request.  The program may want
              to improve the logic to avoid deadlocks which can impact performance.
 ______________________________________________________________________________________________________________
-0072(X'48')  A lock time out occurred. A read/write request timed out waiting for a document lock for the
+**0072(X'48')**  A lock time out occurred. A read/write request timed out waiting for a document lock for the
              specified key.  The timeout value specifed at open was greated than zero and the request waited
              longer than the timeout value.
 
@@ -1767,49 +1767,49 @@ ________________________________________________________________________________
              the failed request.  The timeout value may need to be increased to tolerate the expected wait
              time.
 ______________________________________________________________________________________________________________
-0073(X'49')  Out of space. A write request attempt to extend the size of the database failed.
+**0073(X'49')**  Out of space. A write request attempt to extend the size of the database failed.
 
              The database may have reached its maximum size or there is not enough space on the available
              volumes.
 ______________________________________________________________________________________________________________
-0074(X'4A') - Reserved.
-0079(X'4F')
+**0074(X'4A')** - Reserved.
+**0079(X'4F')**
 ______________________________________________________________________________________________________________
-0080(X'50')  Memory obtain error. A read or write request attempted to obtain memory for internal control
+**0080(X'50')**  Memory obtain error. A read or write request attempted to obtain memory for internal control
              blocks and the obtain failed.
 
              The program's memory may be exhausted.  If unexpected, report the problem to z/OS support for
              help diagnosing the problem.
 ______________________________________________________________________________________________________________
-0081(X'51')  Buffer too small. A read or write request provided a too small buffer to hold the requested 
+**0081(X'51')**  Buffer too small. A read or write request provided a too small buffer to hold the requested 
              document.  The required size is returned in the buffer size field provided on the API.
 
              Obtain the correct buffer size and redrive the request.  For write requests the buffer would be
 	     the return buffer for auto-generated keys.
 _______________________________________________________________________________________________________________
-0082(X'52')  Request Parameter List (RPL) reuse error. Multiple requests to access the database are using the
+**0082(X'52')**  Request Parameter List (RPL) reuse error. Multiple requests to access the database are using the
              same RPL. This is an internal logic error in the system software.
 
              Report the problem to z/OS support.
 _______________________________________________________________________________________________________________
-0083(X'53')  Maximum number of concurrent requests exceeded the limit.  For each znsq_open, 1024 concurrent
+**0083(X'53')**  Maximum number of concurrent requests exceeded the limit.  For each znsq_open, 1024 concurrent
              requests are allowed.  Requests exceeding 1024 will be failed.
 
              Reduce the number of concurrent requests or issue another znsq_open in the same program or other
              sharing instances.
 ________________________________________________________________________________________________________________
-0084(X'54')  Illegal key change.  An update request for a document through an alternate index attemted to change
+**0084(X'54')**  Illegal key change.  An update request for a document through an alternate index attemted to change
              the primary key.  Primary keys cannot be changed once the document is inserted.
 
              Correct the document to ensure the primary key has not been changed.
 _________________________________________________________________________________________________________________
-0085(X'55')  No keyname found.  A write request provided a document that does not contain a key that matches the
+**0085(X'55')**  No keyname found.  A write request provided a document that does not contain a key that matches the
              keyname on the znsq_create. Either the keyname is not in the JSON document, or the JSON document
              itself is of an invalid structure.
 
              Ensure the document contains the required keyname or is a valid JSON document.
 _________________________________________________________________________________________________________________
-0086(X'56')  Incomplete document found. A read request attempted to return a document that has an imcomplete
+**0086(X'56')**  Incomplete document found. A read request attempted to return a document that has an imcomplete
              length.  The write of the original document may have failed and was only partially writted to disk.
              This type of error may occur for non-recoverable (logOptions(NONE)) databases. Recoverable databases
              (logOptions(UNDO)) would have backed out the damaged document after the unit of reocvery was backed
@@ -1818,7 +1818,7 @@ ________________________________________________________________________________
              The damaged document may still be deleted from the data set.  Use recoverable data sets to avoid
              damaged data sets.  The logOptions attribute is returned on the `znsq_report_stats` API.
 __________________________________________________________________________________________________________________
-0087(X'57')  Request Parameter List (RPL) error. Invalid RPL options were specified by the system code. One
+**0087(X'57')**  Request Parameter List (RPL) error. Invalid RPL options were specified by the system code. One
              example would be when attempting sequential writes/updates/deletes to the primary index set).
 	     Using sequential access (i.e znsq_position) for updates/deletes is only applicable to secondary
 	     indexes.
@@ -1827,23 +1827,23 @@ ________________________________________________________________________________
 	     znsq_delete_result.  If an error is still received, capture the znsq_last_result diagnostic
 	     information and report the problem to the z/OS support.
 __________________________________________________________________________________________________________________
-0088(X'58')  Invalid user environment. The user's program is executing in cross memory mode.  znsq API calls must
+**0088(X'58')**  Invalid user environment. The user's program is executing in cross memory mode.  znsq API calls must
              not be issued in cross memory.
 
              Correct the environment the user program is executing in to non cross memory.
 ____________________________________________________________________________________________________________________
-0089(X'59')  Invalid index pointers. The database's index is corrupted.  This is likely a system software defect.
+**0089(X'59')**  Invalid index pointers. The database's index is corrupted.  This is likely a system software defect.
 
              For the primary index, the database may need to be redefined and reloaded to rebuild the index.  For
              alternate indexes, a znsq_drop_index followed by a znsq_add_index will rebuild the index.  Save a copy
              of the damaged database and report the problem to the z/OS Storage Administrator.
 ___________________________________________________________________________________________________________________
-0090(X'5A')  Access type not allowed. A write, update, or erase request was issued against a database opened for
+**0090(X'5A')**  Access type not allowed. A write, update, or erase request was issued against a database opened for
              input (read) only.
 
              If write access is required, open the database for output if eligible.
 ___________________________________________________________________________________________________________________
-0091(X'5B')  Retained lock failure. A request to obtain a document level lock has failed because the lock is in a
+**0091(X'5B')**  Retained lock failure. A request to obtain a document level lock has failed because the lock is in a
              retained state from a previous transaction, which has either failed to back out (transaction shunted),
              or has closed the database and not yet issued a commit or abort.  The request to obtain the lock is
              failed until such a time the owning transaction (URID) completes the transaction.
@@ -1852,10 +1852,10 @@ ________________________________________________________________________________
              be enccountered.  It the transaction owning the lock has become shunted, contact the system storage
              adminstrator to list the shunted URIDs and either retry or if necessary purge the URID(s).
 ___________________________________________________________________________________________________________________
-0092(X'5C') - Reserved.
-0095(X'5F')
+**0092(X'5C')** - Reserved.
+**0095(X'5F')**
 ___________________________________________________________________________________________________________________
-0096(X'60')  Incomplete document found. A read request attempted to return a document that has an imcomplete
+**0096(X'60')**  Incomplete document found. A read request attempted to return a document that has an imcomplete
              document segment.  The write of the original document may have failed and was only partially writted to
              disk. This type of error may occur for non-recoverable (logOptions(NONE)) databases. Recoverable data
              sets (logOptions(UNDO)) would have backed out the damaged document after the unit of reocvery was
@@ -1864,26 +1864,26 @@ ________________________________________________________________________________
              The damaged document may still be deleted from the data set.  Use recoverable data sets to avoid
              damaged data sets.  The logOptions attribute is returned on the `znsq_report_stats` API.
 ____________________________________________________________________________________________________________________
-0097(X'61')  No primary key value was found.  The primary key name or valid key value was found in the document to
+**0097(X'61')**  No primary key value was found.  The primary key name or valid key value was found in the document to
              be inserted or updated.  Or, when reading, the key value does not specify a valid primary key value.  
 
              When a primary key value is not found while reading via a secondary index, try rebuilding the index
 	     in case the index has become out of sync with the primary index.  
 ____________________________________________________________________________________________________________________
-0098(X'62')  Maximum duplicate index keys. The maximum number of non-primary (alternate) keys has been reached. The
+**0098(X'62')**  Maximum duplicate index keys. The maximum number of non-primary (alternate) keys has been reached. The
              maximum number of duplicate keys support is 4 gigabytes.
 
              Consider choosing index keys for more unique values.  The unique attribute is returned on the
              nsq_report_api.
 ____________________________________________________________________________________________________________________
-0099(X'63')  Attempt to write corrupted index entry. While inserting/updating documents, the system software
+**0099(X'63')**  Attempt to write corrupted index entry. While inserting/updating documents, the system software
              detected an invalid index record is about to update the database's index. The bad record is not written
              the the request which caused the bad entry is failed.  A dump is produced.  This is likely a system
              software defect.
 
              Report the problem to the z/OS Storage Administrator.
 _____________________________________________________________________________________________________________________
-0100(X'64')  Potentially corrupted database. Write requests are failed due to a prior internal logic error which
+**0100(X'64')**  Potentially corrupted database. Write requests are failed due to a prior internal logic error which
              occurred during a critcal system code path and may indicate the database was damaged and needs to be
              recovered.
 
@@ -1893,159 +1893,159 @@ ________________________________________________________________________________
 
              Save a copy of the potentially damaged database and report the problem to the z/OS Storage Administrator.
 ______________________________________________________________________________________________________________________
-0101(X'65')  User not authorized to alter the database.  The znsq_add_index and znsq_drop_index API alters the data
+**0101(X'65')**  User not authorized to alter the database.  The znsq_add_index and znsq_drop_index API alters the data
              set and update access is required.
 
              Obtain update access if allowed for this database.
 _______________________________________________________________________________________________________________________
-0102(X'66')  Multiple add indexes in progress. More than one znsq_add_index is executing for the same alternate index.
+**0102(X'66')**  Multiple add indexes in progress. More than one znsq_add_index is executing for the same alternate index.
              The duplicate adds are failed.
 
              Restrict the number of concurrent znsq_add_indexes for a given index.
 _______________________________________________________________________________________________________________________
-0103(X'67')  Physical I/O failed. While writing a document to the database, a physical i/o error occurred.
+**0103(X'67')**  Physical I/O failed. While writing a document to the database, a physical i/o error occurred.
              The duplicate adds are failed.  A system dump is produce for this error.
 
              Report the problem to the z/OS Storage Administrator.
 ________________________________________________________________________________________________________________________
-0104(X'68')  Insert in backward mode. A znsq_write request was issued while processing the data in backward.  This is
+**0104(X'68')**  Insert in backward mode. A znsq_write request was issued while processing the data in backward.  This is
              likely an internal logic error.
 
              Report the problem to the z/OS Storage Administrator.
 ________________________________________________________________________________________________________________________
-0105(X'69')  New system instance after open. The system server's transactional instance has restarted after open.
+**0105(X'69')**  New system instance after open. The system server's transactional instance has restarted after open.
 
              Fully close and reopen the database on this system.
 ________________________________________________________________________________________________________________________
-0106(X'6A')  Read next or close result issued without prior position. A znsq_Next_result or znsq_close_result API was
+**0106(X'6A')**  Read next or close result issued without prior position. A znsq_Next_result or znsq_close_result API was
              issued without a proceeding znsq_position.
 
              Issue or reissue the znsq_position prior to issuing the znsq_next_result .
 ________________________________________________________________________________________________________________________
-0107(X'6B') - Reserved.
-0111(X'6F')
+**0107(X'6B')** - Reserved.
+**0111(X'6F')**
 ________________________________________________________________________________________________________________________
-0112(X'70')  The database is quiesced for backup.  A request to insert/update/erase a document occurred while the data
+**0112(X'70')**  The database is quiesced for backup.  A request to insert/update/erase a document occurred while the data
              set is temporarily quiesced for backup.
 
              Retry the request after the backup completes, define the database using a DCName for a Dataclas with the
              Backup While Open (BWO) option in the DATACLAS.
 ________________________________________________________________________________________________________________________
-0113(X'71')  The system's transactional server is disabling. An attempt to access a recoverable database
+**0113(X'71')**  The system's transactional server is disabling. An attempt to access a recoverable database
              (logOptions(UNDO/ALL) while the transaction server instance is disabling.
 
              Fully close and reopen the data set after the transaction server is available. The logOptions attribute is
              returned on the `znsq_report_stats` API.
 ________________________________________________________________________________________________________________________
-0114(X'72')  Invalid user environment. The user's program is executing in an invalid environment.  Either the program is
+**0114(X'72')**  Invalid user environment. The user's program is executing in an invalid environment.  Either the program is
              executing in cross memory mode, or issuing requests from a task that is not either the task that issued the
              open (via a read/write request), or a subtask of the task that did the open.
 
              Correct the environment the user program is establish an environment that meets the requirements.
 ________________________________________________________________________________________________________________________
-0115(X'73')  Document too large for logging.  The database was defined as a recoverable database (logOptions(UNDO/ALL))
+**0115(X'73')**  Document too large for logging.  The database was defined as a recoverable database (logOptions(UNDO/ALL))
              and a document larger than 62K (63488 bytes) was inserted/updated in the database.  Documents must be less
              than 62K when using recoverable databases.
 
              Limit the size of the documents to 62K when using recoverable data sets.  The logOptions attribute is
              returned on the `znsq_report_stats` API.
 ________________________________________________________________________________________________________________________
-0116(X'74')  Update or delete issue without prior read for update. A znsq_update_result or znsq_delete_result was issued
+**0116(X'74')**  Update or delete issue without prior read for update. A znsq_update_result or znsq_delete_result was issued
              without a prior znsq_read or znsq_next_result for Update.
 
              Issue or reissue the znsq_read or znsq_next_result with the update parameter prior to issuing the
              znsq_update_result or znsq_delete_result
 ________________________________________________________________________________________________________________________
-0117(X'75')  Index not active.  A request was made to access an inactive index which was inactivated by the
+**0117(X'75')**  Index not active.  A request was made to access an inactive index which was inactivated by the
              znsq_drop_index API.
 
              Reactivate the desired index with the znsq_add_index API. The active attribute is returned using the `znsq_report_stats` API.
 ________________________________________________________________________________________________________________________
-0118(X'76') - Reserved.
+**0118(X'76')** - Reserved.
 ________________________________________________________________________________________________________________________
-0119(X'77')  A system abend has occurred. The znsq APIs while reading/writing documentes encountered an error which
+**0119(X'77')**  A system abend has occurred. The znsq APIs while reading/writing documentes encountered an error which
              resulted in a system abend.  A dump is produced for the error.
 
              Report the problem to z/OS support.
 ________________________________________________________________________________________________________________________
-0120(X'78')  Locate of internal (BTREE) control blocks failed. The znsq APIs while accessing the database could not
+**0120(X'78')**  Locate of internal (BTREE) control blocks failed. The znsq APIs while accessing the database could not
              locate a BTREE control block anchored in the user's connect token.  This error could represent a system or
              user error if the connection token is overlaid or is invalid.
 
              Verify that a valid connection token was passed on the znsq API.  If valid the problem to z/OS support.
 ________________________________________________________________________________________________________________________
-0122(X'7A')  Internal ACB control block pool could not be freed. The a znsq API could not free the storage for an
+**0122(X'7A')**  Internal ACB control block pool could not be freed. The a znsq API could not free the storage for an
              internal (ACB) control block. This error would most likely be an interal system logic error.  A system dump
              is produced for this error.
 
              Report the problem to z/OS support.
 ________________________________________________________________________________________________________________________
-0123(X'7B')  Free of internal (BTREE) control block failed. The a znsq API could not free the storage for a node in
+**0123(X'7B')**  Free of internal (BTREE) control block failed. The a znsq API could not free the storage for a node in
              a system BTREE. This error would most likely be an interal system logic error.  A system dump is produced
              for this error.
 
              Report the problem to z/OS support.
 ________________________________________________________________________________________________________________________
-0124(X'7C') - Reserved.
-0126(X'7E')
+**0124(X'7C')** - Reserved.
+**0126(X'7E')**
 ________________________________________________________________________________________________________________________
-0144(X'90')  Internal system logic error. While reading/writing to the database, an internal system logic error was
+**0144(X'90')**  Internal system logic error. While reading/writing to the database, an internal system logic error was
              detected.  A dump may have been produced for this error.
 
              Report the issue to the z/OS Storage Administrator.
 ________________________________________________________________________________________________________________________
-0146(X'92')  I/O error flusing buffers.  While closing the database, an I/O error occurred while flusing in memory
+**0146(X'92')**  I/O error flusing buffers.  While closing the database, an I/O error occurred while flusing in memory
              buffers to disk.  A dump may have been produced for this error.
 
              Report the issue to the z/OS Storage Administrator.
 
 ______________________________________________________________________________________________________________________________________
-0150(X'96')  Secondary index not found. The znsq_add_index API encountered an error while dynamically allocating a secondary index.
+**0150(X'96')**  Secondary index not found. The znsq_add_index API encountered an error while dynamically allocating a secondary index.
 
              Ensure the secondary index has been previously created with the znsq_create_index or equivalent native API. Issue the
 	     `znsq_report_stats` API to list the available indexes.
 _____________________________________________________________________________________________________________________________________
-0151(X'97')  Primary index not found. The znsq_add_index API encountered an error while dynamically allocating the primary index.
+**0151(X'97')**  Primary index not found. The znsq_add_index API encountered an error while dynamically allocating the primary index.
 
              Ensure the secondary index has been previously created with the znsq_create_index or equivalent native API. Issue the
 	     `znsq_report_stats` API to list the available indexes.
 _________________________________________________________________________________________________________________________
-0154(X'9A') - Reserved.
-0159(X'9F')
+**0154(X'9A')** - Reserved.
+**0159(X'9F')**
 __________________________________________________________________________________________________________________________
-0256(X'100') Invalid keyname. The znsq_add_index API detected that an invalid keyname was provided to the API.  The
+**0256(X'100')** Invalid keyname. The znsq_add_index API detected that an invalid keyname was provided to the API.  The
              keyname did not start with an opening double quote.
 
              Correct the program to pass a valid keyname.
 __________________________________________________________________________________________________________________________
-0257(X'101') Invalid keyname. The znsq_add_index API detected that an invalid keyname was provided to the API.  The
+**0257(X'101')** Invalid keyname. The znsq_add_index API detected that an invalid keyname was provided to the API.  The
              keyname did not end with an opening double quote and/or did not match the keyname length provided to the API.
 
              Correct the program to pass a valid keyname and/or length.
 __________________________________________________________________________________________________________________________
-0261(X'105') Invalid keyname. An invalid alternate keyname was located in the catalog entry and exceeded 255 bytes
+**0261(X'105')** Invalid keyname. An invalid alternate keyname was located in the catalog entry and exceeded 255 bytes
              including quotes.
 
              Correct the program to use an alternate keyname <= 255 including quotes.
 __________________________________________________________________________________________________________________________
-0262(X'106') Invalid keyname. An invalid primary keyname was located in the catalog entry and exceeded 255 bytes including
+**0262(X'106')** Invalid keyname. An invalid primary keyname was located in the catalog entry and exceeded 255 bytes including
              quotes.
 
              Correct the program to use a primary keyname <= 255 including quotes.
 __________________________________________________________________________________________________________________________
-0263(X'107') Open failed for alternate index. While accessing the database, the open for a previously added alternate
+**0263(X'107')** Open failed for alternate index. While accessing the database, the open for a previously added alternate
              index could not obtain a necessary control block (ACB/Key Btree).  This error is likely related to a storage
              shortage in the program's memory.
 
              Attempt to reduce memory requirements in the program's memory.  If unsuccessful, report the issue to the z/OS
              Storage Administrator.
 ___________________________________________________________________________________________________________________________
-0264(X'108') Database not found. The znsq_open API could not locate the database.
+**0264(X'108')** Database not found. The znsq_open API could not locate the database.
 
              Ensure the database was created (znsq_create) prior to attempting to open the data st. If the database was
              created, report the issue to the z/OS Storage Administrator.
 ___________________________________________________________________________________________________________________________
-0265(X'109') Database not eligible. The znsq_open API could not locate the database information required for eligiblity for
+**0265(X'109')** Database not eligible. The znsq_open API could not locate the database information required for eligiblity for
              API access.  This error is most likely related to a previously created database which did not use the
              znsq_create API.
 
@@ -2053,27 +2053,27 @@ ________________________________________________________________________________
              znsq_API or create a database which is eligible for RLS access.  If the database was created validly and the
              error still occurs, report the issue to the z/OS Storage Administrator.
 ____________________________________________________________________________________________________________________________
-0266(X'10A') - Reserved.
-0271(X'10F')
+**0266(X'10A')** - Reserved.
+**0271(X'10F')**
 _____________________________________________________________________________________________________________________________
-0272(X'110') Invalid keyname when accessing an EzNoSQL database. The keyname passed as input does not match the database
+**0272(X'110')** Invalid keyname when accessing an EzNoSQL database. The keyname passed as input does not match the database
              keyname from the znsq_create or any other keynames provided on znsq_create_index APIs.
 
              Verify that a znsq_create or znsq_add_index was issued to add the keyname passed on the read/write API.
 _____________________________________________________________________________________________________________________________
-0275(X'113') Commit failed. The znsq_commit API detected a failure.  The znsq_commit API should only be used for databases
+**0275(X'113')** Commit failed. The znsq_commit API detected a failure.  The znsq_commit API should only be used for databases
              defined as a recoverable database (logOptions(UNDO/ALL).
 
              Verify the database was created using the logOptions(UNDO/ALL).  The znsq_report API can be used to verify this
              option.  If the database is defined correctly, contact the z/OS Storage Administrator.
 _____________________________________________________________________________________________________________________________
-0276(X'114') Abort failed. The znsq_abort API detected a failure.  The znsq_abort API should only be used for databases
+**0276(X'114')** Abort failed. The znsq_abort API detected a failure.  The znsq_abort API should only be used for databases
              defined as a recoverable database (logOptions(UNDO/ALL).
 
              Verify the data set was created using the logOptions(UNDO/ALL).  The `znsq_report_stats` API can be used to
              verify this option.  If the data set is defined correctly, contact the z/OS Storage Administrator.
 ______________________________________________________________________________________________________________________________
-0277(X'115') Database not found. The znsq_add_index or the znsq_drop Index could not locate the base database provided to the
+**0277(X'115')** Database not found. The znsq_add_index or the znsq_drop Index could not locate the base database provided to the
              API.
 
              Ensure a valid connection token for the correct data set name was provided to the znsq_add_index API and
@@ -2081,56 +2081,56 @@ ________________________________________________________________________________
              token.
              If the name is correct, contact the z/OS Storage Administrator.
 ______________________________________________________________________________________________________________________________
-0279(X'117') Alternate index information not found. The `znsq_report_stats` API could not locate the alternate key information
+**0279(X'117')** Alternate index information not found. The `znsq_report_stats` API could not locate the alternate key information
              or one of the alternate index previously created with the znsq_add_index.
 
              Ensure a valid connection token for the correct data set name was provided to the `znsq_report_stats` API. If the
              name is correct, contact the z/OS Storage Administrator.
 _______________________________________________________________________________________________________________________________
 
-0280(X'118') Data set information not found. The `znsq_report_report` API could not locate information for the base or one of
+**0280(X'118')** Data set information not found. The `znsq_report_report` API could not locate information for the base or one of
              the alternate index previously created with the znsq_add_index.
 
              Ensure a valid connection token for the correct data set name was provided to the `znsq_report_stats` API. If the
              name is
 _______________________________________________________________________________________________________________________________
-0281(X'119') Report buffer too small.  The size of the report buffer is too small to hold the complete `znsq_report_stats`
+**0281(X'119')** Report buffer too small.  The size of the report buffer is too small to hold the complete `znsq_report_stats`
              information. The required length is returned in the report length parameter on the `znsq_report_stats` API.
 
              Obtain the required buffer size and reissue the znq_report API.
 _______________________________________________________________________________________________________________________________
-0282(X'11A') - Reserved.
-0287(X'11F')
+**0282(X'11A')** - Reserved.
+**0287(X'11F')**
 _______________________________________________________________________________________________________________________________
-0288(X'120') A null connection token. The znsq_close API detected a null connection token.
+**0288(X'120')** A null connection token. The znsq_close API detected a null connection token.
 
              Ensure a connection token was passed to the znsq_close API.
 ________________________________________________________________________________________________________________________________
-0289(X'121') An invalid connection token. The znsq_close API detected an invalid connection token.
+**0289(X'121')** An invalid connection token. The znsq_close API detected an invalid connection token.
 
              Ensure a valid connection token was passed to the znsq_close API.
 ________________________________________________________________________________________________________________________________
-0291(X'123') Document too large for logging.  The database was defined as a recoverable database (logOptions(UNDO/ALL)) and a
+**0291(X'123')** Document too large for logging.  The database was defined as a recoverable database (logOptions(UNDO/ALL)) and a
              document larger than 62K (63488 bytes) was inserted/updated in the database.  Documents must be less than 62K when
              using recoverable databases.
 
              Limit the size of the documents to 62K when using recoverable data sets.  The logOptions attribute is returned
              on the `znsq_report_stats` API.
 ________________________________________________________________________________________________________________________________
-0296(X'128')  CF cache set is not found. While accessing a EzNoSQL database, the Coupling Facility (CF) cache set was not found
+**0296(X'128')**  CF cache set is not found. While accessing a EzNoSQL database, the Coupling Facility (CF) cache set was not found
              in the database's storage class during the open of the database.
 
              Contact the z/OS Storage Administrator and provide additional documentation via the
 	     znsq_last_result report.
 ________________________________________________________________________________________________________________________________
-0299(X'12B') Access to ICSF keylabel failed.  The open for an EzNoSQL failed because the user does not have access to the ICSF
+**0299(X'12B')** Access to ICSF keylabel failed.  The open for an EzNoSQL failed because the user does not have access to the ICSF
              encryption keylabel.
 
              Contact your z/OS Security Administrator to gain access to the keylabel, or provide the correct keylabel in the
 	     database's SMS DATACLAS.
 ________________________________________________________________________________________________________________________________
-0297(X'1298') -
-4095(X'FFF') Reserved.
+**0297(X'1298')** -
+**4095(X'FFF')** Reserved.
 ________________________________________________________________________________________________________________________________
 
 ## Return Code 12
@@ -2138,128 +2138,128 @@ ________________________________________________________________________________
 Return Code 12(X'0C')
 Reason Code Meaning
 ________________________________________________________________________________________________________________________________
-0002(X'02')  Duplicate database name. The database name passed on the API was already defined.  This error likely occurs if two
+**0002(X'02')**  Duplicate database name. The database name passed on the API was already defined.  This error likely occurs if two
              znsq_create API calls are made with out a znsq_destroy in between.
 
              Verify if the database should have been destroyed prior to this create and issue the znsq_destroy API for the data
              set.
 ________________________________________________________________________________________________________________________________
-0003(X'03')  Invalid database name. The database name passed on the API has either invalid characters, qualifiers, or exceeds 44
+**0003(X'03')** Invalid database name. The database name passed on the API has either invalid characters, qualifiers, or exceeds 44
              characters.
 
              Correct the database name to meet z/OS restrictions.  Refer the Data Set names section in the z/OS: z/OS DFSMS Using
              Data Sets book for a description of valid data set names.
 _________________________________________________________________________________________________________________________________
-0004(X'04')  No candidate space or volumes available for the creation of the database. The system does not have enough candidate
+**0004(X'04')**  No candidate space or volumes available for the creation of the database. The system does not have enough candidate
              volumes available for the znsq_create API. If a guaranteed space STORCLAS was either assigned explicitly on the API,
              or via the z/OS storage management policy, then the storage group must have 59 volumes.
 
              Use a storage class which contains 59 candidate voluems, or assign the database to a non guaranteed storage class.
 ________________________________________________________________________________________________________________________________
-0005(X'05')  No guaranteed storage space for the creation of the database. The system does not have enough guaranteed storage
+**0005(X'05')**  No guaranteed storage space for the creation of the database. The system does not have enough guaranteed storage
              space for the database's maximum space requirement on the znsq_create API.
 
              Either reduce the maximum space amount, or request more space from the z/OS system administrator.
 ________________________________________________________________________________________________________________________________
-0006(X'06')  No storage space available for the creation of the database. The system does not have enough storage space for the
+**0006(X'06')**  No storage space available for the creation of the database. The system does not have enough storage space for the
              database's maximum space requirement on the znsq_create API.
 
              Either reduce the maximum space amount, or request more space from the z/OS system administrator.
 ________________________________________________________________________________________________________________________________
-0007(X'07')  Parameter out of range. A parameter passed to  z/OS Access Method Services  on either the znsq_create,
+**0007(X'07')**  Parameter out of range. A parameter passed to  z/OS Access Method Services  on either the znsq_create,
              znsq_add_index, znsq_drop_index, or znsq_destroy API is out of range.
 
              Verify the parameters on the above API.  Contact z/OS support for additional diagnostic help.
 _________________________________________________________________________________________________________________________________
-0008(X'08')  No log stream provided. A database paramters on the znsq_create API indicate that LOG_OPTIONS(ALL) is required, but
+**0008(X'08')**  No log stream provided. A database paramters on the znsq_create API indicate that LOG_OPTIONS(ALL) is required, but
              failed to provide the required LOGSTRNAME name for the forward recovery log stream.
 
              Provide the LOGSTRNAME parameter, or define the database as LOG_OPTIONS(NONE) or LOG_OPTIONS(UNDO) if foward
              recovery logging is not required.
 _________________________________________________________________________________________________________________________________
-0016(X'10')  Security check failed.  The user does not have the required authority to create or access the database.
+**0016(X'10')**  Security check failed.  The user does not have the required authority to create or access the database.
 
              Obtain the required security prior to creating or accessing the database.
 __________________________________________________________________________________________________________________________________
-0017(X'11')  Encryption violation.  The znsq_create API has detected that the database requires encryption support however the
+**0017(X'11')**  Encryption violation.  The znsq_create API has detected that the database requires encryption support however the
              data is using a non-extended format DATACLAS database. Database level key labels are only supported for extended
              format databases.
 
              If encryption support is required, provide an extended format DATACLAS on the create API. Contact the z/OS storage
              administrator for the desired DATACLAS.
 __________________________________________________________________________________________________________________________________
-0026(X'1A')  OPEN failed while building the index.  The znsq_add_index API could not open the base or alternate index while
+**0026(X'1A')**  OPEN failed while building the index.  The znsq_add_index API could not open the base or alternate index while
              attempting to build the index.
 
              Check for valid database names. Refer to the last result report for more specific details regarding the failure.
 __________________________________________________________________________________________________________________________________
-0058(X'3A')  No storage space available for the creation of the database. The system does not have enough storage space for the
+**0058(X'3A')**  No storage space available for the creation of the database. The system does not have enough storage space for the
              database's maximum space requirement on the znsq_create or znsq_create_index APIs.
 
              Either reduce the maximum space amount, or request more space from the z/OS system administrator.
 __________________________________________________________________________________________________________________________________
-0128(X'80')  Internal control block (RPL) pool could not be obtained. The znsq APIs could not obtain storage for an internal (RPL)
+**0128(X'80')**  Internal control block (RPL) pool could not be obtained. The znsq APIs could not obtain storage for an internal (RPL)
              control block. This error would most likely be related to a memory shortage.
              A system dump is produced for this error.
 
              Possibly close databases to free up menory.  Report the problem to z/OS support if the memory shortage is unexpected.
 ___________________________________________________________________________________________________________________________________
-0129(X'81')  Internal RPL control block pool could not be freed. The znsq APIs could not free the  storage for an internal (RPL)
+**0129(X'81')**  Internal RPL control block pool could not be freed. The znsq APIs could not free the  storage for an internal (RPL)
              control block. This error would most likely be a interal system logic error.  A system dump is produced for this
              error.
 
              Report the problem to z/OS support.
 ___________________________________________________________________________________________________________________________________
-0130(X'82')  Physical I/O failed. While reading the data component of the database, the physical I/O failed the read for data
+**0130(X'82')**  Physical I/O failed. While reading the data component of the database, the physical I/O failed the read for data
              component control interval containing the document.  A system dump is produce for this error.
 
              Report the problem to the z/OS Storage Administrator.
 ___________________________________________________________________________________________________________________________________
-0131(X'83')  Physical I/O failed. While reading the index component of the database, the physical I/O failed the read the index
+**0131(X'83')**  Physical I/O failed. While reading the index component of the database, the physical I/O failed the read the index
              component control interval containing the key for the document.  A system dump is produce for this error.
 
              Report the problem to the z/OS Storage Administrator.
 __________________________________________________________________________________________________________________________________
-0132(X'84')  Physical I/O failed. While reading the index component of the database, the physical I/O failed the read the index
+**0132(X'84')**  Physical I/O failed. While reading the index component of the database, the physical I/O failed the read the index
              component's sequence set control intervals.  A system dump is produce for this error.
 
              Report the problem to the z/OS Storage Administrator.
 __________________________________________________________________________________________________________________________________
-0133(X'85')  Physical I/O failed. While writing to the data component of the database, the physical I/O failed the write for data
+**0133(X'85')**  Physical I/O failed. While writing to the data component of the database, the physical I/O failed the write for data
              component control interval containing the document.  A system dump is produce for this error.
 
              Report the problem to the z/OS Storage Administrator.
 __________________________________________________________________________________________________________________________________
-0134(X'86')  Physical I/O failed. While writing to the index component of the database, the physical I/O failed the write for the
+**0134(X'86')**  Physical I/O failed. While writing to the index component of the database, the physical I/O failed the write for the
              index component control interval containing the key for the document.  A system dump is produce for this error.
 
              Report the problem to the z/OS Storage Administrator.
 __________________________________________________________________________________________________________________________________
-0135(X'87')  Physical I/O failed. While writing to the index component of the database, the physical I/O failed the write to the
+**0135(X'87')**  Physical I/O failed. While writing to the index component of the database, the physical I/O failed the write to the
              index component's sequence set control intervals.  A system dump is produce for this error.
 
              Report the problem to the z/OS Storage Administrator.
 __________________________________________________________________________________________________________________________________
-0136(X'88')  Cache unavailable.  The system's znsq server (SMSVSAM) cannot access the global cache structure for this database.
+**0136(X'88')**  Cache unavailable.  The system's znsq server (SMSVSAM) cannot access the global cache structure for this database.
              This error is likely a system configuration issue.
 
              Report the issue to the z/OS Storage Administrator.
 __________________________________________________________________________________________________________________________________
-0137(X'89')  Cache failure.  The global cache structure for this database failed.  This may be a temporary eror.
+**0137(X'89')**  Cache failure.  The global cache structure for this database failed.  This may be a temporary eror.
 
              The program can try redriving the request. Report the issue to the z/OS Storage Administrator.
 __________________________________________________________________________________________________________________________________________
-0282(X'11A') Create, add or drop function terminated. An error occurred while creating a database, secondary index, or enabling/disabling
+**0282(X'11A')** Create, add or drop function terminated. An error occurred while creating a database, secondary index, or enabling/disabling
              the index.
 
              Contact the z/OS Storage and provide the output from the znsq_last_result error.	
 __________________________________________________________________________________________________________________________________________
-0282(X'11B') Create, add or drop function terminated due to z/OS catalog error. An error occurred while creating a database, secondary 
+**0282(X'11B')** Create, add or drop function terminated due to z/OS catalog error. An error occurred while creating a database, secondary 
              index, or enabling/disabling the index.
 
              Contact the z/OS Storage and provide the output from the znsq_last_result error.			     
 __________________________________________________________________________________________________________________________________________
-0295(X'127') Storage or data class not found.  The znsq_create API could not find a valid storage or data class name, either from the user 
+**0295(X'127')** Storage or data class not found.  The znsq_create API could not find a valid storage or data class name, either from the user 
              paramters on the znsq_create API or implicitly assigned by the server.  A valid storage or optional data class name must be
 	     available to the creation of the database.
 
@@ -2267,7 +2267,7 @@ ________________________________________________________________________________
 	     Administrator to configure the system's storage management policy to assign a Record Level Sharing (RLS) storage class and 
 	     optional data class for the database.  If necessary, provide the output from the znsq_last_result error.	     
 __________________________________________________________________________________________________________________________________
-0297(X'129')  Inconsistent parameters.  The znsq_create or znsq_create_index failed with inconsistent parameters.  This error is
+**0297(X'129')**  Inconsistent parameters.  The znsq_create or znsq_create_index failed with inconsistent parameters.  This error is
               likely due to creating a database larger than 4 gigabytes and not specifing a SMS DATCLAS containing the Extended
 	      Format and Extended Addressability options.
 
@@ -2275,7 +2275,7 @@ ________________________________________________________________________________
 	      Extended Format and Extended Addressability options.  If this is not the reason for the inconsistent parameter error,
 	      contact the z/OS Storage Aministrator and provide the output from the znsq_last_result error.
 __________________________________________________________________________________________________________________________________
-0298(X'12A')  Catalog unavailable.  The z/OS ICF catalog, associated with the high level qualifier representing the EzNoSQL
+**0298(X'12A')**  Catalog unavailable.  The z/OS ICF catalog, associated with the high level qualifier representing the EzNoSQL
               database name is not available.
 
               Report the error to the z/OS Storage Aministrator and provide the output from the znsq_last_result error.
@@ -2308,186 +2308,186 @@ ________________________________________________________________________________
 Return Code 36(X'24')
 Reason Code Meaning
 __________________________________________________________________________________________________________________________________
-0022(X'16')  Dynamic Allocation of the database failed.  The znsq_open and znsq_add_index could not allocate the database or
+**0022(X'16')**  Dynamic Allocation of the database failed.  The znsq_open and znsq_add_index could not allocate the database or
              alternate index to the user's program.
 
              Ensure the database or index was successfully created prior to issue the open or add index.
 ___________________________________________________________________________________________________________________________________
-0023(X'17')  Open connection_token could not be obtained.  The znsq_open API could not obtain storage for a connention token.  This
+**0023(X'17')**  Open connection_token could not be obtained.  The znsq_open API could not obtain storage for a connention token.  This
              error would most likely be related to a memory shortage.
 
              Possibly close databases to free up menory.  Report the problem to z/OS support if the memory
              shortage is unexpected.
 ____________________________________________________________________________________________________________________________________
-0024(X'18')  Internal control block could not be obtained. The znsq_open API could not obtain storage for an internal control block.
+**0024(X'18')**  Internal control block could not be obtained. The znsq_open API could not obtain storage for an internal control block.
              This error would most likely be related to a memory shortage.
 
              Possibly close databases to free up menory.  Report the problem to z/OS support if the memory
              shortage is unexpected.
 ____________________________________________________________________________________________________________________________________
-0025(X'19')  Internal control block could not be obtained. The znsq_open API could not obtain storage for an internal control block.
+**0025(X'19')**  Internal control block could not be obtained. The znsq_open API could not obtain storage for an internal control block.
              This error would most likely be related to a memory shortage.
 
              Possibly close databases to free up menory.  Report the problem to z/OS support if the memory
              shortage is unexpected.
 _____________________________________________________________________________________________________________________________________
-0032(X'20')  Internal control block could not be obtained. The znsq_open or znsq_add_index APIs could not obtain storage for an ACB
+**0032(X'20')**  Internal control block could not be obtained. The znsq_open or znsq_add_index APIs could not obtain storage for an ACB
              control block. This error would most likely be related to a memory shortage.
 
              Possibly close database to free up menory.  Report the problem to z/OS support if the memory
              shortage is unexpected.
 _____________________________________________________________________________________________________________________________________
-0033(X'21')  Internal control block could not be obtained. The znsq_open or znsq_add_index APIs could not obtain storage for an
+**0033(X'21')**  Internal control block could not be obtained. The znsq_open or znsq_add_index APIs could not obtain storage for an
              ACB/Key control block. This error would most likely be related to a memory Shortage.
 
              Possibly close databases to free up menory.  Report the problem to z/OS support if the memory shortage is unexpected.
 _____________________________________________________________________________________________________________________________________
-0034(X'22')  Internal control block could not be obtained. The znsq_open API could not obtain storage for an internal control block.
+**0034(X'22')**  Internal control block could not be obtained. The znsq_open API could not obtain storage for an internal control block.
              This error would most likely be related to a memory shortage.
 
              Possibly close databases to free up menory.  Report the problem to z/OS support if the memory shortage is unexpected.
 _____________________________________________________________________________________________________________________________________
-0035(X'23')  Internal control block could not be obtained. The znsq APIs could not obtain storage for an internal control block. This
+**0035(X'23')**  Internal control block could not be obtained. The znsq APIs could not obtain storage for an internal control block. This
              error would most likely be related to a memory shortage.
 
              Possibly close databases to free up menory.  Report the problem to z/OS support if the memory shortage is unexpected.
 _____________________________________________________________________________________________________________________________________
-0036(X'24')  Internal error locating a database or its attributes.  An internal error attempting to locate the database or its
+**0036(X'24')**  Internal error locating a database or its attributes.  An internal error attempting to locate the database or its
              attributes failed.
 
              Report the problem to z/OS support.
 _____________________________________________________________________________________________________________________________________
-0037(X'25')  Internal control block could not be obtained. The znsq APIs could not obtain storage for an internal ACB or RPL control
+**0037(X'25')**  Internal control block could not be obtained. The znsq APIs could not obtain storage for an internal ACB or RPL control
              block. This error would most likely be related to a memory shortage.
 
              Possibly close databases to free up menory.  Report the problem to z/OS support if the memory shortage is unexpected.
 _____________________________________________________________________________________________________________________________________
-0038(X'26')  Internal control block pool could not be obtained. The znsq APIs could not obtain storage for a set of internal control
+**0038(X'26')**  Internal control block pool could not be obtained. The znsq APIs could not obtain storage for a set of internal control
              blocks. This error would most likely be related to a memory shortage.
 
              Possibly close databases to free up menory.  Report the problem to z/OS support if the memory shortage is unexpected.
 _____________________________________________________________________________________________________________________________________
-0039(X'27')  Internal control block pool could not be obtained. The znsq APIs could not obtain storage for a set of internal control
+**0039(X'27')**  Internal control block pool could not be obtained. The znsq APIs could not obtain storage for a set of internal control
              blocks. This error would most likely be related to a memory shortage.
 
              Possibly close databases to free up menory.  Report the problem to z/OS support if the memory shortage is unexpected.
 ____________________________________________________________________________________________________________________________________
-0040(X'28')  An internal logic error occurred. The znsq APIs encountered an internal logic error with IBM code.
+**0040(X'28')**  An internal logic error occurred. The znsq APIs encountered an internal logic error with IBM code.
 
              The internal logic likely produced a system dump. Report the problem to z/OS support.
 ____________________________________________________________________________________________________________________________________
-0049(X'31')  An internal logic error occurred. The znsq APIs encountered an internal logic error while freeing storage.
+**0049(X'31')**  An internal logic error occurred. The znsq APIs encountered an internal logic error while freeing storage.
 
              The internal logic likely produced a system dump. Report the problem to z/OS support.
 ____________________________________________________________________________________________________________________________________
-0050(X'32')  An internal logic error occurred. The znsq APIs encountered an internal logic error while dynamically allocating small
+**0050(X'32')**  An internal logic error occurred. The znsq APIs encountered an internal logic error while dynamically allocating small
              internal temporary work files (2 tracks).
 
              Verify adequate disk space (volumes mounted STRG) is available to the program for allocating the temporary files.  If
              this does not resolve the problem, contact z/OS support.
 ____________________________________________________________________________________________________________________________________
-0145(X'91')  Open failed for a secondary index.  While reading/writing to the database, an open failed for a previously added
+**0145(X'91')**  Open failed for a secondary index.  While reading/writing to the database, an open failed for a previously added
              secondary index.
 
              Report the issue to the z/OS Storage Administrator.
 _____________________________________________________________________________________________________________________________________
-0147(X'93')  An internal logic error occurred. The znsq_add_index API encountered an internal logic error while dynamically
+**0147(X'93')**  An internal logic error occurred. The znsq_add_index API encountered an internal logic error while dynamically
              allocating small internal temporary work files (2 tracks).
 
              Verify adequate disk space (volumes mounted STRG) is available to the program for allocating
              the temporary files.  Report the issue to the z/OS Storage Administrator.
 _____________________________________________________________________________________________________________________________________
-0148(X'94')  An internal logic error occurred. The znsq_add_index API encountered an internal logic error while dynamically
+**0148(X'94')**  An internal logic error occurred. The znsq_add_index API encountered an internal logic error while dynamically
              allocating small internal temporary work files (2 tracks).
 
              Verify adequate disk space (volumes mounted STRG) is available to the program for allocating the temporary files.  Report
              the issue to the z/OS Storage Administrator.
 _____________________________________________________________________________________________________________________________________
-0149(X'95')  An internal logic error occurred. The znsq_add_index API encountered an internal logic error while dynamically
+**0149(X'95')**  An internal logic error occurred. The znsq_add_index API encountered an internal logic error while dynamically
              allocating small internal temporary work files (2 tracks).
 
              Verify adequate disk space (volumes mounted STRG) is available to the program for allocating the temporary files.  Report
              the issue to the z/OS Storage Administrator.
 _______________________________________________________________________________________________________________________________________
-0152(X'98')  MEmory shortage occurred. The znsq_add_index API encountered an error obtaining 24 bit storage for a
+**0152(X'98')**  MEmory shortage occurred. The znsq_add_index API encountered an error obtaining 24 bit storage for a
              DCB control block.  This error is likely due to a memory shortage below the 31 bit line.
 
              Reduce memory requirements for 24 bit storage.  Report the issue to the z/OS Storage Administrator.
 _______________________________________________________________________________________________________________________________________
-0153(X'99')  An internal logic error occurred. The znsq_add_index API encountered an error freeing 24 bit storage for a DCB control
+**0153(X'99')**  An internal logic error occurred. The znsq_add_index API encountered an error freeing 24 bit storage for a DCB control
              block.
 
              Report the issue to the z/OS Storage Administrator.
 _______________________________________________________________________________________________________________________________________
-0258(X'102') An internal logic error occurred. The znsq_add_index API encountered an internal logic error while dynamically
+**0258(X'102')** An internal logic error occurred. The znsq_add_index API encountered an internal logic error while dynamically
              unallocating internal temporary work files.
 
              Report the issue to the z/OS Storage Administrator.
 _______________________________________________________________________________________________________________________________________
-0259(X'103') An internal logic error occurred. The znsq_add_index API encountered an internal logic error while dynamically
+**0259(X'103')** An internal logic error occurred. The znsq_add_index API encountered an internal logic error while dynamically
              unallocating internal temporary work files.
 
              Report the issue to the z/OS Storage Administrator.
 ________________________________________________________________________________________________________________________________________
-0260(X'104') An internal logic error occurred. The znsq_add_index API encountered an internal logic error while dynamically unallocating
+**0260(X'104')** An internal logic error occurred. The znsq_add_index API encountered an internal logic error while dynamically unallocating
              internal temporary work files.
 
              Report the issue to the z/OS Storage Administrator.
 ________________________________________________________________________________________________________________________________________
-0273(X'111') The JSON key value was not found. While accessing the database using the znsq_write with the write_force option, the APi
+**0273(X'111')** The JSON key value was not found. While accessing the database using the znsq_write with the write_force option, the APi
              could not locate the key value in the document.  This maybe the result of an interal parsing error.
 
              If the index was added contact the z/OS Storage Administrator.
 _________________________________________________________________________________________________________________________________________
-0274(X'112') The JSON key value was not found. While accessing the database using the znsq_write with the write_force option, The APi
+**0274(X'112')** The JSON key value was not found. While accessing the database using the znsq_write with the write_force option, The APi
              could not locate the key value in the document.  This maybe the result of an interal parsing error.
 
              If the index was added contact the z/OS Storage Administrator.
 _________________________________________________________________________________________________________________________________________
-0277(X'115') Database not found. The znsq_add_index or the znsq_drop Index could not locate the base database provided to the API.
+**0277(X'115')** Database not found. The znsq_add_index or the znsq_drop Index could not locate the base database provided to the API.
 
              Ensure a valid connection token for the correct data set name was provided to the znsq_add_index API and znsq_drop_api.  The
              `znsq_report_stats` API can be used to verify the correct base name for this connection token.  If the name is correct, contact the
              z/OS Storage Administrator.
 _________________________________________________________________________________________________________________________________________
-0278(X'116') Data set not found. The `znsq_report_stats` API could not locate the base data set provided to the API.
+**0278(X'116')** Data set not found. The `znsq_report_stats` API could not locate the base data set provided to the API.
 
              Ensure a valid connection token for the correct data set name was provided to the `znsq_report_stats` API. If the name is correct,
              contact the z/OS Storage Administrator.
 __________________________________________________________________________________________________________________________________________
-0279(X'117') Alternate index information not found. The `znsq_report_stats` API could not locate the alternate key information for one of the
+**0279(X'117')** Alternate index information not found. The `znsq_report_stats` API could not locate the alternate key information for one of the
              alternate index previously created with the znsq_add_index.
 
              Ensure a valid connection token for the correct data set name was provided to the `znsq_report_stats` API. If the name is correct,
              contact the z/OS Storage Administrator.
 __________________________________________________________________________________________________________________________________________
-0280(X'118') Data set information not found. The `znsq_report_stats` API could not locate information for the base or one of the alternate index
+**0280(X'118')** Data set information not found. The `znsq_report_stats` API could not locate information for the base or one of the alternate index
              previously created with the znsq_add_index.
 
              Ensure a valid connection token for the correct data set name was provided to the `znsq_report_stats` API.
 __________________________________________________________________________________________________________________________________________
-0290(X'122') Database in use. The znsq_destroy API detected the database is still open/allocated.
+**0290(X'122')** Database in use. The znsq_destroy API detected the database is still open/allocated.
 
              Ensure the connection for this database is closed using the znsq_close API before attempting to destory the database.
 _________________________________________________________________________________________________________________________________________
-0292(X'124') UTF8 conversion failed. The `znsq_report_stats` API encountered an error converting data set information (such as the data set name)
+**0292(X'124')** UTF8 conversion failed. The `znsq_report_stats` API encountered an error converting data set information (such as the data set name)
              to UTF8.  This is likely due to an invalid connenction token or an internal error.
 
              Verify a valid connection token was passed to the `znsq_report_stats` API.  If valid, contact the z/OS Storage Administrator.
 __________________________________________________________________________________________________________________________________________
-0293(X'125') Data set information not found. The `znsq_report_stats` API could not locate information for the base or one of the alternate index
+**0293(X'125')** Data set information not found. The `znsq_report_stats` API could not locate information for the base or one of the alternate index
              previously created with the znsq_add_index.
 
              Ensure a valid connection token for the correct data set name was provided to the `znsq_report_stats` API. If the name is correct,
              contact the z/OS Storage Administrator.
 __________________________________________________________________________________________________________________________________________
-0294(X'126') Data set information not found. The `znsq_report_stats` API could not locate information for the base or one of the alternate index
+**0294(X'126')** Data set information not found. The `znsq_report_stats` API could not locate information for the base or one of the alternate index
              previously created with the znsq_add_index.
 
              Ensure a valid connection token for the correct data set name was provided to the `znsq_report_stats` API. If the name is
              correct, contact the z/OS Storage Administrator.
 ________________________________________________________________________________________________________________________________________
-32767(x'7FFF') Unknown error.  An unknown error resulted in the termination of the API request.  Likely an abend occurred during the
+**32767(x'7FFF')** Unknown error.  An unknown error resulted in the termination of the API request.  Likely an abend occurred during the
                the request.
 
               Report the problem to the Storage Administrator along with any last result API diagnostic information.
