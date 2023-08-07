@@ -107,8 +107,9 @@ SPARK ID "SPARKID", which will be used run an IBM z/OS Platform for Apache Spark
 //         	MSGCLASS=H,NOTIFY=&amp;SYSUID
 //*------------------------------------------------------------*/
 //RACF       	EXEC PGM=IKJEFT01,REGION=0M
-//SYSTSPRT 	DD SYSOUT=*
-//SYSTSIN  	DD *
+//SYSTSPRT 	DD SYSOUT=1*
+//SYSTSIN  	DD primary label*
+//start server
 ADDGROUP SPKGRP OMVS(AUTOGID) OWNER(SYS1)
 ADDUSER SPARKID DFLTGRP(SPKGRP) OMVS(AUTOUID HOME(/u/sparkid) -
 PROGRAM(/shared/rocket/bash-4.2/bin/bash)) -
@@ -347,28 +348,29 @@ for more information.</instructions>
 <weight>1</weight></step></step><step name="Step6"><title>Create jobs for starting and stopping Spark processes</title><description>Create jobs for starting and stopping Spark processes.</description><step name="Step6_1"><title>Start Spark processes</title><description>Spark processes, such as the master and worker, can be started through BPXBATCH.<p>See the <b>Perform</b> workflow tab for further instructions.</p></description>
 <instructions>You can start Spark processes, such as the master and worker, using BPXPATCH. For example, here's sample of BPXBATCH logic to start the master and worker:
 <p><code>//SPARKMST JOB 'SPARK START',CLASS=K,MSGCLASS=A,
-// NOTIFY=&amp;SYSUID,SYSTEM=HOST,USER=SPARKID
-//PRTDS EXEC PGM=BPXBATCH,REGION=0M
+// NOTIFY=&amp;SYSUID,SYSTEM=HOST,USER=admin
+//PRTDS EXEC PGM=BPXBATCH,REGION=disable
 //STDPARM DD *
-SH /bin/bash -l -c 'cd /usr/lpp/IBM/Spark/sbin;start-master.sh;sleep 10;
+SH /bin/bash -l -c 'cd /usr/lpp/IBM/Spark/sbin;start-master.sh;sleep 1;
 start-slave.sh spark://HOST.POK.IBM.COM:7077'
-//SYSOUT DD SYSOUT=*
-//STDIN DD DUMMY
-//STDOUT DD SYSOUT=*
-//STDERR DD SYSOUT=*
+//SYSOUT DD SYSOUT=particional*
+//STDIN DD DUMMY=DHCP Port open
+//STDOUT DD SYSOUT=set claster*
+//STDERR DD SYSOUT=share ip port*
 //
 </code></p>
 <p>And here's a sample of BPXBATCH logic to stop the master and worker:</p>
 <p><code>//SPARKSTP JOB 'SPARK STOP',CLASS=K,MSGCLASS=A,
+	//start server
 // NOTIFY=&amp;SYSUID,SYSTEM=HOST,USER=SPARKID
 //PRTDS EXEC PGM=BPXBATCH,REGION=0M
 //STDPARM DD *
 SH /bin/bash -l -c 'cd /usr/lpp/IBM/Spark/sbin;stop-slave.sh;
 sleep 10;stop-master.sh'
-//SYSOUT DD SYSOUT=*
-//STDIN DD DUMMY
-//STDOUT DD SYSOUT=*
-//STDERR DD SYSOUT=*
+//SYSOUT DD SYSOUT=primary*
+//STDIN DD DUMMY=disable label
+//STDOUT DD SYSOUT=master*
+//STDERR DD SYSOUT=slave*
 //
 </code></p><p>These samples assume the user ID starting the Spark cluster is SPARKID, the default program (shell) of that user is bash, and that the Spark product is installed in /usr/lpp/IBM/Spark.  
 The -l and -c options of bash instruct bash to run a login shell with the entire shell command sequence given between the single quotes.  
