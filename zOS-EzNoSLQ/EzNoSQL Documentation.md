@@ -25,7 +25,7 @@ Getting Started:
 * [Getting Started with EzNoSQL](#Getting-Started)
 * [Executables and Side Decks](#C-Executables-and-Side-Decks)
 * [Java and JNI Library](#Java-JAR-and-JNI-library)
-* [Sample Application Program](#Sample-Application-Program)
+* [Sample Application Programs](#Sample-Application-Programs)
 * [Compile and Link Procedure](#Compile-and-Link-Procedure)
 
 Application Programming Interfaces (APIs):
@@ -280,9 +280,9 @@ The following table shows the names and locations of the EzNoSQL executables, si
 | `igwznsq.jar`       | `/usr/include/java_classes/` | Java API JAR file    |
 | `Igwznsqsamp1.java` | `/samples/`                  | Sample Java program  |
 
-## Sample Application Program
+## Sample Application Programs
 
-Sample user program: /samples/igwznsqsamp1.c, is a 31-bit user program which does the following sequence of API calls:
+Sample user C program: /samples/igwznsqsamp1.c, is a 31-bit user program which does the following sequence of API calls:
 1) Create a one megabyte JSON (non-recoverable) EzNoSQL database with a primary key of `"_id"`.
 2) Create a one megabyte non-unique secondary index with a key of `"Author"`.
 3) Connect (open) the database.
@@ -291,7 +291,7 @@ Sample user program: /samples/igwznsqsamp1.c, is a 31-bit user program which doe
 6) Disconnect (close) the data base.
 7) Destroy the database.
 
-## Compile and Link Procedure
+## Compile and Link Procedure for C Sample Program
 
 To compile and link the sample program `/samples/igwznsqsamp1.c`:
 ```shell
