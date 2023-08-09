@@ -258,7 +258,7 @@ Optionally, loading data into the CF cache may be bypassed and reduces overhead 
 
 # Getting Started
 
-The EzNoSQL C APIs can be called from application user programs running in either 31-bit or 64-bit mode. The Java APIs are 64-bit mode only. The user programs can link to the required executables and side decks directly from z/OS USS directories. This section explains the required files along with their location and descriptions. Additionally, a sample user program containing compile and link instructions is provided to help test the system configuration and to gain familiarity with a subset of the available APIs. The full suite of available APIs are detailed in the following sections.
+The EzNoSQL C APIs can be called from application user programs running in either 31-bit or 64-bit mode. The Java APIs are 64-bit mode only running on the minimum supported version of Java 8. The user programs can link to the required executables and side decks directly from z/OS USS directories. This section explains the required files along with their location and descriptions. Additionally, a sample user program containing compile and link instructions is provided to help test the system configuration and to gain familiarity with a subset of the available APIs. The full suite of available APIs are detailed in the following sections.
 
 ## C Executables and Side Decks
 
