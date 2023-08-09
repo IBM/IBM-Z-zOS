@@ -100,7 +100,8 @@ EzNoSQL is a document-oriented data store which accepts UTF-8 JSON documents (an
 
 An EzNoSQL database can be defined with a user supplied primary key, where the chosen key must be contained in each the document and paired with a unique value.
 
-The primary key name must be less than 256 characters; however, the value size is unrestricted. In the above example, the `"Customer_id"` key name may be a good choice for a unique primary key. In this case, `"4084"` becomes the primary key value used to retrieve the document. The primary key value cannot be part of an array; however, it can be an embedded document less than sixteen megabytes in size.
+The primary key name must be less than 256 characters; however, the key value size is unrestricted. In the above example, the `"Customer_id"` key name may be a good choice for a unique primary key. In this case, `"4084"` becomes the primary key value used to retrieve the document. The primary key value cannot be part of an array; however, it can be an embedded document less than sixteen megabytes in size.  Primary key values cannot be changed (replaced) once inserted, only 
+deleted and re-inserted.
 
 If a unique key name is not available, the database can be defined without a key name. EzNoSQL will generate a unique `key:value` and insert the additional element at the beginning of the document. The additional element will use a reserved key name of `"znsq_id"` and will be paired with a 122 byte unique character value:
 ```json
@@ -121,7 +122,7 @@ The inserted documents can then be retrieved directly via the primary key name a
 
 ## Secondary Indexes
 
-Documents may also be retrieved or updated through the use of secondary indexes. Secondary indexes contain alternate keys which can be used to retrieve the documents in the database. By creating alternate keys, the application can have more than one option for locating specific documents, or can find groups of like documents more directly than scanning the entire database.
+Documents may also be retrieved or updated through the use of secondary indexes. Secondary indexes contain alternate keys which can be used to retrieve the documents in the database. By creating alternate keys, the application can have more than one option for locating specific documents, or can find groups of like documents more directly than scanning the entire database.  Alternate keys be changed (replaced) after the initial insert.
 
 When creating a secondary index, the application developer assigns the alternate key name which contains the value to be used as the alternate key. Although the alternate key names must be less than 256 characters, the combined key name and paired value is not restricted by length. Secondary indexes must also be created while the database is fully disconnected (closed); however, the activation or deactivation can occur dynamically while the database is connected (open) and in-use. Consideration should be given when creating secondary indexes, as each additional active index will incur additional overhead when updating the database.
 
@@ -213,7 +214,7 @@ If the task ends normally without a commit for the last transaction, an implicit
 ## Hardware and Software Requirements
 
 EzNoSQL executes in an IBM Parallel Sysplex configuration. Refer to [z/OS MVS Setting Up a Sysplex](https://www.ibm.com/docs/en/zos/2.5.0?topic=mvs-zos-setting-up-sysplex) for more information on configuring a Parallel Sysplex. The minimum hardware/software configuration for EzNoSQL requires:
-1. At least one logical partition (LPAR) running IBM's Version 2.4 z/OS or above in plex mode with APAR OA62553 (C API), and OA64018 (Java API).
+1. At least one logical partition (LPAR) running IBM's Version 2.4 z/OS or above in plex mode with APAR OA62553 (C API), and OA64018/OA64811 (Java API).
 2. At least one internal or external Coupling Facility (CF) attached to the LPAR(s) (see [PR/SM Planning Guide](https://www.ibm.com/support/pages/sites/default/files/inline-files/SB10-7175-01a.pdf)). EzNoSQL is provided with z/OS and does not require any additional software licences.
 
 ## Storage Administration Requirements
@@ -235,6 +236,10 @@ Contact your system administrator for requirements when creating EzNoSQL databas
 4. `MGMTCLAS` name if not assigned by the system for application requirements related to data backup frequency and data retention.
 
 Programs intending to use EzNoSQL must not execute in cross-memory (XM) mode, Functional Recovery Routine (FRR) mode, or non-primary Address Space Control (ASC) mode.
+
+Programs intending to allow multiple concurrent reads/writes to the database while sharing a connection and single open must issue the connect and at least one read/write API to force the open from a parent task.  Subsequent concurrent read/write requests must be issued as children of the parent task which issued the open.  The close connection must be issued by the task that performed the open (i.e. parent task).  
+
+Applications should consider a recovery design for handling a z/OS EzNoSQL server (SMSVSAM) recycle while databases are open.  Any subsequent API call to the database will receive and error indicating the server is unavailable or a new instance has initialized.  Databases should be closed and reopened when the server is available.  SMSVSAM will issue an ENF 45 upon initialization.  
 
 # Performance Considerations
 
@@ -378,7 +383,11 @@ int znsq_create_index(const char *alternate_key, unsigned int flags,
 ```
 
 #### Create EzNoSQL Secondary Index
-Creates a secondary index with the name specified in parameters `aix_name`, using a key name of `alternate_key`. The database to be associated with this index is specified in the `base_name` parameter. Together, the secondary index and database are associated by the `path_name` parameter. The `path_name` is used internally by EzNoSQL to identify the correct association of the secondary index to its base database. The secondary index is created in an inactive state, and must be activated via the `znsq_add_index()` API before attempting to access documents via the specified `alternate_key`. For EzNoSQL databases created as recoverable (`znsq_log_options=UNDO/ALL`), a commit will be issued for any active transaction following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.  The creation of any secondary index must occur while the database is fully disconnected.
+Creates a secondary index with the name specified in parameters `aix_name`, using a key name of `alternate_key`. The database to be associated with this index is specified in the `base_name` parameter. Together, the secondary index and database are associated by the `path_name` parameter. The `path_name` is used internally by EzNoSQL to identify the correct association of the secondary index to its base database. 
+
+The secondary index is created in an inactive state, and must be activated via the `znsq_add_index()` API before attempting to access documents via the specified `alternate_key`. For EzNoSQL databases created as recoverable (`znsq_log_options=UNDO/ALL`), a commit will be issued for any active transaction following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.  
+
+The creation of any secondary index must occur while the database is fully disconnected.
 
 #### Parameters
 
@@ -483,6 +492,8 @@ int znsq_add_index(const znsq_add_index_options *options);
 
 #### Add EzNoSQL Secondary Index
 Builds and activates a previously inactive EzNoSQL secondary index for the name specified in parameter `aix_name` and for a base database specified in parameter `base_name`. Note that the length of time to complete the build phase is directly related to the size of the primary index. For databases created as recoverable (`znsq_log_options=UNDO/ALL`), a commit will be issued for any active transaction following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.
+
+Adding an index requires a system reion size or OMVS memory limit greater than 245762M. 
 
 #### Return value
 The return code of the function.
@@ -775,7 +786,7 @@ int znsq_read(znsq_connection_t con, const char *buf, size_t *buf_len, const cha
 #### Direct Read Documents
 Issues a direct read for a previously added document using the `key` name and `key_value` specified on the read request.  The key name must match the name on a previously issued `znsq_create()`, `znsq_create_index()`, or a generated `"znsq_id"` element. The value must match a previously added `key_value` paired with the specified key, otherwise a document not found error is returned.
 
-The read request can opt to retrieve the document for update which will obtain an exclusive lock and return a result set token representing ownership of the lock.  The result set token must then be used to issue an update, delete, or end result for the document via `znsq_update_result()`, `znsq_delete_result()`, or `znsq_close_result()` APIs.  For non-recoverable databases, the lock will be released following the update or delete request.  For recoverable databases, the lock will be released by the `znsq_commit()` or `znsq_abort()` APIs.
+The read request can opt to retrieve the document for update which will obtain an exclusive lock and return a result set token representing ownership of the lock.  The result set token must then be used to issue an update, delete, or end result for the document via `znsq_update_result()`, `znsq_delete_result()`, or `znsq_close_result()` APIs.  For non-recoverable databases, the lock will be released following the update, delete request, or close result.  For recoverable databases, the lock will be released by the `znsq_commit()` or `znsq_abort()` APIs.
 
 #### Parameters
 
@@ -865,7 +876,8 @@ int znsq_position(znsq_connection_t con, znsq_result_set_t *result_set, const ch
 #### Position to a key within the EzNoSQL database
 Issues a request to locate a specific key value (or a key value greater than or equal to) the desired key range. When the key value length is zero, positioning will be to the first or last document in the database based on the search order parameter: a search order (specified with the `znsq_open()` API) of forward (default) will position to the first document, while backward will position to the last document. Following a successful position, a `result_set` token is returned which is then used as input for subsequent sequential retrieves or updates/deletes.  Positioning is therefore required prior to issuing the `znsq_next_result()`, `znsq_update_result()`, or the `znsq_delete_result()` APIs. Positioning should be terminated by using the `znsq_close_result()` API in order to release the `result_set`.
 
-When using alternate keys and search_method_option equal to one, key values may be generic (partial key value).  Documents which match the generic key or are greater than will be returned for subsequent retrieves. When providing a generic key for a string, the key value should include the ending double quotes.
+When using alternate keys with a search_method_option equal to one and searching in a forward (ascending) direcction, key values may be generic (partial key value).  Documents which match the generic key or are greater than will be returned for subsequent retrieves. When providing a generic key for a string it 
+should still include ending double quotes which are not part of the actual key value and will not be used in the search for the generic key value.
 
 #### Parameters
 
@@ -1266,6 +1278,9 @@ int znsq_update_result(znsq_connection_t con, znsq_result_set_t result, const ch
 Updates existing documents previously retrieved by a (direct) `znsq_read()` or a (sequential) `znsq_next_result()` with the update options specified. An exclusive document level lock is obtained by the read requests. For non-recoverable databases, the lock will be released immediately following the update result request, and for recoverable databases, the lock will be released by a `znsq_commit()`, `znsq_abort()`, or when the task ends.
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful update.
+
+The updated version of the document may not change the primary key value, however, secondary key values may be change resutlting in the addition of new 
+alternate keys or the deletion of existing ones. 
 
 #### Parameters
 
@@ -1788,7 +1803,8 @@ control blocks and the request failed.
         help diagnosing the problem.
 ____________________________________________________________________________________________________
 **0081(X'51)** - Buffer too small. A read or write request did not provide an adequate buffer to 
-hold the requested document. The required size is returned in the buffer size field provided on the API.
+hold the requested document or auto-generated key value. The required size is returned in the
+buffer size field provided on the API.
 
         Obtain the correct buffer size and redrive the request. For write requests the buffer would 
         be the return buffer for autogenerated keys.
@@ -1873,12 +1889,13 @@ the unit of recovery was backed out or retried.
         The damaged document may still be deleted from the data set. Use recoverable data sets to 
         avoid damaged data sets. The logOptions attribute is returned on the znsq_report_stats() API.
 ____________________________________________________________________________________________________
-**0097(X'61)** - No primary key value was found. The primary key name or valid key value was found 
-in the document to be inserted or updated. Or, when reading, the key value does not specify a valid
-primary key value.
+**0097(X'61)** - 0097(X'61') No base record. A read or write through an alternate index could not 
+locate the document in the base database. This is likely an internal error or system failure that
+cause the alternate index to be out of sync with the base database.
 
-        When a primary key value is not found while reading via a secondary index, try rebuilding 
-        the index in case the index has become out of sync with the primary index.  
+        Rebuilding the index can correct the problem by issuing a znsq_drop_index (or znsq_destroy
+	_index, followed by a znsq_add_index).  Saving a copy of the primary and secondary indexes
+        prior to rebuilding the index may help diagnose the inconsistencey.
 ____________________________________________________________________________________________________
 **0098(X'62)** - Maximum duplicate index keys. The maximum number of non-primary (alternate) keys 
 has been reached. The maximum number of duplicate keys support is 4 gigabytes.
@@ -2472,17 +2489,7 @@ logic error while dynamically deallocating temporary work files.
 
         Report the issue to the z/OS Storage Administrator.
 ____________________________________________________________________________________________________
-**0273(X'111)** - The JSON key value was not found. While accessing the database using znsq_write() 
-with the write_force option, the API could not locate the key value in the document. This maybe the 
-result of an internal parsing error.
-
-        If the index was added contact the z/OS Storage Administrator.
-____________________________________________________________________________________________________
-**0274(X'112)** - The JSON key value was not found. While accessing the database using the 
-znsq_write() API with the write_force option, the API could not locate the key value in the document. 
-This maybe the result of an internal parsing error.
-
-        If the index was added contact the z/OS Storage Administrator.
+**0273(X'111)-0274(x'112)** - Reserved.
 ____________________________________________________________________________________________________
 **0277(X'115)** - Database not found. The znsq_add_index or the znsq_drop Index could not locate the
 base database provided to the API.
