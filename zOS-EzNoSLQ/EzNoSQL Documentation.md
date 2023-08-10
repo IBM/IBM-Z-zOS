@@ -292,11 +292,11 @@ the source to customize the high level qualifier for the database and STORCLAS n
 6) Disconnect (close) the data base.
 7) Destroy the database.
 
-8) A successful run of igwznsqsamp1.c would show the following messages:
-9) ![image](https://github.com/TerriMenendez/IBM-Z-zOS/assets/75999294/2eacdbbd-8eb2-49e8-823b-5a24ab9f6ebd)
+A successful run of igwznsqsamp1.c would show the following messages:
+![image](https://github.com/TerriMenendez/IBM-Z-zOS/assets/75999294/2eacdbbd-8eb2-49e8-823b-5a24ab9f6ebd)
  
 
-10) Sample user Java program: /samples/Igwznsqsamp1.java, is a 64-bit user program which does the following sequence of API calls.  Prior to running the program, edit the source to customize the high level qualifier for the database and STORCLAS name for your configuration.  
+Sample user Java program: /samples/Igwznsqsamp1.java, is a 64-bit user program which does the following sequence of API calls.  Prior to running the program, edit the source to customize the high level qualifier for the database and STORCLAS name for your configuration.  
 1) Create a one megabyte JSON (non-recoverable) EzNoSQL database with a primary key of `"_id"`.
 2) Create a one megabyte non-unique secondary index with a key of `"Author"`.
 3) Connect (open) the database.
@@ -304,6 +304,10 @@ the source to customize the high level qualifier for the database and STORCLAS n
 5) Position to the top of the secondary index and read all three documents sequentially.
 6) Disconnect (close) the data base.
 7) Destroy the database.
+
+A successful run of Igwznsqsamp1.java would show the following messages: 
+![image](https://github.com/TerriMenendez/IBM-Z-zOS/assets/75999294/7089c2df-a086-4b01-9360-f0bec6d93b7b)
+
 
 ## Compile and Link Procedure 
 
