@@ -293,17 +293,18 @@ the source to customize the high level qualifier for the database and STORCLAS n
 7) Destroy the database.
 
 A successful run of igwznsqsamp1.c would show the following messages:
-![image](https://github.com/TerriMenendez/IBM-Z-zOS/assets/75999294/9b47ab1d-f77b-436e-a111-3580efd34fd3)
- 
+![image](https://github.com/TerriMenendez/IBM-Z-zOS/assets/75999294/0e0d8fc2-69f5-4919-8a05-1256da2e04b9)
+
 
 Sample user Java program: /samples/Igwznsqsamp1.java, is a 64-bit user program which does the following sequence of API calls.  Prior to running the program, edit the source to customize the high level qualifier for the database and STORCLAS name for your configuration.  
 1) Create a one megabyte JSON (non-recoverable) EzNoSQL database with a primary key of `"_id"`.
-2) Create a one megabyte non-unique secondary index with a key of `"Author"`.
-3) Connect (open) the database.
-4) Insert three documents with identical key values for `"Author":"J. R. R. Tolkien"`.
-5) Position to the top of the secondary index and read all three documents sequentially.
-6) Disconnect (close) the data base.
-7) Destroy the database.
+2) Create a one megabyte non-unique secondary index with a key of `"Title"`.
+3) Add (enable) the secondary index.
+4) Connect (open) the database.
+5) Insert, update, delete documents.
+6) Drop the secondary index.
+8) Disconnect (close) the data base.
+9) Destroy the database.
 
 A successful run of Igwznsqsamp1.java would show the following messages: 
 ![image](https://github.com/TerriMenendez/IBM-Z-zOS/assets/75999294/ea80f9aa-43f7-40ab-865d-07b7a4204c3a)
