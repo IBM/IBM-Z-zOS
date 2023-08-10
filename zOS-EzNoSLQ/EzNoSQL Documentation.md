@@ -282,7 +282,21 @@ The following table shows the names and locations of the EzNoSQL executables, si
 
 ## Sample Application Programs
 
-Sample user C program: /samples/igwznsqsamp1.c, is a 31-bit user program which does the following sequence of API calls:
+Sample user C program: /samples/igwznsqsamp1.c, is a 31-bit user program which does the following sequence of API calls.  Prior to running the program, edit 
+the source to customize the high level qualifier for the database and STORCLAS name for your configuration.  
+1) Create a one megabyte JSON (non-recoverable) EzNoSQL database with a primary key of `"_id"`.
+2) Create a one megabyte non-unique secondary index with a key of `"Author"`.
+3) Connect the database.
+4) Insert three documents with identical key values for `"Author":"J. R. R. Tolkien"`.
+5) Position to the top of the secondary index and read all three documents sequentially.  RSN=34x returned for duplicate alternate keys.
+6) Disconnect (close) the data base.
+7) Destroy the database.
+
+8) A successful run of igwznsqsamp1.c would show the following messages:
+9) ![image](https://github.com/TerriMenendez/IBM-Z-zOS/assets/75999294/2eacdbbd-8eb2-49e8-823b-5a24ab9f6ebd)
+ 
+
+10) Sample user Java program: /samples/Igwznsqsamp1.java, is a 64-bit user program which does the following sequence of API calls.  Prior to running the program, edit the source to customize the high level qualifier for the database and STORCLAS name for your configuration.  
 1) Create a one megabyte JSON (non-recoverable) EzNoSQL database with a primary key of `"_id"`.
 2) Create a one megabyte non-unique secondary index with a key of `"Author"`.
 3) Connect (open) the database.
@@ -291,13 +305,21 @@ Sample user C program: /samples/igwznsqsamp1.c, is a 31-bit user program which d
 6) Disconnect (close) the data base.
 7) Destroy the database.
 
-## Compile and Link Procedure for C Sample Program
+## Compile and Link Procedure 
 
-To compile and link the sample program `/samples/igwznsqsamp1.c`:
+To compile and link the sample C program `/samples/igwznsqsamp1.c`:
 ```shell
 xlc -c -qDLL -qcpluscmt -qLSEARCH="//'SYS1.SCUNHF'" igwznsqsamp1.c
 xlc -o igwznsqsamp1 igwznsqsamp1.o -W l,DLL /usr/lib/libigwznsqd31.x
 ```
+
+To compile and link the sample java program `/samples/Igwznsqsamp1.java`:
+```shell
+cd /samples
+CLASSPATH="$CLASSPATH":/usr/include/java_classes/*
+CLASSPATH="$CLASSPATH":/samples/
+javac Igwznsqsamp1.java
+java Igwznsqsamp1
 
 # Application Programming Tiers
 
