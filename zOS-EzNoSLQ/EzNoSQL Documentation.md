@@ -306,7 +306,7 @@ Sample user Java program: /samples/Igwznsqsamp1.java, is a 64-bit user program w
 7) Destroy the database.
 
 A successful run of Igwznsqsamp1.java would show the following messages: 
-![image](https://github.com/TerriMenendez/IBM-Z-zOS/assets/75999294/7089c2df-a086-4b01-9360-f0bec6d93b7b)
+![image](https://github.com/TerriMenendez/IBM-Z-zOS/assets/75999294/ea80f9aa-43f7-40ab-865d-07b7a4204c3a)
 
 
 ## Compile and Link Procedure 
