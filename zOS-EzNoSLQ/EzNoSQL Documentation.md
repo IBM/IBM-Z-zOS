@@ -293,7 +293,7 @@ the source to customize the high level qualifier for the database and STORCLAS n
 7) Destroy the database.
 
 A successful run of igwznsqsamp1.c would show the following messages:
-![image](https://github.com/TerriMenendez/IBM-Z-zOS/assets/75999294/2eacdbbd-8eb2-49e8-823b-5a24ab9f6ebd)
+![image](https://github.com/TerriMenendez/IBM-Z-zOS/assets/75999294/5d33c346-8aed-4a5e-a4c7-b23e3c41dd0e)
  
 
 Sample user Java program: /samples/Igwznsqsamp1.java, is a 64-bit user program which does the following sequence of API calls.  Prior to running the program, edit the source to customize the high level qualifier for the database and STORCLAS name for your configuration.  
