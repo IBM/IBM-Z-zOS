@@ -932,34 +932,32 @@ If an error occurred, the return code contains the detailed error reason. The ma
 2 and 3 of the return code.
 
 Example of positioning to document from an EzNoSQL database:
-```C
-     char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};                 //  "_id" in utf-8  225F696422
-     char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                     //  "01"
-     int32_t position_keyname_len = strlen(keyname);                        //  Key name length
-     int32_t Position_keyname_val_len = strlen(key_value);                  //  Key value length
-     char* position_keyname_ptr = (char*) malloc(read_keyname_val_len);     //  Pointer to key name
-     char* Position_keyname_val_ptr = (char*) malloc(read_keyname_val_len); //  Pointer to value
-     strncpy(position_keyname_ptr, keyname, position_keyname_val_len);      //  Copy key name
-     strncpy(keyname_val_ptr, key_value, read_keyname_val_len);             //  Copy value
+```
+char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};                     //  "_id" in utf-8  225F696422
+char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                         //  "01"
+int32_t position_keyname_len = strlen(keyname);                            //  Key name length
+int32_t position_keyname_val_len = strlen(key_value);                      //  Key value length
+char* position_keyname_ptr = (char*) malloc(position_keyname_len);         //  Pointer to key name
+char* position_keyname_val_ptr = (char*) malloc(position_keyname_val_len); //  Pointer to value
+strncpy(position_keyname_ptr, keyname, position_keyname_len);              //  Copy key name
+strncpy(position_keyname_val_ptr, key_value, position_keyname_val_len);    //  Copy value
 
-     #define VSAMDB_KEY_EQUAL (1 << 0)                                      //  Set position to the first document with the specified key_value
+return_code = znsq_position(
+    connection,
+    &rs,
+    position_keyname_ptr,
+    position_keyname_val_ptr,
+    EQUAL,
+    NULL
+);
 
-     return_code = znsq_position(
-        connection,
-        &rs,
-        position_keyname_ptr,
-        VSAMDB_KEY_EQUAL,
-        NULL
-       );
-
-     if (return_code != 0)
-     {
-        Ilog("Error returned from znsq_position()");
-        Ilog("Return code received: X%x", znsq_err(return_code));
-        free(keyname_val_ptr);
-        free(read_keyname_ptr);
-        break;
-     }
+if (return_code != 0){
+    Ilog("Error returned from znsq_position()");
+    Ilog("Return code received: X%x", znsq_err(return_code));
+    free(position_keyname_ptr);
+    free(position_keyname_val_ptr);
+    break;
+}    
 ```
 
 ### znsq_next_result
