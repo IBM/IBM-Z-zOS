@@ -321,10 +321,8 @@ xlc -o igwznsqsamp1 igwznsqsamp1.o -W l,DLL /usr/lib/libigwznsqd31.x
 To compile and link the sample java program `/samples/Igwznsqsamp1.java`:
 ```shell
 cd /samples
-CLASSPATH="$CLASSPATH":/usr/include/java_classes/*
-CLASSPATH="$CLASSPATH":/samples/
-javac Igwznsqsamp1.java
-java Igwznsqsamp1
+javac -cp /usr/include/java_classes/igwznsq.jar Igwznsqsamp1.java
+java -cp /usr/include/java_classes/igwznsq.jar:. Igwznsqsamp1
 ```
 
 # Application Programming Tiers
