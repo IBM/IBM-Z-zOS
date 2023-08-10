@@ -318,7 +318,7 @@ xlc -c -qDLL -qcpluscmt -qLSEARCH="//'SYS1.SCUNHF'" igwznsqsamp1.c
 xlc -o igwznsqsamp1 igwznsqsamp1.o -W l,DLL /usr/lib/libigwznsqd31.x
 ```
 
-To compile and link the sample java program `/samples/Igwznsqsamp1.java`:
+To compile the sample java program `/samples/Igwznsqsamp1.java`:
 ```shell
 cd /samples
 javac -cp /usr/include/java_classes/igwznsq.jar Igwznsqsamp1.java
