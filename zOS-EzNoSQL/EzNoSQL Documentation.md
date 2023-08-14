@@ -982,8 +982,6 @@ The read request can opt to retrieve the documents for update which will obtain 
 `flags`:
 + _`1 (= (1 << 0))`_ indicates read for update.  A read with the update option will obtain a document level lock exclusively and return a token in the `result_set`.
 
-`options`: Pointer to an object of type `znsq_next_result_options`, where the next result options are provided.
-
 #### Return value
 The return code of the function.
 
@@ -1001,7 +999,7 @@ Example of reading documents sequentially from an EzNoSQL database:
      int32_t read_keyname_val_len = strlen(key_value);              // Key_Value length
      char* read_buf_ptr = (char*) malloc(read_buf_len);             // Pointer to returned document
 
-     #define FLAG_READ_UPDATE       (1 << 1)                        // Read for update
+     #define FLAG_READ_UPDATE       (1 << 0)                        // Read for update
      next_result_flags = FLAG_READ_UPDATE;                          // Set flag to read forupdate
 
      return_code = znsq_next_result(
