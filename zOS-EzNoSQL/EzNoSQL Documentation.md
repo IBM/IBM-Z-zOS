@@ -1097,31 +1097,31 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of writing a document to a keyed EzNoSQL database:
 ```C
-char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};  // "_id" in utf-8  225F696422
-char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};      // "01"
+   char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};  // "_id" in utf-8  225F696422
+   char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};      // "01"
 
-char write_buf[13] = {                                  // Document containing an element with "_id"
-    0x7B, 0x22, 0x5f, 0x69, 0x64, 0x22, 0x3A, 0x22, 0x30, 0x31, 0x22, 0x7D, 0x00
-};
+   char write_buf[13] = {                                  // Document containing an element with "_id"
+       0x7B, 0x22, 0x5f, 0x69, 0x64, 0x22, 0x3A, 0x22, 0x30, 0x31, 0x22, 0x7D, 0x00
+   };
 
-size_t write_buf_len = strlen(write_buf);
+   size_t write_buf_len = strlen(write_buf);
 
-znsq_write_options write_options = {0};
-write_options.key_name = keyname;
+   znsq_write_options write_options = {0};
+   write_options.key_name = keyname;
 
-int return_code = znsq_write(
-    connection,
-    write_buf,
-    write_buf_len,
-    &write_options
-);
+   int return_code = znsq_write(
+       connection,
+       write_buf,
+       write_buf_len,
+       &write_options
+   );
 
-if (return_code != 0)
-{
-    Ilog("Error returned from znsq_write()");
-    Ilog("Return code received: X%x", znsq_err(return_code));
-    break;
-}
+   if (return_code != 0)
+   {
+       Ilog("Error returned from znsq_write()");
+       Ilog("Return code received: X%x", znsq_err(return_code));
+       break;
+  }
 ```
 
 ### znsq_delete
