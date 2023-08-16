@@ -1097,7 +1097,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of writing a document to a keyed EzNoSQL database:
 ```C
-      char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};  // "_id" in utf-8  225F696422
+char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};  // "_id" in utf-8  225F696422
 char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};      // "01"
 
 char write_buf[13] = {                                  // Document containing an element with "_id"
