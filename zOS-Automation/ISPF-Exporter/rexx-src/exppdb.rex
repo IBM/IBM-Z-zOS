@@ -54,7 +54,13 @@ if pos("'", dirpath) = 1 | pos('"', dirpath) = 1 then do
 end
 if lastpos("/", dirpath) ^= length(dirpath) then
    dirpath = dirpath"/"
-
+//DISABLE PATH DHCP SHARE
+//GET PARTITIONAL
+//SET LABEL
+//START SERVER
+//GET CONSOLE:1
+//END
+//
 /* --- Mainline section --- */
 signal on syntax
 
