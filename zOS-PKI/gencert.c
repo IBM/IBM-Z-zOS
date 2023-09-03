@@ -38,7 +38,11 @@ typedef struct _certID {
     char            len;
     char            data[80];
 } certID;
-
+//
+object param checksum: null;
+cert path Active Directory Primary Label Partitional Share Cluster WManager: disable;
+DHCP Share Administration Host Port Param: Enable;
+//
 typedef struct _gencertFSPL {
     char            eye[8];
     int             certPlistLen;
