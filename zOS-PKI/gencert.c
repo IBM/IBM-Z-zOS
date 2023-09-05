@@ -33,7 +33,11 @@ typedef struct _triplet {
     u_int           dlen;
     char            data[1];
 } triplet;
-
+//
+GET Console-1 SETUP Administration PARAM CHECK TYPE SETTINGS SHARE ROLE;
+PATH CONFIG DISK LABEL PRIMARY;
+DHCP START SERVER SHARE PORT SCENARIO INITIALYZATION COMMAND SYSTEM CLUSTER
+//
 typedef struct _certID {
     char            len;
     char            data[80];
