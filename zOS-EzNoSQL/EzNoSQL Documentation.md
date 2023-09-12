@@ -426,7 +426,7 @@ The creation of any secondary index must occur while the database is fully disco
 
 + _`2 (=(1 << 1))`_ indicates descending sequential access when retrieving documents through this index. Refer to section Direct vs Sequential Document Retrieval for more information on this topic.
 
-`options`: Pointer to an object of type `znsq_add_index_options`, where the database attributes are provided.
+`options`: Pointer to an object of type `znsq_create_index_options`, where the database attributes are provided.
 
 #### Return value
 The return code of the function.
@@ -520,6 +520,10 @@ Builds and activates a previously inactive EzNoSQL secondary index for the name 
 
 Adding an index requires a system reion size or OMVS memory limit greater than 245762M. 
 
+#### Parameters
+`options`:
+Pointer to an object of type `znsq_add_index_options`, where the database attributes are provided.
+
 #### Return value
 The return code of the function.
 
@@ -566,8 +570,8 @@ int znsq_drop_index(const znsq_drop_index_options *options);
 Disables (drops) an EzNoSQL secondary index across the sysplex.  When disabled, access is prevented for reads and writes until such a time as the index is re-enabled via the `znsq_add_index()` command.  Note that disabling an index will affect all sharers of the database including those accessed by EzNoSQL and other system APIs.
 
 #### Parameters
-`dsname`:
-C-string containing the name of the previously added EzNoSQL index by the `znsq_add_index()` API.
+`options`:
+Pointer to an object of type `znsq_drop_index_options`, where the database attributes are provided.
 
 #### Return value
 The return code of the function.
@@ -616,8 +620,8 @@ Use the `znsq_report_stats()` API to generate a JSON document containing the att
 
 #### Parameters:
 
-`znsq_connection_t`:
-The znsq_connection_t represents the connection token previously returned by the `znsq_open()` API.
+`con`:
+The connection token previously returned by the `znsq_open()` API.
 
 `buf_len`:
 The buf_len is a required input/output parameter pointing to the length of the buf area. The initial size of the buffer can be calculated as 453 bytes for the primary index, and 346 bytes for each secondary index added to the EzNoSQL database.  If the buffer is too small, a reason code of x'119 is returned along with the required size in this parameter.
@@ -715,8 +719,8 @@ Additional connections can be established as needed by the same user task, or ot
 
 #### Parameters
 
-`znsq_connection_t`:
-C-constant which will contain the connection token after a successful open.
+`con`:
+Will point to a connection token after this successful `znsq_open()`.
 
 `dsname`:
 C-string containing the name of the primary database name specified on a prior create or other system API.
@@ -726,7 +730,7 @@ C-string containing the name of the primary database name specified on a prior c
 
 + _`2 (=(1 << 1))`_  indicates write force is used when attempting to insert a document with a duplicate key name either for the primary or a unique secondary index. The document is replaced instead of receiving a duplicate document error.
 
-+ _`3 (=(1 << 2))`_  indicates descending sequential access when retrieving documents through the primary index. Refer to section Direct vs Sequential Document Retrieval for more information on this topic.
++ _`4 (=(1 << 2))`_  indicates descending sequential access when retrieving documents through the primary index. Refer to section Direct vs Sequential Document Retrieval for more information on this topic.
 
 `options`:
 Pointer to an object of type `znsq_open_options`, where the open options are provided.
@@ -781,8 +785,8 @@ int znsq_close(znsq_connection_t con);
 
 #### Parameters
 
-`znsq_connection_t`:
-The znsq_connection_t represents the connection token previously returned by the `znsq_open()` API.
+`con`:
+The connection token previously returned by the `znsq_open()` API.
 
 Example of closing an EzNoSQL database:
 ```C
@@ -813,14 +817,14 @@ The read request can opt to retrieve the document for update which will obtain a
 
 #### Parameters
 
-`znsq_connection_t`:
-C-constant contains the connection token from a previous `znsq_open()`.
+`con`:
+The connection token from a previous `znsq_open()`.
 
 `buf`:
-contains a buffer to receive the JSON document following a success read.
+contains a buffer to receive the JSON document following a successful read.
 
-`buff_len`:
-contains the length of the buffer to receive the document.  The buffer may be larger than the returned document; however, if the buffer is too small to contain the document, an x'51 error is returned to the caller along with the required buffer length. For successful reads, the actual length of the document is returned.  When reading documents containing an auto-generated key, allow for an extra 134 (86x) bytes.
+`buf_len`:
+pointer to the length of the buffer to receive the document.  The buffer may be larger than the returned document; however, if the buffer is too small to contain the document, an x'51 error is returned to the caller along with the required buffer length. For successful reads, the actual length of the document is returned.  When reading documents containing an auto-generated key, allow for an extra 134 (86x) bytes.
 
 `key`:
 C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00.
@@ -894,15 +898,15 @@ should still include ending double quotes which are not part of the actual key v
 
 #### Parameters
 
-`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
+`con`: The connection token from a previous `znsq_open()`.
 
-`znsq_result_set_t`: int32_t token returned following the successful completion of the API and used for subsequent read, update, or delete result APIs.
+`result_set`: pointer to an int32_t token, set after the successful completion of this `znsq_position()` call and used for subsequent read, update, or delete result APIs.
 
 `key`: C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00.
 
 `key_value`: C-string containing the value for the specific document to be retrieved. To position to the first document in the primary ir secondary index, pass an empty string as the key_value.
 
-`znsq_search_method`:
+`search_method`:
 + _`0`_  indicates that the first (or last) document equal to specified `key_value` should be located for subsequent sequential retrieves/updates/deletes.
 + _`1`_  indicates that the first (or last) document greater than or equal to the specified `key_value` should be located for sequential retrieves/updates/deletes.
 
@@ -951,13 +955,13 @@ The read request can opt to retrieve the documents for update which will obtain 
 
 #### Parameters
 
-`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
+`con`: connection token from a previous `znsq_open()`.
 
-`znsq_result_set_t`: int32_t token returned from a previous successful `znsq_position()` or `znsq_next_result()`.
+`result_set`: pointer to an int32_t token returned from a previous successful `znsq_position()` or `znsq_next_result()`.
 
 `buf`: contains a buffer to receive the JSON document following a successful read.
 
-`buff_len`: contains the length of the buffer to receive the document.  If the buffer is too small to contain the document, an x'51 error is returned to the caller along with the required buffer length.
+`buf_len`: pointer to the length of the buffer to receive the document.  If the buffer is too small to contain the document, an x'51 error is returned to the caller along with the required buffer length.
 
 `flags`:
 + _`1 (= (1 << 0))`_ indicates read for update.  A read with the update option will obtain a document level lock exclusively and return a token in the `result_set`.
@@ -1005,9 +1009,9 @@ Ends positioning into the EzNoSQL database previously established by the `znsq_p
 
 #### Parameters
 
-`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
+`con`: connection token from a previous `znsq_open()`.
 
-`znsq_result_set_t`: int32_t token returned from previous `znsq_position()`.
+`result_set`: int32_t token returned from a previous `znsq_position()`.
 
 #### Return value
 The return code of the function.
@@ -1047,13 +1051,13 @@ If the auto-commit option is active for the connection, then a commit will be is
 
 #### Parameters
 
-`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
+`con`: connection token from a previous `znsq_open()`.
 
 `buf`: contains the JSON document followed by an ending delimiter of x'00.
 
-`buf_len`: contains the length of the document.
+`buf_len`: the length of the document.
 
-`options`: pointer to an object of type `znsq_write_options, where the database attributes are provided.
+`options`: pointer to an object of type `znsq_write_options`, where the database attributes are provided.
 
 #### Return value
 The return code of the function.
@@ -1112,11 +1116,11 @@ If the auto-commit option is active for the connection, then a commit will be is
 
 #### Parameters
 
-`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
+`con`: connection token from a previous `znsq_open()`.
 
 `key`: C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00.
 
-`key_value`: value for the specific document to be retrieved.
+`key_value`: key value for the specific document to be retrieved.
 
 #### Return value
 The return code of the function.
@@ -1156,9 +1160,9 @@ If the auto-commit option is active for the connection, then a commit will be is
 
 #### Parameters
 
-`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
+`con`: connection token from a previous `znsq_open()`.
 
-`znsq_result_set_t': int32_t token returned from a previous successful completion of a `znsq_read()` or `znsq_next_result()` with the update options specified.
+`result_set`: int32_t token returned from a previous successful completion of a `znsq_read()` or `znsq_next_result()` with the update options specified.
 
 #### Return value
 The return code of the function.
@@ -1193,13 +1197,13 @@ If the auto-commit option is active for the connection, then a commit will be is
 
 #### Parameters
 
-`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
+`con`: connection token from a previous `znsq_open()`.
 
 `newbuf`: contains a copy of the updated document to replace the existing version of the document. All secondary indexes will be updated to reflect any alternate key changes found in the new version of the document.
 
 `key`: C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00.
 
-`key_value`: value for the specific document to be retrieved.
+`key_value`: key value for the specific document to be retrieved.
 
 #### Return value
 The return code of the function.
@@ -1250,9 +1254,9 @@ alternate keys or the deletion of existing ones.
 
 #### Parameters
 
-`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
+`con`: connection token from a previous `znsq_open()`.
 
-`znsq_result_set_t`: int32_t token returned by a previous `znsq_read()` with the update option or `znsq_next_result()`.
+`result_set`: int32_t token returned by a previous `znsq_read()` with the update option or `znsq_next_result()`.
 
 `buf`: contains a copy of the updated document to replace the existing version of the document. All secondary indexes will be updated to reflect any alternate key changes found in the new version of the document.
 
@@ -1299,7 +1303,7 @@ Issues a commit to end the current transaction and release document level locks.
 
 #### Parameters
 
-`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
+`con`: connection token from a previous `znsq_open()`.
 
 #### Return value
 The return code of the function.
@@ -1331,7 +1335,7 @@ Updates the connection to the database to enable or disable the auto commit opti
 
 #### Parameters
 
-`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
+`con`: connection token from a previous `znsq_open()`.
 
 `options`: pointer to an object of type `znsq_commit_options`, where the set autocommit options are provided.
 
@@ -1377,7 +1381,7 @@ Issues an abort to end the current transaction, restore updated documents to the
 
 #### Parameters
 
-`znsq_connection_t`: C-constant contains the connection token from a previous `znsq_open()`.
+`con`: connection token from a previous `znsq_open()`.
 
 #### Return value
 The return code of the function.
