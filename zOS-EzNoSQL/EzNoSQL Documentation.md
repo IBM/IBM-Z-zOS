@@ -382,23 +382,25 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of creating a keyed EzNoSQL database:
 ```c
-      struct znsq_create_options create_options;
-      char* dsname = "MY.JSON.DATA";                          // Database name, "MY" qualifer assigned by the system administrator
-      char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};  // "_id" in utf-8 225F696422
-      char storclas[] = "MYSTORCL";                           // STORCLAS name assigned by the system administrator
+znsq_create_options create_options = {0};
+char dsname[] = "MY.JSON.DATA";                         //  Database name, "MY" qualifer assigned by the system administrator
+char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};  // "_id" in utf-8  225F696422
+char storclas[] = "MYSTORCL";                           // STORCLAS name assigned by the system administrator
 
-      create_options.storclas = storclas;
-      create_options.primary_key = keyname;
+create_options.max_space = 1;
+create_options.primary_key = keyname;
+create_options.storclas = storclas;
 
-      return_code = znsq_create(dsname, &create_options);
+int return_code = znsq_create(
+    dsname,
+    &create_options
+);
 
-      if (return_code != 0)
-      {
-        Ilog("Unexpected return code received from znsq_create()");
-        Ilog("Return code from znsq_create(): X%x", znsq_err(return_code));
-        variation_rc = 1;
-        break;
-      }
+if (return_code != 0) {
+    printf("Unexpected return code received from znsq_create()\n");
+    printf("Return code from znsq_create(): X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ### znsq_create_index
@@ -450,31 +452,29 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of creating a non-unique secondary index with descending access:
 ```C
-      struct znsq_create_index_options create__index_options;
-      unsigned int create_index_flags = 0;                         //  Initialize create index flags
-      char* base_name = "MY.JSON.DATA";                            //  Database name for primary index created with znsq_create
-      char* aix_name = "MY.JSON.AIX1 ";                            //  Database name for secondary index
-      char* path_name = "MY.JSON.PATH1 ";                          //  Database name for path name to secondary index
-      char altkey[] = {0x22, 0x44, 0x61, 0x74, 0x65, 0x22, 0x00};  //  Secondary key name of "Date" in utf-8  224461746522
+znsq_create_index_options create_index_options = {0};
+unsigned int create_index_flags = 0;                         //  Initialize create index flags
+char* base_name = "MY.JSON.DATA";                            //  Database name for primary index created with znsq_create
+char* aix_name = "MY.JSON.AIX1";                             //  Database name for secondary index
+char* path_name = "MY.JSON.PATH1";                           //  Database name for path name to secondary index
+char altkey[] = {0x22, 0x44, 0x61, 0x74, 0x65, 0x22, 0x00};  //  Secondary key name of "Date" in utf-8  224461746522
 
-      #define FLAG_UNIQUE          (1 << 0)                        //  Unique index
-      #define FLAG_DESCENDING_KEYS (1 << 1)                        //  Descending retrieves
+create_index_flags = VSAMDB_CREATE_INDEX_FLAG_NON_UNIQUE
+                   & VSAMDB_CREATE_INDEX_FLAG_DESCENDING_KEYS;     //  Set flags to non-unique and descending retrieves
 
-      create_index_flags = FLAG_UNIQUE + FLAG_DESCENDING_KEYS;     //  Set flags to unique and descending retrieves
+create_index_options.base_name = base_name;                  //  Database name for primary index
+create_index_options.aix_name = aix_name;                    //  Database name for secondary index
+create_index_options.path_name = path_name;                  //  Path name to associate secondary to primary index
+create_index_options.max_space = 1;
 
-      create_aix_options.base_name = base_name;                    //  Database name for primary index
-      create_aix_options.aix_name = aix_name;                      //  Database name for secondary index
-      create_aix_options.path_name = path_name;                    //  Path name to associate secondary to primary index
+int return_code = znsq_create_index(altkey, create_index_flags, &create_index_options);
 
-      return_code = znsq_create_index(altkey, create_index_flags, &znsq_create_index_options);
-
-      if (return_code != 0)
-      {
-        Ilog("Unexpected return code received from znsq_create_index()");
-        Ilog("Return code from znsq_create_index(): X%x", znsq_err(return_code));
-        variation_rc = 1;
-        break;
-      }
+if (return_code != 0)
+{
+    printf("Unexpected return code received from znsq_create_index()\n");
+    printf("Return code from znsq_create_index(): X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ### znsq_destroy
@@ -498,17 +498,16 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of destroying an EzNoSQL:
 ```C
-      char* dsname = "MY.JSON.DATA";           // Database name, "MY" qualifer assigned by the system administrator
+char dsname[] = "MY.JSON.DATA";           // Database name, "MY" qualifer assigned by the system administrator
 
-      return_code = znsq_destroy(dsname);
+int return_code = znsq_destroy(dsname);
 
-      if (return_code != 0)
-      {
-        Ilog("Unexpected return code received from znsq_destroy()");
-        Ilog("Return code from znsq_create(): X%x", znsq_err(return_code));
-        variation_rc = 1;
-        break;
-      }
+if (return_code != 0)
+{
+    printf("Unexpected return code received from znsq_destroy()\n");
+    printf("Return code from znsq_destroy(): X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ### znsq_add_index
@@ -540,23 +539,23 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | aix_name  | `char` | C-string containing the name of the secondary index. The name consists of 1 to 44 EBCDIC characters divided by one or up to 22 segments. Each name segment (qualifier) is 1 to 8 characters, the first of which must be alphabetic (A to Z) or national (# @ $). The remaining seven characters are either alphabetic, numeric (0 - 9), national, or a hyphen (-). Name segments are separated by a period (.) |
 |           |        | Example: _MY.JSON.AIX1_                                                                                                                                                                                                                                                                                                                                                                                        |
 
-Example of creating a non-unique secondary index with descending access:
+Example of adding a non-unique secondary index with descending access:
 ```C
-      struct znsq_add_index_options add__index_options;
-      char* base_name = "MY.JSON.DATA";                 // Database name for primary index created with znsq_create()
-      char* aix_name = "MY.JSON.AIX1 ";                 //  Database name for secondary index
+znsq_add_index_options add_index_options = {0};
+char* base_name = "MY.JSON.DATA";                 // Database name for primary index created with znsq_create()
+char* aix_name = "MY.JSON.AIX1";                  //  Database name for secondary index
 
-      add_index_options.base_name = base_name;
+add_index_options.base_name = base_name;
+add_index_options.aix_name = aix_name;
 
-      return_code = znsq_add_index(aix_name, &znsq_add_index_options);
+int return_code = znsq_add_index(&add_index_options);
 
-      if (return_code != 0)
-      {
-        Ilog("Unexpected return code received from znsq_add_index()");
-        Ilog("Return code from znsq_add_index(): X%x", znsq_err(return_code));
-        variation_rc = 1;
-        break;
-      }
+if (return_code != 0)
+{
+    printf("Unexpected return code received from znsq_add_index()\n");
+    printf("Return code from znsq_add_index(): X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 ### znsq_drop_index
 ```C
@@ -590,20 +589,20 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of dropping an EzNoSQL index:
 ```C
-      char* dsname = "MY.JSON.AIX1";               // Secondary index name from znsq_add_index()
-      char* base_name = "MY.JSON.DATA;             // Associated database name for the primary index
+char* aix_name = "MY.JSON.AIX1";               // Secondary index name from znsq_add_index()
+char* base_name = "MY.JSON.DATA";              // Associated database name for the primary index
 
-      drop_index_options.base_name = base_name;
+znsq_drop_index_options drop_index_options = {0};
+drop_index_options.aix_name = aix_name;
 
-      return_code = znsq_drop_index(dsname, &znsq_add_index_options);
+int return_code = znsq_drop_index(&drop_index_options);
 
-      if (return_code != 0)
-      {
-        Ilog("Unexpected return code received from znsq_drop_index()");
-        Ilog("Return code from znsq_create(): X%x", znsq_err(return_code));
-        variation_rc = 1;
-        break;
-      }
+if (return_code != 0)
+{
+    printf("Unexpected return code received from znsq_drop_index()\n");
+    printf("Return code from znsq_drop_index(): X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ### znsq_report_stats
@@ -628,15 +627,17 @@ The buff_len is a required input/output parameter pointing to the length of the 
 
 Example call to `znsq_report_stats()`:
 ```C
-      return_code = znsq_report_stats(connection, &buf_len, buf);
+size_t buf_len = 453 + (2 * 346);
+char *buf = calloc(buf_len, sizeof(char));
 
-      if (return_code != 0)
-      {
-        Ilog("Unexpected return code received from znsq_report_stats()");
-        Ilog("Return code from znsq_report_stats(): X%x", znsq_err(return_code));
-        variation_rc = 1;
-        break;
-      }
+return_code = znsq_report_stats(connection, &buf_len, buf);
+
+if (return_code != 0)
+{
+    printf("Unexpected return code received from znsq_report_stats()\n");
+    printf("Return code from znsq_report_stats(): X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 Example format of the returned JSON report document:
@@ -750,27 +751,24 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of opening an EzNoSQL database:
 ```C
-      char* base_name = "MY.JSON.DATA";          //  Database name for primary index created with znsq_create()
-      znsq_connection_t connection = 0;          //  Initialize returned connection token
-      unsigned int open_flags = 0;               //  Initialize open flags
-      znsq_open_options.znsq_timeout = 5;        //  Timeout lock waiters after 5 seconds
-      znsq_open_options.znsq_boolean = 1;        //  Auto commit after ever update
+char* base_name = "MY.JSON.DATA";          //  Database name for primary index created with znsq_create()
+znsq_connection_t connection = 0;          //  Initialize returned connection token
+unsigned int open_flags = 0;               //  Initialize open flags
 
-      #define FLAG_READ_ONLY       (1 << 0)      //  Read only
-      #define FLAG_FORCE_WRITE     (1 << 1)      //  Force writes
-      #define FLAG_DESCENDING_KEYS (1 << 2)      //  Descending access to primary index
+znsq_open_options open_options = {0};
+open_options.timeout = 5;                  //  Timeout lock waiters after 5 seconds
+open_options.autocommit = 1;               //  Auto commit after every update
 
-      open_flags = FLAG_FORCE_WRITE;             //  Set flags to write force on
+open_flags = VSAMDB_OPEN_FLAG_FORCE_UPDATE;  //  Set flags to write force on
 
-      return_code = znsq_open(&connection, dsname, open_flags, &open_options);
+int return_code = znsq_open(&connection, base_name, open_flags, &open_options);
 
-      if (return_code != 0)
-      {
-        Ilog("Unexpected return code received from znsq_open()");
-        Ilog("Return code from znsq_open(): X%x", znsq_err(return_code));
-        variation_rc = 3;
-        break;
-     }
+if (return_code != 0)
+{
+    printf("Unexpected return code received from znsq_open()\n");
+    printf("Return code from znsq_open(): X%x\n", znsq_err(return_code));
+}
+return connection;
 ```
 
 ### znsq_close
@@ -788,15 +786,14 @@ The znsq_connection_t represents the connection token previously returned by the
 
 Example of closing an EzNoSQL database:
 ```C
-      return_code = znsq_close(connection);               // Connection token returned by znsq_open
+int return_code = znsq_close(connection);           // Connection token returned by znsq_open
 
-      if (return_code != 0)
-      {
-        Ilog("Unexpected return code received from znsq_close()");
-        Ilog("Return code from znsq_close(): X%x", znsq_err(return_code));
-        variation_rc = 6;
-        break;
-      }
+if (return_code != 0)
+{
+    printf("Unexpected return code received from znsq_close()\n");
+    printf("Return code from znsq_close(): X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ## Document Retrieval
@@ -855,42 +852,32 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of reading a document from an EzNoSQL database:
 ```C
-     struct znsq_read_options read_options;
-     unsigned int read_flags = 0;                                      // Initialize read flags
-     char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};            // "_id" in utf-8  225F696422
-     char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                // "01" in utf-8 22303122
-     char *read_buf = calloc(200, 1);                                  // Buffer for returned document
-     size_t read_buf_len = strlen(read_buf);                           // Buffer length
-     int32_t read_keyname_len = strlen(keyname);                       // Key name length
-     int32_t read_keyname_val_len = strlen(key_value);                 // Key_value length
-     char* read_buf_ptr = (char*) malloc(read_buf_len);                // Pointer to returned document
-     char* keyname_ptr = (char*) malloc(read_keyname_len);             // Pointer to key name
-     char* keyname_val_ptr = (char*) malloc(read_keyname_val_len);     // Pointer to value
-     strncpy(keyname_ptr, keyname, read_keyname_val_len);              // Copy key name
-     strncpy(keyname_val_ptr, key_value, read_keyname_val_len);        // Copy value
+struct znsq_read_options read_options = {0};
+unsigned int read_flags = 0;                                      // Initialize read flags
+char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};            // "_id" in utf-8  225F696422
+char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                // "01" in utf-8 22303122
+size_t read_buf_len = 200;                                        // Buffer length
+char *read_buf = calloc(read_buf_len, sizeof(char));              // Buffer for returned document
 
-     #define FLAG_READ_UPDATE       (1 << 1)                           // Read for update
-     read_flags = FLAG_READ_UPDATE;                                    // Set flag to read for no update
+read_flags = VSAMDB_READ_UPDATE;                                  // Set flag to read for update
 
-     return_code = znsq_read(
-        connection,
-        read_buf_ptr,
-        &read_buf_len,
-        read_keyname_ptr,
-        read_keyname_val_ptr,
-        read_flags,
-        &read_options
-      );
+int return_code = znsq_read(
+    connection,
+    read_buf,
+    &read_buf_len,
+    keyname,
+    key_value,
+    read_flags,
+    &read_options
+);
 
-     if (return_code != 0)
-     {
-        Ilog("Error returned from znsq_read()");
-        Ilog("Return code received: X%x", znsq_err(return_code));
-        free(read_buf_ptr);
-        free(keyname_val_ptr);
-        free(read_keyname_ptr);
-        break;
-     }
+if (return_code != 0)
+{
+    printf("Error returned from znsq_read()\n");
+    printf("Return code received: X%x\n", znsq_err(return_code));
+    free(read_buf);
+    return znsq_err(return_code);
+}
 ```
 
 ### znsq_position
@@ -930,32 +917,25 @@ If an error occurred, the return code contains the detailed error reason. The ma
 2 and 3 of the return code.
 
 Example of positioning to document from an EzNoSQL database:
-```
-char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};                     //  "_id" in utf-8  225F696422
-char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                         //  "01"
-int32_t position_keyname_len = strlen(keyname);                            //  Key name length
-int32_t position_keyname_val_len = strlen(key_value);                      //  Key value length
-char* position_keyname_ptr = (char*) malloc(position_keyname_len);         //  Pointer to key name
-char* position_keyname_val_ptr = (char*) malloc(position_keyname_val_len); //  Pointer to value
-strncpy(position_keyname_ptr, keyname, position_keyname_len);              //  Copy key name
-strncpy(position_keyname_val_ptr, key_value, position_keyname_val_len);    //  Copy value
+```C
+char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};              //  "_id" in utf-8  225F696422
+char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                  //  "01"
+znsq_result_set_t rs = 0;
 
-return_code = znsq_position(
+int return_code = znsq_position(
     connection,
     &rs,
-    position_keyname_ptr,
-    position_keyname_val_ptr,
+    keyname,
+    key_value,
     EQUAL,
-    NULL
+    0
 );
 
-if (return_code != 0){
-    Ilog("Error returned from znsq_position()");
-    Ilog("Return code received: X%x", znsq_err(return_code));
-    free(position_keyname_ptr);
-    free(position_keyname_val_ptr);
-    break;
-}    
+if (return_code != 0) {
+    printf("Error returned from znsq_position()\n");
+    printf("Return code received: X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ### znsq_next_result
@@ -992,29 +972,27 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of reading documents sequentially from an EzNoSQL database:
 ```C
-     unsigned int next_result_flags = 0;
-     char *read_buf = calloc(200, 1);                               // Buffer for returned document
-     size_t read_buf_len = strlen(read_buf);                        // Buffer length
-     char* read_buf_ptr = (char*) malloc(read_buf_len);             // Pointer to returned document
+unsigned int next_result_flags = 0;
+size_t read_buf_len = 200;                                     // Buffer length
+char *read_buf = calloc(read_buf_len, sizeof(char));           // Buffer for returned document
 
-     #define FLAG_READ_UPDATE       (1 << 0)                        // Read for update
-     next_result_flags = FLAG_READ_UPDATE;                          // Set flag to read forupdate
+next_result_flags = VSAMDB_NEXT_RESULT_FLAG_UPDATE;            // Set flag to read for update
 
-     return_code = znsq_next_result(
-        connection,
-        &rs,
-        read_buf_ptr,
-        &read_buf_len,
-        next_result_flags
-       );
+int return_code = znsq_next_result(
+    connection,
+    &rs,
+    read_buf,
+    &read_buf_len,
+    next_result_flags
+);
 
-     if (return_code != 0)
-     {
-        Ilog("Error returned from znsq_next_result()");
-        Ilog("Return code received: X%x", znsq_err(return_code));
-        free(read_buf_ptr);
-        break;
-     }
+if (return_code != 0)
+{
+    printf("Error returned from znsq_next_result()\n");
+    printf("Return code received: X%x\n", znsq_err(return_code));
+    free(read_buf);
+    return znsq_err(return_code);
+}
 ```
 
 ### znsq_close_result
@@ -1041,14 +1019,14 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of ending positioning with `znsq_close_result()`:
 ```C
-     return_code = znsq_next_result(connection, &rs);
+int return_code = znsq_close_result(connection, rs);
 
-     if (return_code != 0)
-     {
-        Ilog("Error returned from znsq_close_result()");
-        Ilog("Return code received: X%x", znsq_err(return_code));
-        break;
-     }
+if (return_code != 0)
+{
+    printf("Error returned from znsq_close_result()\n");
+    printf("Return code received: X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ## Document Management
@@ -1097,31 +1075,29 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of writing a document to a keyed EzNoSQL database:
 ```C
-   char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};  // "_id" in utf-8  225F696422
-   char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};      // "01"
+char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};  // "_id" in utf-8  225F696422
+char write_buf[] = {                                    // UTF-8 Document containing an element with "_id"
+    0x7B, 0x22, 0x5f, 0x69, 0x64, 0x22, 0x3A, 0x22, 0x30, 0x31, 0x22, 0x7D, 0x00
+};
 
-   char write_buf[13] = {                                  // Document containing an element with "_id"
-       0x7B, 0x22, 0x5f, 0x69, 0x64, 0x22, 0x3A, 0x22, 0x30, 0x31, 0x22, 0x7D, 0x00
-   };
+size_t write_buf_len = strlen(write_buf);
 
-   size_t write_buf_len = strlen(write_buf);
+znsq_write_options write_options = {0};
+write_options.key_name = keyname;
 
-   znsq_write_options write_options = {0};
-   write_options.key_name = keyname;
+int return_code = znsq_write(
+    connection,
+    write_buf,
+    write_buf_len,
+    &write_options
+);
 
-   int return_code = znsq_write(
-       connection,
-       write_buf,
-       write_buf_len,
-       &write_options
-   );
-
-   if (return_code != 0)
-   {
-       Ilog("Error returned from znsq_write()");
-       Ilog("Return code received: X%x", znsq_err(return_code));
-       break;
-  }
+if (return_code != 0)
+{
+    printf("Error returned from znsq_write()\n");
+    printf("Return code received: X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ### znsq_delete
@@ -1151,30 +1127,21 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of deleting a document from an EzNoSQL database:
 ```C
-      char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};            // "_id" in utf-8 225F696422
-      char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                // "01"
-      int32_t delete_keyname_len = strlen(keyname);                     //  key name length
-      int32_t delete_keyname_val_len = strlen(key_value);               //  key value length
-      char* delete_keyname_ptr = (char*) malloc(delete_keyname_len);    //  Pointer to key name
-      char* delete_keyval_ptr = (char*) malloc(read_keyname_val_len);   //  Pointer to key value
-      strncpy(delete_keyname_ptr, keyname, delete_keyname_len);         //  Copy key name
-      strncpy(keyname_val_ptr, key_value, read_keyname_val_len);        //  Copy value
+char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};       // "_id" in utf-8 225F696422
+char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};           // "01"
 
-      return_code = znsq_delete(
-        connection,
-        delete_keyname_ptr,
-        delete_keyval_ptr,
-      );
+int return_code = znsq_delete(
+    connection,
+    keyname,
+    key_value
+);
 
-      if (return_code != 0)
-      {
-        Ilog("Error returned from znsq_delete()");
-        Ilog("Return code received: X%x", znsq_err(return_code));
-        free(delete_keyname_ptr);
-        free(delete_keyval_ptr);
-        variation_rc = 3;
-        break;
-      }
+if (return_code != 0)
+{
+    printf("Error returned from znsq_delete()\n");
+    printf("Return code received: X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ### znsq_delete_result
@@ -1202,16 +1169,14 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of a delete result for a document from an EzNoSQL database:
 ```C
-    return_code = znsq_delete_result(connection, &rs);
+int return_code = znsq_delete_result(connection, rs);
 
-    if (return_code != 0)
-    {
-        Ilog("Error returned from znsq_delete_result()");
-        Ilog("Return code received: X%x", znsq_err(return_code));
-        free(delete_keyname_ptr);
-        free(delete_keyval_ptr);
-        variation_rc = 3;
-    }
+if (return_code != 0)
+{
+    printf("Error returned from znsq_delete_result()\n");
+    printf("Return code received: X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ### znsq_update
@@ -1246,40 +1211,28 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of updating a document in an EzNoSQL database:
 ```C
-      char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};            // "_id" in utf-8  225F696422
-      char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                // "01"
-      char update_buf[13] = {                                           // Updated document (adds new element)
-        0x7B, 0x22, 0x5f, 0x69, 0x64, 0x22, 0x3A, 0x22, 
-        0x30, 0x31, 0x22, 0x2C, 0x22, 0x6e, 0x61, 0x6d, 
-        0x65, 0x22, 0x3A, 0x22, 0x4a, 0x6f, 0x68, 0x6e,
-        0x22, 0x7D, 0x00
-      };
-      
-      int32_t update_keyname_len = strlen(keyname);                     // Key name length
-      int32_t update_keyname_val_len = strlen(key_value);               // Key_value length
-      size_t update_buf_len = strlen(write_buf);                        // New buffer length
-      char* keyname_ptr = (char*) malloc(update_keyname_len);           // Pointer to keynane
-      char* keyname_val_ptr = (char*) malloc(update_keyname_val_len);   // Pointer to value
-      char* update_buf_ptr = (char*) malloc(update_buf_len);            // Pointer to new buffer
-      strncpy(keyname_ptr, keyname, update_keyname_val_len);            // Copy key name
-      strncpy(keyname_val_ptr, key_value, update_keyname_val_len);      // Copy value
-      strncpy(update_buf_ptr, update_buf, update_buf_len);              // Copy new document
+char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};            // "_id" in utf-8  225F696422
+char key_value[] = {0x22, 0x30, 0x31, 0x22, 0x00};                // "01"
+char update_buf[] = {                                             // Updated document (adds new element)
+    0x7B, 0x22, 0x5f, 0x69, 0x64, 0x22, 0x3A, 0x22,
+    0x30, 0x31, 0x22, 0x2C, 0x22, 0x6e, 0x61, 0x6d,
+    0x65, 0x22, 0x3A, 0x22, 0x4a, 0x6f, 0x68, 0x6e,
+    0x22, 0x7D, 0x00
+};
 
-      return_code = znsq_update(
-        connection,
-	    update_buf_ptr,
-        update_keyname_ptr,
-        update_keyname_val_ptr
-      );
+int return_code = znsq_update(
+    connection,
+    update_buf,
+    keyname,
+    key_value
+);
 
-      if (return_code != 0)
-      {
-        Ilog("Error returned from znsq_update()");
-        Ilog("Return code received: X%x", znsq_err(return_code));
-        free(update_buf_ptr);
-        free(update_keyname_val_ptr);
-        free(update_keyname_ptr);
-      }
+if (return_code != 0)
+{
+    printf("Error returned from znsq_update()\n");
+    printf("Return code received: X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ### znsq_update_result
@@ -1315,27 +1268,25 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of updating a document in an EzNoSQL database:
 ```C
-    char update_buf[13] = {                                 // Updated document (adds new element)
-        0x7B, 0x22, 0x5f, 0x69, 0x64, 0x22, 
-        0x3A, 0x22, 0x30, 0x31, 0x22, 0x2C, 
-        0x22, 0x6e, 0x61, 0x6d, 0x65, 0x22, 
-        0x3A, 0x22, 0x4a, 0x6f, 0x68, 0x6e,
-        0x22, 0x7D, 0x00
-    };
+char update_buf[] = {
+    0x7b, 0x22, 0x5f, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x30, 0x31, 0x22,
+    0x2c, 0x22, 0x44, 0x61, 0x74, 0x65, 0x22,
+    0x3a, 0x22, 0x30, 0x31, 0x2f, 0x30, 0x31, 0x2f, 0x32, 0x33, 0x22, 0x2C,
+    0x22, 0x6e, 0x61, 0x6d, 0x65, 0x22,
+    0x3A, 0x22, 0x4a, 0x6f, 0x68, 0x6e,
+    0x22, 0x7d, 0x00
+};
 
-    size_t update_buf_len = strlen(write_buf);              // New buffer length
-    char* update_buf_ptr = (char*) malloc(update_buf_len);  // Pointer to new buffer
-    strncpy(update_buf_ptr, update_buf, update_buf_len);    // Copy new document into buffer
+size_t update_buf_len = strlen(update_buf);              // New buffer length
 
-    return_code = znsq_update_result(connection, &rs, update_buf_ptr, &update_buf_len);
+int return_code = znsq_update_result(connection, rs, update_buf, update_buf_len);
 
-    if (return_code != 0)
-    {
-        Ilog("Error returned from znsq_update()");
-        Ilog("Return code received: X%x", znsq_err(return_code));
-        free(update_buf_ptr);
-        break;
-    }
+if (return_code != 0)
+{
+    printf("Error returned from znsq_update_result()\n");
+    printf("Return code received: X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ### znsq_commit
@@ -1360,15 +1311,14 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of committing transactions for an EzNoSQL database:
 ```C
-     return_code = znsq_commit(connection);
+int return_code = znsq_commit(connection);
 
-     if (return_code != 0)
-     {
-        Ilog("Error returned from znsq_commit()");
-        Ilog("Return code received: X%x", znsq_err(return_code));
-        free(read_buf_ptr);
-        break;
-     }
+if (return_code != 0)
+{
+    printf("Error returned from znsq_commit()\n");
+    printf("Return code received: X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ### znsq_set_autocommit
@@ -1404,16 +1354,17 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of enabling auto commit for an EzNoSQL database:
 ```C
-     commit_options.znsq_autocommit = 1;             // Enables auto commit
+znsq_commit_options commit_options = {0};
+commit_options.auto_commit = AUTOCOMMIT_ON;             // Enables auto commit
 
-     return_code = znsq_set_autocommit(connection, &commit_options);
+int return_code = znsq_set_autocommit(connection, &commit_options);
 
-     if (return_code != 0)
-     {
-        Ilog("Error returned from znsq_set_autocommit()");
-        Ilog("Return code received: X%x", znsq_err(return_code));
-        break;
-     }
+if (return_code != 0)
+{
+    printf("Error returned from znsq_set_autocommit()\n");
+    printf("Return code received: X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ### znsq_abort
@@ -1438,15 +1389,14 @@ If an error occurred, the return code contains the detailed error reason. The ma
 
 Example of committing transactions for an EzNoSQL database:
 ```C
-     return_code = znsq_abort(connection);
+int return_code = znsq_abort(connection);
 
-     if (return_code != 0)
-     {
-        Ilog("Error returned from znsq_abort()");
-        Ilog("Return code received: X%x", znsq_err(return_code));
-        free(read_buf_ptr);
-        break;
-     }
+if (return_code != 0)
+{
+    printf("Error returned from znsq_abort()\n");
+    printf("Return code received: X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
 ```
 
 ## Diagnostic Management
@@ -1468,32 +1418,30 @@ int znsq_last_result(const char *buf, size_t buff_len);
 
 Example call to `znsq_last_result()`:
 ```C
-    size_t buffer_size = 32*1024;
-    char *buffer = (char *) malloc(buffer_size);
-    
-    if (!buffer)
-    {
-        printf("FATAL ERROR - malloc()\n");
-        return;
-    }
-    
-    int err = znsq_last_result(&buffer_size, buffer);
-    if (err)
-    {
-        printf("FATAL ERROR - znsq_last_result, rc=%08X\n", err);
-        return;
-    }
+size_t buffer_size = 32*1024;
+char *buffer = (char *) malloc(buffer_size);
+if (!buffer)
+{
+    printf("FATAL ERROR - malloc()\n");
+    return -1;
+}
 
-    printf("buffer addr %p, buffer size %d\n", buffer, buffer_size);
-    
-    char c;
-    for (int z = 0; z <= buffer_size; z++)
-    {
-         c = buffer[z];
-         printf("%c",c);
-    }
-    
+int return_code = znsq_last_result(&buffer_size, buffer);
+if (return_code != 0)
+{
+    printf("FATAL ERROR - znsq_last_result, rc=%08X\n", return_code);
     free(buffer);
+    return znsq_err(return_code);
+}
+
+printf("buffer addr %p, buffer size %d\n", buffer, buffer_size);
+for (int z = 0; z < buffer_size; z++)
+{
+    printf("%c",buffer[z]);
+}
+printf("\n");
+
+free(buffer);
 ```
 
 #### Example Report 1
