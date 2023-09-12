@@ -406,20 +406,20 @@ if (return_code != 0) {
 ### znsq_create_index
 
 ```C
-int znsq_create_index(const char *alternate_key, unsigned int flags, 
+int znsq_create_index(const char *altkey, unsigned int flags, 
                       const znsq_create_index_options *options)
 ```
 
 #### Create EzNoSQL Secondary Index
-Creates a secondary index with the name specified in parameters `aix_name`, using a key name of `alternate_key`. The database to be associated with this index is specified in the `base_name` parameter. Together, the secondary index and database are associated by the `path_name` parameter. The `path_name` is used internally by EzNoSQL to identify the correct association of the secondary index to its base database. 
+Creates a secondary index with the name specified in parameters `aix_name`, using a key name of `altkey`. The database to be associated with this index is specified in the `base_name` parameter. Together, the secondary index and database are associated by the `path_name` parameter. The `path_name` is used internally by EzNoSQL to identify the correct association of the secondary index to its base database. 
 
-The secondary index is created in an inactive state, and must be activated via the `znsq_add_index()` API before attempting to access documents via the specified `alternate_key`. For EzNoSQL databases created as recoverable (`znsq_log_options=UNDO/ALL`), a commit will be issued for any active transaction following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.  
+The secondary index is created in an inactive state, and must be activated via the `znsq_add_index()` API before attempting to access documents via the specified `altkey`. For EzNoSQL databases created as recoverable (`znsq_log_options=UNDO/ALL`), a commit will be issued for any active transaction following the build of the index. Note that EzNoSQL databases can also be created through other system APIs and are compatible and shareable with the EzNoSQL APIs.  
 
 The creation of any secondary index must occur while the database is fully disconnected.
 
 #### Parameters
 
-`alternate_key`: C-string containing the name of the UTF-8 JSON C-string providing the secondary key name for the index. The string must be <256 bytes including quotes and end in one byte of x'00.  The key name may consist of a multi level name.  Refer to section [Multi Level Keys](#Multi-Level-Keys) for more information on this option.
+`altkey`: C-string containing the name of the UTF-8 JSON C-string providing the secondary key name for the index. The string must be <256 bytes including quotes and end in one byte of x'00.  The key name may consist of a multi level name.  Refer to section [Multi Level Keys](#Multi-Level-Keys) for more information on this option.
 
 `flags`:
 + _`1 (= (1 << 0))`_ indicates the creation of a unique index. Non-Unique indexes may contain alternate keys representing one or more documents, while unique indexes ensure only one document is represented by each key.  Attempting to insert duplicate documents with the same alternate key into a unique index will result in a duplicate document error. Refer to section entitled Unique vs Non-Unique Indexes for more information on this topic.
@@ -607,7 +607,7 @@ if (return_code != 0)
 
 ### znsq_report_stats
 ```C
-int znsq_report_stats(znsq_connection_t con, const char *buf, size_t buff_len);
+int znsq_report_stats(znsq_connection_t con, size_t *buf_len, char* buf);
 ```
 
 #### Create EzNoSQL usage report
@@ -619,11 +619,11 @@ Use the `znsq_report_stats()` API to generate a JSON document containing the att
 `znsq_connection_t`:
 The znsq_connection_t represents the connection token previously returned by the `znsq_open()` API.
 
+`buf_len`:
+The buf_len is a required input/output parameter pointing to the length of the buf area. The initial size of the buffer can be calculated as 453 bytes for the primary index, and 346 bytes for each secondary index added to the EzNoSQL database.  If the buffer is too small, a reason code of x'119 is returned along with the required size in this parameter.
+
 `buf`:
 The buf parameter is a required input parameter containing a pointer to a buffer which will contain the generated JSON report document.
-
-`buff_len`:
-The buff_len is a required input/output parameter pointing to the length of the buf area. The initial size of the buffer can be calculated as 453 bytes for the primary index, and 346 bytes for each secondary index added to the EzNoSQL database.  If the buffer is too small, a reason code of x'119 is returned along with the required size in this parameter.
 
 Example call to `znsq_report_stats()`:
 ```C
@@ -997,7 +997,7 @@ if (return_code != 0)
 
 ### znsq_close_result
 ```C
-int znsq_close_result(znsq_connection_t con, znsq_result_set_t result);
+int znsq_close_result(znsq_connection_t con, znsq_result_set_t result_set);
 ```
 
 #### Close Result
@@ -1035,7 +1035,7 @@ APIs in the Document Management section must run in non cross-memory mode.
 
 ### znsq_write
 ```C
-int znsq_write(znsq_connection_t con, const char *buf, size_t buff_len, znsq_write_options *options);
+int znsq_write(znsq_connection_t con, const char *buf, size_t buf_len, znsq_write_options *options);
 ```
 
 #### Write new documents
@@ -1051,7 +1051,7 @@ If the auto-commit option is active for the connection, then a commit will be is
 
 `buf`: contains the JSON document followed by an ending delimiter of x'00.
 
-`buff_len`: contains the length of the document.
+`buf_len`: contains the length of the document.
 
 `options`: pointer to an object of type `znsq_write_options, where the database attributes are provided.
 
@@ -1102,7 +1102,7 @@ if (return_code != 0)
 
 ### znsq_delete
 ```C
-int znsq_delete(znsq_connection_t, const char *key, const char *key_value);
+int znsq_delete(znsq_connection_t con, const char *key, const char *key_value);
 ```
 
 #### Delete Documents
@@ -1146,7 +1146,7 @@ if (return_code != 0)
 
 ### znsq_delete_result
 ```C
-int znsq_delete_result(znsq_connection_t con, znsq_result_set_t result);
+int znsq_delete_result(znsq_connection_t con, znsq_result_set_t result_set);
 ```
 
 #### Delete Result
@@ -1237,7 +1237,7 @@ if (return_code != 0)
 
 ### znsq_update_result
 ```C
-int znsq_update_result(znsq_connection_t con, znsq_result_set_t result, const char *buf, size_t buf_len);
+int znsq_update_result(znsq_connection_t con, znsq_result_set_t result_set, const char *buf, size_t buf_len);
 ```
 
 #### Update Documents after Reads for Update
@@ -1408,13 +1408,13 @@ APIs in the Document Management section must run in non-cross memory mode.
 Use the `znsq_last_result()` API to obtain a text report containing additional diagnostic information following an API failure. The report is primarily intended for the system support staff. The information can be logged by the application and referred to for problem determination.
 
 ```C
-int znsq_last_result(const char *buf, size_t buff_len);
+int znsq_last_result(size_t *buflen, char *buf);
 ```
 
 #### Parameters
-`buf`: the buf parameter is a required input parameter which will point to a buffer to receive the generated text report.
+`buf_len`: the buff_len is a required input/output parameter pointing to the length of the buffer, and on return the length of the report.
 
-`buff_len`: the buff_len is a required input/output parameter pointing to the length of the buffer, and on return the length of the report.
+`buf`: the buf parameter is a required input parameter which will point to a buffer to receive the generated text report.
 
 Example call to `znsq_last_result()`:
 ```C
