@@ -198,7 +198,7 @@ When using alternate keys, documents may be retrieved by specifying either an ex
 
 ## Recoverable Databases
 
-The recoverability of a database determines the duration of the locking and the transactional (atomic) capabilities when accessing documents in and across an EzNoSQL database. EzNoSQL will always obtain a document-level exclusive lock for any type of write, update, or delete request, but an optional shared lock may be obtained for reads:
+The recoverability of a database determines the duration of the locking and the transactional (atomic) capabilities when accessing documents in and across EzNoSQL databases. EzNoSQL will always obtain a document-level exclusive lock for any type of write, update, or delete request, but an optional shared lock may be obtained for reads:
 
 * Non-recoverable databases are created using the default log option parameter of `NONE`. When the database is created with the default log option, the document-level locks are held only for the duration of the update or read request. This means for any type of update (insert, replace, delete), a document-level lock is obtained exclusively and protects the document from multiple (simultaneous) updates. Read requests use a default option with no read integrity (`NRI`).  With `NRI`, the latest version of the document is returned at the time of the read request. Optionally shared locks may be obtained to provide a consistent read which will better protect a reader from viewing the document in the middle of an update. These shared locks may be obtained for the duration of the read request via specifying consistent read (`CR`) or for the entire duration of the transaction via consistent read extended (`CRE`). Obtaining shared locks may incur overhead and should be used only when required.
 
@@ -2011,7 +2011,24 @@ dynamically allocating the primary index.
         Ensure the secondary index has been previously created with the znsq_create_index() or 
         equivalent native API. Issue the znsq_report_stats() API to list the available indexes.
 ____________________________________________________________________________________________________
-**0154(X'9A)** - Reserved.
+**0152(X'98)** - Internal control block could not be obtained. The znsq_create_index() API could not 
+obtain storage for an internal control block. This error would most likely be related to a memory 
+shortage.
+
+    Possibly close databases to free up memory. Report the problem to z/OS support if the memory
+    shortage is unexpected.
+____________________________________________________________________________________________________  
+**0153(X'99)** - Internal control block could not be freed. The znsq_create_index() API could not 
+free storage for an internal control block. 
+
+    Internal error, report the problem to the Storage Administrator.
+____________________________________________________________________________________________________
+**0154(X'9A)** - Task hiearchy restriction during disconnect.  A znsq_close was issued from a task
+(thread) which did not perform the znsq_open, or was not a subtask of the open task. 
+
+    Ensure that znsq_open and znsq_close follows the task hiearchy requirements. 
+____________________________________________________________________________________________________
+**0155(X'9B)** - Reserved.
 **0159(X'9F)**
 ____________________________________________________________________________________________________
 **0256(X'100)** - Invalid key name. The znsq_add_index() API detected that an invalid key name was 
