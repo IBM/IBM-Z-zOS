@@ -4,7 +4,7 @@
 Introduction and Concepts:
 * [Introduction to EzNoSQL](#Introduction-to-EzNoSQL)
 * [JSON Documents](#JSON-Documents)
-* [Primary Keys](#Primary-keys)
+* [Primary Indexes](#Primary-Indexes)
 * [Secondary Indexes](#Secondary-Indexes)
 * [Active Secondary Indexes](#Creating-and-Activating-Secondary-Indexes)
 * [Non-Unique Secondary Indexes](#Unique-and-Non-Unique-Secondary-Indexes)
@@ -83,7 +83,7 @@ IBM's Parallel Sysplex Coupling Facility (CF) technology enables separate proces
 
 ## JSON Documents
 
-EzNoSQL is a document-oriented data store which accepts UTF-8 JSON documents (analogous to records or rows in other databases). JSON documents must meet the standard as described by [JavaScript Object Notation (JSON)](https://www.json.org/json-en.html). JSON documents consist of an unordered set of `key:value` elements enclosed in brackets, and can be up to two gigabytes in size. The document may contain arrays and other embedded documents:
+EzNoSQL is a document-oriented data store which accepts UTF-8 JSON documents (analogous to records or rows in other databases). JSON documents must meet the standard as described by [JavaScript Object Notation (JSON)](https://www.json.org/json-en.html). JSON documents consist of an unordered set of `key:value` elements enclosed in brackets, and may contain arrays and other embedded documents:
 ```json
 {
   "Customer_id": "4084",
@@ -95,15 +95,21 @@ EzNoSQL is a document-oriented data store which accepts UTF-8 JSON documents (an
   "Accounts": ["Checking", "Savings"]
 }
 ```
+EzNoSQL JSON documents may be up to 2 gigabytes in size, and a maximum of 128 terabytes of data can be stored in the database.
 
-## Primary Keys
+## Primary Indexes
 
-An EzNoSQL database can be defined with a user supplied primary key, where the chosen key must be contained in each the document and paired with a unique value.
+Each EzNoSQL database contains a primary index by default along with an associated primary keyname. When creating the database, a specific user keyname can  be provided, otherwise EzNoSQL will use a reserved keyname of `"znsq_id"`. Primary keynames are restricted to 256 bytes, and must be contained in each document and paired with a unique key value, otherwise the insert will fail. When using the reserved keyname, EzNoSQL will pre-append an additional element at the beginning of the document consisting of `"znsq_id"` and an internally generated unique 122 byte key value. If requested, the auto-generated key value will be returned to the application following the insert, and can then be used to retrieve the associated document.  
 
-The primary key name must be less than 256 characters; however, the key value size is unrestricted. In the above example, the `"Customer_id"` key name may be a good choice for a unique primary key. In this case, `"4084"` becomes the primary key value used to retrieve the document. The primary key value cannot be part of an array; however, it can be an embedded document less than sixteen megabytes in size.  Primary key values cannot be changed (replaced) once inserted, only 
-deleted and re-inserted.
+EzNoSQL databases can be defined with 2 types of a primary index: ordered vs unordered:
 
-If a unique key name is not available, the database can be defined without a key name. EzNoSQL will generate a unique `key:value` and insert the additional element at the beginning of the document. The additional element will use a reserved key name of `"znsq_id"` and will be paired with a 122 byte unique character value:
+An ordered index behaves in a traditional manner by storing the key values in the clear so that the index can be searched sequentially, either forward or backward.  With an ordered index, the key values are restricted to 251 bytes.  When inserting a high volume of documents from multiple threads or application instances with ascending key values, performance issues may occur as the inserts will contend for the end of the database.  Randomizing the key values, or using an unordered index can avoid this potential performance issue.  
+
+An unordered index randomizes the key values by hashing the values into a 128 encrypted random hash, which is used internally to store the documents in the database.  The hashed key is currently not available to the user. The user provided key values have no restriction in length. The advantage of an unordered index is that it avoids potential insert performance problems with ascending key values by internally randominzing the keys.  The disadvantage of an unordered index is that the keys cannot be searched sequentially.  The entire index can be read from top to bottom (or bottom to top), however the user key values will not be in returned in order. Adding a secondary index can be used to search the documents in order, since secondary indexes store the keys in order.         
+
+In the above example, the `"Customer_id"` key name may be a good choice for a unique primary key. In this case, `"4084"` becomes the primary key value used to retrieve the document. The primary key value cannot be part of an array; however, it can be an embedded document less than sixteen megabytes in size.  Primary key values cannot be changed (replaced) once inserted, only deleted and re-inserted.
+
+The following document is an example of using the reserved keyname `"znsq_id"`and the resulting element added by EzNosQL:
 ```json
 {
   "znsq_id": "F3F9F3F1C1F0F140404040404040404040404040F0F0F0F0F0F0F0F0F0F0F0F7F2F3C...",
@@ -115,18 +121,15 @@ If a unique key name is not available, the database can be defined without a key
   "Accounts": ["Checking", "Savings"]
 }
 ```
-Note that the use of autogenerated keys will incur additional CPU overhead when compared to providing a primary key for document inserts.
-
-The inserted documents can then be retrieved directly via the primary key name and value (e.g. `"Customer_id":"4084"` or `"znsq_id":"F3F9F3F1C1F0F140404040404040404040404040F0F0F0F0F0F0F0F0F0F0F0F7F2F3C"`).  Alternatively, all the documents in the database can be retrieved in a consecutive fashion, beginning either with the first or the last document without providing a key name value. Retrieving documents in this manner will not return documents in order of the key values.
-
+The inserted documents can then be retrieved directly via the primary key name and value (e.g. `"Customer_id":"4084"` or `"znsq_id":"F3F9F3F1C1F0F140404040404040404040404040F0F0F0F0F0F0F0F0F0F0F0F7F2F3C..."`).  
 
 ## Secondary Indexes
 
-Documents may also be retrieved or updated through the use of secondary indexes. Secondary indexes contain alternate keys which can be used to retrieve the documents in the database. By creating alternate keys, the application can have more than one option for locating specific documents, or can find groups of like documents more directly than scanning the entire database.  Alternate keys be changed (replaced) after the initial insert.
+Documents may also be retrieved or updated through the use of secondary indexes. Secondary indexes contain alternate keys which can be used to retrieve the documents in the database. By creating alternate keys, the application can have more than one option for locating specific documents, or can find groups of like documents more directly than scanning the entire database.  Alternate keys can be changed (replaced) after the initial insert.
 
-When creating a secondary index, the application developer assigns the alternate key name which contains the value to be used as the alternate key. Although the alternate key names must be less than 256 characters, the combined key name and paired value is not restricted by length. Secondary indexes must also be created while the database is fully disconnected (closed); however, the activation or deactivation can occur dynamically while the database is connected (open) and in-use. Consideration should be given when creating secondary indexes, as each additional active index will incur additional overhead when updating the database.
+When creating a secondary index, the application developer assigns the alternate key name which contains the value to be used as the alternate key. Although the alternate key names must be less than 251 characters, the paired value is not restricted by length. Secondary indexes must also be created while the database is fully disconnected (closed); however, the activation or deactivation can occur dynamically while the database is connected (open) and in-use. Consideration should be given when creating secondary indexes, as each additional active index will incur additional overhead when updating the database.
 
-Assume an EzNoSQL database is created with a primary key name of `"Customer_id"` and a secondary index with an alternate key name of `"Address"`. It contains the following JSON document:
+Assume an EzNoSQL database is created with a primary key name of `"Customer_id"` and a secondary index with an alternate key name of `"Address"`, and contains the following JSON document:
 ```json
 {
   "Customer_id": "4084",
@@ -187,13 +190,13 @@ Multi-key names can also span into embedded documents or an array of embedded do
 
 ## Document Retrieval
 
-Documents can be directly read, updated, or deleted by specifying the desired key name and value. Additionally, documents can be retrieved in an ordered fashion through the use of secondary indexes. For example, the application can position into the secondary index to a specific key-value, or for any value greater than or equal to the desired key range. The documents can then be retrieved in a sequential ascending or descending order, and optionally updated or deleted following the retrieval. When using sequential access to update or delete, the document will not be visible on disk and to other sharers until 1) the end of the buffer is reached, 2) a close result is issued, or 3) a successful close of the database. When a close result is issued, positioning is ended and a new request must be issued to re-establish position within the secondary index. EzNoSQL will indicate via a return code when a duplicate key-value is returned by a non-unique secondary index.
+Documents can be directly read, updated, or deleted by specifying the desired key name and value. Additionally, documents can be retrieved in an ordered fashion through the use of ordered primary or secondary indexes. For example, the application can position into the database to a specific key-value, or for any value greater than or equal to the desired key range. The documents can then be retrieved in a sequential ascending or descending order, and optionally updated or deleted following the retrieval. When using sequential access for updates or deletes, the document will not be visible on disk and to other sharers until 1) the end of the VSAM buffer is reached, 2) a close result is issued, or 3) a successful close of the database. When a close result is issued, positioning is ended and a new request must be issued to re-establish position within the database. 
 
-In order to iterate in an ordered fashion over the primary key, and optionally update/delete the document(s), the application may perform a direct read with the update option for the primary key. Then optionally update result, delete result, or end the update by closing the result. Attempting to position with a generic (greater than or equal to) search may result in unpredictable results when used in conjunction with a primary index.
+In order to iterate over an unordered index, and optionally update/delete the document(s), the application may perform a direct read with the update option for the primary key and a specific full key-value. Then optionally update result, delete result, or end the update by closing the result. Attempting to position with a generic (greater than or equal to) search may result in unpredictable results when used in conjunction with an unordered primary index.
 
-While the combined alternate key-value pair is not length restricted, the alternate key itself will be automatically truncated after the first 251 bytes. Note that truncated keys may be inadvertently recognized as a non-unique key when there exists other keys containing the same initial 251 bytes. Moreover, sequentially reading truncated keys may also return the documents out of order and require further sorting by the application. EzNoSQL will return a reason code alerting the application if a truncated key is detected.
+When searching sequentially via a non-unique secondary index, EzNoSQL will issue an informational return code of '34'x when a duplicate key-value is returned. While the combined alternate key-value pair is not length restricted, the alternate key itself will be automatically truncated after the first 251 bytes. Note that truncated keys may be inadvertently recognized as a non-unique key when there exists other keys containing the same initial 251 bytes. Moreover, sequentially reading truncated keys may also return the documents out of order and require further sorting by the application. EzNoSQL will return a retrun code '35'x alerting the application if a truncated key is detected.  A return code of '36'x indicates that both a duplicate and truncated key was encountered.
 
-When using alternate keys, documents may be retrieved by specifying either an exact match or generic search (via a full or partial key-value). If the key value is a String, then the partial key-value should contain an ending escaped quote character. For example, `"\"John S\""`.
+When using alternate keys, documents may be retrieved by specifying either an exact match or generic search (via a full or partial key-value). If the key-value is a String, then the partial key-value should contain an ending escaped quote character. For example, `"\"John S\""`.
 
 
 ## Recoverable Databases
@@ -716,9 +719,9 @@ int znsq_open(znsq_connection_t *con, const char *dsname, unsigned int flags,
 ```
 
 #### Establishes an open connection to an EzNoSQL database
-Opens an EzNoSQL database by establishing a connection between the user's task and the database. Additionally, the `znsq_open()` API establishes the optional parameters to be used on behalf of this connection, such as read integrity, lock timeout, auto commit, read only, write force, and read access direction for the primary index:
+Opens an EzNoSQL database by establishing a connection between the user's task and the database. Each connection allows for 1024 concurrent read/write requests. Additionally, the `znsq_open()` API establishes the optional parameters to be used on behalf of this connection, such as read integrity, lock timeout, auto commit, read only, write force, and read access direction for the primary index.
 
-Additional connections can be established as needed by the same user task, or other tasks executing across the sysplex. Additional connections allow for the use of different options, or to load balance the workload across different processors. A successful open generates a connection token which must be provided on other APIs for reading and writing to the database.
+Additional connections can be established as needed by the same user task, or other tasks executing across the sysplex. Additional connections allow for  the use of different options, or to load balance the workload across different processors. A successful open generates a connection token which must be provided on other APIs for reading and writing to the database.
 
 #### Parameters
 
