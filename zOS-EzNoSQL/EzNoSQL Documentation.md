@@ -99,15 +99,26 @@ EzNoSQL JSON documents may be up to 2 gigabytes in size, and a maximum of 128 te
 
 ## Primary Indexes
 
-Each EzNoSQL database contains a primary index by default along with an associated primary keyname. When creating the database, a specific user keyname can  be provided, otherwise EzNoSQL will use a reserved keyname of `"znsq_id"`. Primary keynames are restricted to 256 bytes, and must be contained in each document and paired with a unique key value, otherwise the insert will fail. When using the reserved keyname, EzNoSQL will pre-append an additional element at the beginning of the document consisting of `"znsq_id"` and an internally generated unique 122 byte key value. If requested, the auto-generated key value will be returned to the application following the insert, and can then be used to retrieve the associated document.  
+Each EzNoSQL database contains a primary index by default along with an associated primary keyname. When creating the database, a specific user keyname can  be provided, otherwise EzNoSQL will use a reserved keyname of `"znsq_id"`. Primary keynames are restricted to 256 bytes, and must be contained in each document and paired with a unique key-value, otherwise the insert will fail. When using the reserved keyname `"znsq_id"`, EzNoSQL will pre-append an additional element at the beginning of the document consisting of `"znsq_id"` and an internally generated (unique) 122 byte key-value. If requested, the auto-generated key-value will be returned to the application following the insert, and can then be used to retrieve the associated document.  
 
 EzNoSQL databases can be defined with 2 types of a primary index: ordered vs unordered:
 
-An ordered index behaves in a traditional manner by storing the key values in the clear so that the index can be searched sequentially, either forward or backward.  With an ordered index, the key values are restricted to 251 bytes.  When inserting a high volume of documents from multiple threads or application instances with ascending key values, performance issues may occur as the inserts will contend for the end of the database.  Randomizing the key values, or using an unordered index can avoid this potential performance issue.  
+An ordered index behaves in a traditional manner by storing the key-values in the clear so that the index can be searched sequentially, either forward or backward.  With an ordered index, the key-values are restricted to 251 bytes.  When inserting a high volume of documents from multiple threads (or application instances) using ascending key-values, performance issues may occur as the inserts will contend for the end of the database.  Randomizing the key values, or using an unordered index can avoid this potential performance issue.  
 
-An unordered index randomizes the key values by hashing the values into a 128 encrypted random hash, which is used internally to store the documents in the database.  The hashed key is currently not available to the user. The user provided key values have no restriction in length. The advantage of an unordered index is that it avoids potential insert performance problems with ascending key values by internally randominzing the keys.  The disadvantage of an unordered index is that the keys cannot be searched sequentially.  The entire index can be read from top to bottom (or bottom to top), however the user key values will not be in returned in order. Adding a secondary index can be used to search the documents in order, since secondary indexes store the keys in order.         
+An unordered index randomizes the key values by hashing the values into a 128 encrypted random hash, which is used internally to store the documents in the database.  The hashed key is currently not available to the user. The user provided key-values have no restriction in length. The advantage of an unordered index is that it avoids potential insert performance problems with ascending key values by internally randominzing the keys.  The disadvantage of an unordered index is that the keys cannot be searched sequentially.  The entire index can be read from top to bottom (or bottom to top), however the user key values will not be in returned in order. Adding a secondary index can be used to search the documents in order, since secondary indexes store the alternate keys in order.         
 
-In the above example, the `"Customer_id"` key name may be a good choice for a unique primary key. In this case, `"4084"` becomes the primary key value used to retrieve the document. The primary key value cannot be part of an array; however, it can be an embedded document less than sixteen megabytes in size.  Primary key values cannot be changed (replaced) once inserted, only deleted and re-inserted.
+In the following example, the `"Customer_id"` key name may be a good choice for a unique primary key. In this case, `"4084"` becomes the primary key value used to retrieve the document. The primary key value cannot be part of an array; however, it can be an embedded document less than sixteen megabytes in size.  Primary key values cannot be changed (replaced) once inserted, only deleted and re-inserted.
+```json
+{
+  "Customer_id": "4084",
+  "Address": {
+    "Street": "1 Main Street",
+    "City": "New York",
+    "State": "NY"
+  },
+  "Accounts": ["Checking", "Savings"]
+}
+```
 
 The following document is an example of using the reserved keyname `"znsq_id"`and the resulting element added by EzNosQL:
 ```json
@@ -121,13 +132,13 @@ The following document is an example of using the reserved keyname `"znsq_id"`an
   "Accounts": ["Checking", "Savings"]
 }
 ```
-The inserted documents can then be retrieved directly via the primary key name and value (e.g. `"Customer_id":"4084"` or `"znsq_id":"F3F9F3F1C1F0F140404040404040404040404040F0F0F0F0F0F0F0F0F0F0F0F7F2F3C..."`).  
+The inserted document can then be retrieved directly via the primary key name and value (e.g. `"Customer_id":"4084"` or `"znsq_id":"F3F9F3F1C1F0F140404040404040404040404040F0F0F0F0F0F0F0F0F0F0F0F7F2F3C..."`) when using auto-generated key-values.  
 
 ## Secondary Indexes
 
 Documents may also be retrieved or updated through the use of secondary indexes. Secondary indexes contain alternate keys which can be used to retrieve the documents in the database. By creating alternate keys, the application can have more than one option for locating specific documents, or can find groups of like documents more directly than scanning the entire database.  Alternate keys can be changed (replaced) after the initial insert.
 
-When creating a secondary index, the application developer assigns the alternate key name which contains the value to be used as the alternate key. Although the alternate key names must be less than 251 characters, the paired value is not restricted by length. Secondary indexes must also be created while the database is fully disconnected (closed); however, the activation or deactivation can occur dynamically while the database is connected (open) and in-use. Consideration should be given when creating secondary indexes, as each additional active index will incur additional overhead when updating the database.
+When creating a secondary index, the application developer assigns the alternate key name which contains the value to be used as the alternate key. Although the alternate key names must be less than 256 characters, the paired value is not restricted by length. Secondary indexes must also be created while the database is fully disconnected (closed); however, the activation or deactivation can occur dynamically while the database is connected (open) and in-use. Consideration should be given when creating secondary indexes, as each additional active index will incur additional overhead when accessing the database.
 
 Assume an EzNoSQL database is created with a primary key name of `"Customer_id"` and a secondary index with an alternate key name of `"Address"`, and contains the following JSON document:
 ```json
@@ -196,7 +207,21 @@ In order to iterate over an unordered index, and optionally update/delete the do
 
 When searching sequentially via a non-unique secondary index, EzNoSQL will issue an informational return code of '34'x when a duplicate key-value is returned. While the combined alternate key-value pair is not length restricted, the alternate key itself will be automatically truncated after the first 251 bytes. Note that truncated keys may be inadvertently recognized as a non-unique key when there exists other keys containing the same initial 251 bytes. Moreover, sequentially reading truncated keys may also return the documents out of order and require further sorting by the application. EzNoSQL will return a retrun code '35'x alerting the application if a truncated key is detected.  A return code of '36'x indicates that both a duplicate and truncated key was encountered.
 
-When using alternate keys, documents may be retrieved by specifying either an exact match or generic search (via a full or partial key-value). If the key-value is a String, then the partial key-value should not contain an ending escaped quote character. For example, `"\"John S"`.
+Documents may be retrieved by specifying a key-value either as an exact match (equal), or a partial match (greater than), in order to start a sequential search of the database. For an exact match, specify the key-value exactly as it appears in the document.  For a partial match, specify the the key-value characters which must match in order to start the search. 
+
+For example, assume the following document was inserted with a keyname of `"Customer_id"`. To search for an exact match, specify a key-value of `"\"4084\""` using the position API. The next result would return the document for "4084".  The second next result would return the next higher key-value (i.e. "4085").  For a partial match, specify a key-value of `"\"408"` in order to start the search for documents greater than or eauls to "408.  If the keyname is `"Address", to search for an exact match of an imbedded document key-value, specify `"{"Street":"1 Main Street","City":"New York","State":"NY"}"`.  To search for a partial key specify: `"{"Street":"1 Main Street","City":"New York","State":"NY"}" 
+```json
+{
+  "Customer_id": "4084",
+  "Address": {
+    "Street": "1 Main Street",
+    "City": "New York",
+    "State": "NY"
+  },
+  "Accounts": ["Checking", "Savings"]
+}
+```
+n alternate xAssu   characters to  evly A full If the key-value is a String, then the partial key-value should not contain an ending escaped quote character. If the key For example,  `"\"John S"`.  If the value is an imbedded document, then a partial key-value search would be specified as: `"{ 
 
 
 ## Recoverable Databases
