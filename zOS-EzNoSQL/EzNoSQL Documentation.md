@@ -196,7 +196,7 @@ In order to iterate over an unordered index, and optionally update/delete the do
 
 When searching sequentially via a non-unique secondary index, EzNoSQL will issue an informational return code of '34'x when a duplicate key-value is returned. While the combined alternate key-value pair is not length restricted, the alternate key itself will be automatically truncated after the first 251 bytes. Note that truncated keys may be inadvertently recognized as a non-unique key when there exists other keys containing the same initial 251 bytes. Moreover, sequentially reading truncated keys may also return the documents out of order and require further sorting by the application. EzNoSQL will return a retrun code '35'x alerting the application if a truncated key is detected.  A return code of '36'x indicates that both a duplicate and truncated key was encountered.
 
-When using alternate keys, documents may be retrieved by specifying either an exact match or generic search (via a full or partial key-value). If the key-value is a String, then the partial key-value should contain an ending escaped quote character. For example, `"\"John S\""`.
+When using alternate keys, documents may be retrieved by specifying either an exact match or generic search (via a full or partial key-value). If the key-value is a String, then the partial key-value should not contain an ending escaped quote character. For example, `"\"John S"`.
 
 
 ## Recoverable Databases
