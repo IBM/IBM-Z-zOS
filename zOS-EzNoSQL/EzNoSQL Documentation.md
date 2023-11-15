@@ -1947,8 +1947,20 @@ ________________________________________________________________________________
 znsq_position().
 
         Issue or reissue the znsq_position() prior to issuing the znsq_next_result().
+  ____________________________________________________________________________________________________
+**0107(X'6B)** - Retained lock held. A document level lock was retained when a recoverable application
+failed to commit or backout the transaction prior to the successful close of the database. 
+
+        Ending the application task which performed the open will invoke an implicit commit for a 
+	normal end of task, or a backout for an abnormal end of task (i.e. cancel).
+  ____________________________________________________________________________________________________
+**0108(X'6C)** - Key sequence error. A sequential write request via the znsq_write_result, 
+znsq_update_result, or znsq_erase_result APIs supplied a primary key value which did not have a value
+larger then the proceeding key value in the database.
+
+        Ensure that the key values are written in ascending order.
 ____________________________________________________________________________________________________
-**0107(X'6B)** - Reserved.
+**0109(X'6D)** - Reserved.
 **0111(X'6F)**
 ____________________________________________________________________________________________________
 **0112(X'70)** - The database is quiesced for backup. A request to insert/update/erase a document 
