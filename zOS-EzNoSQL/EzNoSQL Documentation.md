@@ -1956,9 +1956,11 @@ failed to commit or backout the transaction prior to the successful close of the
   ____________________________________________________________________________________________________
 **0108(X'6C)** - Key sequence error. A sequential write request via the znsq_write_result, 
 znsq_update_result, or znsq_erase_result APIs supplied a primary key value which did not have a value
-larger then the proceeding key value in the database.
+larger then the proceeding key value in the database.  Unordered primary indexes are not suitable for
+sequential writes as the keys are randomized.
 
-        Ensure that the key values are written in ascending order.
+        Ensure that the key values are written in ascending order.  Use a primary ordered index if
+	sequential writes are desired. 
 ____________________________________________________________________________________________________
 **0109(X'6D)** - Reserved.
 **0111(X'6F)**
