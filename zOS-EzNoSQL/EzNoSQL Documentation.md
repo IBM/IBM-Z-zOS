@@ -109,6 +109,11 @@ An unordered index randomizes the key values by hashing the values into a 128 en
 
 To convert between existing ordered and unordered indexes, simple read and rewrite the documents from one type of index into the other.  Or, use the z/OS IDCAMS REPRO utility:
 ```
+//REPRO1  EXEC PGM=IDCAMS                             
+//INDD   DD DSN=unordereddb,DISP=SHR      
+//OUTDD   DD DSN=ordereddb,DISP=SHR      
+//SYSPRINT DD SYSOUT=*                                
+//SYSIN    DD *                                       
 REPRO -                        
 INFILE(INDD) RLSSOURCE(YES)-   
 OUTFILE(OUTDD) RLSTARGET(YES)
