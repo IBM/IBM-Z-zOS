@@ -108,9 +108,11 @@ An ordered index behaves in a traditional manner by storing the key-values in th
 An unordered index randomizes the key values by hashing the values into a 128 encrypted random hash, which is used internally to store the documents in the database.  The hashed key is currently not available to the user. The user provided key-values have no restriction in length. The advantage of an unordered index is that it avoids potential insert performance problems with ascending key values by internally randominzing the keys.  The disadvantage of an unordered index is that the keys cannot be searched sequentially.  The entire index can be read from top to bottom (or bottom to top), however the user key values will not be in returned in order. Adding a secondary index can be used to search the documents in order, since secondary indexes store the alternate keys in order.  
 
 To convert between existing ordered and unordered indexes, simple read and rewrite the documents from one type of index into the other.  Or, use the z/OS IDCAMS REPRO utility:
-`REPRO -                        
+```
+REPRO -                        
 INFILE(INDD) RLSSOURCE(YES)-   
-OUTFILE(OUTDD) RLSTARGET(YES)'  
+OUTFILE(OUTDD) RLSTARGET(YES)
+``'  
 
 In the following example, the `"Customer_id"` key name may be a good choice for a unique primary key. In this case, `"4084"` becomes the primary key- value used to retrieve the document. The primary key-value cannot be part of an array; however, it can be an embedded document less than sixteen megabytes in size.  Primary key values cannot be changed (replaced) once inserted, only deleted and re-inserted.
 ```json
