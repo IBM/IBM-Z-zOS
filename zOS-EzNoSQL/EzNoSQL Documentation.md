@@ -112,7 +112,7 @@ To convert between existing ordered and unordered indexes, simple read and rewri
 REPRO -                        
 INFILE(INDD) RLSSOURCE(YES)-   
 OUTFILE(OUTDD) RLSTARGET(YES)
-``'  
+```  
 
 In the following example, the `"Customer_id"` key name may be a good choice for a unique primary key. In this case, `"4084"` becomes the primary key- value used to retrieve the document. The primary key-value cannot be part of an array; however, it can be an embedded document less than sixteen megabytes in size.  Primary key values cannot be changed (replaced) once inserted, only deleted and re-inserted.
 ```json
