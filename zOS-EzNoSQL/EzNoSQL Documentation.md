@@ -263,7 +263,7 @@ Contact your system administrator for requirements when creating EzNoSQL databas
 3. `DATACLAS` name if not assigned by the system for optional features (i.e. encryption, compression, storing data in the CF global cache) if required by the application.
 4. `MGMTCLAS` name if not assigned by the system for application requirements related to data backup frequency and data retention.
 
-Programs intending to use EzNoSQL must not execute in cross-memory (XM) mode, Functional Recovery Routine (FRR) mode, or non-primary Address Space Control (ASC) mode.
+Programs intending to use EzNoSQL must execute in a valid C LE environment and must not execute in cross-memory (XM) mode, Functional Recovery Routine (FRR) mode, or non-primary Address Space Control (ASC) mode.
 
 Programs intending to allow multiple concurrent reads/writes to the database while sharing a connection and single open must issue the connect and at least one read/write API to force the open from a parent task.  Subsequent concurrent read/write requests must be issued as children of the parent task which issued the open.  The close connection must be issued by the task that performed the open (i.e. parent task).  
 
