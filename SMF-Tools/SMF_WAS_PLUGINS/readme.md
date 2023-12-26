@@ -209,6 +209,12 @@ across all the requests seen.
   – average bytes received per URI
   
   – average bytes send (response) per URI
+  
+  If `-Dcom.ibm.ws390.smf.smf1209.useTime=[RECEIVED|QUEUED|DISPATCH_START|DISPATCH_END|RESPONDED]` is set, then
+  response times are printed per unit time grouping by the specified request time (normally `RESPONDED`).
+  The interval may be configured with `-Dcom.ibm.ws390.smf.smf1209.intervalType=[PER_SECOND|PER_MINUTE|PER_HOUR]`
+  (defaults to `PER_MINUTE`). Statistics may also be further printed by a subgrouping with
+  `-Dcom.ibm.ws390.smf.smf1209.breakdown=[NONE|BY_SERVER]` (default `NONE`).
 
 - **ReWrite** - If you have a huge volume of data and you are using the filter properties as shown above to thin out
 the amount being processed, it might be nice to just have less data. For some of the more complex

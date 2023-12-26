@@ -24,6 +24,7 @@ public class STCK
    * Calculate and remember the origin difference between Java and the MVS time
    */
   public final static long JAVA_MVS_ORIGIN_DIFFERENCE = calculateClockOriginDifference();
+  private static DateFormat formatter;
 
   private static long calculateClockOriginDifference() {
       Calendar calendar = Calendar.getInstance();
@@ -111,17 +112,19 @@ public class STCK
 	   // Add the timestamp to the origin difference and convert
 	   Date date = new Date(millis + JAVA_MVS_ORIGIN_DIFFERENCE);
 
-	   DateFormat df;
-	   String dtf = System.getProperty("com.ibm.ws390.smf.dateTimeFormat");
-	    if (dtf!=null){
-	    	df = new SimpleDateFormat(dtf);
-	    } else {
-	    	df = DateFormat.getDateTimeInstance(DateFormat.FULL,DateFormat.FULL); 	
-	    }
+	   if (formatter == null) {
+		   String dtf = System.getProperty("com.ibm.ws390.smf.dateTimeFormat");
+		    if (dtf!=null){
+		    	formatter = new SimpleDateFormat(dtf);
+		    } else {
+		    	formatter = DateFormat.getDateTimeInstance(DateFormat.FULL,DateFormat.FULL); 	
+		    }
 
-	   TimeZone tz = TimeZone.getTimeZone("GMT");
-	   df.setTimeZone(tz);
-	   return df.format(date);
+		   TimeZone tz = TimeZone.getTimeZone("GMT");
+		   formatter.setTimeZone(tz);
+	   }
+	   
+	   return formatter.format(date);
 	  
   }
   
@@ -144,6 +147,4 @@ public class STCK
        return date;
 	   
  }
-
 }
-
