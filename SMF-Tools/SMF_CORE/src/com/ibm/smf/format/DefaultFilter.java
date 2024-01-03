@@ -20,6 +20,12 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * The default implementation of SMFFilter 
@@ -31,6 +37,8 @@ public class DefaultFilter implements SMFFilter
 	private SmfPrintStream smf_printstream = null;
 	/** record counter */
 	public static int recordN = 0;
+	private final boolean PRINT_DETAILS = Boolean.getBoolean("PRINT_DETAILS");
+	private final Map<String, RecordStats> stats = new HashMap<>();
 	
 	/**
 	 * Calls commonInitialize to create smf printstream
@@ -68,7 +76,16 @@ public class DefaultFilter implements SMFFilter
 	 */
 	public void processRecord(SmfRecord record)
 	{
-	 commonProcessRecord(record,smf_printstream);
+		if (PRINT_DETAILS) {
+			commonProcessRecord(record,smf_printstream);
+		} else {
+			RecordStats rs = stats.get(record.sid());
+			if (rs == null) {
+				rs = new RecordStats(record.sid());
+				stats.put(record.sid(), rs);
+			}
+			rs.addRecord(record);
+		}
 	}
 	
 	/**
@@ -77,7 +94,22 @@ public class DefaultFilter implements SMFFilter
 	 */
 	public void processingComplete()
 	{
-		
+		if (!PRINT_DETAILS) {
+			for (Entry<String, RecordStats> entry : stats.entrySet()) {
+				RecordStats rs = entry.getValue();
+				smf_printstream.println("");
+				smf_printstream.println("SMF Data for system " + entry.getKey() + " covering " + rs._minDate + " to " + rs._maxDate);
+				smf_printstream.println(String.format("%12s %12s %7s %12s %12s %12s", "Record Type", "Records", "%Total", "Avg Length", "Min Length", "Max Length"));
+				Integer[] types = new Integer[rs.typeStats.size()];
+				rs.typeStats.keySet().toArray(types);
+				Arrays.sort(types);
+				for (Integer type : types) {
+					RecordTypeStats rts = rs.typeStats.get(type);
+					smf_printstream.println(String.format("%1$,12d %2$,12d %3$7.2f %4$,12.2f %5$,12d %6$,12d", type, rts._count, ((double)rts._count / (double)rs._count) * 100D, ((double)rts._sum / (double)rts._count), rts._minSize, rts._maxSize));
+				}
+				smf_printstream.println(String.format("%1$12s %2$,12d %3$7.2f %4$,12.2f %5$,12d %6$,12d", "Total", rs._count, (double)100, ((double)rs._sum / (double)rs._count), rs._minSize, rs._maxSize));
+			}
+		}
 	}
 	
 	/**
@@ -279,4 +311,62 @@ public class DefaultFilter implements SMFFilter
 	 record.dump(smf_printstream);	
 	}
 	
+	class RecordStats {
+		String _systemId;
+		Date _minDate;
+		Date _maxDate;
+		long _count;
+		long _sum;
+		long _minSize = -1;
+		long _maxSize = -1;
+		Map<Integer, RecordTypeStats> typeStats = new HashMap<>();
+		
+		RecordStats() {
+		}
+
+		RecordStats(String systemId) {
+			_systemId = systemId;
+		}
+		
+		void basicCalculations(SmfRecord record) {
+			_count++;
+			int size = record.rawRecord().length;
+			_sum += size;
+			if (_minSize == -1 || size < _minSize) {
+				_minSize = size;
+			}
+			if (_maxSize == -1 || size > _maxSize) {
+				_maxSize = size;
+			}
+			Date d = record.date();
+			if (_minDate == null || d.compareTo(_minDate) < 0) {
+				_minDate = d;
+			}
+			if (_maxDate == null || d.compareTo(_maxDate) > 0) {
+				_maxDate = d;
+			}
+		}
+		
+		void addRecord(SmfRecord record) {
+			basicCalculations(record);
+			RecordTypeStats rts = typeStats.get(record.type());
+			if (rts == null) {
+				rts = new RecordTypeStats(record.type());
+				typeStats.put(record.type(), rts);
+			}
+			rts.addRecord(record);
+		}
+	}
+	
+	class RecordTypeStats extends RecordStats {
+		int _type;
+		
+		RecordTypeStats(int type) {
+			_type = type;
+		}
+		
+		void addRecord(SmfRecord record) {
+			basicCalculations(record);
+		}
+	}
 }

@@ -51,7 +51,8 @@ You can then continue to read from the stream whatever makes
 up the record type being supported.
 
 Implementers typically also override the `dump( )` method.  It is
-usually only called if no plugin is provided.  The base `SMFRecord` implementation
+usually only called if no plugin is provided and
+`-DPRINT_DETAILS=YES` is set. The base `SMFRecord` implementation
 just prints the header, but specific record type implementations
 may choose to print out a long-form formatted version of the record.
 This can be helpful if you are just looking at one single record and
@@ -118,8 +119,20 @@ on the classpath, you can invoke the SMF processing from the shell like this:
 where your SMF data is in a z/OS dataset called USER.SMFDATA.  This is
 SMF data dumped via the IFASMFDP utility.
 
-Without a plugin specified, the default will be used which will call the `dump` method
-on each record as it is processed.
+Without a plugin specified:
+
+* If `-DPRINT_DETAILS=YES` is not set (the default), then statistics on record
+  types are printed per system; for example:
+  ```
+  SMF Data for system ABCD covering Mon Dec 11 12:30:00 GMT 2023 to Mon Dec 11 14:29:59 GMT 2023
+   Record Type      Records  %Total   Avg Length   Min Length   Max Length
+            98        1,440    0.03    28,533.69       27,292       30,204
+           120    4,801,374   99.97     1,680.77        1,236        6,116
+         Total    4,802,814  100.00     1,688.82        1,236       30,204
+  ```
+* If `-DPRINT_DETAILS=YES` is set, the `dump` method is called on each record as
+  it is processed. This will print each record header and raw record which
+  is useful for developing plugins.
 
 If you want to use a plugin, you'll need to know the package and class name.
 For example, if you want to use my.plugin you would invoke SMF processing like this:
