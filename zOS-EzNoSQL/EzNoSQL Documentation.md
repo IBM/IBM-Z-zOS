@@ -101,17 +101,17 @@ EzNoSQL JSON documents may be up to 2 gigabytes in size, and a maximum of 128 te
 
 Each EzNoSQL database contains a primary index by default along with an associated primary keyname. When creating the database, a specific user keyname can  be provided, otherwise EzNoSQL will use a reserved keyname of `"znsq_id"`. Primary keynames are restricted to 256 bytes, and must be contained in each document and paired with a unique key-value, otherwise the insert will fail. When using the reserved keyname `"znsq_id"`, EzNoSQL will pre-append an additional element at the beginning of the document consisting of `"znsq_id"` and an internally generated (unique) 122 byte key-value. If requested, the auto-generated key-value will be returned to the application following the insert, and can then be used to retrieve the associated document.  
 
-EzNoSQL databases can be defined with 2 types of a primary index: ordered vs unordered:
+EzNoSQL databases can be defined with 2 types of a primary index: ordered and unordered:
 
-An ordered index behaves in a traditional manner by storing the key-values in the clear so that the index can be searched sequentially, either forward or backward.  With an ordered index, the key-values are restricted to 251 bytes.  When inserting a high volume of documents from multiple threads (or application instances) using ascending key-values, performance issues may occur as the inserts will contend for the end of the database.  Randomizing the key values, or using an unordered index can avoid this potential performance issue.  
+An _ordered index_ behaves in a traditional manner by storing the key-values in the clear so that the index can be searched sequentially, either forward or backward.  With an ordered index, the key-values are restricted to 251 bytes.  When inserting a high volume of documents from multiple threads (or application instances) using ascending key-values, performance issues may occur as the inserts will contend for the end of the database.  Randomizing the key-values, or using an unordered index can avoid this potential performance issue.  
 
-An unordered index randomizes the key values by hashing the values into a 128 encrypted random hash, which is used internally to store the documents in the database.  The hashed key is currently not available to the user. The user provided key-values have no restriction in length. The advantage of an unordered index is that it avoids potential insert performance problems with ascending key values by internally randominzing the keys.  The disadvantage of an unordered index is that the keys cannot be searched sequentially.  The entire index can be read from top to bottom (or bottom to top), however the user key values will not be in returned in order. Adding a secondary index can be used to search the documents in order, since secondary indexes store the alternate keys in order.  
+An _unordered index_ randomizes the key-values by hashing the values into a 128 encrypted random hash, which is used internally to store the documents in the database.  The hashed key is currently not available to the user. The user provided key-values have no restriction in length. The advantage of an unordered index is that it avoids potential insert performance problems with ascending key-values by internally randominzing the keys.  The disadvantage of an unordered index is that the keys cannot be searched sequentially.  The entire index can be read from top to bottom (or bottom to top), however the user key-values will not be returned in order. Adding a secondary index can be used to search the documents in order, since secondary indexes store the alternate keys in order.  
 
 To convert between existing ordered and unordered indexes, simple read and rewrite the documents from one type of index into the other.  Or, use the z/OS IDCAMS REPRO utility:
 ```
-//REPRO1  EXEC PGM=IDCAMS                             
-//INDD   DD DSN=unordereddb,DISP=SHR      
-//OUTDD   DD DSN=ordereddb,DISP=SHR      
+//REPRO1   EXEC PGM=IDCAMS                             
+//INDD     DD DSN=unordereddb,DISP=SHR      
+//OUTDD    DD DSN=ordereddb,DISP=SHR      
 //SYSPRINT DD SYSOUT=*                                
 //SYSIN    DD *                                       
 REPRO -                        
@@ -119,7 +119,7 @@ INFILE(INDD) RLSSOURCE(YES)-
 OUTFILE(OUTDD) RLSTARGET(YES)
 ```  
 
-In the following example, the `"Customer_id"` key name may be a good choice for a unique primary key. In this case, `"4084"` becomes the primary key- value used to retrieve the document. The primary key-value cannot be part of an array; however, it can be an embedded document less than sixteen megabytes in size.  Primary key values cannot be changed (replaced) once inserted, only deleted and re-inserted.
+In the following example, the `"Customer_id"` keyname may be a good choice for a unique primary key. In this case, `"4084"` becomes the primary key- value used to retrieve the document. The primary key-value cannot be part of an array; however, it can be an embedded document less than sixteen megabytes in size.  Primary key-values cannot be changed (replaced) once inserted, only deleted and re-inserted.
 ```json
 {
   "Customer_id": "4084",
@@ -144,15 +144,15 @@ The following document is an example of using the reserved keyname `"znsq_id"`an
   "Accounts": ["Checking", "Savings"]
 }
 ```
-The inserted document can then be retrieved directly via the primary key name and value (e.g. `"Customer_id":"4084"` or `"znsq_id":"F3F9F3F1C1F0F140404040404040404040404040F0F0F0F0F0F0F0F0F0F0F0F7F2F3C..."`) when using auto-generated key-values.  
+The inserted document can then be retrieved directly via the primary keyname and value (e.g. `"Customer_id":"4084"` or `"znsq_id":"F3F9F3F1C1F0F140404040404040404040404040F0F0F0F0F0F0F0F0F0F0F0F7F2F3C..."`) when using auto-generated key-values.  
 
 ## Secondary Indexes
 
 Documents may also be retrieved or updated through the use of secondary indexes. Secondary indexes contain alternate keys which can be used to retrieve the documents in the database. By creating alternate keys, the application can have more than one option for locating specific documents, or can find groups of like documents more directly than scanning the entire database.  Alternate keys can be changed (replaced) after the initial insert.
 
-When creating a secondary index, the application developer assigns the alternate key name which contains the value to be used as the alternate key. Although the alternate key names must be less than 256 characters, the paired value is not restricted by length. Secondary indexes must also be created while the database is fully disconnected (closed); however, the activation or deactivation can occur dynamically while the database is connected (open) and in-use. Consideration should be given when creating secondary indexes, as each additional active index will incur additional overhead when accessing the database.
+When creating a secondary index, the application developer assigns the alternate keyname which contains the value to be used as the alternate key. Although the alternate keynames must be less than 256 characters, the paired value is not restricted by length. Secondary indexes must also be created while the database is fully disconnected (closed); however, the activation or deactivation can occur dynamically while the database is connected (open) and in-use. Consideration should be given when creating secondary indexes, as each additional active index will incur additional overhead when accessing the database.
 
-Assume an EzNoSQL database is created with a primary key name of `"Customer_id"` and a secondary index with an alternate key name of `"Address"`, and contains the following JSON document:
+Assume an EzNoSQL database is created with a primary keyname of `"Customer_id"` and a secondary index with an alternate keyname of `"Address"`, and contains the following JSON document:
 ```json
 {
   "Customer_id": "4084",
@@ -165,14 +165,14 @@ Assume an EzNoSQL database is created with a primary key name of `"Customer_id"`
 }
 ```
 
-The document can be retrieved either through the primary index using a key name of `"Customer_id"` and a value of `"4084"`, or via the secondary index using a key name of `"Address"` and a value of `{"Street":"1 Main Street","City":"New York","State":"NY"}`. When replacing documents, all active secondary indexes will be updated to reflect the latest `key:value` changes in the new version of the document.
+The document can be retrieved either through the primary index using a keyname of `"Customer_id"` and a value of `"4084"`, or via the secondary index using a keyname of `"Address"` and a value of `{"Street":"1 Main Street","City":"New York","State":"NY"}`. When replacing documents, all active secondary indexes will be updated to reflect the latest `key:value` changes in the new version of the document.
 
-When secondary index key names are paired with an array, alternate keys will be generated for all the values in the array. For example, an alternate key name of `"Accounts"` would allow the above document to be retrieved using a value of `"Checking"` or `"Savings"`. Pprimary keys are not allowed with array values.
+When secondary index keynames are paired with an array, alternate keys will be generated for all the values in the array. For example, an alternate keyname of `"Accounts"` would allow the above document to be retrieved using a value of `"Checking"` or `"Savings"`. Pprimary keys are not allowed with array values.
 
 
 ### Creating and Activating Secondary Indexes
 
-A Secondary Index can be created only while the database is disconnected. However, it can be activated and built at any point in time after the successful creation of the index. Note that the time it takes to build an index is relative to the size of the database. All active indexes are updated whenever new documents are inserted, erased, or updated via the primary key or any other (active) alternate key. If a secondary index is no longer required, it can be switched to inactive (quiesced) across the sysplex.  Activating secondary indexes will require obtaining several large (2 GB) temporary buffers. Ensure that any memory restrictions allow for the necessary buffers.
+A secondary index can be created only while the database is disconnected. However, it can be activated and built at any point in time after the successful creation of the index. Note that the time it takes to build an index is relative to the size of the database. All active indexes are updated whenever new documents are inserted, erased, or updated via the primary key or any other (active) alternate key. If a secondary index is no longer required, it can be switched to inactive (quiesced) across the sysplex.  Activating secondary indexes will require obtaining several large (2 GB) temporary buffers. Ensure that any memory restrictions allow for the necessary buffers.
 
 Once a secondary index is switched to inactive, it will no longer be updated and may become out-of-sync with the documents in the database. While a secondary index is inactive, any requests to access documents via the index will fail. Switching the index to inactive will remove the additional overhead of maintaining that index. Inactive indexes can be re-activated and rebuilt by re-adding the index.
 
