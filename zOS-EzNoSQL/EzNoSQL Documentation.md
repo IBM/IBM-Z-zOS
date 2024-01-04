@@ -951,7 +951,7 @@ should still include ending double quotes which are not part of the actual key v
 
 `key`: C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00.
 
-`key_value`: C-string containing the value for the specific document to be retrieved. To position to the first document in the primary ir secondary index, pass an empty string as the key_value.
+`key_value`: C-string containing the value for the specific document to be retrieved. To position to the first document in the primary or secondary index, pass an empty string as the key_value.
 
 `search_method`:
 + _`0`_  indicates that the first (or last) document equal to specified `key_value` should be located for subsequent sequential retrieves/updates/deletes.
