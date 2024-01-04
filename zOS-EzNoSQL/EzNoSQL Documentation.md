@@ -167,7 +167,7 @@ Assume an EzNoSQL database is created with a primary keyname of `"Customer_id"` 
 
 The document can be retrieved either through the primary index using a keyname of `"Customer_id"` and a value of `"4084"`, or via the secondary index using a keyname of `"Address"` and a value of `{"Street":"1 Main Street","City":"New York","State":"NY"}`. When replacing documents, all active secondary indexes will be updated to reflect the latest `key:value` changes in the new version of the document.
 
-When secondary index keynames are paired with an array, alternate keys will be generated for all the values in the array. For example, an alternate keyname of `"Accounts"` would allow the above document to be retrieved using a value of `"Checking"` or `"Savings"`. Pprimary keys are not allowed with array values.
+When secondary index keynames are paired with an array, alternate keys will be generated for all the values in the array. For example, an alternate keyname of `"Accounts"` would allow the above document to be retrieved using a value of `"Checking"` or `"Savings"`. Primary keys are not allowed with array values.
 
 
 ### Creating and Activating Secondary Indexes
