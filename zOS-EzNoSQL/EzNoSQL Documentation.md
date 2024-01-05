@@ -2029,22 +2029,54 @@ ________________________________________________________________________________
 database could not locate a BTREE control block anchored in the user's connect token. This error 
 could represent a system or user error if the connection token is overlaid or is invalid.
 
-        Verify that a valid connection token was passed on the znsq API. If valid the problem to z/OS support.
+        Verify that a valid connection token was passed on the znsq API. If valid the problem to 
+	z/OS support.
 ____________________________________________________________________________________________________
-**0122(X'7A)** - Internal ACB control block pool could not be freed. The znsq API could not free the
-storage for an internal (ACB) control block. This error would most likely be an internal system 
-logic error. A system dump is produced for this error.
+**0122(X'7A)** - Internal VRGB control block not found. The VRGB control block is created when the 
+SMSVSAM address space has initialized on the z/OS server. SMSVSAM is required to be active when 
+accessing EzNoSQL databases.
 
-        Report the problem to z/OS support.
+        Report the problem to z/OS support to ensure a proper z/OS server configuration exists
+	including the SMSVSAM address space.
 ____________________________________________________________________________________________________
-**0123(X'7B)** - Free of internal (BTREE) control block failed. The znsq API could not free the 
-storage for a node in a system BTREE. This error would most likely be an internal system logic error.
-A system dump is produced for this error.
+**0123(X'7B)** - Create for internal VTLB control block failed during znsq_open. The storage obtain 
+for the VTLB failed. This error would most likely be related to a memory shortage in the user's	
+address space.  A memory (SVC) dump of the address space is produced.
 
-        Report the problem to z/OS support.
+        Report the problem to z/OS support and refer to the associated SVC dump to aid in debugging
+	the memory issue.
 ____________________________________________________________________________________________________
-**0124(X'7C)** - Reserved.
-**0126(X'7E)**
+**0124(X'7C)** - Transactional VSAM (TVS) is not available. TVS is required to be active on the z/OS
+server when accessing a recoverable EzNoSQL database.  Recoverable databases are created when the 
+log_options(log_undo / log_all) are specified on the create.
+
+        Report the problem to z/OS support and request Transaction VSAM to be initialized on the z/OS
+	server.
+____________________________________________________________________________________________________
+**0125(X'7D)** - Transactional VSAM (TVS) is not installed. TVS is required to be active on the z/OS
+server when accessing a recoverable EzNoSQL database.  Recoverable databases are created when the 
+log_options(log_undo / log_all) are specified on the create.  TVS is a priced feature in z/OS 
+releases prior to z/OS 3.1.  TVS is included in the base license for z/OS 3.1 and above.
+
+        Report the problem to z/OS support and request Transaction VSAM to be initialized on the z/OS
+	server.
+____________________________________________________________________________________________________
+**0127(X'7F)** - Reserved.
+**0127(X'7F)**
+____________________________________________________________________________________________________
+**0128(X'80)** - Creation of internal control block representing the connection to the EzNoSQL 
+database failed.  This is most likely an internal system logic error. A (SVC) dump may have been
+produced for this error.
+
+        Report the issue to the z/OS System Programmer and reference the associated SVC dump.
+____________________________________________________________________________________________________
+**0129(X'81)** - Deletion of internal control block representing the result_set failed. This is most
+likely an internal system logic error. A (SVC) dump may have been produced for this error.
+
+        Report the issue to the z/OS System Programmer and reference the associated SVC dump.
+____________________________________________________________________________________________________
+**0138(X'8A)** - Reserved.
+**0143(X'8F)**
 ____________________________________________________________________________________________________
 **0144(X'90)** - Internal system logic error. While reading/writing to the database, an internal 
 system logic error was detected. A dump may have been produced for this error.
