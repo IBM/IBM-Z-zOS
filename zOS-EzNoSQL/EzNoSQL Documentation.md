@@ -1853,11 +1853,11 @@ of recovery was backed out or retried.
         avoid damaged data sets. The logOptions attribute is returned on the znsq_report_stats() API.
 ____________________________________________________________________________________________________
 **0087(X'57)** - Request Parameter List (RPL) error. Invalid RPL options were specified by the 
-system code. One example would be when attempting sequential writes/updates/deletes to the primary 
-index set. Using sequential access (i.e., znsq_position()) for updates/deletes is only applicable to
-secondary indexes.
+system code on behalf of the application's request. One example would be when attempting sequential
+writes/updates/deletes to an unordered primary index set. 
 
-        To update the primary index, use znsq_read for update followed by znsq_updated_result or
+        For the sequential write error, choose an ordered index for your data base, otherwise use a
+	direct read (znsq_read) for update followed by znsq_write_result, znsq_update_result, or
         znsq_delete_result(). If an error is still received, capture the znsq_last_result diagnostic
         information and report the problem to the z/OS support.
 ____________________________________________________________________________________________________
