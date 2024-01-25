@@ -1456,7 +1456,7 @@ APIs in the Document Management section must run in non-cross memory mode.
 
 ### znsq_last_result
 
-Use the `znsq_last_result()` API to obtain a text report containing additional diagnostic information following an API failure. The report is primarily intended for the system support staff. The information can be logged by the application and referred to for problem determination.
+Use the `znsq_last_result()` API to obtain a text report containing additional diagnostic information following the last API failure. Only failures which occur in the server will contain additional diagnostic information. The report is primarily intended for the system support staff. The information can be logged by the application and referred to for problem determination.
 
 ```C
 int znsq_last_result(size_t *buflen, char *buf);
