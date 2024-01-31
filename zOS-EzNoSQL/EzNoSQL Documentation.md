@@ -4,7 +4,7 @@
 Introduction and Concepts:
 * [Introduction to EzNoSQL](#Introduction-to-EzNoSQL)
 * [JSON Documents](#JSON-Documents)
-* [Primary Keys](#Primary-keys)
+* [Primary Indexes](#Primary-Indexes)
 * [Secondary Indexes](#Secondary-Indexes)
 * [Active Secondary Indexes](#Creating-and-Activating-Secondary-Indexes)
 * [Non-Unique Secondary Indexes](#Unique-and-Non-Unique-Secondary-Indexes)
@@ -83,7 +83,43 @@ IBM's Parallel Sysplex Coupling Facility (CF) technology enables separate proces
 
 ## JSON Documents
 
-EzNoSQL is a document-oriented data store which accepts UTF-8 JSON documents (analogous to records or rows in other databases). JSON documents must meet the standard as described by [JavaScript Object Notation (JSON)](https://www.json.org/json-en.html). JSON documents consist of an unordered set of `key:value` elements enclosed in brackets, and can be up to two gigabytes in size. The document may contain arrays and other embedded documents:
+EzNoSQL is a document-oriented data store which accepts UTF-8 JSON documents (analogous to records or rows in other databases). JSON documents must meet the standard as described by [JavaScript Object Notation (JSON)](https://www.json.org/json-en.html). JSON documents consist of an unordered set of `key:value` elements enclosed in brackets, and may contain arrays and other embedded documents:
+```json
+{
+  "Customer_id": "4084",
+  "Address": {
+    "Street": "1 Main Street",
+    "City": "New York",
+    "State": "NY"
+  },
+  "Accounts": ["Checking", "Savings"]
+}
+```
+EzNoSQL JSON documents may be up to 2 gigabytes in size, and a maximum of 128 terabytes of data can be stored in the database.
+
+## Primary Indexes
+
+Each EzNoSQL database contains a primary index by default along with an associated primary keyname. When creating the database, a specific user keyname can  be provided, otherwise EzNoSQL will use a reserved keyname of `"znsq_id"`. Primary keynames are restricted to 256 bytes, and must be contained in each document and paired with a unique key-value, otherwise the insert will fail. When using the reserved keyname `"znsq_id"`, EzNoSQL will pre-append an additional element at the beginning of the document consisting of `"znsq_id"` and an internally generated (unique) 122 byte key-value. If requested, the auto-generated key-value will be returned to the application following the insert, and can then be used to retrieve the associated document.  
+
+EzNoSQL databases can be defined with 2 types of a primary indices: ordered and unordered:
+
+An _ordered index_ stores key-values in the clear so that the index can be searched sequentially, either forward or backward.  With an ordered index, the key-values are restricted to 251 bytes.  When inserting a high volume of documents from multiple threads (or application instances) using ascending key-values, users may encounter a performance hit as the inserts will contend for the end of the database. Users can avoid this scenario with randomized key-values or by using an unordered index. 
+
+An _unordered index_ randomizes the key-values by hashing the values into a 128 encrypted keys, which is then used internally to store the documents in the database.  The hashed key is currently not available to the user. In an unordered index, the key-values have no restriction in length.  An unordered index may mitigate performance issues when inserting ascending key-values by internally randomizing the keys. The disadvantage of an unordered index is that the keys cannot be searched sequentially nor will key-values return in order of insertion. To allow for ordered search in an unordered index, users may define and add a secondary index - since unlike primary keys, alternate keys are stored in order.  
+
+To convert between existing ordered and unordered indexes, simple read and rewrite the documents from one type of index into the other.  Or, use the z/OS IDCAMS REPRO utility:
+```
+//REPRO1   EXEC PGM=IDCAMS                             
+//INDD     DD DSN=unordereddb,DISP=SHR      
+//OUTDD    DD DSN=ordereddb,DISP=SHR      
+//SYSPRINT DD SYSOUT=*                                
+//SYSIN    DD *                                       
+REPRO -                        
+INFILE(INDD) RLSSOURCE(YES)-   
+OUTFILE(OUTDD) RLSTARGET(YES)
+```  
+
+In the following example, the `"Customer_id"` keyname may be a good choice for a unique primary key. In this case, `"4084"` becomes the primary key- value used to retrieve the document. The primary key-value cannot be part of an array; however, it can be an embedded document less than sixteen megabytes in size.  Primary key-values cannot be changed (replaced) once inserted, only deleted and re-inserted.
 ```json
 {
   "Customer_id": "4084",
@@ -96,14 +132,7 @@ EzNoSQL is a document-oriented data store which accepts UTF-8 JSON documents (an
 }
 ```
 
-## Primary Keys
-
-An EzNoSQL database can be defined with a user supplied primary key, where the chosen key must be contained in each the document and paired with a unique value.
-
-The primary key name must be less than 256 characters; however, the key value size is unrestricted. In the above example, the `"Customer_id"` key name may be a good choice for a unique primary key. In this case, `"4084"` becomes the primary key value used to retrieve the document. The primary key value cannot be part of an array; however, it can be an embedded document less than sixteen megabytes in size.  Primary key values cannot be changed (replaced) once inserted, only 
-deleted and re-inserted.
-
-If a unique key name is not available, the database can be defined without a key name. EzNoSQL will generate a unique `key:value` and insert the additional element at the beginning of the document. The additional element will use a reserved key name of `"znsq_id"` and will be paired with a 122 byte unique character value:
+The following document is an example of using the reserved keyname `"znsq_id"`and the resulting element added by EzNosQL:
 ```json
 {
   "znsq_id": "F3F9F3F1C1F0F140404040404040404040404040F0F0F0F0F0F0F0F0F0F0F0F7F2F3C...",
@@ -115,18 +144,15 @@ If a unique key name is not available, the database can be defined without a key
   "Accounts": ["Checking", "Savings"]
 }
 ```
-Note that the use of autogenerated keys will incur additional CPU overhead when compared to providing a primary key for document inserts.
-
-The inserted documents can then be retrieved directly via the primary key name and value (e.g. `"Customer_id":"4084"` or `"znsq_id":"F3F9F3F1C1F0F140404040404040404040404040F0F0F0F0F0F0F0F0F0F0F0F7F2F3C"`).  Alternatively, all the documents in the database can be retrieved in a consecutive fashion, beginning either with the first or the last document without providing a key name value. Retrieving documents in this manner will not return documents in order of the key values.
-
+The inserted document can then be retrieved directly via the primary keyname and value (e.g. `"Customer_id":"4084"` or `"znsq_id":"F3F9F3F1C1F0F140404040404040404040404040F0F0F0F0F0F0F0F0F0F0F0F7F2F3C..."`) when using auto-generated key-values.  
 
 ## Secondary Indexes
 
-Documents may also be retrieved or updated through the use of secondary indexes. Secondary indexes contain alternate keys which can be used to retrieve the documents in the database. By creating alternate keys, the application can have more than one option for locating specific documents, or can find groups of like documents more directly than scanning the entire database.  Alternate keys be changed (replaced) after the initial insert.
+Documents may also be retrieved or updated through the use of secondary indexes. Secondary indexes contain alternate keys which can be used to retrieve the documents in the database. By creating alternate keys, the application can have more than one option for locating specific documents, or can find groups of like documents more directly than scanning the entire database.  Alternate keys can be changed (replaced) after the initial insert.
 
-When creating a secondary index, the application developer assigns the alternate key name which contains the value to be used as the alternate key. Although the alternate key names must be less than 256 characters, the combined key name and paired value is not restricted by length. Secondary indexes must also be created while the database is fully disconnected (closed); however, the activation or deactivation can occur dynamically while the database is connected (open) and in-use. Consideration should be given when creating secondary indexes, as each additional active index will incur additional overhead when updating the database.
+When creating a secondary index, the application developer assigns the alternate keyname which contains the value to be used as the alternate key. Although the alternate keynames must be less than 256 characters, the paired value is not restricted by length. Secondary indexes must also be created while the database is fully disconnected (closed); however, the activation or deactivation can occur dynamically while the database is connected (open) and in-use. Consideration should be given when creating secondary indexes, as each additional active index will incur additional overhead when accessing the database.
 
-Assume an EzNoSQL database is created with a primary key name of `"Customer_id"` and a secondary index with an alternate key name of `"Address"`. It contains the following JSON document:
+Assume an EzNoSQL database is created with a primary keyname of `"Customer_id"` and a secondary index with an alternate keyname of `"Address"`, and contains the following JSON document:
 ```json
 {
   "Customer_id": "4084",
@@ -139,21 +165,21 @@ Assume an EzNoSQL database is created with a primary key name of `"Customer_id"`
 }
 ```
 
-The document can be retrieved either through the primary index using a key name of `"Customer_id"` and a value of `"4084"`, or via the secondary index using a key name of `"Address"` and a value of `{"Street":"1 Main Street","City":"New York","State":"NY"}`. When replacing documents, all active secondary indexes will be updated to reflect the latest `key:value` changes in the new version of the document.
+The document can be retrieved either through the primary index using a keyname of `"Customer_id"` and a value of `"4084"`, or via the secondary index using a keyname of `"Address"` and a value of `{"Street":"1 Main Street","City":"New York","State":"NY"}`. When replacing documents, all active secondary indexes will be updated to reflect the latest `key:value` changes in the new version of the document.
 
-When secondary index key names are paired with an array, alternate keys will be generated for all the values in the array. For example, an alternate key name of `"Accounts"` would allow the above document to be retrieved using a value of `"Checking"` or `"Savings"`. For a primary key name, only the first value in the array will be used as the primary key.
+When secondary index keynames are paired with an array, alternate keys will be generated for all the values in the array. For example, an alternate keyname of `"Accounts"` would allow the above document to be retrieved using a value of `"Checking"` or `"Savings"`. Primary keys are not allowed with array values.
 
 
 ### Creating and Activating Secondary Indexes
 
-A Secondary Index can be created only while the database is disconnected. However, it can be activated and built at any point in time after the successful creation of the index. Note that the time it takes to build an index is relative to the size of the database. All active indexes are updated whenever new documents are inserted, erased, or updated via the primary key or any other (active) alternate key. If a secondary index is no longer required, it can be switched to inactive (quiesced) across the sysplex.  Activating secondary indexes will require obtaining several large (2 GB) temporary buffers. Ensure that any memory restrictions allow for the necessary buffers.
+A secondary index can be created only while the database is disconnected. However, it can be activated and built at any point in time after the successful creation of the index. Note that the time it takes to build an index is relative to the size of the database. All active indexes are updated whenever new documents are inserted, erased, or updated via the primary key or any other (active) alternate key. If a secondary index is no longer required, it can be switched to inactive (quiesced) across the sysplex.  Activating secondary indexes will require obtaining several large (2 GB) temporary buffers. Ensure that any memory restrictions allow for the necessary buffers.
 
-Once a secondary index is switched to inactive, it will no longer be updated and may become out-of-sync with the documents in the database. While a secondary index is inactive, any requests to access documents via the same index will also fail. Switching the index to inactive will remove the additional overhead of maintaining that index. Inactive indexes can be re-activated and rebuilt by adding the index.
+Once a secondary index is switched to inactive, it will no longer be updated and may become out-of-sync with the documents in the database. While a secondary index is inactive, any requests to access documents via the index will fail. Switching the index to inactive will remove the additional overhead of maintaining that index. Inactive indexes can be re-activated and rebuilt by re-adding the index.
 
 
 ### Unique and Non-Unique Secondary Indexes
 
-Secondary indexes can be defined as either unique or non-unique.  For unique indexes, each key-value must be unique or a duplicate key error is returned. Note that the primary index is always unique. For non-unique secondary indexes, a duplicate value can be used to retrieve all documents containing the same value. In this scenario, EzNoSQL will indicate when more than one document exists for a given alternate key-value.
+Secondary indexes can be defined as either unique or non-unique.  For unique indexes, each key-value must be unique or a duplicate key error is returned. Note that the primary index is always unique. For non-unique secondary indexes, a duplicate value can be used to retrieve all documents containing the same value. In this scenario, EzNoSQL will return an indication when more than one document exists for a given alternate key-value.
 
 
 ## Multi-Level Keys
@@ -185,28 +211,42 @@ Multi-key names can also span into embedded documents or an array of embedded do
 }
 ```
 
+
 ## Document Retrieval
 
-Documents can be directly read, updated, or deleted by specifying the desired key name and value. Additionally, documents can be retrieved in an ordered fashion through the use of secondary indexes. For example, the application can position into the secondary index to a specific key-value, or for any value greater than or equal to the desired key range. The documents can then be retrieved in a sequential ascending or descending order, and optionally updated or deleted following the retrieval. When using sequential access to update or delete, the document will not be visible on disk and to other sharers until 1) the end of the buffer is reached, 2) a close result is issued, or 3) a successful close of the database. When a close result is issued, positioning is ended and a new request must be issued to re-establish position within the secondary index. EzNoSQL will indicate via a return code when a duplicate key-value is returned by a non-unique secondary index.
+Documents can be directly read, updated, or deleted by specifying the desired key name and value. Additionally, documents can be retrieved in an ordered (sequential) fashion through the use of ordered primary or secondary indexes. For example, the application can position into the database to a specific key-value, or for any value greater than or equal to the desired key range. The documents can then be retrieved in a sequential ascending or descending order, and optionally updated or deleted following the retrieval. When using sequential access for updates or deletes, the document will not be visible on disk and to other sharers until 1) the end of the VSAM buffer is reached, 2) a close result is issued, or 3) a successful close of the database. When a close result is issued, the VSAM buffer is written to cache and disk, positioning is ended, and a new request must be issued to re-establish position within the database. 
 
-In order to iterate in an ordered fashion over the primary key, and optionally update/delete the document(s), the application may perform a direct read with the update option for the primary key. Then optionally update result, delete result, or end the update by closing the result. Attempting to position with a generic (greater than or equal to) search may result in unpredictable results when used in conjunction with a primary index.
+In order to iterate over an unordered index, and optionally update/delete the document(s), the application may perform a direct read with the update option for the primary key and a specific full key-value. Then optionally update result, delete result, or end the update by closing the result. Attempting to position with a generic (greater than or equal to) search may result in unpredictable results when used in conjunction with an unordered primary index.
 
-While the combined alternate key-value pair is not length restricted, the alternate key itself will be automatically truncated after the first 251 bytes. Note that truncated keys may be inadvertently recognized as a non-unique key when there exists other keys containing the same initial 251 bytes. Moreover, sequentially reading truncated keys may also return the documents out of order and require further sorting by the application. EzNoSQL will return a reason code alerting the application if a truncated key is detected.
+When searching sequentially via a non-unique secondary index, EzNoSQL will issue an informational return code of '34'x when a duplicate key-value is returned. While the combined alternate key-value pair is not length restricted, the alternate key itself will be automatically truncated after the first 251 bytes. Note that truncated keys may be inadvertently recognized as a non-unique key when there exists other keys containing the same initial 251 bytes. Moreover, sequentially reading truncated keys may also return the documents out of order and require further sorting by the application. EzNoSQL will return a retrun code '35'x alerting the application if a truncated key is detected.  A return code of '36'x indicates that both a duplicate and truncated key was encountered.  When the last duplicate alternate key is returned, a '00'x return code is returned.  The application can then choose to continue reading into the next higher key range, or end the query with a close result.  
 
-When using alternate keys, documents may be retrieved by specifying either an exact match or generic search (via a full or partial key-value). If the key value is a String, then the partial key-value should contain an ending escaped quote character. For example, `"\"John S\""`.
+Documents may be retrieved by specifying a key-value either as an exact match (equal), or a partial match (greater than), in order to start a sequential search of the database. For an exact match, specify the key-value exactly as it appears in the document.  For a partial match, specify the the key-value characters which must match in order to start the search. 
+
+For example, assume the following document was inserted with a keyname of `"Customer_id"`. To search for an exact match, specify a key-value of `"\"4084\""` using the position API. The next result would return the document for "4084".  The following next result would return the next higher key-value (i.e. "4085") or the end-of-data return code.  For a partial match, one could specify a key-value of `"\"408"` would start the search for documents greater than or eauls to "408.  If the keyname is `"Address", to search for an exact match of an imbedded document key-value, specify `"{"Street":"1 Main Street","City":"New York","State":"NY"}"`.  An example of searching for a partial key could be: `"{"Street":"1 Main Street""` to start the search for any docuemnts which match the provided key-value of "Street": "1 Main Street". 
+```json
+{
+  "Customer_id": "4084",
+  "Address": {
+    "Street": "1 Main Street",
+    "City": "New York",
+    "State": "NY"
+  },
+  "Accounts": ["Checking", "Savings"]
+}
+```
 
 
 ## Recoverable Databases
 
-The recoverability of a database determines the duration of the locking and the transactional (atomic) capabilities when accessing documents in and across an EzNoSQL database. EzNoSQL will always obtain a document-level exclusive lock for any type of write, update, or delete request, but an optional shared lock may be obtained for reads:
+The recoverability of a database determines the duration of the locking and the transactional (atomic) capabilities when accessing documents in and across EzNoSQL databases. EzNoSQL will always obtain a document-level exclusive lock for any type of write, update, or delete request, but an optional shared lock may be obtained for reads.
 
-* Non-recoverable databases are created using the default log option parameter of `NONE`. When the database is created with the default log option, the document-level locks are held only for the duration of the update or read request. This means for any type of update (insert, replace, delete), a document-level lock is obtained exclusively and protects the document from multiple (simultaneous) updates. Read requests use a default option with no read integrity (`NRI`).  With `NRI`, the latest version of the document is returned at the time of the read request. Optionally shared locks may be obtained to provide a consistent read which will better protect a reader from viewing the document in the middle of an update. These shared locks may be obtained for the duration of the read request via specifying consistent read (`CR`) or for the entire duration of the transaction via consistent read extended (`CRE`). Obtaining shared locks may incur overhead and should be used only when required.
+* Non-recoverable databases are created using the default log option parameter of `NONE`. When the database is created with the default log option, the document-level locks are held only for the duration of the update or read for update request. This means for any type of update (insert, replace, delete), a document-level lock is obtained exclusively and protects the document from multiple (simultaneous) updates. Read requests use a default option of no read integrity (`NRI`).  With `NRI`, the latest version of the document is returned at the time of the read request. Optionally shared locks may be obtained to provide a consistent read which will better protect a reader from viewing the document in the middle of an update. These shared locks may be obtained for the duration of the read request via specifying consistent read (`CR`) or for the entire duration of the transaction via consistent read extended (`CRE`). Obtaining shared locks may incur overhead and should be used only when required.
 
-* Recoverable databases are created using the log option `UNDO` or `ALL`.  The `UNDO` option logs the before image of the document for backing out of a failed transaction. The `ALL` option logs both the before and after image to a forward recovery log for recovering a damaged data set. Using the `ALL` log options parameter adds forward recovery logging for the database and requires a forward recovery log to be assigned to the database. When the database is created with either `UNDO` or `ALL` option, the document-level locks (exclusive or CRE shared locks) are held for the duration of the transaction and only released after a successful commit or abort request. A transaction is started and assigned a unit of work (UOW) ID when the first update is made to any EzNoSQL database under the current task. The transaction can then be explicitly committed or backed out (aborted) by the application via the EzNoSQL APIs. Following a commit or abort, the next update request will start a new transaction ID.
+* Recoverable databases are created using the log option `UNDO` or `ALL`.  The `UNDO` option logs the before image of the document for backing out of a failed transaction. The `ALL` option logs both the before and after image to a forward recovery log for recovering a damaged data set. Using the `ALL` log options parameter adds forward recovery logging for the database and requires a forward recovery log to be assigned to the database.
 
-For recoverable databases, the autocommit option will generate a commit after every update. The autocommit option is enabled by default and the application can enable/disable autocommit at any time the task is actively connected. Note that frequent commits can cause additional overhead when updating the database, while infrequent commits can cause record lock contention with other sharers of the database.
+When accessing a recoverable database, the document-level locks (exclusive or CRE shared locks) are held for the duration of the transaction and only released after a successful commit or abort API request. Following a commit or abort, the next update request will start a new transaction ID. Additionally, an implicit commit or backout will be issued by EzNoSQL when the task ends normally or abnormally respectively. If a close occurs before an explicit commit or backout, any held locks will be retained until the task ends. New requests trying to access documents with retain locks will receive a retained lock error. Transactions which fail to abort will be shunted and the locks owned by the transaction will be retained until the issue preventing the abort is resolved.
 
-If the task ends normally without a commit for the last transaction, an implicit commit will be issued by EzNoSQL. If the task ends abnormally without a commit following the last transaction, an implicit back out (abort) will be issued by EzNoSQL. Transactions which fail to abort will be shunted and the locks owned by the transaction will be retained until the issue preventing the abort is resolved.
+* For recoverable databases, the autocommit option will generate a commit after every update. The autocommit option is enabled by default and the application can enable/disable autocommit at any time the databsase is actively connected. Note that frequent commits can cause additional overhead when updating the database, while infrequent commits can cause lock contention with other sharers of the database.
 
 
 # System Requirements
@@ -235,7 +275,7 @@ Contact your system administrator for requirements when creating EzNoSQL databas
 3. `DATACLAS` name if not assigned by the system for optional features (i.e. encryption, compression, storing data in the CF global cache) if required by the application.
 4. `MGMTCLAS` name if not assigned by the system for application requirements related to data backup frequency and data retention.
 
-Programs intending to use EzNoSQL must not execute in cross-memory (XM) mode, Functional Recovery Routine (FRR) mode, or non-primary Address Space Control (ASC) mode.
+Programs intending to use EzNoSQL must execute in a valid C LE environment and must not execute in cross-memory (XM) mode, Functional Recovery Routine (FRR) mode, or non-primary Address Space Control (ASC) mode.
 
 Programs intending to allow multiple concurrent reads/writes to the database while sharing a connection and single open must issue the connect and at least one read/write API to force the open from a parent task.  Subsequent concurrent read/write requests must be issued as children of the parent task which issued the open.  The close connection must be issued by the task that performed the open (i.e. parent task).  
 
@@ -368,7 +408,7 @@ If an error occurred, the return code contains the detailed error reason. The ma
 #### Member attributes
 | member           | type     | description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 |------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| version          | `uint8_t`    | API version.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| version          | `uint8_t`    | API version. This determines which members are usable by the API.<br>`0`: default, same as `1`<br>`ZNSQ_CREATE_OPTIONS_V1` or `1`: supports all struct members except ordered_index<br>`ZNSQ_CREATE_OPTIONS_V2` or `2`: supports ordered_index, requires OA64954                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | format           | `enum znsq_format` | Database format. Specify `0` (default) for JSON. Currently, only JSON is supported.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | max_space        | `unsigned int`    | Maximum space of database in megabytes (required). Additional space will be added per document for system metadata and generated keys: <br> ```Keyed:....x'AC' bytes``` <br> ```Autogenerated Keyed:....x'132' bytes```</br> Refer to section Primary keyed vs Autogenerated keyed databases for information on this option.                                                                                                                                                                                                                                                                   |
 | avg_doc_size     | `unsigned int`    | Average size of all documents in the database.  Providing an accurate size as close as possible may improve performance when reading/writing to the database.  A zero value will result in a default physical block size of 32768.                                                                                                                                                                                                                                                                                                                                                             |
@@ -379,8 +419,9 @@ If an error occurred, the return code contains the detailed error reason. The ma
 | mgmtclas         | `char*`   | C-string in EBCDIC (maximum of 8 character) for the optional system management class name (`MGMTCLAS`).</br>Refer to section System Administration Requirements for more information on this option.                                                                                                                                                                                                                                                                                                                                                                                           |
 | dataclas         | `char*`   | C-string in EBCDIC (maximum of 8 characters) for the optional system data class name (`DATACLAS`).</br>Refer to the section System Administration Requirements for more information on this option.                                                                                                                                                                                                                                                                                                                                                                                            |
 | logstream_id     | `char*`   | C-string in EBCDIC (maximum of 26 characters) for the optional forwards recovery log stream.  Required when log_options = 3 (`LOG_ALL`) is specified.                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ordered_index    | `unsigned int` | Specifies creation of an unordered (`0`) or ordered (`1`) primary index. If ordered, `version` must be 2 or greater. Requires OA64954. <br>Refer to section Primary Indexes for more information on this option.
 
-Example of creating a keyed EzNoSQL database:
+Example of creating a keyed EzNoSQL database with an ordered primary index:
 ```c
 znsq_create_options create_options = {0};
 char dsname[] = "MY.JSON.DATA";                         //  Database name, "MY" qualifer assigned by the system administrator
@@ -390,6 +431,9 @@ char storclas[] = "MYSTORCL";                           // STORCLAS name assigne
 create_options.max_space = 1;
 create_options.primary_key = keyname;
 create_options.storclas = storclas;
+
+create_options.version = ZNSQ_CREATE_OPTIONS_V2;        // version = 2 required for ordered index
+create_options.ordered_index = 1;
 
 int return_code = znsq_create(
     dsname,
@@ -422,7 +466,7 @@ The creation of any secondary index must occur while the database is fully disco
 `altkey`: C-string containing the name of the UTF-8 JSON C-string providing the secondary key name for the index. The string must be <256 bytes including quotes and end in one byte of x'00.  The key name may consist of a multi level name.  Refer to section [Multi Level Keys](#Multi-Level-Keys) for more information on this option.
 
 `flags`:
-+ _`1 (= (1 << 0))`_ indicates the creation of a unique index. Non-Unique indexes may contain alternate keys representing one or more documents, while unique indexes ensure only one document is represented by each key.  Attempting to insert duplicate documents with the same alternate key into a unique index will result in a duplicate document error. Refer to section entitled Unique vs Non-Unique Indexes for more information on this topic.
++ _`1 (= (1 << 0))`_ indicates the creation of a non-unique index. Non-Unique indexes may contain alternate keys representing one or more documents, while unique indexes ensure only one document is represented by each key.  Attempting to insert duplicate documents with the same alternate key into a unique index will result in a duplicate document error. Refer to section entitled Unique vs Non-Unique Indexes for more information on this topic.
 
 + _`2 (=(1 << 1))`_ indicates descending sequential access when retrieving documents through this index. Refer to section Direct vs Sequential Document Retrieval for more information on this topic.
 
@@ -716,9 +760,9 @@ int znsq_open(znsq_connection_t *con, const char *dsname, unsigned int flags,
 ```
 
 #### Establishes an open connection to an EzNoSQL database
-Opens an EzNoSQL database by establishing a connection between the user's task and the database. Additionally, the `znsq_open()` API establishes the optional parameters to be used on behalf of this connection, such as read integrity, lock timeout, auto commit, read only, write force, and read access direction for the primary index:
+Opens an EzNoSQL database by establishing a connection between the user's task and the database. Each connection allows for 1024 concurrent read/write requests. Additionally, the `znsq_open()` API establishes the optional parameters to be used on behalf of this connection, such as read integrity, lock timeout, auto commit, read only, write force, and read access direction for the primary index.
 
-Additional connections can be established as needed by the same user task, or other tasks executing across the sysplex. Additional connections allow for the use of different options, or to load balance the workload across different processors. A successful open generates a connection token which must be provided on other APIs for reading and writing to the database.
+Additional connections can be established as needed by the same user task, or other tasks executing across the sysplex. Additional connections allow for  the use of different options, or to load balance the workload across different processors. A successful open generates a connection token which must be provided on other APIs for reading and writing to the database.
 
 #### Parameters
 
@@ -907,7 +951,7 @@ should still include ending double quotes which are not part of the actual key v
 
 `key`: C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00.
 
-`key_value`: C-string containing the value for the specific document to be retrieved. To position to the first document in the primary ir secondary index, pass an empty string as the key_value.
+`key_value`: C-string containing the value for the specific document to be retrieved. To position to the first document in the primary or secondary index, pass an empty string as the key_value.
 
 `search_method`:
 + _`0`_  indicates that the first (or last) document equal to specified `key_value` should be located for subsequent sequential retrieves/updates/deletes.
@@ -1412,7 +1456,7 @@ APIs in the Document Management section must run in non-cross memory mode.
 
 ### znsq_last_result
 
-Use the `znsq_last_result()` API to obtain a text report containing additional diagnostic information following an API failure. The report is primarily intended for the system support staff. The information can be logged by the application and referred to for problem determination.
+Use the `znsq_last_result()` API to obtain a text report containing additional diagnostic information following the last API failure. Only failures which occur in the server will contain additional diagnostic information. The report is primarily intended for the system support staff. The information can be logged by the application and referred to for problem determination.
 
 ```C
 int znsq_last_result(size_t *buflen, char *buf);
@@ -1809,11 +1853,11 @@ of recovery was backed out or retried.
         avoid damaged data sets. The logOptions attribute is returned on the znsq_report_stats() API.
 ____________________________________________________________________________________________________
 **0087(X'57)** - Request Parameter List (RPL) error. Invalid RPL options were specified by the 
-system code. One example would be when attempting sequential writes/updates/deletes to the primary 
-index set. Using sequential access (i.e., znsq_position()) for updates/deletes is only applicable to
-secondary indexes.
+system code on behalf of the application's request. One example would be when attempting sequential
+writes/updates/deletes to an unordered primary index set. 
 
-        To update the primary index, use znsq_read for update followed by znsq_updated_result or
+        For the sequential write error, choose an ordered index for your data base, otherwise use a
+	direct read (znsq_read) for update followed by znsq_write_result, znsq_update_result, or
         znsq_delete_result(). If an error is still received, capture the znsq_last_result diagnostic
         information and report the problem to the z/OS support.
 ____________________________________________________________________________________________________
@@ -1919,8 +1963,22 @@ ________________________________________________________________________________
 znsq_position().
 
         Issue or reissue the znsq_position() prior to issuing the znsq_next_result().
+  ____________________________________________________________________________________________________
+**0107(X'6B)** - Retained lock held. A document level lock was retained when a recoverable application
+failed to commit or backout the transaction prior to the successful close of the database. 
+
+        Ending the application task which performed the open will invoke an implicit commit for a 
+	normal end of task, or a backout for an abnormal end of task (i.e. cancel).
+  ____________________________________________________________________________________________________
+**0108(X'6C)** - Key sequence error. A sequential write request via the znsq_write_result, 
+znsq_update_result, or znsq_erase_result APIs supplied a primary key value which did not have a value
+larger then the proceeding key value in the database.  Unordered primary indexes are not suitable for
+sequential writes as the keys are randomized.
+
+        Ensure that the key values are written in ascending order.  Use a primary ordered index if
+	sequential writes are desired. 
 ____________________________________________________________________________________________________
-**0107(X'6B)** - Reserved.
+**0109(X'6D)** - Reserved.
 **0111(X'6F)**
 ____________________________________________________________________________________________________
 **0112(X'70)** - The database is quiesced for backup. A request to insert/update/erase a document 
@@ -1971,22 +2029,54 @@ ________________________________________________________________________________
 database could not locate a BTREE control block anchored in the user's connect token. This error 
 could represent a system or user error if the connection token is overlaid or is invalid.
 
-        Verify that a valid connection token was passed on the znsq API. If valid the problem to z/OS support.
+        Verify that a valid connection token was passed on the znsq API. If valid the problem to 
+	z/OS support.
 ____________________________________________________________________________________________________
-**0122(X'7A)** - Internal ACB control block pool could not be freed. The znsq API could not free the
-storage for an internal (ACB) control block. This error would most likely be an internal system 
-logic error. A system dump is produced for this error.
+**0122(X'7A)** - Internal VRGB control block not found. The VRGB control block is created when the 
+SMSVSAM address space has initialized on the z/OS server. SMSVSAM is required to be active when 
+accessing EzNoSQL databases.
 
-        Report the problem to z/OS support.
+        Report the problem to z/OS support to ensure a proper z/OS server configuration exists
+	including the SMSVSAM address space.
 ____________________________________________________________________________________________________
-**0123(X'7B)** - Free of internal (BTREE) control block failed. The znsq API could not free the 
-storage for a node in a system BTREE. This error would most likely be an internal system logic error.
-A system dump is produced for this error.
+**0123(X'7B)** - Create for internal VTLB control block failed during znsq_open. The storage obtain 
+for the VTLB failed. This error would most likely be related to a memory shortage in the user's	
+address space.  A memory (SVC) dump of the address space is produced.
 
-        Report the problem to z/OS support.
+        Report the problem to z/OS support and refer to the associated SVC dump to aid in debugging
+	the memory issue.
 ____________________________________________________________________________________________________
-**0124(X'7C)** - Reserved.
-**0126(X'7E)**
+**0124(X'7C)** - Transactional VSAM (TVS) is not available. TVS is required to be active on the z/OS
+server when accessing a recoverable EzNoSQL database.  Recoverable databases are created when the 
+log_options(log_undo / log_all) are specified on the create.
+
+        Report the problem to z/OS support and request Transaction VSAM to be initialized on the z/OS
+	server.
+____________________________________________________________________________________________________
+**0125(X'7D)** - Transactional VSAM (TVS) is not installed. TVS is required to be active on the z/OS
+server when accessing a recoverable EzNoSQL database.  Recoverable databases are created when the 
+log_options(log_undo / log_all) are specified on the create.  TVS is a priced feature in z/OS 
+releases prior to z/OS 3.1.  TVS is included in the base license for z/OS 3.1 and above.
+
+        Report the problem to z/OS support and request Transaction VSAM to be initialized on the z/OS
+	server.
+____________________________________________________________________________________________________
+**0127(X'7F)** - Reserved.
+**0127(X'7F)**
+____________________________________________________________________________________________________
+**0128(X'80)** - Creation of internal control block representing the connection to the EzNoSQL 
+database failed.  This is most likely an internal system logic error. A (SVC) dump may have been
+produced for this error.
+
+        Report the issue to the z/OS System Programmer and reference the associated SVC dump.
+____________________________________________________________________________________________________
+**0129(X'81)** - Deletion of internal control block representing the result_set failed. This is most
+likely an internal system logic error. A (SVC) dump may have been produced for this error.
+
+        Report the issue to the z/OS System Programmer and reference the associated SVC dump.
+____________________________________________________________________________________________________
+**0138(X'8A)** - Reserved.
+**0143(X'8F)**
 ____________________________________________________________________________________________________
 **0144(X'90)** - Internal system logic error. While reading/writing to the database, an internal 
 system logic error was detected. A dump may have been produced for this error.
@@ -2011,7 +2101,24 @@ dynamically allocating the primary index.
         Ensure the secondary index has been previously created with the znsq_create_index() or 
         equivalent native API. Issue the znsq_report_stats() API to list the available indexes.
 ____________________________________________________________________________________________________
-**0154(X'9A)** - Reserved.
+**0152(X'98)** - Internal control block could not be obtained. The znsq_create_index() API could not 
+obtain storage for an internal control block. This error would most likely be related to a memory 
+shortage.
+
+    Possibly close databases to free up memory. Report the problem to z/OS support if the memory
+    shortage is unexpected.
+____________________________________________________________________________________________________  
+**0153(X'99)** - Internal control block could not be freed. The znsq_create_index() API could not 
+free storage for an internal control block. 
+
+    Internal error, report the problem to the Storage Administrator.
+____________________________________________________________________________________________________
+**0154(X'9A)** - Task hiearchy restriction during disconnect.  A znsq_close was issued from a task
+(thread) which did not perform the znsq_open, or was not a subtask of the open task. 
+
+    Ensure that znsq_open and znsq_close follows the task hiearchy requirements. 
+____________________________________________________________________________________________________
+**0155(X'9B)** - Reserved.
 **0159(X'9F)**
 ____________________________________________________________________________________________________
 **0256(X'100)** - Invalid key name. The znsq_add_index() API detected that an invalid key name was 
