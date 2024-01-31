@@ -67,3 +67,4 @@ if verbose then do i = 1 to words(users)
   user = word(users,i)
   say left(user,10) || ttys.user
 end
+
