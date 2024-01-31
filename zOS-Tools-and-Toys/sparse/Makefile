@@ -7,7 +7,10 @@
 # by default this will build in the same directory the files are in, you will
 # have to modify it if you wish to do otherwise
 
-OBJS   = sparse.o
+CC      = c99
+CFLAGS  = -c -O2 -Wc,xplink
+LDFLAGS = -Wl,xplink,edit=no
+OBJS    = sparse.o
 TARGET = sparse
 
 # --------------------------------------------------
@@ -15,10 +18,11 @@ TARGET = sparse
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
+	@echo 'Linking...'
 	$(CC) -o $(TARGET) $(LDFLAGS) $(OBJS)
 
 sparse.o: sparse.c
-	$(CC) -c $(CFLAGS) $^
-
+	$(CC) -o sparse.o $(CFLAGS) sparse.c
 clean:
-	rm -f *.o $(TARGET)
+	rm -f *.o
+	rm -f $(TARGET)
