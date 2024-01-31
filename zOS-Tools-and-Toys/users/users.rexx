@@ -61,7 +61,7 @@ do i=1 to out.0
   ttys.user = ttys.user tty
 end
 
-say "There are" out.0 "shell sessions and" words(users) "unique users"
+say "There are" out.0 "shell sessions and" words(users) "unique users."
 
 if verbose then do i = 1 to words(users)
   user = word(users,i)
