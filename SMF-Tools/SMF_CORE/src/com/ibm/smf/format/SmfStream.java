@@ -1,5 +1,5 @@
 /*                                                                   */
-/* Copyright 2021 IBM Corp.                                          */
+/* Copyright 2024 IBM Corp.                                          */
 /*                                                                   */
 /* Licensed under the Apache License, Version 2.0 (the "License");   */
 /* you may not use this file except in compliance with the License.  */
@@ -76,6 +76,39 @@ public class SmfStream extends ByteArrayInputStream {
 
   } // SmfStream.getInteger(int aByteN)	  						//@P4C
   
+	public long getLong(int aByteN) {
+
+		// return value
+		long r = 0;
+
+		// remember if the binary representation of the integer in "buf[]" is
+		// in twos complement (representation of negative values)
+		// System.out.println(">>> pos = " + pos);
+		// System.out.println(">>> buf.length = " + buf.length);
+		long sign = (buf[pos] < 0) ? -1 : 1;
+
+		// compute the integer value by adding (two complemented, if "negative" is
+		// true) bytes, that are raised to the appropriate power, to the integer
+		// value
+		int posN = pos + aByteN;
+		for (int x = pos; x < posN; ++x) {
+			int b = buf[x]; // get byte
+			if (sign < 0)
+				b = ~b; // reverse bits
+			if (b < 0)
+				b = b + 256; // correct sign
+			r = (r << 8) + b; // shift old value and add byte
+		}
+
+		if (sign < 0)
+			++r; // add one for two's complement
+
+		skip(aByteN); // bump buf
+
+		return r * sign; // apply sign
+
+	} // SmfStream.getInteger(int aByteN) //@P4C
+	  
   //----------------------------------------------------------------------------
   /** Returns a copy string, decoded as specified, of specified size.
    * @param aStringS Requested string size.
@@ -130,13 +163,13 @@ public class SmfStream extends ByteArrayInputStream {
   } // SmfStream.getByteBuffer(...)
   
   //----------------------------------------------------------------------------
-  /** Retzrns the size of the SmfStream.
+  /** Returns the size of the SmfStream.
    * @return size of SmfStream
    */
   public int size() {
     return count;
   } // SmfStream.size()
-
+  
   //----------------------------------------------------------------------------
   /** Returns a long from 8 bytes of the buffer.
    * @return long.
@@ -144,5 +177,10 @@ public class SmfStream extends ByteArrayInputStream {
   public long getLong(){ // @MD17014 3 A
       return (((getInteger(4) & 0xFFFFFFFFL)) << 32) + (getInteger(4) & 0xFFFFFFFFL);
   } //SmfStream.getLong()
+  
+  @Override
+  public String toString() {
+    return super.toString() + " { count: " + count + ", position: " + pos + ", mark: " + mark + " }";
+  }
   
 } // SmfStream
