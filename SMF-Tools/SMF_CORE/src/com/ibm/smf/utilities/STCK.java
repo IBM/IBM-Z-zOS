@@ -14,7 +14,7 @@
 /* language governing permissions and limitations under the License. */
 /*                                                                   */
 
-package com.ibm.smf.was.plugins.utilities;
+package com.ibm.smf.utilities;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -33,7 +33,6 @@ public class STCK
    * Calculate and remember the origin difference between Java and the MVS time
    */
   public final static long JAVA_MVS_ORIGIN_DIFFERENCE = calculateClockOriginDifference();
-  private static DateFormat formatter;
 
   private static long calculateClockOriginDifference() {
       Calendar calendar = Calendar.getInstance();
@@ -121,21 +120,10 @@ public class STCK
 	   // Add the timestamp to the origin difference and convert
 	   Date date = new Date(millis + JAVA_MVS_ORIGIN_DIFFERENCE);
 
-	   if (formatter == null) {
-		   String dtf = System.getProperty("com.ibm.ws390.smf.dateTimeFormat");
-		    if (dtf!=null){
-		    	formatter = new SimpleDateFormat(dtf);
-		    } else {
-		    	formatter = DateFormat.getDateTimeInstance(DateFormat.FULL,DateFormat.FULL); 	
-		    }
-
-		   TimeZone tz = TimeZone.getTimeZone("GMT");
-		   formatter.setTimeZone(tz);
-	   }
-	   
-	   return formatter.format(date);
-	  
+	   return ConversionUtilities.toString(date);
   }
+
+
   
   /**
    * Converts a String format STCK timestamp into a java.util.Date 

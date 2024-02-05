@@ -1,15 +1,26 @@
-package com.ibm.smf.was.plugins.utilities;
-//(C) Copyright IBM Corp. 2010 - All Rights Reserved.
-//DISCLAIMER:
-//The following source code is sample code created by IBM Corporation.
-//This sample code is provided to you solely for the purpose of assisting you
-//in the  use of  the product. The code is provided 'AS IS', without warranty or
-//condition of any kind. IBM shall not be liable for any damages arising out of your
-//use of the sample code, even if IBM has been advised of the possibility of
-//such damages.
+/*                                                                   */
+/* Copyright 2024 IBM Corp.                                          */
+/*                                                                   */
+/* Licensed under the Apache License, Version 2.0 (the "License");   */
+/* you may not use this file except in compliance with the License.  */
+/* You may obtain a copy of the License at                           */
+/*                                                                   */
+/* http://www.apache.org/licenses/LICENSE-2.0                        */
+/*                                                                   */
+/* Unless required by applicable law or agreed to in writing,        */
+/* software distributed under the License is distributed on an       */
+/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      */
+/* either express or implied. See the License for the specific       */
+/* language governing permissions and limitations under the License. */
+/*                                                                   */
+package com.ibm.smf.utilities;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * A set of utilities used by various plugin routines to get 
@@ -198,5 +209,27 @@ public class ConversionUtilities
   }
  }
  
+ private static DateFormat formatter;
+
+	public static String toString(Date date) {
+		if (formatter == null) {
+			String dtf = System.getProperty("com.ibm.ws390.smf.dateTimeFormat");
+			if (dtf != null) {
+				formatter = new SimpleDateFormat(dtf);
+			} else {
+				formatter = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+			}
+
+			TimeZone tz = TimeZone.getTimeZone("GMT");
+			formatter.setTimeZone(tz);
+		}
+
+		return formatter.format(date);
+	}
+	
+	public static String escapeCSV(String str) {
+		if (str == null) return "";
+		return str.replaceAll("\"", "\\\"");
+	}
 }
 
