@@ -64,7 +64,31 @@ import com.ibm.smf.format.UnsupportedVersionException;
       
     } // UserDataSection(..)
     
+    //----------------------------------------------------------------------------
+    /**
+     * UserDataSection constructor from a SmfStream.
+     *
+     * @param aSmfStream        SmfStream to be used to build this UserDataSection.
+     * @param lengthFromTriplet The length of each userdata section read from the userdata triplet
+     *                              The requested version is currently set in the Platform Neutral Section
+     * @throws UnsupportedVersionException  Exception to be thrown when version is not supported
+     * @throws UnsupportedEncodingException Exception thrown when an unsupported encoding is detected.
+     */
+    public UserDataSection(SmfStream aSmfStream, int lengthFromTriplet) throws UnsupportedVersionException, UnsupportedEncodingException {
 
+        super(s_supportedVersion);
+
+        m_version = aSmfStream.getInteger(4);
+
+        m_dataType = aSmfStream.getInteger(4);
+
+        m_dataLength = aSmfStream.getInteger(4);
+
+        m_data = aSmfStream.getByteBuffer(lengthFromTriplet - 12);
+
+    } // UserDataSection(..)
+
+    
     /**
      * Copy CTOR, called by custom formatters that extend this class.
      * @param uds The user data section
@@ -131,14 +155,15 @@ import com.ibm.smf.format.UnsupportedVersionException;
      *     
      * @param aSmfStream SmfStream to be used to build this UserDataSection.
      * @param recordSubType the 120 subtype we're adding user data to (e.g. 9)
+     * @param lengthFromTriplet The length of each userdata section read from the userdata triplet
      * @return UserDataSection formatter
      * @throws UnsupportedVersionException Exception to be thrown when version is not supported
      * @throws UnsupportedEncodingException Exception thrown when an unsupported encoding is detected.
      */
-    public static UserDataSection loadUserDataFormatter(SmfStream aSmfStream,int recordSubType)
-      throws UnsupportedVersionException, UnsupportedEncodingException 
+    public static UserDataSection loadUserDataFormatter(SmfStream aSmfStream,int recordSubType,
+    		int lengthFromTriplet) throws UnsupportedVersionException, UnsupportedEncodingException 
     {
-      UserDataSection uds = new UserDataSection(aSmfStream);
+      UserDataSection uds = new UserDataSection(aSmfStream,lengthFromTriplet);
 
 	    int type = 120;
       int subtype = recordSubType;
