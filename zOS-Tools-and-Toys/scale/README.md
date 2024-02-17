@@ -1,7 +1,7 @@
-# cleanvi
+# scale
 
-This displays an 80-column scale on the screen.  It can be useful for adjusting program output to fit without wrapping.
-
+This displays an 80-column scale on the screen.  It can be useful for adjusting
+program output to fit without wrapping.
 
 ## Syntax
 
