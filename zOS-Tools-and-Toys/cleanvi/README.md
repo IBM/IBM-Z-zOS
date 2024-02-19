@@ -1,12 +1,12 @@
 # cleanvi
 
-This displays an 80-column scale on the screen.  It can be useful for adjusting program output to fit without wrapping.
-
+A helper script to clean up the messes that interrupted ex and vi sessions
+leave around.
 
 ## Syntax
 
 ```shell
-scale
+cleanvi
 ```
 
 ## Install
