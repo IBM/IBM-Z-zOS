@@ -41,7 +41,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -129,5 +128,8 @@
       }
     }
   },
-  "defaultProject": "zosmf-external-plugin"
+  "defaultProject": "zosmf-external-plugin",
+  "cli": {
+    "analytics": false
+  }
 }

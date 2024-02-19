@@ -1,5 +1,5 @@
 /*                                                                   */
-/* Copyright 2021 IBM Corp.                                          */
+/* Copyright 2024 IBM Corp.                                          */
 /*                                                                   */
 /* Licensed under the Apache License, Version 2.0 (the "License");   */
 /* you may not use this file except in compliance with the License.  */
@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class Interpreter {
 
+	private static final boolean PRINT_WRAPPER = Boolean.parseBoolean(System.getProperty("PRINT_WRAPPER", "true"));
 
 	//----------------------------------------------------------------------------
 	/** Create a SmfRecord from a stream buffer.
@@ -62,7 +63,8 @@ public class Interpreter {
 	 */
 	public static void interpret(ISmfFile infile, SMFFilter a_filter) {
 
-		System.out.println("SMF file analysis starts ...");
+		if (PRINT_WRAPPER)
+			System.out.println("SMF file analysis starts ...");
 
 		while (true) {
 			try 
@@ -117,8 +119,11 @@ public class Interpreter {
 	}
 
 	a_filter.processingComplete();
-	System.out.println("");
-	System.out.println("SMF file analysis ended.");
+	
+	if (PRINT_WRAPPER) {
+		System.out.println("");
+		System.out.println("SMF file analysis ended.");
+	}
 	        
  } // Interpreter.interpret()
 

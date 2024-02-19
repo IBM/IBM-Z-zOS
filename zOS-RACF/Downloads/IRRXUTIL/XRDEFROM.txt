@@ -1,0 +1,84 @@
+/*rexx*/                                                                        
+/* rexx */                                                                      
+/*********************************************************************/         
+/*                                                                   */         
+/* Copyright 2022 IBM Corp.                                          */         
+/*                                                                   */         
+/* Licensed under the Apache License, Version 2.0 (the "License");   */         
+/* you may not use this file except in compliance with the License.  */         
+/* You may obtain a copy of the License at                           */         
+/*                                                                   */         
+/* http://www.apache.org/licenses/LICENSE-2.0                        */         
+/*                                                                   */         
+/* Unless required by applicable law or agreed to in writing,        */         
+/* software distributed under the License is distributed on an       */         
+/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      */         
+/* either express or implied. See the License for the specific       */         
+/* language governing permissions and limitations under the License. */         
+/*                                                                   */         
+/*********************************************************************          
+  Name:    XRDEFROM                                                             
+                                                                                
+  Author:  Bruce Wells - brwells@us.ibm.com                                     
+                                                                                
+  Purpose: Implements RDEFINE FROM with the member list included.               
+           This assumes that the new and FROM profiles are in the               
+           same class.                                                          
+                                                                                
+  Input:   A RACF user ID                                                       
+                                                                                
+  Notes:                                                                        
+                                                                                
+   The class name must be specified in full, and the profile names              
+   are case-sensitive.                                                          
+                                                                                
+  Authorization required:                                                       
+    - READ access to IRR.RADMIN.RLIST in the FACILITY class                     
+    - Authority to list the FROM profile, including its access list             
+    - Authority to define profiles in the specified class                       
+                                                                                
+  Example:                                                                      
+                                                                                
+    To define a profile named NEWPROF modeled on FROMPROF in the                
+    GTERMINL class:                                                             
+                                                                                
+    ex 'MY.REXX(EXECNAME)' 'GTERMINL NEWPROF FROMPROF'                          
+                                                                                
+**********************************************************************/         
+                                                                                
+parse arg type newprof fromprof                                                 
+Upper type                                                                      
+/*-------------------------------------------------------------------*/         
+/* Use IRRXUTIL to extract the profile into the stem named "RES".    */         
+/*                                                                   */         
+/* A return code of 12 12 8 8 24 means you do not have READ access   */         
+/* to IRR.RADMIN.RLIST in the FACILITY CLASS.                        */         
+/*-------------------------------------------------------------------*/         
+myrc=IRRXUTIL("EXTRACT",type,fromprof,"RES",,FALSE)                             
+if (word(myrc,1)<>0) then do                                                    
+   say "MYRC="myrc                                                              
+   say "An error occurred extracting" type "profile" fromprof                   
+   exit 1                                                                       
+end                                                                             
+                                                                                
+ADDRESS "TSO"                                                                   
+cmd = "RDEFINE " || type newprof || " FROM("||fromprof||")"                     
+say "Issuing:" cmd                                                              
+cmd                                                                             
+                                                                                
+say ""                                                                          
+say "================="                                                         
+if RES.BASE.MEMCNT.REPEATCOUNT > 0 then do                                      
+  say "Copying member list."                                                    
+  do i = 1 to RES.BASE.MEMCNT.REPEATCOUNT                                       
+    "RALTER" type newprof "ADDMEM("RES.BASE.MEMBER.i")"                         
+  end                                                                           
+end                                                                             
+else                                                                            
+  say "There are no members in the FROM profile to copy."                       
+                                                                                
+say ""                                                                          
+say "================="                                                         
+say "Listing new profile for verification:"                                     
+"RLIST" type newprof ALL                                                        
+                                                                                

@@ -1,0 +1,266 @@
+/*rexx*/
+#                                                                    
+#  Licensed under the Apache License, Version 2.0 (the "License");   
+#  you may not use this file except in compliance with the License.  
+#  You may obtain a copy of the License at                           
+#                                                                    
+#  http://www.apache.org/licenses/LICENSE-2.0                        
+#                                                                    
+#  Unless required by applicable law or agreed to in writing,        
+#  software distributed under the License is distributed on an       
+#  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      
+#  either express or implied. See the License for the specific       
+#  language governing permissions and limitations under the License. 
+#         
+/*---------------------------------------------------------------------------*/
+/* COPYRIGHT:                                                                */
+/*    5647-A01 (C) Copyright IBM Corporation 2023.                           */
+/*    All Rights Reserved.                                                   */
+/*    Licensed Materials - Property of IBM.                                  */
+/*    US Government Users Restricted Rights - Use, duplication or            */
+/*    disclosure restricted by GSA ADP Schedule Contract with                */
+/*    IBM Corp.                                                              */
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/* aopstart is a REXX exec used to establish a secure environment in which   */
+/* to start the Infoprint Server daemons.                                    */
+/*                                                                           */
+/* This exec assumes a default installation environment.   If this exec is   */
+/* to be used in a non-default environment, then it should be copied to      */
+/* another directory (for example /usr/sbin), and edited to accommodate the  */
+/* environment changes.  Also, modify your operator procedures to execute    */
+/* the edited version of this exec, for example, place the /usr/sbin         */
+/* directory in the PATH environment variable before Infoprint Server        */
+/* installation directory /usr/lpp/Printsrv/bin.                             */
+/*                                                                           */
+/* Items that may need to be changed include:                                */
+/*                                                                           */
+/*     REXX EXEC VARIABLES:                                                  */
+/*        install_path <-- edit this variable's value if Infoprint Server    */ 
+/*                         was installed in a non-default directory.         */
+/*                                                                           */
+/*     SECURE ENVIRONMENT VARIABLES:                                         */
+/*        PATH                                                               */
+/*        LIBPATH                                                            */
+/*        CLASSPATH                                                          */
+/*        NLSPATH                                                            */
+/*        JAVA_HOME                                                          */
+/*        AOPCONF                                                            */
+/*        AOPXFD_CONF                                                        */
+/*        AOPRXF_CONF                                                        */
+/*        AOPTRACEDIR                                                        */
+/*        _BPX_SHAREAS                                                       */
+/*        _BPX_UNLIMITED_OUTPUT                                              */
+/*                                                                           */
+/*     OTHER VARIABLES THAT MAY NEED TO BE DEFINED:                          */
+/*        STEPLIB                                                            */
+/*        _BPXK_SETIBMOPT_TRANSPORT                                          */
+/*        AOP_SAP2AFP_RESOURCES                                              */
+/*        AOPSAPD_CONF                                                       */
+/*        AOP_APPLID                                                         */
+/*                                                                           */
+/* It is recommended that nothing else be changed in this exec.              */
+/*                                                                           */
+/*                                                                           */
+/* STEP-BY-STEP INSTRUCTIONS:                                                */
+/*   1. Change to UID 0:                                                     */
+/*         su                                                                */
+/*                                                                           */
+/*   2. Copy the default aopstart file to another directory (for example,    */
+/*      /usr/sbin):                                                          */
+/*         cp /usr/lpp/Printsrv/bin/aopstart /usr/sbin/                      */
+/*                                                                           */
+/*   3. Change to the directory where aopstart was copied:                   */
+/*         cd /usr/sbin                                                      */
+/*                                                                           */
+/*   4. Set the ownership of the new aopstart file to UID 0 (ROOT):          */
+/*         chown 0 aopstart                                                  */
+/*                                                                           */
+/*   5. Set the group of the aopstart file to AOPOPER:                       */
+/*         chgrp AOPOPER aopstart                                            */
+/*                                                                           */
+/*   6. Edit the copied aopstart file, using your preferred editor:          */
+/*         vi aopstart                                                       */
+/*                                                                           */
+/*   After editing:                                                          */
+/*   7. Set the set-user-ID bit on, writeable by only UID 0, readable by     */
+/*      everyone, and executable only by UID0 and the AOPOPER group:         */
+/*         chmod 4754 aopstart                                               */
+/*                                                                           */
+/*      NOTE:  This step must be done after editing the file, since the      */
+/*             set-user-ID bit is reset by editing.                          */
+/*                                                                           */
+/*   8. Place the directory that contains the new aopstart in the PATH       */
+/*      environment variable of each operator's /u/userid/.profile file      */
+/*      before the directory that contains Infoprint Server files (default   */
+/*      directory /usr/lpp/Printsrv/bin).  For example, add this line to the */
+/*      end of the profile:                                                  */
+/*         export PATH=/usr/sbin:$PATH                                       */
+/*                                                                           */
+/*   9. Specify the full path name of the aopstart EXEC in the /etc/rc shell */
+/*      script.                                                              */
+/*                                                                           */
+/*  10. Specify the full path name of the aopstart EXEC on the PARM parameter*/
+/*      in the AOPSTART procedure.                                           */
+/*                                                                           */
+/*---------------------------------------------------------------------------*/
+/* SPECIAL NOTES:                                                            */
+/*                                                                           */
+/*      SAP Callback Daemon - if you have configured the SAP Callback Daemon,*/
+/*      you must include, in LIBPATH, the directory containing the SAP       */
+/*      remote function calls DLL (librfc.dll).                              */
+/*                                                                           */
+/*---------------------------------------------------------------------------*/
+install_path='/usr/lpp/Printsrv'  /* <<--------- EDIT this line if necessary */
+
+/*------------------------------------------------*/
+/* Establish Infoprint Server daemons environment */
+/*------------------------------------------------*/
+do
+   n=0     /* Init daemon environment variable counter */
+
+   /*----------------------------------------------------------------------*/
+   /* Copy variables to be included from the caller's to the daemon        */
+   /* environment, such as:                                                */
+   /*     LANG                                                             */
+   /*     TZ                                                               */
+   /*     LC_ALL                                                           */
+   /*     LC_CTYPE                                                         */
+   /*     LC_TIME                                                          */
+   /*     AOPTRACEON (and variations)                                      */
+   /*     AOPTRACEBYTES                                                    */
+   /*     AOPTRACEMAXFILES                                                 */
+   /*     AOPDUMPON                                                        */
+   /*     AOPVALIDATEDB                                                    */
+   /* It is recommended that no other variables be included in this list.  */
+   /* If any other variables are included, please consider their potential */
+   /* impact on system security, if misused.                               */
+   /*----------------------------------------------------------------------*/
+   do i=1 to __environment.0
+      var = substr(__environment.i,1,pos('=',__environment.i)-1)
+      if ( var="LANG",
+         | var="TZ",
+         | var="LC_ALL",
+         | var="LC_CTYPE",
+         | var="LC_TIME",
+         | substr(var,1,10)="AOPTRACEON",
+         | var="AOPTRACEBYTES",
+         | var="AOPTRACEMAXFILES",
+         | var="AOPDUMPON",
+         | var="AOPVALIDATEDB",
+         ) then
+         do
+            n=n+1                  /* Increment environment variable count.*/
+            env.n=__environment.i  /* Include env variable in daemon env.  */
+         end
+   end
+
+   /*-----------------------------------------------------------------------*/
+   /* SECURE ENVIRONMENT VARIABLES:                                         */
+   /* These environment variable values should be edited only to accommodate*/
+   /* a non-default installation configuration.                             */
+   /*-----------------------------------------------------------------------*/
+   n=n+1; env.n='PATH='install_path'/bin:/bin'
+
+/* LIBPATH not set to any XML toolkit path                                  */
+/*   n=n+1; env.n='LIBPATH='install_path'/lib:'||,                          */
+/*                         '/usr/lpp/Printsrv/lib'                          */
+
+/* LIBPATH set to the V1.10 version of the XML toolkit                      */
+/*   n=n+1; env.n='LIBPATH='install_path'/lib:/usr/lpp/ixm/IBM/xml4c-5_7/lib:'||, */  
+/*                         '/usr/lpp/ixm/IBM/xslt4c-1_11/lib:'                ||, */
+/*                         '/usr/lpp/Printsrv/lib'                                */
+
+/* LIBPATH set to the V1.11 version of the XML toolkit                          */
+   n=n+1; env.n='LIBPATH='install_path'/lib:/usr/lpp/ixm/IBM/xml4c-5_8/lib:'||, 
+                         '/usr/lpp/ixm/IBM/xslt4c-1_12/lib:'                ||,  
+                         '/usr/lpp/Printsrv/lib'                                 
+
+/* LIBPATH set to the V1.10 and V1.11 versions of the XML toolkit               */
+/* n=n+1; env.n='LIBPATH='install_path'/lib:/usr/lpp/ixm/IBM/xml4c-5_8/lib:'||, */
+/*                       '/usr/lpp/ixm/IBM/xslt4c-1_12/lib:'                ||, */
+/*                       '/usr/lpp/ixm/IBM/xml4c-5_7/lib:'                  ||, */
+/*                       '/usr/lpp/ixm/IBM/xslt4c-1_11/lib:'                ||, */ 
+/*                       '/usr/lpp/Printsrv/lib'                                */
+
+
+   n=n+1; env.n='CLASSPATH='install_path'/classes/ipp.jar:'          ||,
+                            install_path'/classes/ippserver.jar:'    ||,
+                            install_path'/classes/ippreal.jar'
+
+   n=n+1; env.n='NLSPATH='install_path'/%L/%N:'                      ||,
+                          install_path'/En_US/%N:'                   ||,
+                         '/usr/lib/nls/msg/%L/%N'
+
+   n=n+1; env.n='AOPCONF=/etc/Printsrv/aopd.conf'
+
+   n=n+1; env.n='AOPXFD_CONF=/etc/Printsrv/aopxfd.conf'
+
+   n=n+1; env.n='AOPRXF_CONF=/etc/Printsrv/aoprxf.conf'
+
+   n=n+1; env.n='AOPTRACEDIR=/var/Printsrv/trace'
+
+   n=n+1; env.n='_BPX_SHAREAS=YES'  /* Do not specify MUST. */
+
+   n=n+1; env.n='_BPX_UNLIMITED_OUTPUT=YES'
+
+   /*-----------------------------------------------------------------------*/
+   /* The following environment variables are examples of other variables   */
+   /* which may need to be set for your installation.                       */
+   /*-----------------------------------------------------------------------*/
+   /* n=n+1; env.n='JAVA_HOME=/usr/lpp/java/J1.4'                           */
+   /* n=n+1; env.n='STEPLIB=hlq.SCEERUN:hlq.SCLBDLL'                        */
+   /* n=n+1; env.n='_BPXK_SETIBMOPT_TRANSPORT=xxxxxxxx'                     */
+   /* n=n+1; env.n='AOP_SAP2AFP_RESOURCES='install_path'/sap2afp'           */
+   /* n=n+1; env.n='AOPSAPD_CONF=/etc/Printsrv/aopsapd.conf'                */
+   /* n=n+1; env.n='AOP_APPLID=xxxxxx'                                      */
+   /*-----------------------------------------------------------------------*/
+
+   env.0=n    /* Set daemon environment variable count */
+end
+
+/*--------------*/
+/* No arguments */
+/*--------------*/
+args.0=0     /* Set arg count */
+
+/*-------------------------------------------------------*/
+/* Start Infoprint Server Daemons in a clean environment */
+/*-------------------------------------------------------*/
+address syscall
+
+"geteuid"
+if (RETVAL ^= 0) then do
+  say "The effective UID is not 0 (ROOT).  Make this REXX exec (aopstart)",
+      "owned by UID=0 and set the set-user-ID bit on.",
+      "For example:"
+  say "   chown 0 aopstart       <<---set uid=0 as the owner"
+  say "   chmod 4754 aopstart    <<---set the set-user-ID bit on"
+  exit 1
+end
+
+spawn install_path||'/bin/aopcstart' 0 fd_map. args. env.
+select
+   when (RC < 0) then do;
+      say "AOP053E (aopstart) 'SYSCALL spawn' exited with status RC="RC"."
+      exit RC
+      end
+   when (RC >= 0 & RETVAL=-1) then do;
+      say "AOP053E (aopstart) 'spawn(aopcstart)' exited with status",
+          "errno=x"ERRNO" errnojr=x"ERRNOJR"."
+      if (ERRNO='81' & ERRNOJR='53B006C') then 
+         say "If you have installed Infoprint Server into a directory other than",
+             "the default, this error may indicate that you have not updated the",
+             "PATH and related environment variables in the aopstart REXX exec."
+      if (ERRNO='6F' & ERRNOJR='5B4C0002') then
+         say "If you have copied the aopstart REXX exec, then this error",
+             "may indicate the aopstart REXX exec is not owned by UID(0) and/or",
+             "does not have the set-user-ID bit set on."
+      exit RC
+      end
+   otherwise
+      /* Wait for the spawned program to end */
+      wait wstat.
+   end
+exit 0
+
