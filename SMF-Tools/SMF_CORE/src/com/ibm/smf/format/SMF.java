@@ -1,5 +1,5 @@
 /*                                                                   */
-/* Copyright 2021 IBM Corp.                                          */
+/* Copyright 2024 IBM Corp.                                          */
 /*                                                                   */
 /* Licensed under the Apache License, Version 2.0 (the "License");   */
 /* you may not use this file except in compliance with the License.  */
@@ -48,7 +48,7 @@ public class SMF
   {
    System.out.println("Specify INFILE(dataset.name) to process an SMF dump dataset");
    System.out.println("Specify PLUGIN(class,parms) to run an alternate plugin");
-   System.out.println("The default is PLUGIN(DEFAULT,STDOUT");
+   System.out.println("The default is PLUGIN(DEFAULT,STDOUT)");
    System.out.println("Additional documentation, license information, source code,");
    System.out.println("and javadoc may be found inside this .jar file");
    return;
@@ -56,6 +56,9 @@ public class SMF
   for (int i=0;i<args.length;++i)
   {
    String parm = args[i];
+   if ("com.ibm.smf.format.SMF".equals(parm)) {
+	   continue;
+   }
    int openpren=parm.indexOf("(");
    int closepren = parm.indexOf(")");
    
