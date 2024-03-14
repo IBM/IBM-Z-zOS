@@ -76,7 +76,7 @@ public class LibertyResponseTimes implements SMFFilter {
 		long bytesSent = 0;
 		String uri = null;
 
-		if (rec.m_subtypeVersion==2) {
+		if (rec.m_subtypeVersion>=2) {
 			Triplet requestDataTriplet = rec.m_requestDataTriplet;
 			sectionCount = requestDataTriplet.count();
 			if (sectionCount>0)
@@ -87,7 +87,12 @@ public class LibertyResponseTimes implements SMFFilter {
 				long endTime = (new BigInteger(ConversionUtilities.longByteArrayToHexString(sec.m_endStck),16).shiftRight(12).longValue())/1000L;
 
 				responseTime = endTime-startTime;
-				cpuTime = sec.m_totalCPUEnd-sec.m_totalCPUStart;
+				
+				long totalCPUStart = (sec.m_totalCPUStart/4096)/1000;
+				long totalCPUEnd = (sec.m_totalCPUEnd/4096)/1000;
+				
+				
+				cpuTime = totalCPUEnd - totalCPUStart;
 			}
 
 
@@ -131,7 +136,7 @@ public class LibertyResponseTimes implements SMFFilter {
 	}	
 	@Override
 	public void processingComplete() {
-		smf_printstream.println("Requests,AvgResponse,AvgCPU,AvgBytesSent,URI");
+		smf_printstream.println("Requests,AvgResponse(ms),AvgCPU(ms),AvgBytesSent,URI");
 		
 		Iterator uridIT = table.keySet().iterator();
 		while (uridIT.hasNext()) {
