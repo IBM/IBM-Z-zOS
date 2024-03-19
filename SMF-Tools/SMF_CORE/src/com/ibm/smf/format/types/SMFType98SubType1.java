@@ -53,15 +53,24 @@ public class SMFType98SubType1 extends SmfRecord {
 		int SMF98PartSeqNo = m_stream.read();
 		int SMF98SDSLen = m_stream.getInteger(2);
 		int SMF98SDSTripletsNum = m_stream.getInteger(2);
+		
+		if (DEBUG)
+			System.out.println(
+					"SMFType98SubType1 new record SMF98IND: " + SMF98IND + ", SMF98PartSeqNo: " + SMF98PartSeqNo
+							+ ", SMF98SDSLen: " + SMF98SDSLen + ", SMF98SDSTripletsNum: " + SMF98SDSTripletsNum);
 
 		// Sanity check
 		if (SMF98SDSTripletsNum == 3) {
-			// Reserved
+			// Reserved: https://www.ibm.com/docs/en/zos/3.1.0?topic=rm-record-header
 			m_stream.skip(18);
 
 			Triplet i = new Triplet(m_stream, 4, 2, 2);
 			Triplet cs = new Triplet(m_stream, 4, 2, 2);
 			Triplet d = new Triplet(m_stream, 4, 2, 2);
+			
+			if (DEBUG)
+				System.out.println(
+						"SMFType98SubType1 triplets i: " + i + ", cs: " + cs + ", d: " + d);
 
 			if (i.count() == 1) {
 				// https://www.ibm.com/docs/en/zos/3.1.0?topic=rm-identification-section-2
@@ -166,7 +175,7 @@ public class SMFType98SubType1 extends SmfRecord {
 								int tripletsLength = m_stream.getInteger(4);
 
 								if (DEBUG)
-									System.out.println("SMFType98SubType1: triplets: " + tripletsCount);
+									System.out.println("SMFType98SubType1 triplets: " + tripletsCount);
 
 								Triplet Env = new Triplet(m_stream, 4, 2, 2);
 								Triplet SIGPGRP = new Triplet(m_stream, 4, 2, 2);
@@ -188,7 +197,9 @@ public class SMFType98SubType1 extends SmfRecord {
 
 								// Read utilization:
 								// https://www.ibm.com/docs/en/zos/3.1.0?topic=supervisor-utilization-section
-								if (UT.count() == 1) {
+								if (UT.count() == 0) {
+									// ignore
+								} else if (UT.count() == 1) {
 									seek(UT);
 									int SMF98_1_UT_CPUs_Unparked_CP = m_stream.getInteger(4);
 									int SMF98_1_UT_CPUs_Unparked_zAAP = m_stream.getInteger(4);
