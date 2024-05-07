@@ -1,5 +1,5 @@
 /*                                                                   */
-/* Copyright 2021 IBM Corp.                                          */
+/* Copyright 2024 IBM Corp.                                          */
 /*                                                                   */
 /* Licensed under the Apache License, Version 2.0 (the "License");   */
 /* you may not use this file except in compliance with the License.  */
@@ -36,12 +36,24 @@ public class Triplet {
    * @param aSmfStream Smf stream to create this instance of ServeIntervalSection from.
    */
   public Triplet(SmfStream aSmfStream) {
+	  this(aSmfStream, 4, 4, 4);
+  }
+  
+  //----------------------------------------------------------------------------
+  /** Triplet constructor from SmfStream.
+   * The instance is filled from the provided SmfStream.
+   * @param aSmfStream Smf stream to create this instance of ServeIntervalSection from.
+   * @param offsetLength Length of offset field
+   * @param lengthLength Length of length field
+   * @param countLength Length of count field
+   */
+  public Triplet(SmfStream aSmfStream, int offsetLength, int lengthLength, int countLength) {
     
-    m_offset = aSmfStream.getInteger(4);
+    m_offset = aSmfStream.getInteger(offsetLength);
     
-    m_length = aSmfStream.getInteger(4);
+    m_length = aSmfStream.getInteger(lengthLength);
     
-    m_count = aSmfStream.getInteger(4);
+    m_count = aSmfStream.getInteger(countLength);
     
   } // Triplet(...)
   
@@ -109,5 +121,10 @@ public class Triplet {
     
   } // dump(...)
   /* @L1 end */
+  
+  @Override
+	public String toString() {
+		return super.toString() + " { count: " + m_count + ", offset: " + m_offset + ", length: " + m_length + " }";
+	}
   
 } // Triplet

@@ -172,7 +172,7 @@ public class LibertyBatchRecord extends WASSmfRecord{
 			     m_userDataSection = new UserDataSection[m_userDataTriplet.count()];
 			     for (int i=0; i < m_userDataTriplet.count(); i++)
 			     {
-			       m_userDataSection[i] = UserDataSection.loadUserDataFormatter(m_stream,11); 
+			       m_userDataSection[i] = UserDataSection.loadUserDataFormatter(m_stream,12,m_userDataTriplet.length()); 
 			     }
 			   }			    
 

@@ -2,7 +2,7 @@
 ```
 ** Beginning of Copyright and License **
 
-Copyright 2021 IBM Corp.                                           
+Copyright 2024 IBM Corp.                                           
                                                                     
 Licensed under the Apache License, Version 2.0 (the "License");    
 you may not use this file except in compliance with the License.   
@@ -23,10 +23,9 @@ limitations under the License.
 
 This is a Java program intended to read and process z/OS
 SMF records.  This project forms the core and defines the
-interfaces used.  Support for parsing individual SMF 
-records is provided by other projects.  Other projects 
-also may implement plugins which are called at key points
-in processing to help produce reports, etc.  
+interfaces used as well as some core SMF records and plugins.
+Other projects may implement product-specific records
+and plugins to help produce reports, etc.  
 
 ## Adding Support for SMF Record Types (and subtypes)
 
@@ -52,7 +51,7 @@ up the record type being supported.
 
 Implementers typically also override the `dump( )` method.  It is
 usually only called if no plugin is provided and
-`-DPRINT_DETAILS=YES` is set. The base `SMFRecord` implementation
+`-DPRINT_DETAILS=true` is set. The base `SMFRecord` implementation
 just prints the header, but specific record type implementations
 may choose to print out a long-form formatted version of the record.
 This can be helpful if you are just looking at one single record and
@@ -108,6 +107,12 @@ this method.
 One instance of the plugin is created for the entire run, so you can use
 object attributes to hold summary data etc. along the way.  
 
+## Core plugins
+
+- **Type98CPU** - Create a CSV from type 98.1 records with the timestamp,
+  average percent CP, zAAP, and zIIP used, and largest CPU-consuming address
+  space names for CP, zAAP, and zIIP.
+
 ## Invoking from the shell
 
 Assuming the .jar files for the core SMF processor plus any needed
@@ -121,7 +126,7 @@ SMF data dumped via the IFASMFDP utility.
 
 Without a plugin specified:
 
-* If `-DPRINT_DETAILS=YES` is not set (the default), then statistics on record
+* If `-DPRINT_DETAILS=true` is not set (the default), then statistics on record
   types are printed per system; for example:
   ```
   SMF Data for system ABCD covering Mon Dec 11 12:30:00 GMT 2023 to Mon Dec 11 14:29:59 GMT 2023
@@ -130,7 +135,7 @@ Without a plugin specified:
            120    4,801,374   99.97     1,680.77        1,236        6,116
          Total    4,802,814  100.00     1,688.82        1,236       30,204
   ```
-* If `-DPRINT_DETAILS=YES` is set, the `dump` method is called on each record as
+* If `-DPRINT_DETAILS=true` is set, the `dump` method is called on each record as
   it is processed. This will print each record header and raw record which
   is useful for developing plugins.
 

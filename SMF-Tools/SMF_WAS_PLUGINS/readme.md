@@ -114,7 +114,7 @@ indicated by a field in the record).
 - **LibertyExport** - This plugin is the equivalent of CSVExport for the SMF 120-11 Version 2 and up records written by Liberty
 for incoming HTTP requests as of 16.0.0.2.
 
-- **LibertyReponseTimes** - This is the same as the ResponseTimes plugin described later, but using the Liberty 120-11 records 
+- **LibertyResponseTimes** - This is the same as the ResponseTimes plugin described later, but using the Liberty 120-11 records 
 instead of the 120-9 records from WebSphere traditional.
 
 - **RequestDensity/RequestDensity2** - These two plugins look at the timestamps for each request and manage counters for the state the
