@@ -824,7 +824,7 @@ return connection;
 
 ### znsq_close
 
-Closes the connection to the EzNoSQL database previously established by a `znsq_open()`.
+Closes the connection to the EzNoSQL database previously established by a `znsq_open()`.  The `znsq_close` must be issued from the same task which issued the `znsq_open`. 
 
 ```C
 int znsq_close(znsq_connection_t con);
