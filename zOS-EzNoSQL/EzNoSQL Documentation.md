@@ -1054,7 +1054,7 @@ int znsq_close_result(znsq_connection_t con, znsq_result_set_t result_set);
 #### Close Result
 Ends positioning into the EzNoSQL database previously established by a `znsq_position()` or `znsq_read` with update option APIs.  The `result_set` (provided as input) is invalidated, and for non-recoverable databases, any document level locks will be released.  A new `znsq_position()` must be issued to restart sequential retrievals following the close result.  
 
-Note that a `znsq_close_result' should be issued following API read/write failures to be sure storage for the `result_set` is freed in the system server's memory. 
+Note that a `znsq_close_result` should be issued following API read/write failures to be sure storage for the `result_set` is freed in the system server's memory. 
 
 #### Parameters
 
