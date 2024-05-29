@@ -1252,7 +1252,7 @@ If the auto-commit option is active for the connection, then a commit will be is
 
 `key`: C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00.
 
-`key_value`: key value for the specific document to be retrieved.
+`key_value`: key value for the specific document to be retrieved and updated.
 
 #### Return value
 The return code of the function.
