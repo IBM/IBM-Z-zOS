@@ -2693,8 +2693,14 @@ information for the base or one of the alternate index previously created with t
 
         Ensure a valid connection token for the correct data set name was provided to the 
         znsq_report_stats() API. If the name is correct, contact the z/OS Storage Administrator.
-____________________________________________________________________________________________________
+___________________________________________________________________________________________________
 **32767(x'7FFF)** - Unknown error. An unknown error resulted in the termination of the API request.  
-Likely an abend occurred during the request.
+Likely an abend occurred during the request and a system dump may be available for further diagnosis.
 
-        Report the problem to the Storage Administrator along with any last result API diagnostic information.
+        Report the problem to the Storage Administrator along with any last result API diagnostic 
+	information.
+____________________________________________________________________________________________________ 
+ **-1(x'FFFF)** - Parameter error.  One or more parameters passed to the EzNoSQL C API are not valid.  
+
+        Probable application error.  Verify the parameters passed to the API are correct.
+____________________________________________________________________________________________________ 
