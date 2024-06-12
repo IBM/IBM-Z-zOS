@@ -141,6 +141,7 @@ public class ResponseTimes implements SMFFilter {
 	@Override
 	public void processRecord(SmfRecord record) {
 	     // cast to a subtype 9 and declare generic variables
+		if (record instanceof RequestActivitySmfRecord) {
 		 RequestActivitySmfRecord rec = (RequestActivitySmfRecord)record;
 		 Triplet zOSRequestTriplet;
 		 int sectionCount;
@@ -267,7 +268,7 @@ public class ResponseTimes implements SMFFilter {
 		 urid.update(responseTime, queueTime, dispatchTime, cpuTime,offloadCpu,bytesReceived,bytesSent);
 	     
          ++totalRequests;
-		
+		}
 	}
 	
 	private Map<String, URIData> getTable(String breakdownKey, long receiveTime, long queuedTime, long dispatchStart, long dispatchEnd, long responded) {

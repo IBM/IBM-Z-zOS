@@ -28,63 +28,80 @@ public class Interpreter {
 
 	private static final boolean PRINT_WRAPPER = Boolean.parseBoolean(System.getProperty("PRINT_WRAPPER", "true"));
 
-	//----------------------------------------------------------------------------
-	/** Create a SmfRecord from a stream buffer.
-	 * The SmfRecord is specialized as indicated by the type.
-	 * createSmfRecord acts as a factory method for SmfRecord.
+	// ----------------------------------------------------------------------------
+	/**
+	 * Create a SmfRecord from a stream buffer. The SmfRecord is specialized as
+	 * indicated by the type. createSmfRecord acts as a factory method for
+	 * SmfRecord.
+	 * 
 	 * @param aStream SmfStream to create the SmfRecord from.
 	 * @return A SmfRecord parsed from the stream.
-	 * @throws UnsupportedVersionException Exception thrown when the requested version is higher than the supported version.
-	 * @throws UnsupportedEncodingException Exception thrown when an unsupported encoding is encountered during Smf stream parse.
-	*/
+	 * @throws UnsupportedVersionException  Exception thrown when the requested
+	 *                                      version is higher than the supported
+	 *                                      version.
+	 * @throws UnsupportedEncodingException Exception thrown when an unsupported
+	 *                                      encoding is encountered during Smf
+	 *                                      stream parse.
+	 */
 	private static SmfRecord createSmfRecord(SmfStream aStream, SMFFilter a_filter)
-		throws UnsupportedVersionException, UnsupportedEncodingException 
-	{
-   	 SmfRecord smfRecord = new SmfRecord(aStream);
+			throws UnsupportedVersionException, UnsupportedEncodingException {
+		SmfRecord smfRecord = new SmfRecord(aStream);
 
-	 /* check the validity of the record header flag */
-	 if (a_filter.preParse(smfRecord))
-	 {	
-	  smfRecord = a_filter.parse(smfRecord);
-	 } 
-	 else
-		smfRecord=null;
+		/* check the validity of the record header flag */
+		if (a_filter.preParse(smfRecord)) {
+			smfRecord = a_filter.parse(smfRecord);
+		} else
+			smfRecord = null;
 
-	 return smfRecord;
+		return smfRecord;
 
 	} // Interpreter.createSmfRecord()
 
-	//----------------------------------------------------------------------------
-	/** Main method of the interpreter
-	 * It reads and interprets SmfRecords from the SmfStream one by one
-	 * and dumps each record into a SmfPrintStream. 
-	 * @param infile input file to parse
-	 * @param a_filter input filter to use
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * Main method of the interpreter It reads and interprets SmfRecords from the
+	 * SmfStream one by one and dumps each record into a SmfPrintStream.
+	 * Perform completion processing.
+	 * 
+	 * @param infile            input file to parse
+	 * @param a_filter          input filter to use
 	 */
 	public static void interpret(ISmfFile infile, SMFFilter a_filter) {
+		interpret(infile, a_filter, true);
+	}
+	
+	/**
+	 * Main method of the interpreter It reads and interprets SmfRecords from the
+	 * SmfStream one by one and dumps each record into a SmfPrintStream.
+	 * 
+	 * @param infile            input file to parse
+	 * @param a_filter          input filter to use
+	 * @param performCompletion whether or not to perform completion on the filter
+	 */
+	public static void interpret(ISmfFile infile, SMFFilter a_filter, boolean performCompletion) {
 
 		if (PRINT_WRAPPER)
 			System.out.println("SMF file analysis starts ...");
 
 		while (true) {
-			try 
-			{
-			 // read record
-			 byte recordData[] = infile.read();
+			try {
+				// read record
+				byte recordData[] = infile.read();
 
-			 if (recordData == null)
-				break;
+				if (recordData == null)
+					break;
 
-			 SmfRecord record = null;
+				SmfRecord record = null;
 
-			 SmfStream recordStream = new SmfStream(recordData);
+				SmfStream recordStream = new SmfStream(recordData);
 
-  		     record = createSmfRecord(recordStream,a_filter);
-			 if (record!=null) {
-				   record.rawRecord(recordData);
-	               a_filter.processRecord(record);
-				 } 
-			 
+				record = createSmfRecord(recordStream, a_filter);
+				if (record != null) {
+					record.rawRecord(recordData);
+					a_filter.processRecord(record);
+				}
+
 			} // try
 
 			catch (UnsupportedVersionException e) {
@@ -101,30 +118,37 @@ public class Interpreter {
 			} // catch ... IOException
 
 			catch (Throwable e) {
-				System.out.println(
-					"Exception during interpretation: " + e.getMessage());
+				System.out.println("Exception during interpretation: " + e.getMessage());
 				e.printStackTrace();
 			} // catch ... Throwable
 
 		} // while (true) ... scan file for records
 
-	try
-	{
-	 infile.close();
-	}  
-	catch (IOException e) 
-	{
-	 System.out.println(" IOException during close:");
-	 System.out.println(" Exception data:\n" + e.toString());
-	}
+		try {
+			infile.close();
+		} catch (IOException e) {
+			System.out.println(" IOException during close:");
+			System.out.println(" Exception data:\n" + e.toString());
+		}
 
-	a_filter.processingComplete();
+		if (performCompletion) {
+			performFilterCompletion(a_filter);
+		}
+
+	} // Interpreter.interpret()
 	
-	if (PRINT_WRAPPER) {
-		System.out.println("");
-		System.out.println("SMF file analysis ended.");
+	/**
+	 * Perform final completion processing on the filter.
+	 * 
+	 * @param a_filter The filter to process.
+	 */
+	public static void performFilterCompletion(SMFFilter a_filter) {
+		a_filter.processingComplete();
+
+		if (PRINT_WRAPPER) {
+			System.out.println("");
+			System.out.println("SMF file analysis ended.");
+		}
 	}
-	        
- } // Interpreter.interpret()
 
 } // Interpreter
