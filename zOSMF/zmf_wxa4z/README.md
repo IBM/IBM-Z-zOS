@@ -10,7 +10,7 @@ Here is a <a href="https://ibm.box.com/shared/static/kk2gl930r84zyzyf7kok105d4z6
 ### Prerequisites
 * Install IBM watsonx Assistant for Z in your on-premises environment.
 * z/OS V2R5 or above with z/OSMF enabled.
-* Ensure IBM watsonx Assistant for Z can be accessed from your browser, and install the server certificate in your browser if it is self-signed.
+* For every end user who needs to access this plugin from z/OSMF, please ensure Cloud Pak for Data host that is used by IBM watsonx Assistant for Z can be accessed from your browser. This can be done by opening the URL of Cloud Pak for Data from your browser.
 
 ### Installation steps for this plugin
 1. Choose a USS directory on z/OS as the installation location for zmf_wxa4z.
