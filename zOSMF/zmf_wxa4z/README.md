@@ -3,7 +3,7 @@
 zmf_wxa4z is a sample plugin for z/OS Management Facility (z/OSMF). It allows you to easily enable chat interface of IBM watsonx Assistant for Z in z/OSMF.
 This IBM watsonx Assistant for Z plugin provides an out-of-box LLM based chat interface in z/OSMF which enables a fingertip assistant for you to work with z/OS from z/OSMF. 
 
-Here is a <a href="https://ibm.box.com/shared/static/wgdg2hmznflh88dw28sdd5mgoc7qtgk6.mov">demo</a> about this plugin.
+Here is a <a href="https://ibm.box.com/shared/static/kk2gl930r84zyzyf7kok105d4z6wfzid.mov">demo</a> about this plugin.
 
 ## Getting Started
 
