@@ -18,6 +18,5 @@ This project demostrates how to use z/OSMF Security Configuration Assistant.
 ## docs
 This directory contains z/OSMF documents that you might find to be helpful in learning about z/OSMF.
 
-
-
-
+## zmf_wxa4z
+This is a sample plugin for z/OSMF. It allows you to easily enable chat interface of IBM watsonx Assistant for Z in z/OSMF.
