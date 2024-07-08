@@ -21,14 +21,14 @@ cd <the installation path you picked up in step 1>
 chmod 644 wxa4z*.properties
 chmod -R 755 ui
 ```
-4. Open the z/OSMF UI and then open Import Manager plugin (If you don't see Import Manager plugin on z/OSMF Desktop, you can find this plugin from "App Center" icon on the bottom left).
-5. Navigate to the Import tab within Import Manager plugin, specify the full path and filename of the property file wxa4z.properties, and proceed by clicking Import. The plugin should now be installed in your z/OSMF. You can find the icon named "watsonx Assistant for Z" on z/OSMF Desktop.
-6. Users who need to access this plugin requries proper security permission. Here are the example RACF commands. If your setup uses an external security manager other than RACF, adjust these commands accordingly for your environment:
+4. Users who need to access this plugin requries proper security permission. Here are the example RACF commands. If your setup uses an external security manager other than RACF, adjust these commands accordingly for your environment:
 ```
 RDEFINE ZMFAPLA IZUDFLT.ZOSMF.IBM_WXA4Z.CHAT UACC(NONE)
 PERMIT IZUDFLT.ZOSMF.IBM_WXA4Z.CHAT CLASS(ZMFAPLA) ID(<user id or group id>) ACCESS(READ)
 SETROPTS RACLIST(ZMFAPLA) REFRESH
 ```
+5. Open the z/OSMF UI and then open Import Manager plugin (If you don't see Import Manager plugin on z/OSMF Desktop, you can find this plugin from "App Center" icon on the bottom left).
+6. Navigate to the Import tab within Import Manager plugin, specify the full path and filename of the property file wxa4z.properties, and proceed by clicking Import. The plugin should now be installed in your z/OSMF. You can find the icon named "watsonx Assistant for Z" on z/OSMF Desktop.
 
 These steps guide you through the process of installing and configuring zmf_wxa4z on your z/OS system for integrating chat interface of IBM watsonx Assistant for Z in z/OSMF. Adjust commands and paths as needed based on your specific environment and security configuration. If you need to upgrade the plugin to a newer version later, simply replace the 'ui' directory with the latest version.
 
