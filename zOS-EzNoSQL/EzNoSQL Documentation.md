@@ -148,7 +148,7 @@ The inserted document can then be retrieved directly via the primary keyname and
 
 ## Secondary Indexes
 
-Documents may also be retrieved or updated through the use of secondary indexes. Secondary indexes contain alternate keys which can be used to retrieve the documents in the database. By creating alternate keys, the application can have more than one option for locating specific documents, or can find groups of like documents more directly than scanning the entire database.  Alternate keys can be changed (replaced) after the initial insert.
+Documents may also be retrieved or updated through the use of secondary indexes. Secondary indexes contain alternate keys which can be used to retrieve the documents in the database. By creating alternate keys, the application can have more than one option for locating specific documents, or can find groups of like documents more directly than scanning the entire database.  Alternate keys can be changed (replaced) or deleted after the initial insert.  Documents are not required to contain an element with the alternate key, unlike the primary index where the documents must contain an element with the primary key. 
 
 When creating a secondary index, the application developer assigns the alternate keyname which contains the value to be used as the alternate key. Although the alternate keynames must be less than 256 characters, the paired value is not restricted by length. Secondary indexes must also be created while the database is fully disconnected (closed); however, the activation or deactivation can occur dynamically while the database is connected (open) and in-use. Consideration should be given when creating secondary indexes, as each additional active index will incur additional overhead when accessing the database.
 
@@ -824,7 +824,7 @@ return connection;
 
 ### znsq_close
 
-Closes the connection to the EzNoSQL database previously established by a `znsq_open()`.
+Closes the connection to the EzNoSQL database previously established by a `znsq_open()`.  The `znsq_close` must be issued from the same task which issued the `znsq_open`. 
 
 ```C
 int znsq_close(znsq_connection_t con);
@@ -1052,7 +1052,9 @@ int znsq_close_result(znsq_connection_t con, znsq_result_set_t result_set);
 ```
 
 #### Close Result
-Ends positioning into the EzNoSQL database previously established by the `znsq_position()` API.  The `result_set` (provided as input) is invalidated, and for non-recoverable databases, any document level locks will be released.  A new `znsq_position()` must be issued to restart sequential retrievals following the close result.
+Ends positioning into the EzNoSQL database previously established by a `znsq_position()` or `znsq_read` with update option APIs.  The `result_set` (provided as input) is invalidated, and for non-recoverable databases, any document level locks will be released.  A new `znsq_position()` must be issued to restart sequential retrievals following the close result.  
+
+Note that a `znsq_close_result` should be issued following API read/write failures to be sure storage for the `result_set` is freed in the system server's memory. 
 
 #### Parameters
 
@@ -1092,7 +1094,7 @@ int znsq_write(znsq_connection_t con, const char *buf, size_t buf_len, znsq_writ
 #### Write new documents
 Writes (inserts) new documents into the EzNoSQL database using the key name (optionally) specified. Whether the key name represents the primary or a secondary index, all indexes are updated to reflect the new values found in the document. For a keyed EzNoSQL database, the key name on write must match the key name specified on create. If the key value was previously added to the database, then a duplicate document error is returned, unless the write force option was specified on the `znsq_open()` API.
 
-If the key name option is omitted, the database is assumed to be an auto-generated keyed database, and will generate a new `"key:value"` element for the document (refer to the section Primary keyed vs Auto-generated keyed databases for more information on this topic).  If the document contains an auto-generated key element from a prior write request, a duplicate document error will be returned unless the write force option was specified on the `znsq_open()` API.
+If the key name option is omitted, the database is assumed to be an auto-generated keyed database, and will generate a new `"key:value"` element for the document (refer to the section Primary keyed vs Auto-generated keyed databases for more information on this topic).  If the document contains an auto-generated key element from a prior write request, a duplicate document error will be returned unless the write force option was specified on the `znsq_open()` API. 
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful write.
 
@@ -1236,7 +1238,7 @@ int znsq_update(znsq_connection_t con, const char *newbuf,const char *key, const
 ```
 
 #### Direct update documents
-Issues a direct update for a previously added document using the requested `key` name and `key_value`, and providing the updated version of the document. The `key` must match the key name on a previously issued `znsq_create()`, `znsq_create_index()`, or a generated `"znsq_id"` element. The value must match a previously added value paired with the specified key name, otherwise a document not found error is returned.
+Issues a direct update for a previously added document using the requested `key` name and `key_value`, and providing the updated version of the document. The `key` must match the key name on a previously issued `znsq_create()`, `znsq_create_index()`, or a generated `"znsq_id"` element. The value must match a previously added value (including a previous generated auto-key value) paired with the specified key name, otherwise a document not found error is returned.
 
 An exclusive document level lock will be obtained for the update request.  For non-recoverable databases, the lock will be released immediately following the request, and for recoverable databases, the lock will be released by a `znsq_commit()`, `znsq_abort()`, or when the task ends.
 
@@ -1250,7 +1252,7 @@ If the auto-commit option is active for the connection, then a commit will be is
 
 `key`: C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00.
 
-`key_value`: key value for the specific document to be retrieved.
+`key_value`: key value for the specific document to be retrieved and updated.
 
 #### Return value
 The return code of the function.
@@ -1456,7 +1458,7 @@ APIs in the Document Management section must run in non-cross memory mode.
 
 ### znsq_last_result
 
-Use the `znsq_last_result()` API to obtain a text report containing additional diagnostic information following the last API failure. Only failures which occur in the server will contain additional diagnostic information. The report is primarily intended for the system support staff. The information can be logged by the application and referred to for problem determination.
+Use the `znsq_last_result()` API to obtain a text report containing additional diagnostic information following API failures. The report may not show the last API to fail but the last API which contains additional diagnostic information.  Only failures which occur in the EzNoSQL server will contain additional diagnostic information. The report is primarily intended for the system support staff. The information can be logged by the application and referred to for problem determination.
 
 ```C
 int znsq_last_result(size_t *buflen, char *buf);
@@ -2075,7 +2077,15 @@ likely an internal system logic error. A (SVC) dump may have been produced for t
 
         Report the issue to the z/OS System Programmer and reference the associated SVC dump.
 ____________________________________________________________________________________________________
-**0138(X'8A)** - Reserved.
+**0138(X'8A)** - Position attempted for an empty database.  A `znsq_position` API was issued for an
+empty database.  The error maybe expected when used to determine if the database is empty. 
+
+        If the error is unexpected, determine whether or not there are documents in the database by 
+	printing the database or disk drive tracks via system utilities. Contact the z/OS Storage  
+        adminstrator for assistence with problem determination. 
+____________________________________________________________________________________________________
+
+**0139(X'8B)** - Reserved.
 **0143(X'8F)**
 ____________________________________________________________________________________________________
 **0144(X'90)** - Internal system logic error. While reading/writing to the database, an internal 
@@ -2117,9 +2127,6 @@ ________________________________________________________________________________
 (thread) which did not perform the znsq_open, or was not a subtask of the open task. 
 
     Ensure that znsq_open and znsq_close follows the task hiearchy requirements. 
-____________________________________________________________________________________________________
-**0155(X'9B)** - Reserved.
-**0159(X'9F)**
 ____________________________________________________________________________________________________
 **0256(X'100)** - Invalid key name. The znsq_add_index() API detected that an invalid key name was 
 provided to the API. The key name did not start with an opening double quote.
@@ -2211,16 +2218,13 @@ parameter on the znsq_report_stats() API.
 
         Obtain the required buffer size and reissue the znsq_report_stats() API.
 ____________________________________________________________________________________________________
-**0282(X'11A)** - Reserved.
-**0287(X'11F)**
-____________________________________________________________________________________________________
 **0288(X'120)** - The znsq_close() API detected a null connection token.
 
         Ensure a connection token was passed to the znsq_close() API.
 ____________________________________________________________________________________________________
-**0289(X'121)** - An invalid connection token. The znsq_close() API detected an invalid connection token.
+**0289(X'121)** - An invalid connection token. The EzNoSQL API detected an invalid connection token.
 
-        Ensure a valid connection token was passed to the znsq_close() API.
+        Ensure a valid connection token was passed to the EzNoSQL API.
 ____________________________________________________________________________________________________
 **0291(X'123)** - Document is too large for logging. The database was defined as a recoverable 
 database (logOptions(UNDO/ALL)) and a document larger than 62K (63488 bytes) was inserted/updated in
@@ -2366,7 +2370,7 @@ the index.
 
              Contact the z/OS Storage and provide the output from the znsq_last_result error.	
 __________________________________________________________________________________________________________________________________________
-**0282(X'11B)** - Create, add or drop function terminated due to z/OS catalog error. An error occurred while creating a database, secondary
+**0283(X'11B)** - Create, add or drop function terminated due to z/OS catalog error. An error occurred while creating a database, secondary
 index, or enabling/disabling the index.
 
              Contact the z/OS Storage and provide the output from the znsq_last_result error.			     
@@ -2423,12 +2427,11 @@ ________________________________________________________________________________
 Return Code 36(X'24)
 Reason Code Meaning
 ____________________________________________________________________________________________________
-**0022(X'16)** - Dynamic Allocation of the database failed. The znsq_open() and znsq_add_index() APIs 
-could not allocate the database or alternate index to the user's program.
+**0022(X'16)** - Dynamic Allocation of the internal work files failed. Select EzNoSQL APIs allocate
+temporary work files which must be allocated on DASD volumes mounted storage (STRG).  If there are
+no available storage volumes, the API will fail.
 
-        Ensure the database or index was successfully created prior to issuing znsq_open() or 
-        znsq_add_index().
-____________________________________________________________________________________________________
+Ensure storage volumes with at least one track per concurrent create or destroy APIs are online. ____________________________________________________________________________________________________
 **0023(X'17)** - Connection token could not be obtained. The znsq_open() API could not obtain 
 storage for a connection token. This error would most likely be related to a memory shortage.
 
@@ -2549,6 +2552,44 @@ freeing 24-bit storage for a DCB control block.
 
         Report the issue to the z/OS Storage Administrator.
 ____________________________________________________________________________________________________
+**0154(X'9A)** - A close was issued from a task which did not issue the open. A `znsq_close` was
+issued for a connection token from a task which did not issue the `znsq_open'.  A task structure 
+violation has occurred.  Most likely, the wrong connection token was used.  
+
+        Ensure the correct connection token was provided, and the `znsq_close` was issued from the
+	task which issued the znsq_open.
+____________________________________________________________________________________________________
+**0155(X'9B)** - Creation of latch failed for internal serialization of result_sets. The creation of
+a latch required to serialize result_set memory in the server failed.  A SVC dump is produced.
+
+        This is a probable internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0156(X'9C)** -A connection token latch obtain failed. A `znsq_open', 'znsq_close`, or the end of the
+task obtains a latch to serialize obtaining/freeing connection token memory.  A SVC dump is produced.
+
+        This is a probable internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0157(X'9D)** - A connection token latch release failed. A `znsq_open', 'znsq_close`, or the end of 
+the task obtains/releases a latch to serialize obtaining/freeing connection token memory.  A SVC
+dump is produced.
+
+        This is a probable internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0158(X'9E)** - Result_set latch obtain failed. The EzNoSQL API latch obtain failed while serializng
+the obtaining/releasing of result_set memory.  A SVC dump is produced.
+
+        This is a probable internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0159(X'9F)** - Result_set latch release failed. The EzNoSQL API latch release failed while 
+serializng the obtaining/releasing of result_set memory.  A SVC dump is produced.
+
+        This is a probable internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
 **0258(X'102)** - An internal logic error occurred. The znsq_add_index() API encountered an internal
 logic error while dynamically deallocating temporary work files.
 
@@ -2564,7 +2605,17 @@ logic error while dynamically deallocating temporary work files.
 
         Report the issue to the z/OS Storage Administrator.
 ____________________________________________________________________________________________________
-**0273(X'111)-0274(x'112)** - Reserved.
+**0273(X'111)** - Delete of connection token memory failed. The `znsq_close` or end of task failed
+to delete connection token memory. A SVC dump is produced.
+
+        This is probably an internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0274(X'112)** - Creation of the connection token related memory failed. The `znsq_open` could not
+create memory for tacking connection tokens. A SVC dump is produced.
+
+        This is probably an internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
 ____________________________________________________________________________________________________
 **0277(X'115)** - Database not found. The znsq_add_index or the znsq_drop Index could not locate the
 base database provided to the API.
@@ -2593,7 +2644,33 @@ information for the base or one of the alternate index previously created with t
         Ensure a valid connection token for the correct data set name was provided to the 
         znsq_report_stats() API.
 ____________________________________________________________________________________________________
-**0290(X'122)** - Database in use. The znsq_destroy() API detected the database is still open/allocated.
+**0284(X'11C)** - Connection token latch obtain failed. The EzNoSQL API attempted to verify
+the validity of the connection token and the latch obtain serializing the check failed. A SVC dump 
+is produced.
+
+        This is probably an internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0285(X'11D)** - Connection token latch release failed. The EzNoSQL API attempted to verify
+the validity of the connection token and the latch release serializing the check failed. A SVC dump 
+is produced.
+
+        This is probably an internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0286(X'11E)** - SYSZNSQL serialization obtain failed.  The `znsq_open` API attempted to obtain the
+SYSZNSQL resource failed while serializing with other opens. A SVC dump is produced.
+
+        This is probably an internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0287(X'11F)** - SYSZNSQL serialization release failed.  The `znsq_open` API attempted to release
+the SYSZNSQL resource failed while serializing with other opens. A SVC dump is produced.
+
+        This is probably an internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0290(X'122)** - Database in use. The `znsq_destroy` API detected the database is still open/allocated.
 
         Ensure the connection for this database is closed using the znsq_close() API before 
         attempting to destroy the database.
@@ -2616,8 +2693,14 @@ information for the base or one of the alternate index previously created with t
 
         Ensure a valid connection token for the correct data set name was provided to the 
         znsq_report_stats() API. If the name is correct, contact the z/OS Storage Administrator.
-____________________________________________________________________________________________________
+___________________________________________________________________________________________________
 **32767(x'7FFF)** - Unknown error. An unknown error resulted in the termination of the API request.  
-Likely an abend occurred during the request.
+Likely an abend occurred during the request and a system dump may be available for further diagnosis.
 
-        Report the problem to the Storage Administrator along with any last result API diagnostic information.
+        Report the problem to the Storage Administrator along with any last result API diagnostic 
+	information.
+____________________________________________________________________________________________________ 
+ **-1(x'FFFF)** - Parameter error.  One or more parameters passed to the EzNoSQL C API are not valid.  
+
+        Probable application error.  Verify the parameters passed to the API are correct.
+____________________________________________________________________________________________________ 
