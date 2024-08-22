@@ -20,3 +20,6 @@ This directory contains z/OSMF documents that you might find to be helpful in le
 
 ## zmf_wxa4z
 This is a sample plugin for z/OSMF. It allows you to easily enable chat interface of IBM watsonx Assistant for Z in z/OSMF.
+
+## Zosmf-Python
+This folder contains sample python scripts that drive z/OSMF REST APIs. 
