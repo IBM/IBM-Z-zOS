@@ -17,6 +17,8 @@ The following major categories are used:
 
 * [zOS Automation](zOS-Automation)
 
+* [zOS Container Platform](zOS-Container-Platform)
+
 * [zOS CPM](zOS-CPM)
 
 * [zOS HCD HCM](zOS-HCD_HCM)
