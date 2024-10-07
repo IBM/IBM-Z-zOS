@@ -51,6 +51,7 @@ Document Retrieval APIs:
 
 Document Management APIs:
 * [znsq_write()](#znsq_write)
+* [znsq_write_result()](#znsq_write_result)
 * [znsq_delete()](#znsq_delete)
 * [znsq_delete_result()](#znsq_delete_result)
 * [znsq_update()](#znsq_update)
@@ -1148,6 +1149,78 @@ int return_code = znsq_write(
 if (return_code != 0)
 {
     printf("Error returned from znsq_write()\n");
+    printf("Return code received: X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
+```
+
+### znsq_write_result
+```C
+int znsq_write_result(znsq_connection_t con, znsq_result_set_t *result_set, const char *buf, size_t buf_len, znsq_write_result_options *options);
+```
+
+#### Write new documents sequentially
+Sequentially writes (inserts) new documents into the EzNoSQL database using the keyname (optionally) specified. Whether the key name represents the primary or a secondary index, all indexes are updated to reflect the new values found in the document. For a keyed EzNoSQL database, the key name on write must match the key name specified on create. If the key value was previously added to the database, then a duplicate document error is returned, unless the write force option was specified on the `znsq_open()` API.
+
+If the key name option is omitted, the database is assumed to be an auto-generated keyed database, and will generate a new `"key:value"` element for the document (refer to the section Primary keyed vs Auto-generated keyed databases for more information on this topic).  If the document contains an auto-generated key element from a prior write request, a duplicate document error will be returned unless the write force option was specified on the `znsq_open()` API. 
+
+If the auto-commit option is active for the connection, then a commit will be issued following a successful write.
+
+#### Parameters
+
+`con`: connection token from a previous `znsq_open()`.
+
+`result_set`: pointer to an int32_t token generated from a previous successful `znsq_position()`. Alternatively, a pointer to a value of 0 is allowed if the database is empty.
+
+`buf`: contains the JSON document followed by an ending delimiter of x'00.
+
+`buf_len`: the length of the document.
+
+`options`: pointer to a struct of type `znsq_write_result_options`, where the database attributes are provided.
+
+#### Return value
+The return code of the function.
+
+If the document was created, the return code is 0.
+
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes 2 and 3 of the return code.
+
+#### struct znsq_write_result_options
+`znsq_write_result_options;`
+
+#### Member attributes
+| member         | type           | description                                                                                                                   |
+|----------------|----------------|-------------------------------------------------------------------------------------------------------------------------------|
+| version        | `uint8_t`      | API version.                                                                                                                  |
+| key_name       | `const char*`  | C-string containing the key name used on the `znsq_create()` or `znsq_create_index()` including an ending delimiter of x'00'. |
+| autokey_buffer | `char*`        | Minimum buffer of 122 bytes to receive the generated key for auto generated EzNoSQL databases.                                |
+| autokey_length | `unsigned int` | Will store the length of the auto generated key (output).                                                                     |                                                                                
+
+Example of sequentially writing a document to a keyed EzNoSQL database:
+```C
+char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};  // "_id" in utf-8
+char write_buf[] = {                                  // Document {"_id":"01","Date":"01/01/23"}
+    0x7b, 0x22, 0x5f, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x30, 0x31, 0x22,
+    0x2c, 0x22, 0x44, 0x61, 0x74, 0x65, 0x22,
+    0x3a, 0x22, 0x30, 0x31, 0x2f, 0x30, 0x31, 0x2f, 0x32, 0x33, 0x22, 0x7d, 0x00
+};
+size_t write_buf_len = strlen(write_buf);
+
+znsq_result_set_t rs = 0; // 0 is allowed if database is empty. Otherwise use znsq_position()
+
+znsq_write_result_options write_result_options = {0};
+write_result_options.key_name = keyname;
+
+int return_code = znsq_write_result(
+    connection,
+    &rs,
+    write_buf,
+    write_buf_len,
+    &write_result_options
+);
+
+if (return_code != 0) {
+    printf("Error returned from znsq_write_result()\n");
     printf("Return code received: X%x\n", znsq_err(return_code));
     return znsq_err(return_code);
 }
