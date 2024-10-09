@@ -369,6 +369,15 @@ javac -cp /usr/include/java_classes/igwznsq.jar Igwznsqsamp1.java
 java -cp /usr/include/java_classes/igwznsq.jar:. Igwznsqsamp1
 ```
 
+To install the Python wheel and run a sample script:
+```shell
+mkdir <path_to_venv_dir>
+python -m venv <path_to_venv_dir>
+cd /usr/lib
+pip install pyeznosql-1.0.1-cp312-none-any.whl
+python <path_to_venv_dir>/bin/sample_runner.py
+```
+
 # Application Programming Tiers
 
 The following section lists the EzNoSQL Application Programming Interfaces (APIs) available to the application architect. The APIs are classified in four tiers:
