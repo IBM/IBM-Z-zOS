@@ -73,7 +73,7 @@ Return and Reason Codes:
 
 # Introduction to EzNoSQL
 
-EzNoSQL for z/OS provides a comprehensive set of C, Java, and Python based Application Programming Interfaces (APIs), which enable applications to store JSON (UTF-8) documents while utilizing the full data-sharing capabilities of IBM's Parallel Sysplex technology and System Z Operating System (z/OS). The JSON data can be accessed as either non-recoverable, or with recoverable (transactional) consistency across the sysplex. The APIs also allow for the creation of secondary indexes, which provide for faster queries to specific key fields within the JSON data.  This document provides the overall functionality of EzNoSQL and specific details of the C based APIs.  The Java and Python API documentation can be found in the EzNoSQL Content Solutions website:  https://ibm.github.io/eznosql/.  
+EzNoSQL for z/OS provides a comprehensive set of C, Java, and Python based Application Programming Interfaces (APIs), which enable applications to store JSON (UTF-8) documents while utilizing the full data-sharing capabilities of IBM's Parallel Sysplex technology and System Z Operating System (z/OS). The JSON data can be accessed as either non-recoverable, or with recoverable (transactional) consistency across the sysplex. The APIs also allow for the creation of secondary indexes, which provide for faster queries to specific key fields within the JSON data.  
 
 IBM's Parallel Sysplex Coupling Facility (CF) technology enables separate processors to share a single instance of a database (collection of documents) without the need for data sharding, replicating the updates, or programming for eventual consistency. Additionally, the sysplex allows for horizontal scalability by adding additional processors (or z/OS instances) as required. Implementing EzNoSQL on z/OS will inherit many of the desired functions provided by z/OS such as in-memory caching, system-managed storage, data encryption, and compression. EzNoSQL databases can be shared with other exploiters of VSAM databases defined as DATABASE(JSON) Refer to the following link for more information on native access to DATABASE(JSON) databases: [z/OS DFSMS Using Data Sets (Chapter 14)](https://www-40.ibm.com/servers/resourcelink/svc00100.nsf/pages/zOSV2R4sc236855?OpenDocument).
 
@@ -299,7 +299,7 @@ Optionally, loading data into the CF cache may be bypassed and reduces overhead 
 
 # Getting Started
 
-The EzNoSQL C APIs can be called from application user programs running in either 31-bit or 64-bit mode. The Java APIs are 64-bit mode only running on the minimum supported version of Java 8. The user programs can link to the required executables and side decks directly from z/OS USS directories. This section explains the required files along with their location and descriptions. Additionally, a sample user program containing compile and link instructions is provided to help test the system configuration and to gain familiarity with a subset of the available APIs. The full suite of available APIs are detailed in the following sections.
+The EzNoSQL C APIs can be called from application user programs running in either 31-bit or 64-bit mode. The Java and Python APIs are 64-bit mode only running on the minimum supported version of Java 8 and Python 3.12 respectively. The user programs can link to the required executables and side decks directly from z/OS USS directories. This section explains the required files along with their location and descriptions. Additionally, a sample user program containing compile and link instructions is provided to help test the system configuration and to gain familiarity with a subset of the available APIs. The full suite of available C APIs are detailed in the following sections. The Java and Python API documentation can be found in the EzNoSQL Content Solutions website:  https://ibm.github.io/eznosql/.  
 
 ## C Executables and Side Decks
 
@@ -320,6 +320,11 @@ The following table shows the names and locations of the EzNoSQL executables, si
 | `libigwznsqj.so`    | `/usr/lib/`                  | JNI Shared Library   |
 | `igwznsq.jar`       | `/usr/include/java_classes/` | Java API JAR file    |
 | `Igwznsqsamp1.java` | `/samples/`                  | Sample Java program  |
+
+## Python Wheel 
+| Member                                             | Location    | Description         |
+|----------------------------------------------------|-------------|---------------------|
+| `pyeznosql_ext-1.1.2-cp310-cp310-os390_28_00_2817` | `/usr/lib/` | Python Wheel File   |
 
 ## Sample Application Programs
 
