@@ -28,7 +28,7 @@ Getting Started:
 * [Sample Application Programs](#Sample-Application-Programs)
 * [Compile and Link Procedure](#Compile-and-Link-Procedure)
 
-Application Programming Interfaces (APIs):
+C Application Programming Interfaces (APIs):
 * [Application Programming Tiers](#Application-Programming-Tiers)
 
 Data Management APIs:
@@ -73,7 +73,7 @@ Return and Reason Codes:
 
 # Introduction to EzNoSQL
 
-EzNoSQL for z/OS provides a comprehensive set of C and Java-based Application Programming Interfaces (APIs), which enable applications to store JSON (UTF-8) documents while utilizing the full data-sharing capabilities of IBM's Parallel Sysplex technology and System Z Operating System (z/OS). The JSON data can be accessed as either non-recoverable, or with recoverable (transactional) consistency across the sysplex. The APIs also allow for the creation of secondary indexes, which provide for faster queries to specific key fields within the JSON data.
+EzNoSQL for z/OS provides a comprehensive set of C, Java, and Python based Application Programming Interfaces (APIs), which enable applications to store JSON (UTF-8) documents while utilizing the full data-sharing capabilities of IBM's Parallel Sysplex technology and System Z Operating System (z/OS). The JSON data can be accessed as either non-recoverable, or with recoverable (transactional) consistency across the sysplex. The APIs also allow for the creation of secondary indexes, which provide for faster queries to specific key fields within the JSON data.  This document provides the overall functionality of EzNoSQL and specific details of the C based APIs.  The Java and Python API documentation can be found in the EzNoSQL Content Solutions website:  https://ibm.github.io/eznosql/.  
 
 IBM's Parallel Sysplex Coupling Facility (CF) technology enables separate processors to share a single instance of a database (collection of documents) without the need for data sharding, replicating the updates, or programming for eventual consistency. Additionally, the sysplex allows for horizontal scalability by adding additional processors (or z/OS instances) as required. Implementing EzNoSQL on z/OS will inherit many of the desired functions provided by z/OS such as in-memory caching, system-managed storage, data encryption, and compression. EzNoSQL databases can be shared with other exploiters of VSAM databases defined as DATABASE(JSON) Refer to the following link for more information on native access to DATABASE(JSON) databases: [z/OS DFSMS Using Data Sets (Chapter 14)](https://www-40.ibm.com/servers/resourcelink/svc00100.nsf/pages/zOSV2R4sc236855?OpenDocument).
 
@@ -952,7 +952,7 @@ should still include ending double quotes which are not part of the actual key v
 
 `key`: C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00.
 
-`key_value`: C-string containing the value for the specific document to be retrieved. To position to the first document in the primary or secondary index, pass an empty string as the key_value.
+`key_value`: C-string containing the value for the specific document to be retrieved. To position to the first document in the primary or secondary index, pass an empty string (i.e. '\0'  , char *empty_str = "" , or "\"\""\0) as the key_value.
 
 `search_method`:
 + _`0`_  indicates that the first (or last) document equal to specified `key_value` should be located for subsequent sequential retrieves/updates/deletes.
