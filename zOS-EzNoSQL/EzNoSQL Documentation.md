@@ -322,7 +322,7 @@ The following table shows the names and locations of the EzNoSQL executables, si
 ## Python Wheel 
 | Member                                             | Location    | Description         |
 |----------------------------------------------------|-------------|---------------------|
-| `pyeznosql_ext-1.1.2-cp310-cp310-os390_28_00_2817` | `/usr/lib/` | Python Wheel File   |
+| `pyeznosql-v1.0.1-cp312-none-any.whl` | `/usr/lib/` | Python Wheel File   |
 
 ## Sample Application Programs
 
@@ -353,6 +353,16 @@ Sample user Java program: /samples/Igwznsqsamp1.java, is a 64-bit user program w
 A successful run of Igwznsqsamp1.java would show the following messages: 
 ![image](https://github.com/TerriMenendez/IBM-Z-zOS/assets/75999294/ea80f9aa-43f7-40ab-865d-07b7a4204c3a)
 
+Sample user Python programs: <venv_dir>/bin/primary_key.py, is a 64-bit user program which does the following sequence of API calls.  Prior to running the program, edit the source to customize the high level qualifier for the database and STORCLAS name for your configuration, or run the sample_runner.py script for guided prompts.  
+1) Create a 50 megabyte JSON (non-recoverable) EzNoSQL database with a primary key of `"_id"`.
+2) Create a 50 megabyte non-unique secondary index with a key of `"Title"`.
+3) Create a 50 megabyte non-unique secondary index with a key of `"Year"`.
+4) Add (enable) the secondary indices.
+5) Connect (open) the database.
+6) Insert, update, delete documents.
+7) Drop the secondary indices.
+8) Disconnect (close) the data base.
+9) Destroy the database.
 
 ## Compile and Link Procedure 
 
@@ -367,6 +377,15 @@ To compile the sample java program `/samples/Igwznsqsamp1.java`:
 cd /samples
 javac -cp /usr/include/java_classes/igwznsq.jar Igwznsqsamp1.java
 java -cp /usr/include/java_classes/igwznsq.jar:. Igwznsqsamp1
+```
+
+To install the Python wheel and run a sample script:
+```shell
+mkdir <path_to_venv_dir>
+python -m venv <path_to_venv_dir>
+cd /usr/lib
+pip install pyeznosql-1.0.1-cp312-none-any.whl
+python <path_to_venv_dir>/bin/sample_runner.py
 ```
 
 # Application Programming Tiers
