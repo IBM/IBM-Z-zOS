@@ -1,0 +1,78 @@
+#                                                                    
+#  Licensed under the Apache License, Version 2.0 (the "License");   
+#  you may not use this file except in compliance with the License.  
+#  You may obtain a copy of the License at                           
+#                                                                    
+#  http://www.apache.org/licenses/LICENSE-2.0                        
+#                                                                    
+#  Unless required by applicable law or agreed to in writing,        
+#  software distributed under the License is distributed on an       
+#  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      
+#  either express or implied. See the License for the specific       
+#  language governing permissions and limitations under the License. 
+#         
+#------------------------------------------------------------------------------
+#
+# COPYRIGHT:
+#    5655-TF1 (C) Copyright IBM Corporation 2023.
+#    All Rights Reserved.
+#    Licensed Materials - Property of IBM.
+#    US Government Users Restricted Rights - Use, duplication or
+#    disclosure restricted by GSA ADP Schedule Contract with
+#    IBM Corp.
+#
+#------------------------------------------------------------------------------
+# 
+###############################################################################
+# PUT THIS FILE IN /etc/Printsrv on the test system if it was IPLed and you 
+# lost your configuration!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+###############################################################################
+# FILENAME:   /usr/lpp/Printsrv/samples/aokpdfexit.db
+#
+# This sample file is used with the sample AOP to PDF transform password exit,
+# /usr/lpp/Printsrv/lib/aokpdfexit.dll. This file maps identifiers to passwords
+# (Identifier -> Password). The AOP to PDF transform uses the passwords when it
+# encrypts PDF documents.
+#
+# To modify this file for use with the sample aokpdfexit exit:
+#
+# 1. Copy this file to /etc/Printsrv/aokpdfexit.db.
+#
+# 2. List the identifiers in the first column (Identifier) and the
+#    corresponding passwords in the second column (Password).
+#    Identifiers and passwords can be up to 256 characters each and are
+#    case sensitive.   Identifiers and passwords are terminated by:
+#       - a blank (' ')
+#       - a tab ('/t')
+#       - a comment ('#')
+#       - a newline ('\n')
+#    Leading blanks and tabs are ignored.
+# 	
+# 3. Start comments with "#".  Anything on the line following the '#'
+#    character is ignored.
+#
+# For information about the AOK to PDF password exit, see "IBM Print 
+# Transform from AFP for Infoprint Server for z/OS, G325-2634".
+#
+# ========
+# Details:
+# ========
+# The sample exit (/usr/lpp/Printsrv/lib/aokpdfexit.dll) processes this file
+# line by line.  The first string in each line is interpreted as an identifier
+# (either user or owner).  The second string (if one exists) is interpreted as
+# a password.  The exit continues searching line by line until it finds an
+# identifier (first string), which also has an associated password (second
+# string), that matches either the specified pdf-user-identifier, or
+# pdf-owner-identifier. If a match is found, the associated password is
+# returned.   The line by line search continues until all requested passwords
+# (owner, user, or both) have been determined.
+#
+# Anything following the password string is ignored.
+#------------------------------------------------------------------------------
+
+#----------  ---------  -------------------------------------------------------
+#Identifier  Password   Comments
+#----------  ---------  -------------------------------------------------------
+Nurse-Lee    Nurse-Lee  #comment
+Dr-Smith     Dr-Smith   #comment
+id1          id1        #comment

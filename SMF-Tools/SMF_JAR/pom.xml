@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.ibm.smf</groupId>
+  <artifactId>smftools</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <name>smftools</name>
+
+  <packaging>jar</packaging>
+
+  <parent>
+    <groupId>com.ibm.smf</groupId>
+    <artifactId>smfaggregator</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+
+  <properties>
+    <maven.build.timestamp.format>yyyyMMdd_HHmmss</maven.build.timestamp.format>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.ibm.smf</groupId>
+      <artifactId>smfcore</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.ibm.smf</groupId>
+      <artifactId>smfwas</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.ibm.smf</groupId>
+      <artifactId>smfwasplugins</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>${project.artifactId}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.6.3</version>
+        <configuration>
+          <additionalOptions>-Xdoclint:none</additionalOptions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>runDuringPhase</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>javadoc</goal>
+            </goals>
+            <configuration>
+              <includeDependencySources>true</includeDependencySources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>target/site</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.5.1</version>
+        <configuration>
+          <transformers>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+              <resource>MANIFEST.MF</resource>
+            </transformer>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+              <mainClass>com.ibm.smf.format.SMF</mainClass>
+            </transformer>
+          </transformers>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <phase>install</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <!-- Copy the JAR file to another file with a timestamp for iterative debugging. -->
+                <copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${project.build.directory}/${project.build.finalName}_${maven.build.timestamp}.jar" />
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

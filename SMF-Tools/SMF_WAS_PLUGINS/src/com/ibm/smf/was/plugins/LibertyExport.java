@@ -1,5 +1,5 @@
 /*                                                                   */
-/* Copyright 2021 IBM Corp.                                          */
+/* Copyright 2024 IBM Corp.                                          */
 /*                                                                   */
 /* Licensed under the Apache License, Version 2.0 (the "License");   */
 /* you may not use this file except in compliance with the License.  */
@@ -29,8 +29,8 @@ import com.ibm.smf.liberty.request.LibertyRequestRecord;
 import com.ibm.smf.liberty.request.LibertyServerInfoSection;
 import com.ibm.smf.was.common.ClassificationDataSection;
 import com.ibm.smf.was.common.WASConstants;
-import com.ibm.smf.was.plugins.utilities.ConversionUtilities;
-import com.ibm.smf.was.plugins.utilities.STCK;
+import com.ibm.smf.utilities.ConversionUtilities;
+import com.ibm.smf.utilities.STCK;
 
 
 /**

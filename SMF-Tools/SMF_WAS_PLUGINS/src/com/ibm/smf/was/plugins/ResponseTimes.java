@@ -1,5 +1,5 @@
 /*                                                                   */
-/* Copyright 2021 IBM Corp.                                          */
+/* Copyright 2024 IBM Corp.                                          */
 /*                                                                   */
 /* Licensed under the Apache License, Version 2.0 (the "License");   */
 /* you may not use this file except in compliance with the License.  */
@@ -18,8 +18,11 @@ package com.ibm.smf.was.plugins;
 
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.ibm.smf.format.DefaultFilter;
 import com.ibm.smf.format.SMFFilter;
@@ -32,7 +35,8 @@ import com.ibm.smf.twas.request.RequestActivitySmfRecord;
 import com.ibm.smf.twas.request.ZosRequestInfoSection;
 import com.ibm.smf.was.common.ClassificationDataSection;
 import com.ibm.smf.was.common.WASConstants;
-import com.ibm.smf.was.plugins.utilities.ConversionUtilities;
+import com.ibm.smf.utilities.ConversionUtilities;
+import com.ibm.smf.utilities.STCK;
 
 /**
  * Reports on response and CPU times for the SMF data provided
@@ -49,10 +53,70 @@ public class ResponseTimes implements SMFFilter {
 	private long totalDispatchTime = 0;
 	private long totalBytesReceived = 0;
 	private long totalBytesSent = 0;
-	private HashMap table = new HashMap();
+	private long maxResponseTime = 0;
+	private Map<Long, Map<String, URIData>> timeTable = new HashMap<>();
+	private Map<String, URIData> nonTimeTable = new HashMap<>();
+	private Map<String, Map<Long, Map<String, URIData>>> breakdownTable = new HashMap<>();
+	private TimeType useTime = TimeType.NONE;
+	private IntervalType useTimeInterval = IntervalType.PER_MINUTE;
+	private Breakdown useTimeBreakdown = Breakdown.NONE;
+	
+	enum TimeType {
+		NONE, RECEIVED, QUEUED, DISPATCH_START, DISPATCH_END, RESPONDED, 
+	}
+	
+	enum IntervalType {
+		PER_SECOND, PER_MINUTE, PER_HOUR, 
+	}
+	
+	enum Breakdown {
+		NONE, BY_SERVER, 
+	}
 	
 	public boolean initialize(String parms) 
 	{
+		String useTimeStr = System.getProperty("com.ibm.ws390.smf.smf1209.useTime");
+		if (useTimeStr != null) {
+			boolean found = false;
+			for (TimeType val : TimeType.values()) {
+				if (val.name().equalsIgnoreCase(useTimeStr)) {
+					useTime = val;
+					found = true;
+				}
+			}
+			if (!found) {
+				throw new UnsupportedOperationException("Unknown time type " + useTimeStr);
+			}
+			
+			String intervalTypeStr = System.getProperty("com.ibm.ws390.smf.smf1209.intervalType");
+			if (intervalTypeStr != null) {
+				found = false;
+				for (IntervalType val : IntervalType.values()) {
+					if (val.name().equalsIgnoreCase(intervalTypeStr)) {
+						useTimeInterval = val;
+						found = true;
+					}
+				}
+				if (!found) {
+					throw new UnsupportedOperationException("Unknown time interval type " + intervalTypeStr);
+				}
+			}
+			
+			String breakdownStr = System.getProperty("com.ibm.ws390.smf.smf1209.breakdown");
+			if (breakdownStr != null) {
+				found = false;
+				for (Breakdown val : Breakdown.values()) {
+					if (val.name().equalsIgnoreCase(breakdownStr)) {
+						useTimeBreakdown = val;
+						found = true;
+					}
+				}
+				if (!found) {
+					throw new UnsupportedOperationException("Unknown breakdown " + breakdownStr);
+				}
+			}
+		}
+
 	 boolean return_value = true;
 	 smf_printstream = DefaultFilter.commonInitialize(parms);
 	 if (smf_printstream==null)
@@ -78,6 +142,7 @@ public class ResponseTimes implements SMFFilter {
 	@Override
 	public void processRecord(SmfRecord record) {
 	     // cast to a subtype 9 and declare generic variables
+		if (record instanceof RequestActivitySmfRecord) {
 		 RequestActivitySmfRecord rec = (RequestActivitySmfRecord)record;
 		 Triplet zOSRequestTriplet;
 		 int sectionCount;
@@ -110,20 +175,40 @@ public class ResponseTimes implements SMFFilter {
 	      cpuTime = sec.m_dispatchTcbCpu/1000;
 		 }
 		 
+		 String breakdownKey = null;
+		 switch (useTimeBreakdown) {
+		 case BY_SERVER:
+			 if (rec.m_platformNeutralSectionTriplet.count() > 0) {
+				 breakdownKey = rec.m_platformNeutralSection.m_serverShortName;
+			 } else {
+				 throw new UnsupportedOperationException("Asked to break down with " + useTimeBreakdown + " but the triple doesn't exist for record " + record.sid());
+			 }
+			 break;
+		 default:
+			 // It's okay to not have a breakdown
+			 break;
+		 }
+		 
 		 // From the zOS request section
 		 zOSRequestTriplet = rec.m_zosRequestInfoTriplet;
 		 sectionCount = zOSRequestTriplet.count();
 		 // If we have the zOS request info section
+		 long receiveTime = -1, queuedTime = -1, dispatchStart = -1, dispatchEnd = -1, responded = -1;
 	     if (sectionCount>0)
 	     {
 	      ZosRequestInfoSection sec = rec.m_zosRequestInfoSection;
-	         
-
-	      long receiveTime = (new BigInteger(ConversionUtilities.longByteArrayToHexString(sec.m_received),16).shiftRight(12).longValue())/1000L;
-	      long queuedTime = (new BigInteger(ConversionUtilities.longByteArrayToHexString(sec.m_queued),16).shiftRight(12).longValue())/1000L;
-	      long dispatchStart= (new BigInteger(ConversionUtilities.longByteArrayToHexString(sec.m_dispatched),16).shiftRight(12).longValue())/1000L;
-	      long dispatchEnd = (new BigInteger(ConversionUtilities.longByteArrayToHexString(sec.m_dispatchcomplete),16).shiftRight(12).longValue())/1000L;
-	      long responded = (new BigInteger(ConversionUtilities.longByteArrayToHexString(sec.m_complete),16).shiftRight(12).longValue())/1000L;
+	      
+	      // https://www.ibm.com/docs/en/was-nd/9.0.5?topic=mapping-smf-subtype-9-request-activity-record#rtrb_SMFsubtype9__title__9
+	      // "The time that the request was received."
+	      receiveTime = (new BigInteger(ConversionUtilities.longByteArrayToHexString(sec.m_received),16).shiftRight(12).longValue())/1000L;
+	      // "The time that the request was added to the queue."
+	      queuedTime = (new BigInteger(ConversionUtilities.longByteArrayToHexString(sec.m_queued),16).shiftRight(12).longValue())/1000L;
+	      // "The time that the request was dispatched.
+	      dispatchStart= (new BigInteger(ConversionUtilities.longByteArrayToHexString(sec.m_dispatched),16).shiftRight(12).longValue())/1000L;
+	      // "The time that the dispatch completed."
+	      dispatchEnd = (new BigInteger(ConversionUtilities.longByteArrayToHexString(sec.m_dispatchcomplete),16).shiftRight(12).longValue())/1000L;
+	      // "The time that the controller finished processing the request response."
+	      responded = (new BigInteger(ConversionUtilities.longByteArrayToHexString(sec.m_complete),16).shiftRight(12).longValue())/1000L;
 	      responseTime = responded - receiveTime;
 	      queueTime = dispatchStart - queuedTime;
 	      dispatchTime = dispatchEnd - dispatchStart;
@@ -167,6 +252,9 @@ public class ResponseTimes implements SMFFilter {
 	     
 	     
 	     totalResponseTime = totalResponseTime + responseTime;
+	     if (responseTime > maxResponseTime) {
+	    	 maxResponseTime = responseTime;
+	     }
 	     totalQueueTime = totalQueueTime + queueTime;
 	     totalDispatchTime = totalDispatchTime + dispatchTime;	     
 		 totalCPU = totalCPU + cpuTime;
@@ -175,6 +263,7 @@ public class ResponseTimes implements SMFFilter {
 		 totalBytesSent = totalBytesSent + bytesSent;
 	  
 	     // find or create the hashmap entry for this URI and update
+		 Map<String, URIData> table = getTable(breakdownKey, receiveTime, queuedTime, dispatchStart, dispatchEnd, responded);
 		 URIData urid = (URIData)table.get(uri);
 		 if (urid==null){
 			  urid = new URIData(uri);
@@ -183,25 +272,129 @@ public class ResponseTimes implements SMFFilter {
 		 urid.update(responseTime, queueTime, dispatchTime, cpuTime,offloadCpu,bytesReceived,bytesSent);
 	     
          ++totalRequests;
+		}
+	}
+	
+	private Map<String, URIData> getTable(String breakdownKey, long receiveTime, long queuedTime, long dispatchStart, long dispatchEnd, long responded) {
+		long key;
 		
+		switch (useTime) {
+		case NONE:
+			return nonTimeTable;
+		case RECEIVED:
+			key = receiveTime;
+			break;
+		case QUEUED:
+			key = queuedTime;
+			break;
+		case DISPATCH_START:
+			key = dispatchStart;
+			break;
+		case DISPATCH_END:
+			key = dispatchEnd;
+			break;
+		case RESPONDED:
+			key = responded;
+			break;
+		default:
+			throw new UnsupportedOperationException("Unhandled time type " + useTime);
+		}
+		
+		switch (useTimeInterval) {
+		case PER_SECOND:
+			key /= 1000;
+			break;
+		case PER_MINUTE:
+			key /= 1000;
+			key -= (key % 60);
+			break;
+		case PER_HOUR:
+			key /= 1000;
+			key -= (key % 3600);
+			break;
+		default:
+			throw new UnsupportedOperationException("Unhandled interval type " + useTimeInterval);
+		}
+		
+		Map<Long, Map<String, URIData>> finalTimeTable = timeTable;
+		switch (useTimeBreakdown) {
+		case BY_SERVER:
+			finalTimeTable = breakdownTable.get(breakdownKey);
+			if (finalTimeTable == null) {
+				finalTimeTable = new HashMap<>();
+				breakdownTable.put(breakdownKey, finalTimeTable);
+			}
+			break;
+		case NONE:
+			// Nothing extra to do
+			break;
+		default:
+			throw new UnsupportedOperationException("Unhandled breakdown " + useTimeBreakdown);
+		}
+		
+		Map<String, URIData> table = finalTimeTable.get(key);
+		if (table == null) {
+			table = new HashMap<>();
+			finalTimeTable.put(key, table);
+		}
+		return table;
 	}
 
 	@Override
 	public void processingComplete() {
-		smf_printstream.println("Requests,AvgResponse,AvgQueue,AvgDisp,AvgCPU,AvgOffload,AvgOffload%,AvgBytesRcvd,AvgBytesSent,URI");
-		
-		Iterator uridIT = table.keySet().iterator();
-		while (uridIT.hasNext()) {
-		   URIData urid = (URIData)table.get(uridIT.next());
-		   smf_printstream.println(urid.getData());  
+		if (useTime == TimeType.NONE) {
+			printHeader();
+			
+			Map<String, URIData> table = nonTimeTable;
+			Iterator<String> uridIT = table.keySet().iterator();
+			while (uridIT.hasNext()) {
+			   URIData urid = (URIData)table.get(uridIT.next());
+			   smf_printstream.println(urid.getData());  
+			}
+			float averageOffloadPercent = 0;
+			if (totalCPU>0) {
+				averageOffloadPercent = ((float)totalOffloadCPU/(float)totalCPU);
+			}
+			smf_printstream.println(totalRequests+","+totalResponseTime/totalRequests+","+maxResponseTime+","+totalQueueTime/totalRequests+","+totalDispatchTime/totalRequests+","+totalCPU/totalRequests+","+totalOffloadCPU/totalRequests+","+averageOffloadPercent+","+totalBytesReceived/totalRequests+","+totalBytesSent/totalRequests+",Overall");
+		} else {
+			smf_printstream.print("Time,");
+			if (useTimeBreakdown == Breakdown.NONE) {
+				printHeader();
+				processTimeTable(null, timeTable);
+			} else {
+				smf_printstream.print("Server,");
+				printHeader();
+				for (Entry<String, Map<Long, Map<String, URIData>>> entry : breakdownTable.entrySet()) {
+					processTimeTable(entry.getKey(), entry.getValue());
+				}
+			}
 		}
-		float averageOffloadPercent = 0;
-		if (totalCPU>0) {
-			averageOffloadPercent = ((float)totalOffloadCPU/(float)totalCPU);
-		}
-		smf_printstream.println(totalRequests+","+totalResponseTime/totalRequests+","+totalQueueTime/totalRequests+","+totalDispatchTime/totalRequests+","+totalCPU/totalRequests+","+totalOffloadCPU/totalRequests+","+averageOffloadPercent+","+totalBytesReceived/totalRequests+","+totalBytesSent/totalRequests+",Overall");
 	}
 
+	private void processTimeTable(String breakdownKey, Map<Long, Map<String, URIData>> t) {
+		Long[] keys = new Long[t.size()];
+		t.keySet().toArray(keys);
+		Arrays.sort(keys);
+		for (Long key : keys) {
+			String time = STCK.toString(key * 1000);
+			Map<String, URIData> table = t.get(key);
+			Iterator<String> uridIT = table.keySet().iterator();
+			while (uridIT.hasNext()) {
+			   URIData urid = (URIData)table.get(uridIT.next());
+			   smf_printstream.print("\"" + time + "\"");
+			   smf_printstream.print(",");
+			   if (breakdownKey != null) {
+				   smf_printstream.print(breakdownKey);
+				   smf_printstream.print(",");
+			   }
+			   smf_printstream.println(urid.getData());  
+			}
+		}
+	}
+	
+	private void printHeader() {
+		smf_printstream.println("Requests,AvgResponse,MaxResponse,AvgQueue,AvgDisp,AvgCPU,AvgOffload,AvgOffload%,AvgBytesRcvd,AvgBytesSent,URI");
+	}
 	
 	public class URIData {
 		private long totalCPU = 0;
@@ -212,6 +405,7 @@ public class ResponseTimes implements SMFFilter {
 		private long totalDispatchTime = 0;
 		private long totalBytesReceived = 0;
 		private long totalBytesSent = 0;
+		private long maxResponseTime = 0;
 		private String uri;
 		
 		public URIData (String s){
@@ -220,6 +414,9 @@ public class ResponseTimes implements SMFFilter {
 		
 		public void update(long responseTime, long queueTime, long dispatchTime, long cpuTime, long offloadCPU, long bytesReceived, long bytesSent){
 		     totalResponseTime = totalResponseTime + responseTime;
+		     if (responseTime > maxResponseTime) {
+		    	 maxResponseTime = responseTime;
+		     }
 		     totalQueueTime = totalQueueTime + queueTime;
 		     totalDispatchTime = totalDispatchTime + dispatchTime;
 			 totalCPU = totalCPU + cpuTime;
@@ -235,7 +432,7 @@ public class ResponseTimes implements SMFFilter {
 			if (totalCPU>0) {
 				averageOffloadPercent = ((float)totalOffloadCPU/(float)totalCPU);
 			}
-			return new String(totalRequests+","+totalResponseTime/totalRequests+","+totalQueueTime/totalRequests+","+totalDispatchTime/totalRequests+","+totalCPU/totalRequests+","+totalOffloadCPU/totalRequests+","+averageOffloadPercent+","+totalBytesReceived/totalRequests+","+totalBytesSent/totalRequests+","+uri);
+			return new String(totalRequests+","+totalResponseTime/totalRequests+","+maxResponseTime+","+totalQueueTime/totalRequests+","+totalDispatchTime/totalRequests+","+totalCPU/totalRequests+","+totalOffloadCPU/totalRequests+","+averageOffloadPercent+","+totalBytesReceived/totalRequests+","+totalBytesSent/totalRequests+","+uri);
 		}
 		
 	}

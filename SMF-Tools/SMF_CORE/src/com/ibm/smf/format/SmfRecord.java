@@ -1,5 +1,5 @@
 /*                                                                   */
-/* Copyright 2021 IBM Corp.                                          */
+/* Copyright 2024 IBM Corp.                                          */
 /*                                                                   */
 /* Licensed under the Apache License, Version 2.0 (the "License");   */
 /* you may not use this file except in compliance with the License.  */
@@ -17,10 +17,13 @@
 
 package com.ibm.smf.format;
 
-import java.io.*;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
+import com.ibm.smf.utilities.ConversionUtilities;
 
 //------------------------------------------------------------------------------
 /** Data container for SMF data related to a SmfRecord.
@@ -107,34 +110,8 @@ public static final int RequestActivitySmfRecordSubtype = 0;
     
     ++my_recordN;          /* Increment my_recordN(umber)    */     //@SUa
     
-    /* get the time field and calculate the hours, mins, secs */
-    int time = m_stream.getInteger(4);                                        //    @L1C
-    
-    int secs = time / 100;
-    int mins = secs / 60;
-    secs -= (mins * 60);
-    int hours = mins / 60;
-    mins -= (hours * 60);
-    
-    /* get the date */
-    int century = (m_stream.read() == 1) ? 2000 : 1900;
-    
-    int year = m_stream.read();
-    int y2 = year >> 4;
-    int y1 = year - y2*16;
-    year = century + y2*10 + y1;
-    
-    int byte2 = m_stream.read();
-    int byte1 = m_stream.read();
-    int d1 = byte1 >> 4;
-    int d3 = byte2 >> 4;
-    int d2 = byte2 - d3*16;
-    int day = d3*100 + d2*10 + d1;
-    
-    Calendar calendar = new GregorianCalendar(year,1,1,hours,mins,secs);
-    calendar.set(Calendar.DAY_OF_YEAR,day);
-    
-    m_date = calendar.getTime();
+    Calendar cal = readDateTime();
+    m_date = cal.getTime();
     
     /* get the sid */
     m_sid = m_stream.getString(4,SmfUtil.EBCDIC);
@@ -152,11 +129,42 @@ public static final int RequestActivitySmfRecordSubtype = 0;
     	m_subtype=0;
     }
     
-    my_hours = hours;                                     //@SUa
-    my_mins = mins;                                       //@SUa
-    my_secs = secs;                                       //@SUa 
+    my_hours = cal.get(Calendar.HOUR_OF_DAY);                              //@SUa
+    my_mins = cal.get(Calendar.MINUTE);                                    //@SUa
+    my_secs = cal.get(Calendar.SECOND);                                    //@SUa 
     
   } // SmfRecord(...)
+  
+	protected Calendar readDateTime() {
+		/* get the time field and calculate the hours, mins, secs */
+		int time = m_stream.getInteger(4); // @L1C
+
+		int secs = time / 100;
+		int mins = secs / 60;
+		secs -= (mins * 60);
+		int hours = mins / 60;
+		mins -= (hours * 60);
+
+		/* get the date */
+		int century = (m_stream.read() == 1) ? 2000 : 1900;
+
+		int year = m_stream.read();
+		int y2 = year >> 4;
+		int y1 = year - y2 * 16;
+		year = century + y2 * 10 + y1;
+
+		int byte2 = m_stream.read();
+		int byte1 = m_stream.read();
+		int d1 = byte1 >> 4;
+		int d3 = byte2 >> 4;
+		int d2 = byte2 - d3 * 16;
+		int day = d3 * 100 + d2 * 10 + d1;
+
+		Calendar calendar = new GregorianCalendar(year, 1, 1, hours, mins, secs);
+		calendar.set(Calendar.DAY_OF_YEAR, day);
+
+		return calendar;
+	}
   
   //----------------------------------------------------------------------------
   /** Constructs a SmfRecord from a SmfRecord (Copy Constructor).
@@ -291,6 +299,15 @@ public static final int RequestActivitySmfRecordSubtype = 0;
    */
   public String subtypeToString() {
        return "Unknown";
+  }
+  
+  public void seek(Triplet triplet) {
+	  m_stream.reset();
+	  
+	  // The byte array starts after SMFHDR_Seg (or subtype equivalent), so we
+	  // always subtract 4
+	  // https://www.ibm.com/docs/en/zos/3.1.0?topic=practices-standard-extended-smf-record-headers
+	  m_stream.skip(triplet.offset() - 4);
   }
   
 } // SmfRecord

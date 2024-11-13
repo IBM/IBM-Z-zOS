@@ -1,5 +1,5 @@
 /*                                                                   */
-/* Copyright 2021 IBM Corp.                                          */
+/* Copyright 2024 IBM Corp.                                          */
 /*                                                                   */
 /* Licensed under the Apache License, Version 2.0 (the "License");   */
 /* you may not use this file except in compliance with the License.  */
@@ -32,8 +32,8 @@ import com.ibm.smf.twas.request.ZosRequestInfoSection;
 import com.ibm.smf.was.common.PlatformNeutralSection;
 import com.ibm.smf.was.common.WASConstants;
 import com.ibm.smf.was.common.ZosServerInfoSection;
-import com.ibm.smf.was.plugins.utilities.ConversionUtilities;
-import com.ibm.smf.was.plugins.utilities.STCK;
+import com.ibm.smf.utilities.ConversionUtilities;
+import com.ibm.smf.utilities.STCK;
 
 
 /**
@@ -47,7 +47,8 @@ public class RequestsPerServer implements SMFFilter {
 
 	private SmfPrintStream smf_printstream = null;
 	private HashMap servers = new HashMap();
-	private int total_count;
+	private int request_count;
+	private int missed_goal_count;
 	private int[] type_counts = new int[PlatformNeutralRequestInfoSection.TypeMax+1];
 	private int async_work_count;
 	private int outbound_request_count;
@@ -59,7 +60,8 @@ public class RequestsPerServer implements SMFFilter {
 	 if (smf_printstream==null)
 	      return_value = false;
 	 
- 	 total_count = 0;
+ 	 request_count = 0;
+ 	 missed_goal_count = 0;
  	 async_work_count = 0;
  	 outbound_request_count = 0;
      for (int i=0;i<=PlatformNeutralRequestInfoSection.TypeMax;++i) {
@@ -172,6 +174,7 @@ public class RequestsPerServer implements SMFFilter {
 	        PlatformNeutralRequestInfoSection sec = rec.m_platformNeutralRequestInfoSection;
             reqType = sec.m_requestType;
             sd.increment(reqType);
+            ++request_count;
   	        ++type_counts[reqType];
 		   }  else {notRegularWork=1;}
 		 
@@ -201,6 +204,7 @@ public class RequestsPerServer implements SMFFilter {
 			    respRatio = sec.m_EnclaveDeleteRespTimeRatio;
 			    if (respRatio>100) {
 			    	sd.missedGoal_count();
+			    	++missed_goal_count;
 			    }
 		       } 
 		   }
@@ -215,10 +219,6 @@ public class RequestsPerServer implements SMFFilter {
 	     } else if (record.subtype() == WASConstants.OutboundRequestSmfRecordSubtype) {
 	    	 sd.outboundWork();
 	     }
-	     
-		++total_count;
-	    	
-	     
 	}	
 	
 	public void processingComplete() {
@@ -237,7 +237,7 @@ public class RequestsPerServer implements SMFFilter {
 			smf_printstream.println(line);
 		}
 		
-		String last_line = new String("Totals,,,,,,"+total_count);
+		String last_line = new String("Totals,,,,,,"+request_count+","+missed_goal_count);
 		for (int i=0;i<=PlatformNeutralRequestInfoSection.TypeMax;++i) {
 			last_line =last_line + ","+type_counts[i];
 		}

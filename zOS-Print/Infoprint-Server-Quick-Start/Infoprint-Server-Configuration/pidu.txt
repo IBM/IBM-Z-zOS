@@ -1,0 +1,80 @@
+#                                                                    
+#  Copyright 2023 IBM Corp.                                          
+#                                                                    
+#  Licensed under the Apache License, Version 2.0 (the "License");   
+#  you may not use this file except in compliance with the License.  
+#  You may obtain a copy of the License at                           
+#                                                                    
+#  http://www.apache.org/licenses/LICENSE-2.0                        
+#                                                                    
+#  Unless required by applicable law or agreed to in writing,        
+#  software distributed under the License is distributed on an       
+#  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      
+#  either express or implied. See the License for the specific       
+#  language governing permissions and limitations under the License. 
+#         
+#--------------------------------------------------------
+# Printer PRINTTXT - Socket Printer to Print text 
+#--------------------------------------------------------
+create printer PRINTTXT
+   printer-codepage = ISO8859-1
+   filters = {
+      text -> aopfiltr.so
+   }
+   printer-type = ip-printway
+   protocol-type = direct-sockets
+   port-number = 9100
+   destination = PRINTTXT
+   output-class = J
+   response-timeout = 120
+   printer-ip-address = x.x.x.x
+   dcf-routing = yes
+   description = "Socket Printer to Print text"
+;
+
+create dcf-routing-key "PRINTTXT  J"
+   printer = PRINTTXT
+;
+
+#-------------------------------------------------------
+# job-selection-rule PRINTTXT
+#-------------------------------------------------------
+create job-selection-rule PRINTTXT
+   output-class-list = {
+      J
+   }
+   destination-pattern = PRINTTXT
+;
+
+#--------------------------------------------------------
+# Printer PRINTLPR - LPR Printer to Print text 
+#--------------------------------------------------------
+create printer PRINTLPR
+   printer-codepage = ISO8859-1
+   filters = {
+      text -> aopfiltr.so
+   }
+   printer-type = ip-printway
+   protocol-type = lpr
+   destination = PRINTLPR
+   output-class = J
+   print-queue-name = DEST
+   printer-ip-address = x.x.x.x
+   dcf-routing = yes
+;
+
+create dcf-routing-key "PRINTLPR J"
+   printer = PRINTLPR
+;
+
+#-------------------------------------------------------
+# job-selection-rule PRINTLPR
+#-------------------------------------------------------
+create job-selection-rule PRINTLPR
+   output-class-list = {
+      J
+   }
+   destination-pattern = PRINTLPR
+   job-selection-status = enabled
+;
+

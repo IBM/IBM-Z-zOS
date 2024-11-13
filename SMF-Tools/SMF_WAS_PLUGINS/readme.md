@@ -114,7 +114,7 @@ indicated by a field in the record).
 - **LibertyExport** - This plugin is the equivalent of CSVExport for the SMF 120-11 Version 2 and up records written by Liberty
 for incoming HTTP requests as of 16.0.0.2.
 
-- **LibertyReponseTimes** - This is the same as the ResponseTimes plugin described later, but using the Liberty 120-11 records 
+- **LibertyResponseTimes** - This is the same as the ResponseTimes plugin described later, but using the Liberty 120-11 records 
 instead of the 120-9 records from WebSphere traditional.
 
 - **RequestDensity/RequestDensity2** - These two plugins look at the timestamps for each request and manage counters for the state the
@@ -209,6 +209,12 @@ across all the requests seen.
   – average bytes received per URI
   
   – average bytes send (response) per URI
+  
+  If `-Dcom.ibm.ws390.smf.smf1209.useTime=[RECEIVED|QUEUED|DISPATCH_START|DISPATCH_END|RESPONDED]` is set, then
+  response times are printed per unit time grouping by the specified request time (normally `RESPONDED`).
+  The interval may be configured with `-Dcom.ibm.ws390.smf.smf1209.intervalType=[PER_SECOND|PER_MINUTE|PER_HOUR]`
+  (defaults to `PER_MINUTE`). Statistics may also be further printed by a subgrouping with
+  `-Dcom.ibm.ws390.smf.smf1209.breakdown=[NONE|BY_SERVER]` (default `NONE`).
 
 - **ReWrite** - If you have a huge volume of data and you are using the filter properties as shown above to thin out
 the amount being processed, it might be nice to just have less data. For some of the more complex
