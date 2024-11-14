@@ -1,0 +1,558 @@
+{
+  "ServiceId": "5698SA40100I",
+  "ServiceName": "IBM Z System Automation - Users",
+  "MetaValidationItemVersion": 1.01,
+  "Vendor": "IBM",
+  "SecurityValidationItems": [
+    {
+      "ItemID": "5698SA40100I0005000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<domain>",
+      "ResourceClass": "APPL",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0006000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "*.*.*.*",
+      "ResourceClass": "RMTOPS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Controls the NetView-NetView comminication via RMTCMD"
+    },
+    {
+      "ItemID": "5698SA40100I0007000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "AGT.<sysplex-name>.<sa-xcf-group-name>.TARGET.FROMDOM.*.TODOM.*",
+      "ResourceClass": "SYSAUTO",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Controls usage of the TARGET= parameter of the commands"
+    },
+    {
+      "ItemID": "5698SA40100I0016000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0025000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.AOF*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0026000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.EVE*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0027000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.EVI*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0028000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.EVJ*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0029000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.HSA*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0030000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.IHV*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0031000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.ING*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0032000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQ*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0039000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFR2GL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPGW"
+    },
+    {
+      "ItemID": "5698SA40100I0040000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFR2SM",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPMSGS"
+    },
+    {
+      "ItemID": "5698SA40100I0041000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFR2SO",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPAOPS"
+    },
+    {
+      "ItemID": "5698SA40100I0042000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFR3STS",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPASF"
+    },
+    {
+      "ItemID": "5698SA40100I0043000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRADA1",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPFLGS"
+    },
+    {
+      "ItemID": "5698SA40100I0044000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRADA2",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPSCHD"
+    },
+    {
+      "ItemID": "5698SA40100I0045000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRADA5",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPERRS"
+    },
+    {
+      "ItemID": "5698SA40100I0046000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRADA8",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPINFO"
+    },
+    {
+      "ItemID": "5698SA40100I0047000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRADAE",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPSYS"
+    },
+    {
+      "ItemID": "5698SA40100I0048000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRADAG",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPAPG"
+    },
+    {
+      "ItemID": "5698SA40100I0049000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRADAT",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPAUTO"
+    },
+    {
+      "ItemID": "5698SA40100I0050000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRAHLP",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: AOCHELP"
+    },
+    {
+      "ItemID": "5698SA40100I0051000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRDSFL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPSFLT"
+    },
+    {
+      "ItemID": "5698SA40100I0052000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRDTRE",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPTREE"
+    },
+    {
+      "ItemID": "5698SA40100I0053000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRE000",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPEVT"
+    },
+    {
+      "ItemID": "5698SA40100I0054000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRE100",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPEVTS"
+    },
+    {
+      "ItemID": "5698SA40100I0055000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFREXPL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: EXPLAIN"
+    },
+    {
+      "ItemID": "5698SA40100I0056000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFROPER",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: AOC"
+    },
+    {
+      "ItemID": "5698SA40100I0062000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRT000",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPTRG,DISPTRIG"
+    },
+    {
+      "ItemID": "5698SA40100I0063000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFSODDF",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: SDF"
+    },
+    {
+      "ItemID": "5698SA40100I0067000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVIE0000",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: IMS"
+    },
+    {
+      "ItemID": "5698SA40100I0068000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYAMS",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGAMS"
+    },
+    {
+      "ItemID": "5698SA40100I0069000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYDS0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPSTAT"
+    },
+    {
+      "ItemID": "5698SA40100I0070000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYFLT",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGFILT"
+    },
+    {
+      "ItemID": "5698SA40100I0071000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYIN0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGINFO"
+    },
+    {
+      "ItemID": "5698SA40100I0072000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYMO0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPMTR"
+    },
+    {
+      "ItemID": "5698SA40100I0073000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYRL0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGRELS"
+    },
+    {
+      "ItemID": "5698SA40100I0074000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYST0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGLIST"
+    },
+    {
+      "ItemID": "5698SA40100I0079000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFMSG",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: AOCMSG"
+    },
+    {
+      "ItemID": "5698SA40100I0114000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRGCON",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: AOCGETCN"
+    },
+    {
+      "ItemID": "5698SA40100I0201000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGPNJLC",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGJLM"
+    },
+    {
+      "ItemID": "5698SA40100I0284000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRXTX0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: E2E adapter request handler"
+    },
+    {
+      "ItemID": "5698SA40100I0302000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYPA0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGPAC"
+    },
+    {
+      "ItemID": "5698SA40100I0311000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYSPX",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGSCHED,DISPSVP"
+    },
+    {
+      "ItemID": "5698SA40100I0432000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.CNMECANZ.COMMON",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: CANZLOG,CZ"
+    },
+    {
+      "ItemID": "5698SA40100I0443000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_hlq_user>.**",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0445000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_hlq_smpe>.**",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0446000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<nv_hlq_smpe>.**",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0447000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_hlq_user>.*.DSILIST",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0449000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_hlq_user>.*.DSILOG%",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0450000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_hlq_user>.*.DSISVRT",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0451000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_hlq_user>.*.IPLDATA",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40100I0455000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_hlq_user>.*.INGPSWD",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Users (view-mode)",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    }
+  ]
+}
