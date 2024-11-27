@@ -1,0 +1,18 @@
+# sed command file. It searches for first string and replaces it 
+# globally by the second string. E.g. to replace <net-id> by *, 
+# change the line below to: s/<net-id>/*/g 
+# Do the same for all other variables you want to replace statically
+# before importing the security descriptor file to z/OSMF SCA.
+# 
+# Author: Jürgen Holtz
+# Date: 14.11.2024
+# 
+s/<net-id>/<net-id>/g
+s/<domain>/<domain>/g
+s/<sa_hlq_user>/<sa_hlq_user>/g
+s/<sa_hlq_smpe>/<sa_hlq_smpe>/g
+s/<nv_hlq_smpe>/<nv_hlq_smpe>/g
+s/<sysplex-name>/<sysplex-name>/g 
+s/<sa-xcf-group-name>/<sa-xcf-group-name>/g 
+s/<sa_automation_policy>/<sa_automation_policy>/g
+s/<enterprise-name>/<enterprise-name>/g 
