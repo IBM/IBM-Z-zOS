@@ -15,3 +15,4 @@ s/<nv_hlq_smpe>/<nv_hlq_smpe>/g
 s/<sysplex-name>/<sysplex-name>/g 
 s/<sa-xcf-group-name>/<sa-xcf-group-name>/g 
 s/<sa_automation_policy>/<sa_automation_policy>/g
+s/<enterprise-name>/<enterprise-name>/g 
