@@ -53,6 +53,7 @@ public class ResponseTimes implements SMFFilter {
 	private long totalDispatchTime = 0;
 	private long totalBytesReceived = 0;
 	private long totalBytesSent = 0;
+	private long maxResponseTime = 0;
 	private Map<Long, Map<String, URIData>> timeTable = new HashMap<>();
 	private Map<String, URIData> nonTimeTable = new HashMap<>();
 	private Map<String, Map<Long, Map<String, URIData>>> breakdownTable = new HashMap<>();
@@ -141,6 +142,7 @@ public class ResponseTimes implements SMFFilter {
 	@Override
 	public void processRecord(SmfRecord record) {
 	     // cast to a subtype 9 and declare generic variables
+		if (record instanceof RequestActivitySmfRecord) {
 		 RequestActivitySmfRecord rec = (RequestActivitySmfRecord)record;
 		 Triplet zOSRequestTriplet;
 		 int sectionCount;
@@ -250,6 +252,9 @@ public class ResponseTimes implements SMFFilter {
 	     
 	     
 	     totalResponseTime = totalResponseTime + responseTime;
+	     if (responseTime > maxResponseTime) {
+	    	 maxResponseTime = responseTime;
+	     }
 	     totalQueueTime = totalQueueTime + queueTime;
 	     totalDispatchTime = totalDispatchTime + dispatchTime;	     
 		 totalCPU = totalCPU + cpuTime;
@@ -267,7 +272,7 @@ public class ResponseTimes implements SMFFilter {
 		 urid.update(responseTime, queueTime, dispatchTime, cpuTime,offloadCpu,bytesReceived,bytesSent);
 	     
          ++totalRequests;
-		
+		}
 	}
 	
 	private Map<String, URIData> getTable(String breakdownKey, long receiveTime, long queuedTime, long dispatchStart, long dispatchEnd, long responded) {
@@ -350,7 +355,7 @@ public class ResponseTimes implements SMFFilter {
 			if (totalCPU>0) {
 				averageOffloadPercent = ((float)totalOffloadCPU/(float)totalCPU);
 			}
-			smf_printstream.println(totalRequests+","+totalResponseTime/totalRequests+","+totalQueueTime/totalRequests+","+totalDispatchTime/totalRequests+","+totalCPU/totalRequests+","+totalOffloadCPU/totalRequests+","+averageOffloadPercent+","+totalBytesReceived/totalRequests+","+totalBytesSent/totalRequests+",Overall");
+			smf_printstream.println(totalRequests+","+totalResponseTime/totalRequests+","+maxResponseTime+","+totalQueueTime/totalRequests+","+totalDispatchTime/totalRequests+","+totalCPU/totalRequests+","+totalOffloadCPU/totalRequests+","+averageOffloadPercent+","+totalBytesReceived/totalRequests+","+totalBytesSent/totalRequests+",Overall");
 		} else {
 			smf_printstream.print("Time,");
 			if (useTimeBreakdown == Breakdown.NONE) {
@@ -388,7 +393,7 @@ public class ResponseTimes implements SMFFilter {
 	}
 	
 	private void printHeader() {
-		smf_printstream.println("Requests,AvgResponse,AvgQueue,AvgDisp,AvgCPU,AvgOffload,AvgOffload%,AvgBytesRcvd,AvgBytesSent,URI");
+		smf_printstream.println("Requests,AvgResponse,MaxResponse,AvgQueue,AvgDisp,AvgCPU,AvgOffload,AvgOffload%,AvgBytesRcvd,AvgBytesSent,URI");
 	}
 	
 	public class URIData {
@@ -400,6 +405,7 @@ public class ResponseTimes implements SMFFilter {
 		private long totalDispatchTime = 0;
 		private long totalBytesReceived = 0;
 		private long totalBytesSent = 0;
+		private long maxResponseTime = 0;
 		private String uri;
 		
 		public URIData (String s){
@@ -408,6 +414,9 @@ public class ResponseTimes implements SMFFilter {
 		
 		public void update(long responseTime, long queueTime, long dispatchTime, long cpuTime, long offloadCPU, long bytesReceived, long bytesSent){
 		     totalResponseTime = totalResponseTime + responseTime;
+		     if (responseTime > maxResponseTime) {
+		    	 maxResponseTime = responseTime;
+		     }
 		     totalQueueTime = totalQueueTime + queueTime;
 		     totalDispatchTime = totalDispatchTime + dispatchTime;
 			 totalCPU = totalCPU + cpuTime;
@@ -423,7 +432,7 @@ public class ResponseTimes implements SMFFilter {
 			if (totalCPU>0) {
 				averageOffloadPercent = ((float)totalOffloadCPU/(float)totalCPU);
 			}
-			return new String(totalRequests+","+totalResponseTime/totalRequests+","+totalQueueTime/totalRequests+","+totalDispatchTime/totalRequests+","+totalCPU/totalRequests+","+totalOffloadCPU/totalRequests+","+averageOffloadPercent+","+totalBytesReceived/totalRequests+","+totalBytesSent/totalRequests+","+uri);
+			return new String(totalRequests+","+totalResponseTime/totalRequests+","+maxResponseTime+","+totalQueueTime/totalRequests+","+totalDispatchTime/totalRequests+","+totalCPU/totalRequests+","+totalOffloadCPU/totalRequests+","+averageOffloadPercent+","+totalBytesReceived/totalRequests+","+totalBytesSent/totalRequests+","+uri);
 		}
 		
 	}

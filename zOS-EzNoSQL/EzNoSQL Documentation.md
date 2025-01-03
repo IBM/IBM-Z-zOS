@@ -28,7 +28,7 @@ Getting Started:
 * [Sample Application Programs](#Sample-Application-Programs)
 * [Compile and Link Procedure](#Compile-and-Link-Procedure)
 
-Application Programming Interfaces (APIs):
+C Application Programming Interfaces (APIs):
 * [Application Programming Tiers](#Application-Programming-Tiers)
 
 Data Management APIs:
@@ -51,6 +51,7 @@ Document Retrieval APIs:
 
 Document Management APIs:
 * [znsq_write()](#znsq_write)
+* [znsq_write_result()](#znsq_write_result)
 * [znsq_delete()](#znsq_delete)
 * [znsq_delete_result()](#znsq_delete_result)
 * [znsq_update()](#znsq_update)
@@ -72,7 +73,7 @@ Return and Reason Codes:
 
 # Introduction to EzNoSQL
 
-EzNoSQL for z/OS provides a comprehensive set of C and Java-based Application Programming Interfaces (APIs), which enable applications to store JSON (UTF-8) documents while utilizing the full data-sharing capabilities of IBM's Parallel Sysplex technology and System Z Operating System (z/OS). The JSON data can be accessed as either non-recoverable, or with recoverable (transactional) consistency across the sysplex. The APIs also allow for the creation of secondary indexes, which provide for faster queries to specific key fields within the JSON data.
+EzNoSQL for z/OS provides a comprehensive set of C, Java, and Python based Application Programming Interfaces (APIs), which enable applications to store JSON (UTF-8) documents while utilizing the full data-sharing capabilities of IBM's Parallel Sysplex technology and System Z Operating System (z/OS). The JSON data can be accessed as either non-recoverable, or with recoverable (transactional) consistency across the sysplex. The APIs also allow for the creation of secondary indexes, which provide for faster queries to specific key fields within the JSON data.  
 
 IBM's Parallel Sysplex Coupling Facility (CF) technology enables separate processors to share a single instance of a database (collection of documents) without the need for data sharding, replicating the updates, or programming for eventual consistency. Additionally, the sysplex allows for horizontal scalability by adding additional processors (or z/OS instances) as required. Implementing EzNoSQL on z/OS will inherit many of the desired functions provided by z/OS such as in-memory caching, system-managed storage, data encryption, and compression. EzNoSQL databases can be shared with other exploiters of VSAM databases defined as DATABASE(JSON) Refer to the following link for more information on native access to DATABASE(JSON) databases: [z/OS DFSMS Using Data Sets (Chapter 14)](https://www-40.ibm.com/servers/resourcelink/svc00100.nsf/pages/zOSV2R4sc236855?OpenDocument).
 
@@ -99,13 +100,13 @@ EzNoSQL JSON documents may be up to 2 gigabytes in size, and a maximum of 128 te
 
 ## Primary Indexes
 
-Each EzNoSQL database contains a primary index by default along with an associated primary keyname. When creating the database, a specific user keyname can  be provided, otherwise EzNoSQL will use a reserved keyname of `"znsq_id"`. Primary keynames are restricted to 256 bytes, and must be contained in each document and paired with a unique key-value, otherwise the insert will fail. When using the reserved keyname `"znsq_id"`, EzNoSQL will pre-append an additional element at the beginning of the document consisting of `"znsq_id"` and an internally generated (unique) 122 byte key-value. If requested, the auto-generated key-value will be returned to the application following the insert, and can then be used to retrieve the associated document.  
+Each EzNoSQL database contains a primary index by default along with an associated primary keyname. When creating the database, a specific user keyname can  be provided, otherwise EzNoSQL will use a reserved keyname of `"znsq_id"`. Primary keynames are restricted to 256 bytes, and must be contained in each document and paired with a unique key-value, otherwise the insert will fail for a duplicate key-value. When using the reserved keyname `"znsq_id"`, EzNoSQL will pre-append an additional element at the beginning of the document consisting of `"znsq_id"` and an internally generated (unique) 122 byte key-value. If requested, the auto-generated key-value will be returned to the application following the insert, and can then be used to retrieve the associated document.  
 
 EzNoSQL databases can be defined with 2 types of a primary indices: ordered and unordered:
 
-An _ordered index_ stores key-values in the clear so that the index can be searched sequentially, either forward or backward.  With an ordered index, the key-values are restricted to 251 bytes.  When inserting a high volume of documents from multiple threads (or application instances) using ascending key-values, users may encounter a performance hit as the inserts will contend for the end of the database. Users can avoid this scenario with randomized key-values or by using an unordered index. 
+An _ordered index_ stores key-values in the clear so that the index can be inserted into or searched in both a direct or sequential manner. With an ordered index, the key-values are restricted to 251 bytes. When inserting a high volume of documents from multiple threads (or application instances) using ascending key-values, users may encounter a performance hit as the inserts will contend for the end of the database. Users can avoid this scenario with randomized key-values or by using an unordered index.
 
-An _unordered index_ randomizes the key-values by hashing the values into a 128 encrypted keys, which is then used internally to store the documents in the database.  The hashed key is currently not available to the user. In an unordered index, the key-values have no restriction in length.  An unordered index may mitigate performance issues when inserting ascending key-values by internally randomizing the keys. The disadvantage of an unordered index is that the keys cannot be searched sequentially nor will key-values return in order of insertion. To allow for ordered search in an unordered index, users may define and add a secondary index - since unlike primary keys, alternate keys are stored in order.  
+An _unordered index_ randomizes the key-values by hashing the values into a 128 encrypted keys, which are then used internally to store the documents in the database.  The hashed key is currently not available to the user. In an unordered index, the key-values have no restriction in length.  An unordered index may mitigate performance issues when inserting ascending key-values by internally randomizing the keys. The disadvantage of an unordered index is that the keys cannot be inserted sequentially nor will sequential searches return the keys in ascending or descending order. To allow for ordered search in an unordered index, users may define and add a secondary index - since unlike primary keys, alternate keys are stored in order.  
 
 To convert between existing ordered and unordered indexes, simple read and rewrite the documents from one type of index into the other.  Or, use the z/OS IDCAMS REPRO utility:
 ```
@@ -148,7 +149,7 @@ The inserted document can then be retrieved directly via the primary keyname and
 
 ## Secondary Indexes
 
-Documents may also be retrieved or updated through the use of secondary indexes. Secondary indexes contain alternate keys which can be used to retrieve the documents in the database. By creating alternate keys, the application can have more than one option for locating specific documents, or can find groups of like documents more directly than scanning the entire database.  Alternate keys can be changed (replaced) after the initial insert.
+Documents may also be retrieved or updated through the use of secondary indexes. Secondary indexes contain alternate keys which can be used to retrieve the documents in the database. By creating alternate keys, the application can have more than one option for locating specific documents, or can find groups of like documents more directly than scanning the entire database.  Alternate keys can be changed (replaced) or deleted after the initial insert.  Documents are not required to contain an element with the alternate key, unlike the primary index where the documents must contain an element with the primary key. 
 
 When creating a secondary index, the application developer assigns the alternate keyname which contains the value to be used as the alternate key. Although the alternate keynames must be less than 256 characters, the paired value is not restricted by length. Secondary indexes must also be created while the database is fully disconnected (closed); however, the activation or deactivation can occur dynamically while the database is connected (open) and in-use. Consideration should be given when creating secondary indexes, as each additional active index will incur additional overhead when accessing the database.
 
@@ -212,15 +213,15 @@ Multi-key names can also span into embedded documents or an array of embedded do
 ```
 
 
-## Document Retrieval
+## Document Insertion and Retrieval
 
-Documents can be directly read, updated, or deleted by specifying the desired key name and value. Additionally, documents can be retrieved in an ordered (sequential) fashion through the use of ordered primary or secondary indexes. For example, the application can position into the database to a specific key-value, or for any value greater than or equal to the desired key range. The documents can then be retrieved in a sequential ascending or descending order, and optionally updated or deleted following the retrieval. When using sequential access for updates or deletes, the document will not be visible on disk and to other sharers until 1) the end of the VSAM buffer is reached, 2) a close result is issued, or 3) a successful close of the database. When a close result is issued, the VSAM buffer is written to cache and disk, positioning is ended, and a new request must be issued to re-establish position within the database. 
+Documents can be directly read, inserted, updated, or deleted by specifying the desired keyname and key-value. Additionally, documents can be inserted or retrieved in an ordered (sequential) fashion through the use of ordered primary or secondary indexes. For example, the application can position into the database to a specific key-value, or for any value greater than or equal to the desired key range. The documents can then be inserted or retrieved in a sequential ascending or descending order, and optionally updated or deleted following the retrieval. When using sequential access for inserts, updates or deletes, the documents will not be visible on disk and to other sharers until 1) the end of the VSAM buffer is reached, 2) a close result is issued, or 3) a successful close of the database. When a close result is issued, the VSAM buffer is written to cache and disk, positioning is ended, and a new request must be issued to re-establish position within the database. 
 
-In order to iterate over an unordered index, and optionally update/delete the document(s), the application may perform a direct read with the update option for the primary key and a specific full key-value. Then optionally update result, delete result, or end the update by closing the result. Attempting to position with a generic (greater than or equal to) search may result in unpredictable results when used in conjunction with an unordered primary index.
+In order to iterate over an unordered index, and optionally update/delete the document(s), the application may perform a direct read with the update option for the primary keyname and a specific full key-value. If found, EzNoSQL will return a resultSet (pointer to the document) which can then be optionally updated or deleted, or can end the request without a change by closing the result. Attempting to position with a generic (greater than or equal to) search may result in unpredictable results when used in conjunction with an unordered primary index.  Sequential inserts are not allowed with an unordered primary index.
 
-When searching sequentially via a non-unique secondary index, EzNoSQL will issue an informational return code of '34'x when a duplicate key-value is returned. While the combined alternate key-value pair is not length restricted, the alternate key itself will be automatically truncated after the first 251 bytes. Note that truncated keys may be inadvertently recognized as a non-unique key when there exists other keys containing the same initial 251 bytes. Moreover, sequentially reading truncated keys may also return the documents out of order and require further sorting by the application. EzNoSQL will return a retrun code '35'x alerting the application if a truncated key is detected.  A return code of '36'x indicates that both a duplicate and truncated key was encountered.  When the last duplicate alternate key is returned, a '00'x return code is returned.  The application can then choose to continue reading into the next higher key range, or end the query with a close result.  
+When retrieving documents of unknown length, if the buffer length is too small, the request is failed with a reason code of x'51' and the actual size of the document is returned in the buf_len parameter.  The request can then be redriven after obtaining a buffer with a matching or larger size buffer.  The buffer can always be larger than the returned documents.  
 
-Documents may be retrieved by specifying a key-value either as an exact match (equal), or a partial match (greater than), in order to start a sequential search of the database. For an exact match, specify the key-value exactly as it appears in the document.  For a partial match, specify the the key-value characters which must match in order to start the search. 
+When inserting or searching sequentially via a non-unique secondary index, EzNoSQL will issue an informational return code of '34'x when a duplicate key-value is added or returned. While the combined alternate key-value pair is not length restricted, the alternate key itself will be automatically truncated after the first 251 bytes. Note that truncated keys may be inadvertently recognized as a non-unique key when there exists other keys containing the same initial 251 bytes. Moreover, sequentially reading truncated keys may also return the documents out of order and require further sorting by the application. EzNoSQL will return a return code '35'x alerting the application if a truncated key is detected.  A return code of '36'x indicates that both a duplicate and truncated key was encountered.  When the last duplicate alternate key is returned, a '00'x return code is returned.  The application can then choose to continue reading into the next higher key range, or end the query with a close result.  
 
 For example, assume the following document was inserted with a keyname of `"Customer_id"`. To search for an exact match, specify a key-value of `"\"4084\""` using the position API. The next result would return the document for "4084".  The following next result would return the next higher key-value (i.e. "4085") or the end-of-data return code.  For a partial match, one could specify a key-value of `"\"408"` would start the search for documents greater than or eauls to "408.  If the keyname is `"Address", to search for an exact match of an imbedded document key-value, specify `"{"Street":"1 Main Street","City":"New York","State":"NY"}"`.  An example of searching for a partial key could be: `"{"Street":"1 Main Street""` to start the search for any docuemnts which match the provided key-value of "Street": "1 Main Street". 
 ```json
@@ -298,7 +299,7 @@ Optionally, loading data into the CF cache may be bypassed and reduces overhead 
 
 # Getting Started
 
-The EzNoSQL C APIs can be called from application user programs running in either 31-bit or 64-bit mode. The Java APIs are 64-bit mode only running on the minimum supported version of Java 8. The user programs can link to the required executables and side decks directly from z/OS USS directories. This section explains the required files along with their location and descriptions. Additionally, a sample user program containing compile and link instructions is provided to help test the system configuration and to gain familiarity with a subset of the available APIs. The full suite of available APIs are detailed in the following sections.
+The EzNoSQL C APIs can be called from application user programs running in either 31-bit or 64-bit mode. The Java and Python APIs are 64-bit mode only running on the minimum supported version of Java 8 and Python 3.12 respectively. The user programs can link to the required executables and side decks directly from z/OS USS directories. This section explains the required files along with their location and descriptions. Additionally, a sample user program containing compile and link instructions is provided to help test the system configuration and to gain familiarity with a subset of the available APIs. The full suite of available C APIs are detailed in the following sections. The Java and Python API documentation can be found in the EzNoSQL Content Solutions website:  https://ibm.github.io/eznosql/.  
 
 ## C Executables and Side Decks
 
@@ -319,6 +320,11 @@ The following table shows the names and locations of the EzNoSQL executables, si
 | `libigwznsqj.so`    | `/usr/lib/`                  | JNI Shared Library   |
 | `igwznsq.jar`       | `/usr/include/java_classes/` | Java API JAR file    |
 | `Igwznsqsamp1.java` | `/samples/`                  | Sample Java program  |
+
+## Python Wheel 
+| Member                                             | Location    | Description         |
+|----------------------------------------------------|-------------|---------------------|
+| `pyeznosql-v1.0.1-cp312-none-any.whl` | `/usr/lib/` | Python Wheel File   |
 
 ## Sample Application Programs
 
@@ -349,6 +355,16 @@ Sample user Java program: /samples/Igwznsqsamp1.java, is a 64-bit user program w
 A successful run of Igwznsqsamp1.java would show the following messages: 
 ![image](https://github.com/TerriMenendez/IBM-Z-zOS/assets/75999294/ea80f9aa-43f7-40ab-865d-07b7a4204c3a)
 
+Sample user Python programs: <venv_dir>/bin/primary_key.py, is a 64-bit user program which does the following sequence of API calls.  Prior to running the program, edit the source to customize the high level qualifier for the database and STORCLAS name for your configuration, or run the sample_runner.py script for guided prompts.  
+1) Create a 50 megabyte JSON (non-recoverable) EzNoSQL database with a primary key of `"_id"`.
+2) Create a 50 megabyte non-unique secondary index with a key of `"Title"`.
+3) Create a 50 megabyte non-unique secondary index with a key of `"Year"`.
+4) Add (enable) the secondary indices.
+5) Connect (open) the database.
+6) Insert, update, delete documents.
+7) Drop the secondary indices.
+8) Disconnect (close) the data base.
+9) Destroy the database.
 
 ## Compile and Link Procedure 
 
@@ -363,6 +379,15 @@ To compile the sample java program `/samples/Igwznsqsamp1.java`:
 cd /samples
 javac -cp /usr/include/java_classes/igwznsq.jar Igwznsqsamp1.java
 java -cp /usr/include/java_classes/igwznsq.jar:. Igwznsqsamp1
+```
+
+To install the Python wheel and run a sample script:
+```shell
+mkdir <path_to_venv_dir>
+python -m venv <path_to_venv_dir>
+cd /usr/lib
+pip install pyeznosql-1.0.1-cp312-none-any.whl
+python <path_to_venv_dir>/bin/sample_runner.py
 ```
 
 # Application Programming Tiers
@@ -824,7 +849,7 @@ return connection;
 
 ### znsq_close
 
-Closes the connection to the EzNoSQL database previously established by a `znsq_open()`.
+Closes the connection to the EzNoSQL database previously established by a `znsq_open()`.  The `znsq_close` must be issued from the same task which issued the `znsq_open`. 
 
 ```C
 int znsq_close(znsq_connection_t con);
@@ -951,7 +976,7 @@ should still include ending double quotes which are not part of the actual key v
 
 `key`: C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00.
 
-`key_value`: C-string containing the value for the specific document to be retrieved. To position to the first document in the primary or secondary index, pass an empty string as the key_value.
+`key_value`: C-string containing the value for the specific document to be retrieved. To position to the first document in the primary or secondary index, pass an empty string (i.e. '\0'  , char *empty_str = "" , or "\"\""\0) as the key_value.
 
 `search_method`:
 + _`0`_  indicates that the first (or last) document equal to specified `key_value` should be located for subsequent sequential retrieves/updates/deletes.
@@ -1052,7 +1077,9 @@ int znsq_close_result(znsq_connection_t con, znsq_result_set_t result_set);
 ```
 
 #### Close Result
-Ends positioning into the EzNoSQL database previously established by the `znsq_position()` API.  The `result_set` (provided as input) is invalidated, and for non-recoverable databases, any document level locks will be released.  A new `znsq_position()` must be issued to restart sequential retrievals following the close result.
+Ends positioning into the EzNoSQL database previously established by a `znsq_position()` or `znsq_read` with update option APIs.  The `result_set` (provided as input) is invalidated, and for non-recoverable databases, any document level locks will be released.  A new `znsq_position()` must be issued to restart sequential retrievals following the close result.  
+
+Note that a `znsq_close_result` should be issued following API read/write failures to be sure storage for the `result_set` is freed in the system server's memory. 
 
 #### Parameters
 
@@ -1092,7 +1119,7 @@ int znsq_write(znsq_connection_t con, const char *buf, size_t buf_len, znsq_writ
 #### Write new documents
 Writes (inserts) new documents into the EzNoSQL database using the key name (optionally) specified. Whether the key name represents the primary or a secondary index, all indexes are updated to reflect the new values found in the document. For a keyed EzNoSQL database, the key name on write must match the key name specified on create. If the key value was previously added to the database, then a duplicate document error is returned, unless the write force option was specified on the `znsq_open()` API.
 
-If the key name option is omitted, the database is assumed to be an auto-generated keyed database, and will generate a new `"key:value"` element for the document (refer to the section Primary keyed vs Auto-generated keyed databases for more information on this topic).  If the document contains an auto-generated key element from a prior write request, a duplicate document error will be returned unless the write force option was specified on the `znsq_open()` API.
+If the key name option is omitted, the database is assumed to be an auto-generated keyed database, and will generate a new `"key:value"` element for the document (refer to the section Primary keyed vs Auto-generated keyed databases for more information on this topic).  If the document contains an auto-generated key element from a prior write request, a duplicate document error will be returned unless the write force option was specified on the `znsq_open()` API. 
 
 If the auto-commit option is active for the connection, then a commit will be issued following a successful write.
 
@@ -1146,6 +1173,78 @@ int return_code = znsq_write(
 if (return_code != 0)
 {
     printf("Error returned from znsq_write()\n");
+    printf("Return code received: X%x\n", znsq_err(return_code));
+    return znsq_err(return_code);
+}
+```
+
+### znsq_write_result
+```C
+int znsq_write_result(znsq_connection_t con, znsq_result_set_t *result_set, const char *buf, size_t buf_len, znsq_write_result_options *options);
+```
+
+#### Write new documents sequentially
+Sequentially writes (inserts) new documents into the EzNoSQL database using the keyname (optionally) specified. Whether the key name represents the primary or a secondary index, all indexes are updated to reflect the new values found in the document. For a keyed EzNoSQL database, the key name on write must match the key name specified on create. If the key value was previously added to the database, then a duplicate document error is returned, unless the write force option was specified on the `znsq_open()` API.
+
+If the key name option is omitted, the database is assumed to be an auto-generated keyed database, and will generate a new `"key:value"` element for the document (refer to the section Primary keyed vs Auto-generated keyed databases for more information on this topic).  If the document contains an auto-generated key element from a prior write request, a duplicate document error will be returned unless the write force option was specified on the `znsq_open()` API. 
+
+If the auto-commit option is active for the connection, then a commit will be issued following a successful write.
+
+#### Parameters
+
+`con`: connection token from a previous `znsq_open()`.
+
+`result_set`: pointer to an int32_t token generated from a previous successful `znsq_position()`. Alternatively, a pointer to a value of 0 is allowed if the database is empty.
+
+`buf`: contains the JSON document followed by an ending delimiter of x'00.
+
+`buf_len`: the length of the document.
+
+`options`: pointer to a struct of type `znsq_write_result_options`, where the database attributes are provided.
+
+#### Return value
+The return code of the function.
+
+If the document was created, the return code is 0.
+
+If an error occurred, the return code contains the detailed error reason. The macro `znsq_err()` can be used to mask the error reason in bytes 2 and 3 of the return code.
+
+#### struct znsq_write_result_options
+`znsq_write_result_options;`
+
+#### Member attributes
+| member         | type           | description                                                                                                                   |
+|----------------|----------------|-------------------------------------------------------------------------------------------------------------------------------|
+| version        | `uint8_t`      | API version.                                                                                                                  |
+| key_name       | `const char*`  | C-string containing the key name used on the `znsq_create()` or `znsq_create_index()` including an ending delimiter of x'00'. |
+| autokey_buffer | `char*`        | Minimum buffer of 122 bytes to receive the generated key for auto generated EzNoSQL databases.                                |
+| autokey_length | `unsigned int` | Will store the length of the auto generated key (output).                                                                     |                                                                                
+
+Example of sequentially writing a document to a keyed EzNoSQL database:
+```C
+char keyname[] = {0x22, 0x5f, 0x69, 0x64, 0x22, 0x00};  // "_id" in utf-8
+char write_buf[] = {                                  // Document {"_id":"01","Date":"01/01/23"}
+    0x7b, 0x22, 0x5f, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x30, 0x31, 0x22,
+    0x2c, 0x22, 0x44, 0x61, 0x74, 0x65, 0x22,
+    0x3a, 0x22, 0x30, 0x31, 0x2f, 0x30, 0x31, 0x2f, 0x32, 0x33, 0x22, 0x7d, 0x00
+};
+size_t write_buf_len = strlen(write_buf);
+
+znsq_result_set_t rs = 0; // 0 is allowed if database is empty. Otherwise use znsq_position()
+
+znsq_write_result_options write_result_options = {0};
+write_result_options.key_name = keyname;
+
+int return_code = znsq_write_result(
+    connection,
+    &rs,
+    write_buf,
+    write_buf_len,
+    &write_result_options
+);
+
+if (return_code != 0) {
+    printf("Error returned from znsq_write_result()\n");
     printf("Return code received: X%x\n", znsq_err(return_code));
     return znsq_err(return_code);
 }
@@ -1236,7 +1335,7 @@ int znsq_update(znsq_connection_t con, const char *newbuf,const char *key, const
 ```
 
 #### Direct update documents
-Issues a direct update for a previously added document using the requested `key` name and `key_value`, and providing the updated version of the document. The `key` must match the key name on a previously issued `znsq_create()`, `znsq_create_index()`, or a generated `"znsq_id"` element. The value must match a previously added value paired with the specified key name, otherwise a document not found error is returned.
+Issues a direct update for a previously added document using the requested `key` name and `key_value`, and providing the updated version of the document. The `key` must match the key name on a previously issued `znsq_create()`, `znsq_create_index()`, or a generated `"znsq_id"` element. The value must match a previously added value (including a previous generated auto-key value) paired with the specified key name, otherwise a document not found error is returned.
 
 An exclusive document level lock will be obtained for the update request.  For non-recoverable databases, the lock will be released immediately following the request, and for recoverable databases, the lock will be released by a `znsq_commit()`, `znsq_abort()`, or when the task ends.
 
@@ -1250,7 +1349,7 @@ If the auto-commit option is active for the connection, then a commit will be is
 
 `key`: C-string containing the key name associated with either the primary or a secondary index and ending with one byte of x'00.
 
-`key_value`: key value for the specific document to be retrieved.
+`key_value`: key value for the specific document to be retrieved and updated.
 
 #### Return value
 The return code of the function.
@@ -1456,7 +1555,7 @@ APIs in the Document Management section must run in non-cross memory mode.
 
 ### znsq_last_result
 
-Use the `znsq_last_result()` API to obtain a text report containing additional diagnostic information following the last API failure. Only failures which occur in the server will contain additional diagnostic information. The report is primarily intended for the system support staff. The information can be logged by the application and referred to for problem determination.
+Use the `znsq_last_result()` API to obtain a text report containing additional diagnostic information following API failures. The report may not show the last API to fail but the last API which contains additional diagnostic information.  Only failures which occur in the EzNoSQL server will contain additional diagnostic information. The report is primarily intended for the system support staff. The information can be logged by the application and referred to for problem determination.
 
 ```C
 int znsq_last_result(size_t *buflen, char *buf);
@@ -2075,7 +2174,15 @@ likely an internal system logic error. A (SVC) dump may have been produced for t
 
         Report the issue to the z/OS System Programmer and reference the associated SVC dump.
 ____________________________________________________________________________________________________
-**0138(X'8A)** - Reserved.
+**0138(X'8A)** - Position attempted for an empty database.  A `znsq_position` API was issued for an
+empty database.  The error maybe expected when used to determine if the database is empty. 
+
+        If the error is unexpected, determine whether or not there are documents in the database by 
+	printing the database or disk drive tracks via system utilities. Contact the z/OS Storage  
+        adminstrator for assistence with problem determination. 
+____________________________________________________________________________________________________
+
+**0139(X'8B)** - Reserved.
 **0143(X'8F)**
 ____________________________________________________________________________________________________
 **0144(X'90)** - Internal system logic error. While reading/writing to the database, an internal 
@@ -2117,9 +2224,6 @@ ________________________________________________________________________________
 (thread) which did not perform the znsq_open, or was not a subtask of the open task. 
 
     Ensure that znsq_open and znsq_close follows the task hiearchy requirements. 
-____________________________________________________________________________________________________
-**0155(X'9B)** - Reserved.
-**0159(X'9F)**
 ____________________________________________________________________________________________________
 **0256(X'100)** - Invalid key name. The znsq_add_index() API detected that an invalid key name was 
 provided to the API. The key name did not start with an opening double quote.
@@ -2211,16 +2315,13 @@ parameter on the znsq_report_stats() API.
 
         Obtain the required buffer size and reissue the znsq_report_stats() API.
 ____________________________________________________________________________________________________
-**0282(X'11A)** - Reserved.
-**0287(X'11F)**
-____________________________________________________________________________________________________
 **0288(X'120)** - The znsq_close() API detected a null connection token.
 
         Ensure a connection token was passed to the znsq_close() API.
 ____________________________________________________________________________________________________
-**0289(X'121)** - An invalid connection token. The znsq_close() API detected an invalid connection token.
+**0289(X'121)** - An invalid connection token. The EzNoSQL API detected an invalid connection token.
 
-        Ensure a valid connection token was passed to the znsq_close() API.
+        Ensure a valid connection token was passed to the EzNoSQL API.
 ____________________________________________________________________________________________________
 **0291(X'123)** - Document is too large for logging. The database was defined as a recoverable 
 database (logOptions(UNDO/ALL)) and a document larger than 62K (63488 bytes) was inserted/updated in
@@ -2366,7 +2467,7 @@ the index.
 
              Contact the z/OS Storage and provide the output from the znsq_last_result error.	
 __________________________________________________________________________________________________________________________________________
-**0282(X'11B)** - Create, add or drop function terminated due to z/OS catalog error. An error occurred while creating a database, secondary
+**0283(X'11B)** - Create, add or drop function terminated due to z/OS catalog error. An error occurred while creating a database, secondary
 index, or enabling/disabling the index.
 
              Contact the z/OS Storage and provide the output from the znsq_last_result error.			     
@@ -2423,12 +2524,11 @@ ________________________________________________________________________________
 Return Code 36(X'24)
 Reason Code Meaning
 ____________________________________________________________________________________________________
-**0022(X'16)** - Dynamic Allocation of the database failed. The znsq_open() and znsq_add_index() APIs 
-could not allocate the database or alternate index to the user's program.
+**0022(X'16)** - Dynamic Allocation of the internal work files failed. Select EzNoSQL APIs allocate
+temporary work files which must be allocated on DASD volumes mounted storage (STRG).  If there are
+no available storage volumes, the API will fail.
 
-        Ensure the database or index was successfully created prior to issuing znsq_open() or 
-        znsq_add_index().
-____________________________________________________________________________________________________
+Ensure storage volumes with at least one track per concurrent create or destroy APIs are online. ____________________________________________________________________________________________________
 **0023(X'17)** - Connection token could not be obtained. The znsq_open() API could not obtain 
 storage for a connection token. This error would most likely be related to a memory shortage.
 
@@ -2549,6 +2649,44 @@ freeing 24-bit storage for a DCB control block.
 
         Report the issue to the z/OS Storage Administrator.
 ____________________________________________________________________________________________________
+**0154(X'9A)** - A close was issued from a task which did not issue the open. A `znsq_close` was
+issued for a connection token from a task which did not issue the `znsq_open'.  A task structure 
+violation has occurred.  Most likely, the wrong connection token was used.  
+
+        Ensure the correct connection token was provided, and the `znsq_close` was issued from the
+	task which issued the znsq_open.
+____________________________________________________________________________________________________
+**0155(X'9B)** - Creation of latch failed for internal serialization of result_sets. The creation of
+a latch required to serialize result_set memory in the server failed.  A SVC dump is produced.
+
+        This is a probable internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0156(X'9C)** -A connection token latch obtain failed. A `znsq_open', 'znsq_close`, or the end of the
+task obtains a latch to serialize obtaining/freeing connection token memory.  A SVC dump is produced.
+
+        This is a probable internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0157(X'9D)** - A connection token latch release failed. A `znsq_open', 'znsq_close`, or the end of 
+the task obtains/releases a latch to serialize obtaining/freeing connection token memory.  A SVC
+dump is produced.
+
+        This is a probable internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0158(X'9E)** - Result_set latch obtain failed. The EzNoSQL API latch obtain failed while serializng
+the obtaining/releasing of result_set memory.  A SVC dump is produced.
+
+        This is a probable internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0159(X'9F)** - Result_set latch release failed. The EzNoSQL API latch release failed while 
+serializng the obtaining/releasing of result_set memory.  A SVC dump is produced.
+
+        This is a probable internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
 **0258(X'102)** - An internal logic error occurred. The znsq_add_index() API encountered an internal
 logic error while dynamically deallocating temporary work files.
 
@@ -2564,7 +2702,17 @@ logic error while dynamically deallocating temporary work files.
 
         Report the issue to the z/OS Storage Administrator.
 ____________________________________________________________________________________________________
-**0273(X'111)-0274(x'112)** - Reserved.
+**0273(X'111)** - Delete of connection token memory failed. The `znsq_close` or end of task failed
+to delete connection token memory. A SVC dump is produced.
+
+        This is probably an internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0274(X'112)** - Creation of the connection token related memory failed. The `znsq_open` could not
+create memory for tacking connection tokens. A SVC dump is produced.
+
+        This is probably an internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
 ____________________________________________________________________________________________________
 **0277(X'115)** - Database not found. The znsq_add_index or the znsq_drop Index could not locate the
 base database provided to the API.
@@ -2593,7 +2741,33 @@ information for the base or one of the alternate index previously created with t
         Ensure a valid connection token for the correct data set name was provided to the 
         znsq_report_stats() API.
 ____________________________________________________________________________________________________
-**0290(X'122)** - Database in use. The znsq_destroy() API detected the database is still open/allocated.
+**0284(X'11C)** - Connection token latch obtain failed. The EzNoSQL API attempted to verify
+the validity of the connection token and the latch obtain serializing the check failed. A SVC dump 
+is produced.
+
+        This is probably an internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0285(X'11D)** - Connection token latch release failed. The EzNoSQL API attempted to verify
+the validity of the connection token and the latch release serializing the check failed. A SVC dump 
+is produced.
+
+        This is probably an internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0286(X'11E)** - SYSZNSQL serialization obtain failed.  The `znsq_open` API attempted to obtain the
+SYSZNSQL resource failed while serializing with other opens. A SVC dump is produced.
+
+        This is probably an internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0287(X'11F)** - SYSZNSQL serialization release failed.  The `znsq_open` API attempted to release
+the SYSZNSQL resource failed while serializing with other opens. A SVC dump is produced.
+
+        This is probably an internal server error. Report the problem to the z/OS System Programmer
+	and the existence of the SVC dump for further diagnosis.
+____________________________________________________________________________________________________
+**0290(X'122)** - Database in use. The `znsq_destroy` API detected the database is still open/allocated.
 
         Ensure the connection for this database is closed using the znsq_close() API before 
         attempting to destroy the database.
@@ -2616,8 +2790,14 @@ information for the base or one of the alternate index previously created with t
 
         Ensure a valid connection token for the correct data set name was provided to the 
         znsq_report_stats() API. If the name is correct, contact the z/OS Storage Administrator.
-____________________________________________________________________________________________________
+___________________________________________________________________________________________________
 **32767(x'7FFF)** - Unknown error. An unknown error resulted in the termination of the API request.  
-Likely an abend occurred during the request.
+Likely an abend occurred during the request and a system dump may be available for further diagnosis.
 
-        Report the problem to the Storage Administrator along with any last result API diagnostic information.
+        Report the problem to the Storage Administrator along with any last result API diagnostic 
+	information.
+____________________________________________________________________________________________________ 
+ **-1(x'FFFF)** - Parameter error.  One or more parameters passed to the EzNoSQL C API are not valid.  
+
+        Probable application error.  Verify the parameters passed to the API are correct.
+____________________________________________________________________________________________________ 
