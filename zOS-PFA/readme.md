@@ -27,8 +27,8 @@ Sample Requirements.txt for pip install:
 ```
 #####
 #
-# Requirements for python Scripts for the PFA_COMMON_STORAGE_USAGE, PFA_PRIVATE_STORAGE_EXHAUSTION,
-# and PFA_JES2_RESOURCE_EXHAUSTION
+# Requirements for python scripts for the PFA_COMMON_STORAGE_USAGE, PFA_PRIVATE_STORAGE_EXHAUSTION,
+# and PFA_JES2_RESOURCE_EXHAUSTION checks.
 #
 # This is the list of packages that are needed for using the PFA python scripts.  This
 # subset list created from the full list provided was modeled after the list provided with the
