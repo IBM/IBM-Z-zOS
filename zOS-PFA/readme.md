@@ -23,7 +23,8 @@ There are no warranties of any kind, and there is no service or technical suppor
 Though the materials provided herein are not supported by the IBM Service organization, your comments are welcomed by the developers, who reserve the right to revise or remove the materials at any time. To report a problem, or provide feedback, contact  mvassilev@ibm.com, or open a GitHub issue.
 
 Sample Requirements.txt for pip install:
-#####
+
+```#####
 #
 # Requirements for python Scripts for the PFA_COMMON_STORAGE_USAGE, PFA_PRIVATE_STORAGE_EXHAUSTION,
 # and PFA_JES2_RESOURCE_EXHAUSTION
@@ -54,4 +55,4 @@ pillow==10.3.0.post0 --hash=sha256:c1ae4770fe2726288e8a193121c10f43765007c67a43e
 python-dateutil==2.8.2 --hash=sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9
 pyparsing==3.0.10 --hash=sha256:61ce52c4f7808471604fff914cb827e41fd04f2a14623125fcee3892637f295a
 pytz==2022.4 --hash=sha256:6eb3220e93b321d88847ef5da93ac8036cca1ad821d3dc6e956139acc91c1264
-six==1.16.0 --hash=sha256:31b9420324b64686ad1e85d1a981456eeca115dc8503e168ecae830f8f83d86e
+six==1.16.0 --hash=sha256:31b9420324b64686ad1e85d1a981456eeca115dc8503e168ecae830f8f83d86e```
