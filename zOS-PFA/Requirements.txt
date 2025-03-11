@@ -1,7 +1,12 @@
+
 #####
 #
-# Requirements for python scripts for the PFA_COMMON_STORAGE_USAGE, PFA_PRIVATE_STORAGE_EXHAUSTION,
-# and PFA_JES2_RESOURCE_EXHAUSTION checks.
+# Requirements.txt file for pip install of the necessary dependencies for the PFA_COMMON_STORAGE_USAGE, PFA_PRIVATE_STORAGE_EXHAUSTION,
+# and PFA_JES2_RESOURCE_EXHAUSTION checks pythong scripts.    When installing with a requirements.txt file on z/OS, ensure it is created
+# from z/OS.  For example from the OMVS shell, issue these commands
+#       	1. touch requirements.txt  
+#        	2. chtag -mc ISO8859-1 requirements.txt  
+#           3. oedit requirements.txt and copy data from here to create the file.
 #
 # This is the list of packages that are needed for using the PFA python scripts.  This
 # subset list created from the full list provided was modeled after the list provided with the
