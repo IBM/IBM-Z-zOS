@@ -110,6 +110,39 @@ import com.ibm.smf.format.UnsupportedVersionException;
       return s_supportedVersion;
       
     } // supportedVersion()
+    
+    public String getRequestTypeString() {
+    	switch (m_requestType) {
+    	case TypeUnknown:
+    		return "Unknown";
+    	case TypeIIOP:
+    		return "IIOP";
+    	case TypeHTTP:
+    		return "HTTP";
+    	case TypeHTTPS:
+    		return "HTTPS";
+    	case TypeMDBA:
+    		return "MDBA";
+    	case TypeMDBB:
+    		return "MDBB";
+    	case TypeMDBC:
+    		return "MDBC";
+    	case TypeSIP:
+    		return "SIP";
+    	case TypeSIPS:
+    		return "SIPS";
+    	case TypeMBean:
+    		return "MBean";
+    	case TypeOTS:
+    		return "OTS";
+    	case TypeOther:
+    		return "Other";
+    	case TypeOLA:
+    		return "OLA";
+		default:
+			return "MissingCase";
+    	}
+    }
 
 
     //----------------------------------------------------------------------------
