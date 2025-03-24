@@ -1,5 +1,5 @@
 /*                                                                   */
-/* Copyright 2024 IBM Corp.                                          */
+/* Copyright 2025 IBM Corp.                                          */
 /*                                                                   */
 /* Licensed under the Apache License, Version 2.0 (the "License");   */
 /* you may not use this file except in compliance with the License.  */
@@ -162,6 +162,7 @@ public class ResponseTimes implements SMFFilter {
 		 }
 
 		 // From the Platform Neutral Request Info Section
+		 String requestTypeString = null;
 		 zOSRequestTriplet = rec.m_platformNeutralRequestInfoTriplet;
 		 sectionCount = zOSRequestTriplet.count();
 		 if (sectionCount > 0)
@@ -173,6 +174,8 @@ public class ResponseTimes implements SMFFilter {
 	      
 	      // Accumulate CPU time in milliseconds
 	      cpuTime = sec.m_dispatchTcbCpu/1000;
+	      
+	      requestTypeString = sec.getRequestTypeString();
 		 }
 		 
 		 String breakdownKey = null;
@@ -234,6 +237,10 @@ public class ResponseTimes implements SMFFilter {
 	            	uri = cds.m_theData;
 	            } 
 	    	 }
+	     }
+	     
+	     if (uri == null && requestTypeString != null) {
+	    	 uri = requestTypeString;
 	     }
 	     
 		 // From the network section
