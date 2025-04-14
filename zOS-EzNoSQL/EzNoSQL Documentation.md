@@ -385,6 +385,7 @@ To install the Python wheel and run a sample script:
 ```shell
 mkdir <path_to_venv_dir>
 python -m venv <path_to_venv_dir>
+source <path_to_venv_dir>/bin/activate
 cd /usr/lib
 pip install pyeznosql-1.0.1-cp312-none-any.whl
 python <path_to_venv_dir>/bin/sample_runner.py
