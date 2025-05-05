@@ -29,6 +29,10 @@
 **
 ***********************************************************************/
 /**********************************************************************/
+/* WARNING:   This program should NEVER be APF authorized or linked   */
+/*            AC(1). The supported way to call REXX in an authorized  */
+/*            environment is via SYSREXX.                             */
+/*                                                                    */
 /* Program:   rexx                                                    */
 /* Function:  shell utility to run a rexx program                     */
 /* Syntax:    rexx {arg...}                                           */
