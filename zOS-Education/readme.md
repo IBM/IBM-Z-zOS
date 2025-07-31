@@ -19,9 +19,9 @@ Modules are provided for the following:
 
 * [z/OS V2.5](zOS-V2.5-Education)
 
-* [z/OS V3.1](zOS-3.1-Education)
+* [z/OS 3.1](zOS-3.1-Education)
 
-* [z/OS V3.2](zOS-3.2-Education)
+* [z/OS 3.2](zOS-3.2-Education)
 
 * [z15](z15-Education)
 
