@@ -24,9 +24,7 @@ This example will send a **Cross-Site Request** to the default z/OSMF server by 
 
 After depoly `rest-jobs.html` to a server, you also need to add the origin of your website to z/OSMF CSRF white list. For details, please reference [Establish security for cross-site z/OSMF REST requests](https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.3.0/com.ibm.zos.v2r3.e0zm100/IZU_V2R3_CSRF-Header.htm)
 
-
-
-
-
-
-
+## Python example
+This example contains 1 Python file:
+* create_dataset_members.py
+  Sample Python code that uses the z/OS data set REST interface to create three data set members.

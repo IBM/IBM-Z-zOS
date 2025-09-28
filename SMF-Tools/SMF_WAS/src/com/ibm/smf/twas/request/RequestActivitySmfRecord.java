@@ -250,7 +250,7 @@ public class RequestActivitySmfRecord extends WASSmfRecord {
       m_userDataSection = new UserDataSection[m_userDataTriplet.count()];
       for (int i=0; i < m_userDataTriplet.count(); i++)
       {
-        m_userDataSection[i] = UserDataSection.loadUserDataFormatter(m_stream,9); 
+        m_userDataSection[i] = UserDataSection.loadUserDataFormatter(m_stream,9,m_userDataTriplet.length()); 
       }
     }
       

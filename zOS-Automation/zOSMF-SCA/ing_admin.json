@@ -1,0 +1,2418 @@
+{
+  "ServiceId": "5698SA40102I",
+  "ServiceName": "IBM Z System Automation - Administrators",
+  "MetaValidationItemVersion": 1.01,
+  "Vendor": "IBM",
+  "SecurityValidationItems": [
+    {
+      "ItemID": "5698SA40102I0003000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<domain>",
+      "ResourceClass": "APPL",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0006000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "*.*.*.*",
+      "ResourceClass": "RMTOPS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Controls the NetView-NetView comminication via RMTCMD"
+    },
+    {
+      "ItemID": "5698SA40102I0007000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "AGT.<sysplex-name>.<sa-xcf-group-name>.TARGET.FROMDOM.*.TODOM.*",
+      "ResourceClass": "SYSAUTO",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Controls usage of the TARGET= parameter of the commands"
+    },
+    {
+      "ItemID": "5698SA40102I0009000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "AGT.<sysplex-name>.<sa-xcf-group-name>.RES._CONFIG",
+      "ResourceClass": "SYSAUTO",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "CONTROL",
+      "ItemDescription": "Protects the automation configuration data model"
+    },
+    {
+      "ItemID": "5698SA40102I0011000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "AGT.<sysplex-name>.<sa-xcf-group-name>.RES._MANAGER",
+      "ResourceClass": "SYSAUTO",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "CONTROL",
+      "ItemDescription": "Protects control of the Automation Manager in general"
+    },
+    {
+      "ItemID": "5698SA40102I0013000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "AGT.<sysplex-name>.<sa-xcf-group-name>.RES._MANAGER.DIAG",
+      "ResourceClass": "SYSAUTO",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "CONTROL",
+      "ItemDescription": "Protects control of the Automation Manager diagnostics"
+    },
+    {
+      "ItemID": "5698SA40102I0014000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "AGT.<sysplex-name>.<sa-xcf-group-name>.RES._MANAGER.PACING",
+      "ResourceClass": "SYSAUTO",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "UPDATE",
+      "ItemDescription": "Controls the release function of the INGPAC command"
+    },
+    {
+      "ItemID": "5698SA40102I0015000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "POLICY.<enterprise-name>.OPTIONS.ACTIVITYLOG",
+      "ResourceClass": "SYSAUTO",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "UPDATE",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0016000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0025000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.AOF*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0026000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.EVE*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0027000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.EVI*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0028000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.EVJ*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0029000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.HSA*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0030000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.IHV*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0031000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<net-id>.<domain>.ING*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0032000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQ*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0036000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVJETSOU",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DFTSOU,DFTSOR"
+    },
+    {
+      "ItemID": "5698SA40102I0038000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRSDF0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: SDFPANEL,SDFTREE"
+    },
+    {
+      "ItemID": "5698SA40102I0039000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFR2GL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPGW"
+    },
+    {
+      "ItemID": "5698SA40102I0040000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFR2SM",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPMSGS"
+    },
+    {
+      "ItemID": "5698SA40102I0041000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFR2SO",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPAOPS"
+    },
+    {
+      "ItemID": "5698SA40102I0042000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFR3STS",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPASF"
+    },
+    {
+      "ItemID": "5698SA40102I0043000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRADA1",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPFLGS"
+    },
+    {
+      "ItemID": "5698SA40102I0044000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRADA2",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPSCHD"
+    },
+    {
+      "ItemID": "5698SA40102I0045000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRADA5",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPERRS"
+    },
+    {
+      "ItemID": "5698SA40102I0046000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRADA8",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPINFO"
+    },
+    {
+      "ItemID": "5698SA40102I0047000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRADAE",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPSYS"
+    },
+    {
+      "ItemID": "5698SA40102I0048000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRADAG",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPAPG"
+    },
+    {
+      "ItemID": "5698SA40102I0049000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRADAT",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPAUTO"
+    },
+    {
+      "ItemID": "5698SA40102I0050000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRAHLP",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: AOCHELP"
+    },
+    {
+      "ItemID": "5698SA40102I0051000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRDSFL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPSFLT"
+    },
+    {
+      "ItemID": "5698SA40102I0052000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRDTRE",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPTREE"
+    },
+    {
+      "ItemID": "5698SA40102I0053000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRE000",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPEVT"
+    },
+    {
+      "ItemID": "5698SA40102I0054000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRE100",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPEVTS"
+    },
+    {
+      "ItemID": "5698SA40102I0055000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFREXPL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: EXPLAIN"
+    },
+    {
+      "ItemID": "5698SA40102I0056000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFROPER",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: AOC"
+    },
+    {
+      "ItemID": "5698SA40102I0057000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYANX",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGWHY"
+    },
+    {
+      "ItemID": "5698SA40102I0058000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYPS0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGPAUSE"
+    },
+    {
+      "ItemID": "5698SA40102I0059000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRE2E",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "E2E Agent Backend"
+    },
+    {
+      "ItemID": "5698SA40102I0060000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRE2E1",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "E2E Automation Domain Diagnose"
+    },
+    {
+      "ItemID": "5698SA40102I0061000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRPCMD",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGPFXC"
+    },
+    {
+      "ItemID": "5698SA40102I0062000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRT000",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPTRG,DISPTRIG"
+    },
+    {
+      "ItemID": "5698SA40102I0063000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFSODDF",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: SDF"
+    },
+    {
+      "ItemID": "5698SA40102I0067000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVIE0000",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: IMS"
+    },
+    {
+      "ItemID": "5698SA40102I0068000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYAMS",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGAMS"
+    },
+    {
+      "ItemID": "5698SA40102I0069000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYDS0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPSTAT"
+    },
+    {
+      "ItemID": "5698SA40102I0070000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYFLT",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGFILT"
+    },
+    {
+      "ItemID": "5698SA40102I0071000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYIN0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGINFO"
+    },
+    {
+      "ItemID": "5698SA40102I0072000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYMO0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPMTR"
+    },
+    {
+      "ItemID": "5698SA40102I0073000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYRL0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGRELS"
+    },
+    {
+      "ItemID": "5698SA40102I0074000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYST0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGLIST"
+    },
+    {
+      "ItemID": "5698SA40102I0079000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFMSG",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: AOCMSG"
+    },
+    {
+      "ItemID": "5698SA40102I0084000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFR2",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OPER"
+    },
+    {
+      "ItemID": "5698SA40102I0085000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFR3CFG",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DISPACF"
+    },
+    {
+      "ItemID": "5698SA40102I0087000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRAATA",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: SETTIMER"
+    },
+    {
+      "ItemID": "5698SA40102I0094000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRASFX",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ASF,ASFUSER"
+    },
+    {
+      "ItemID": "5698SA40102I0095000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRASTA",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: SETSTATE"
+    },
+    {
+      "ItemID": "5698SA40102I0108000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRDWN7",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Resource processing"
+    },
+    {
+      "ItemID": "5698SA40102I0111000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFREDSS",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGMDFY"
+    },
+    {
+      "ItemID": "5698SA40102I0114000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRGCON",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: AOCGETCN"
+    },
+    {
+      "ItemID": "5698SA40102I0117000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRNSSR",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: NASSIST,SDFCONF"
+    },
+    {
+      "ItemID": "5698SA40102I0118000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFROCIM",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: CD"
+    },
+    {
+      "ItemID": "5698SA40102I0122000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRRSN0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: RESYNC"
+    },
+    {
+      "ItemID": "5698SA40102I0131000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRSA19",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Initialization processing"
+    },
+    {
+      "ItemID": "5698SA40102I0138000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRSD0E",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DRAINJES"
+    },
+    {
+      "ItemID": "5698SA40102I0142000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRSETF",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGAUTO"
+    },
+    {
+      "ItemID": "5698SA40102I0143000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRSGAC",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ACTIVMSG"
+    },
+    {
+      "ItemID": "5698SA40102I0146000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRSGST",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Resource processing"
+    },
+    {
+      "ItemID": "5698SA40102I0147000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRSGTM",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: TERMMSG"
+    },
+    {
+      "ItemID": "5698SA40102I0148000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRSHLD",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: SETHOLD"
+    },
+    {
+      "ItemID": "5698SA40102I0149000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRSMN0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: MONITOR"
+    },
+    {
+      "ItemID": "5698SA40102I0155000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRSOR",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OUTREP"
+    },
+    {
+      "ItemID": "5698SA40102I0158000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AOFRSTR0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: RESTART"
+    },
+    {
+      "ItemID": "5698SA40102I0166000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVEENCCI",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: EVESNCCI"
+    },
+    {
+      "ItemID": "5698SA40102I0171000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVERYCMD",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGCICS"
+    },
+    {
+      "ItemID": "5698SA40102I0175000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVIRYCMD",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGIMS"
+    },
+    {
+      "ItemID": "5698SA40102I0181000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVJEALST",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OPCALIST,OPCLIST"
+    },
+    {
+      "ItemID": "5698SA40102I0184000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVJESPCP",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OPCACOMP"
+    },
+    {
+      "ItemID": "5698SA40102I0186000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVJESRST",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: SRSTAT"
+    },
+    {
+      "ItemID": "5698SA40102I0192000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVJRYCAL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OPCACAL"
+    },
+    {
+      "ItemID": "5698SA40102I0193000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVJRYMOD",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OPCAMOD"
+    },
+    {
+      "ItemID": "5698SA40102I0194000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVJRYOPC",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OPC,OPCA,OPCAO"
+    },
+    {
+      "ItemID": "5698SA40102I0195000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVJRYPST",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OPCAPOST"
+    },
+    {
+      "ItemID": "5698SA40102I0196000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVJRYQRY",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OPCAQRY"
+    },
+    {
+      "ItemID": "5698SA40102I0197000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EVJRYRQ0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGOPC,INGTWS"
+    },
+    {
+      "ItemID": "5698SA40102I0201000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGPNJLC",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGJLM"
+    },
+    {
+      "ItemID": "5698SA40102I0202000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGPNJLC.START",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGJLM START"
+    },
+    {
+      "ItemID": "5698SA40102I0203000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGPNJLC.STOP",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGJLM STOP"
+    },
+    {
+      "ItemID": "5698SA40102I0204000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGPNJLC.SUSPEND",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGJLM SUSPEND"
+    },
+    {
+      "ItemID": "5698SA40102I0206000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGPW",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGPW"
+    },
+    {
+      "ItemID": "5698SA40102I0216000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRCANZ",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Get CANZLOG data to SMU UI"
+    },
+    {
+      "ItemID": "5698SA40102I0217000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRCAPT",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Get captured messages to SMU UI"
+    },
+    {
+      "ItemID": "5698SA40102I0225000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRCNTL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGCNTL"
+    },
+    {
+      "ItemID": "5698SA40102I0235000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYDYN",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGDYN"
+    },
+    {
+      "ItemID": "5698SA40102I0241000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRGARB",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGCLEAN"
+    },
+    {
+      "ItemID": "5698SA40102I0242000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRLCR",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Diagnostics"
+    },
+    {
+      "ItemID": "5698SA40102I0243000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRLNK0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGLINK"
+    },
+    {
+      "ItemID": "5698SA40102I0245000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGROMX0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGOMX"
+    },
+    {
+      "ItemID": "5698SA40102I0252000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRX000",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGPLEX,INGCF"
+    },
+    {
+      "ItemID": "5698SA40102I0253000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRCCHK.INGPLEX.CDS",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGPLEX CDS - CDS manipulation"
+    },
+    {
+      "ItemID": "5698SA40102I0254000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRCCHK.INGPLEX.HW",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGPLEX HW - HW activation and deactivation"
+    },
+    {
+      "ItemID": "5698SA40102I0255000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRCCHK.INGCF.STR",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGCF STR - CF structure manipulation"
+    },
+    {
+      "ItemID": "5698SA40102I0256000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRCCHK.INGCF.CF",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGCF CF - CF manipulation"
+    },
+    {
+      "ItemID": "5698SA40102I0273000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.INGRX810",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGHWCMD"
+    },
+    {
+      "ItemID": "5698SA40102I0274000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.INGRX815",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGHWSRV"
+    },
+    {
+      "ItemID": "5698SA40102I0276000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.INGRX850",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0278000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRX906",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGSTR"
+    },
+    {
+      "ItemID": "5698SA40102I0283000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRXTXP",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGE2E"
+    },
+    {
+      "ItemID": "5698SA40102I0284000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRXTX0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: E2E adapter request handler"
+    },
+    {
+      "ItemID": "5698SA40102I0286000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYCFG",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGCFG"
+    },
+    {
+      "ItemID": "5698SA40102I0287000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYDB2",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGDB2"
+    },
+    {
+      "ItemID": "5698SA40102I0288000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYDBG",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: AOCTRACE"
+    },
+    {
+      "ItemID": "5698SA40102I0289000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYDLA",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGDLA"
+    },
+    {
+      "ItemID": "5698SA40102I0290000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYEV0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGEVENT"
+    },
+    {
+      "ItemID": "5698SA40102I0291000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYEVT",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGEVOBS"
+    },
+    {
+      "ItemID": "5698SA40102I0296000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYGRA",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGGROUP"
+    },
+    {
+      "ItemID": "5698SA40102I0297000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYHIX",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGHIST"
+    },
+    {
+      "ItemID": "5698SA40102I0298000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYLUX",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGLKUP"
+    },
+    {
+      "ItemID": "5698SA40102I0299000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYMSG",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGMSGS"
+    },
+    {
+      "ItemID": "5698SA40102I0300000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYMVX",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGMOVE"
+    },
+    {
+      "ItemID": "5698SA40102I0301000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYNTX",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGNTFY,DISPNTFY"
+    },
+    {
+      "ItemID": "5698SA40102I0302000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYPA0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGPAC"
+    },
+    {
+      "ItemID": "5698SA40102I0303000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYRM0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGRUN"
+    },
+    {
+      "ItemID": "5698SA40102I0304000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYRPX",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGRPT"
+    },
+    {
+      "ItemID": "5698SA40102I0305000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYRQX",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGVOTE"
+    },
+    {
+      "ItemID": "5698SA40102I0306000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYRU0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGREQ"
+    },
+    {
+      "ItemID": "5698SA40102I0307000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYSE0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGSET"
+    },
+    {
+      "ItemID": "5698SA40102I0309000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYSOR",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGSTOBS"
+    },
+    {
+      "ItemID": "5698SA40102I0311000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYSPX",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGSCHED,DISPSVP"
+    },
+    {
+      "ItemID": "5698SA40102I0312000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYSS0",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGSESS"
+    },
+    {
+      "ItemID": "5698SA40102I0313000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYST2",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGDATA"
+    },
+    {
+      "ItemID": "5698SA40102I0314000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYTHX",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGTHRES"
+    },
+    {
+      "ItemID": "5698SA40102I0316000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.INGRYTRX",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: INGTRIG"
+    },
+    {
+      "ItemID": "5698SA40102I0320000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQGATBL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0322000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQGCMD",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0323000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQGFIN",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0325000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQGPOLL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0326000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQGPSES",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0327000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQGPVAR",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0338000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQISTAT",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0347000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQCCMD",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQCCMD"
+    },
+    {
+      "ItemID": "5698SA40102I0348000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQCHK",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQCHK"
+    },
+    {
+      "ItemID": "5698SA40102I0349000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQCMON",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQCMON"
+    },
+    {
+      "ItemID": "5698SA40102I0350000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQEXEC",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQROUTE"
+    },
+    {
+      "ItemID": "5698SA40102I0351000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQHELP",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQHELP"
+    },
+    {
+      "ItemID": "5698SA40102I0352000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQIPSWT",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQIPSWT"
+    },
+    {
+      "ItemID": "5698SA40102I0353000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQMTSYS",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: MONSYS"
+    },
+    {
+      "ItemID": "5698SA40102I0354000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQOVRD",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQOVRD"
+    },
+    {
+      "ItemID": "5698SA40102I0355000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQPSCMD",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0356000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQRCALL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0357000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQRCVM",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0359000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQRPSDF",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0360000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQSEND",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQSEND,ISQSNDH"
+    },
+    {
+      "ItemID": "5698SA40102I0361000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQSNMPI",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0362000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQSTART",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQSTART"
+    },
+    {
+      "ItemID": "5698SA40102I0363000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQSTOP",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQSTOP"
+    },
+    {
+      "ItemID": "5698SA40102I0364000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQSTRT",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0365000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQTCPI",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Processor Operations"
+    },
+    {
+      "ItemID": "5698SA40102I0366000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQVARS",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQVS"
+    },
+    {
+      "ItemID": "5698SA40102I0367000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQXCLS",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQXCLS"
+    },
+    {
+      "ItemID": "5698SA40102I0368000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQXCON",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQXCON"
+    },
+    {
+      "ItemID": "5698SA40102I0369000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQXDRL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQXDRL"
+    },
+    {
+      "ItemID": "5698SA40102I0370000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQXDST",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQXDSTI"
+    },
+    {
+      "ItemID": "5698SA40102I0371000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQXIII",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQXIII"
+    },
+    {
+      "ItemID": "5698SA40102I0372000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQXLOC",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQXLOC"
+    },
+    {
+      "ItemID": "5698SA40102I0373000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQXMON",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQXMON"
+    },
+    {
+      "ItemID": "5698SA40102I0374000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQXOPT",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQXOPT"
+    },
+    {
+      "ItemID": "5698SA40102I0375000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQXPSM",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQXPSM"
+    },
+    {
+      "ItemID": "5698SA40102I0376000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "hardware automation only",
+      "ResourceProfile": "<net-id>.<domain>.ISQXUNL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ISQXUNL"
+    },
+    {
+      "ItemID": "5698SA40102I0377000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.ALLOCATE",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: ALLOC"
+    },
+    {
+      "ItemID": "5698SA40102I0378000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AUTOTASK",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: AUTOTASK"
+    },
+    {
+      "ItemID": "5698SA40102I0379000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.AUTOTBL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: AUTOMSG"
+    },
+    {
+      "ItemID": "5698SA40102I0380000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.CLOSE",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: CLOSE"
+    },
+    {
+      "ItemID": "5698SA40102I0381000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.CNMEAUTB",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: AUTBNABL"
+    },
+    {
+      "ItemID": "5698SA40102I0382000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.CNME2008",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DBAUTO"
+    },
+    {
+      "ItemID": "5698SA40102I0383000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.DEFAULTS",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DEFAULTS"
+    },
+    {
+      "ItemID": "5698SA40102I0384000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.DSIPIINS.*.DSICLD&SLASHFW*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "PIPE stage: INSTORE"
+    },
+    {
+      "ItemID": "5698SA40102I0385000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.DSIPIINS.*.DSIPARM&SLASHFW*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "PIPE stage: INSTORE"
+    },
+    {
+      "ItemID": "5698SA40102I0386000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.DSIPIINS.*.DSIPRF&SLASHFW*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "PIPE stage: INSTORE"
+    },
+    {
+      "ItemID": "5698SA40102I0387000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.DSIPIINS.*.DSIVTAM&SLASHFW*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "PIPE stage: INSTORE"
+    },
+    {
+      "ItemID": "5698SA40102I0388000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.DSIPIPPI",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DSIPIPPI"
+    },
+    {
+      "ItemID": "5698SA40102I0389000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.DSIPITSO",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DSIPITSO"
+    },
+    {
+      "ItemID": "5698SA40102I0390000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.DSIPIUNX",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DSIPIUNX"
+    },
+    {
+      "ItemID": "5698SA40102I0391000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.DSIUSNDM",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: RMTCMD"
+    },
+    {
+      "ItemID": "5698SA40102I0392000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.DSIPIXCF",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DSIPIXCF"
+    },
+    {
+      "ItemID": "5698SA40102I0393000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.DSIPIXTB",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: DSIPIXTB"
+    },
+    {
+      "ItemID": "5698SA40102I0395000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EXCMD",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: AONCMD"
+    },
+    {
+      "ItemID": "5698SA40102I0396000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.REVISMSG",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: REVISMSG"
+    },
+    {
+      "ItemID": "5698SA40102I0397000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.REVISE",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: REVISE"
+    },
+    {
+      "ItemID": "5698SA40102I0398000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.EZLEF002",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: AUTOCMD"
+    },
+    {
+      "ItemID": "5698SA40102I0399000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.FOCALPT",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: FPT,FOC"
+    },
+    {
+      "ItemID": "5698SA40102I0400000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.FREE",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: UNALLOC"
+    },
+    {
+      "ItemID": "5698SA40102I0401000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.LOGONPW",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: LOGONPW"
+    },
+    {
+      "ItemID": "5698SA40102I0402000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.MODIFY",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: MODIFY,F"
+    },
+    {
+      "ItemID": "5698SA40102I0403000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.MVS",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: MVS"
+    },
+    {
+      "ItemID": "5698SA40102I0404000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.MAXCPU",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0405000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.MAXCPU.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0406000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.MAXIO",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0407000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.MAXIO.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0408000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.MAXMQIN",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0409000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.MAXMQIN.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0410000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.MAXMQOUT",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0411000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.MAXMQOUT.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0412000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.MAXSTG",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0413000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.MAXSTG.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0414000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.REXXSTRF",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0415000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.REXXSTRF.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0416000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.REXXENVL",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0417000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.REXXENVL.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0418000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.SLOWSTG",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0419000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.SLOWSTG.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0420000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.TASK",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0421000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.TASK.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0422000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.OVERRIDE.SLOGCMDR",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: OVERRIDE"
+    },
+    {
+      "ItemID": "5698SA40102I0423000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.PURGE",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: PURGE"
+    },
+    {
+      "ItemID": "5698SA40102I0424000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.PWDSEC.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: PWDSEC"
+    },
+    {
+      "ItemID": "5698SA40102I0425000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.REFRESH",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: REFRESH"
+    },
+    {
+      "ItemID": "5698SA40102I0426000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.RESETDB",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: RESETDB"
+    },
+    {
+      "ItemID": "5698SA40102I0427000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.RID",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: RID"
+    },
+    {
+      "ItemID": "5698SA40102I0428000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.START.TASK.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: START"
+    },
+    {
+      "ItemID": "5698SA40102I0429000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.STOP",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: STOP"
+    },
+    {
+      "ItemID": "5698SA40102I0430000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.SWITCH",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: SWITCH"
+    },
+    {
+      "ItemID": "5698SA40102I0431000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.VARY",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: VARY,V"
+    },
+    {
+      "ItemID": "5698SA40102I0432000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.CNMECANZ.COMMON",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: CANZLOG,CZ"
+    },
+    {
+      "ItemID": "5698SA40102I0433000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.READSEC.DSIPARM.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: READSEC"
+    },
+    {
+      "ItemID": "5698SA40102I0434000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.WRITESEC.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: WRITESEC"
+    },
+    {
+      "ItemID": "5698SA40102I0435000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "System Automation commands and functions",
+      "ResourceProfile": "<net-id>.<domain>.WRITESEC.*.*",
+      "ResourceClass": "NETCMDS",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "Command: WRITESEC"
+    },
+    {
+      "ItemID": "5698SA40102I0444000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_hlq_user>.**",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "UPDATE",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0445000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_hlq_smpe>.**",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0446000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<nv_hlq_smpe>.**",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0448000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_hlq_user>.*.DSILIST",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "UPDATE",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0449000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_hlq_user>.*.DSILOG%",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0450000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_hlq_user>.*.DSISVRT",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0452000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_hlq_user>.*.IPLDATA",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "UPDATE",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0456000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_hlq_user>.*.INGPSWD",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "UPDATE",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0458000",
+      "ItemType": "SEMI-PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "<sa_automation_policy>.**",
+      "ResourceClass": "DATASET",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "ALTER",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0459000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "IRR.DIGTCERT.LIST",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0460000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "IRR.DIGTCERT.LISTRING",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0461000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "IEAABD.DMPAUTH",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    },
+    {
+      "ItemID": "5698SA40102I0462000",
+      "ItemType": "PROGRAMMABLE",
+      "ItemCategory": "product-wide, general usage",
+      "ResourceProfile": "IEAABD.DMPAKEY",
+      "ResourceClass": "FACILITY",
+      "WhoNeedsAccess": "Administrators",
+      "LevelOfAccessRequired": "READ",
+      "ItemDescription": "No description available"
+    }
+  ]
+}

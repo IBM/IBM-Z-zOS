@@ -1,0 +1,2213 @@
+<ServiceDefinition xmlns="http://www.ibm.com/xmlns/prod/zwlm/2022/05/ServiceDefinition.xsd">
+    <Name>WSCDEF</Name>
+    <Description>WSC WLM starter policy</Description>
+    <Level>038</Level>
+    <ReplId>E6E2C3C4C5C64040000000000000000000000000000000000000000000000000</ReplId>
+    <ProdId>WLM AA zOS V2R4 HBB77C0 LEVEL038</ProdId>
+    <Notes />
+    <ResourceGroups>
+        <ResourceGroup>
+            <Name>RGCAPPED</Name>
+            <Description>Control quiesced nonswappables</Description>
+            <CreationDate>2024/07/29 12:49:11</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2024/07/29 12:49:11</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <Type>CPUServiceUnits</Type>
+            <CapacityMinimum>0</CapacityMinimum>
+            <CapacityMaximum>1</CapacityMaximum>
+            <IncludeSpecialtyProcessorConsumption>Yes</IncludeSpecialtyProcessorConsumption>
+        </ResourceGroup>
+        <ResourceGroup>
+            <Name>RGCPCAP</Name>
+            <Description>Cap GCP only portion of workload</Description>
+            <CreationDate>2023/07/26 16:34:19</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/07/26 16:34:19</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <Type>CPUServiceUnits</Type>
+            <CapacityMaximum>5000</CapacityMaximum>
+            <IncludeSpecialtyProcessorConsumption>No</IncludeSpecialtyProcessorConsumption>
+        </ResourceGroup>
+    </ResourceGroups>
+    <TenantResourceGroups>
+        <TenantResourceGroup>
+            <Name>RGZCX</Name>
+            <Description>Default to enforce ILMT</Description>
+            <SolutionId>D9F4555-13446AD-70FF8DA303-0915801A-C0AA-489A-891B-6EF7DD-C744F4</SolutionId>
+            <TenantId>DEPT1234</TenantId>
+            <TenantName>Department 1234</TenantName>
+            <CreationDate>2023/02/20 15:35:21</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/06/13 18:34:23</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <Type>NumberCPsTimes100</Type>
+            <CapacityMaximum>170</CapacityMaximum>
+            <IncludeSpecialtyProcessorConsumption>Yes</IncludeSpecialtyProcessorConsumption>
+        </TenantResourceGroup>
+    </TenantResourceGroups>
+    <Workloads>
+        <Workload>
+            <Name>BAT_WKL</Name>
+            <Description>Batch Workloads</Description>
+            <CreationDate>2023/02/06 12:55:00</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 12:55:00</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <ServiceClasses>
+                <ServiceClass>
+                    <Name>BATHI</Name>
+                    <Description>High priority batch</Description>
+                    <CreationDate>2023/02/06 13:00:35</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/02/20 11:27:23</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <Velocity>
+                            <Importance>3</Importance>
+                            <Duration>250</Duration>
+                            <Level>30</Level>
+                        </Velocity>
+                        <Velocity>
+                            <Importance>4</Importance>
+                            <Level>20</Level>
+                        </Velocity>
+                    </Goal>
+                </ServiceClass>
+                <ServiceClass>
+                    <Name>BATLO</Name>
+                    <Description>Low priority batch</Description>
+                    <CreationDate>2023/02/06 16:23:18</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/07/26 16:35:18</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <ResourceGroupName>RGCPCAP</ResourceGroupName>
+                    <Goal>
+                        <Velocity>
+                            <Importance>5</Importance>
+                            <Level>10</Level>
+                        </Velocity>
+                    </Goal>
+                </ServiceClass>
+                <ServiceClass>
+                    <Name>BATTEST</Name>
+                    <Description>Test batch jobs</Description>
+                    <CreationDate>2023/02/06 16:24:50</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/02/06 16:25:13</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <Discretionary />
+                    </Goal>
+                </ServiceClass>
+            </ServiceClasses>
+        </Workload>
+        <Workload>
+            <Name>DB_WKL</Name>
+            <Description>Databaseworkloads</Description>
+            <CreationDate>2023/02/06 12:55:28</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 12:55:28</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <ServiceClasses>
+                <ServiceClass>
+                    <Name>DDFHI</Name>
+                    <Description>DDF high priority</Description>
+                    <CreationDate>2023/02/06 16:33:53</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/06/13 18:26:22</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <PercentileResponseTime>
+                            <Importance>2</Importance>
+                            <Duration>50</Duration>
+                            <ResponseTime>00:00:00.030</ResponseTime>
+                            <Percentile>90</Percentile>
+                        </PercentileResponseTime>
+                        <Velocity>
+                            <Importance>3</Importance>
+                            <Level>40</Level>
+                        </Velocity>
+                    </Goal>
+                </ServiceClass>
+                <ServiceClass>
+                    <Name>DDFLO</Name>
+                    <Description>DDF low priority</Description>
+                    <CreationDate>2023/02/06 16:35:05</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/06/13 18:26:56</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <Velocity>
+                            <Importance>4</Importance>
+                            <Level>20</Level>
+                        </Velocity>
+                    </Goal>
+                </ServiceClass>
+            </ServiceClasses>
+        </Workload>
+        <Workload>
+            <Name>OMVS_WKL</Name>
+            <Description>Open MVS workloads</Description>
+            <CreationDate>2023/02/06 16:28:03</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 16:28:03</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <ServiceClasses>
+                <ServiceClass>
+                    <Name>OMVS</Name>
+                    <Description>OMVSKERN forked/spawned</Description>
+                    <CreationDate>2023/02/06 16:41:57</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/02/06 16:43:49</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <Velocity>
+                            <Importance>1</Importance>
+                            <Level>50</Level>
+                        </Velocity>
+                    </Goal>
+                </ServiceClass>
+            </ServiceClasses>
+        </Workload>
+        <Workload>
+            <Name>ONL_WKL</Name>
+            <Description>Online workloads</Description>
+            <CreationDate>2023/02/06 16:27:33</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 16:27:33</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <ServiceClasses>
+                <ServiceClass>
+                    <Name>CICSHI</Name>
+                    <Description>CICS high priority trans</Description>
+                    <CreationDate>2023/02/06 16:32:26</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/02/20 11:30:28</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <PercentileResponseTime>
+                            <Importance>2</Importance>
+                            <ResponseTime>00:00:00.010</ResponseTime>
+                            <Percentile>90</Percentile>
+                        </PercentileResponseTime>
+                    </Goal>
+                </ServiceClass>
+                <ServiceClass>
+                    <Name>CICSLO</Name>
+                    <Description>CICS low priority trans</Description>
+                    <CreationDate>2023/02/06 16:33:09</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/02/20 11:30:45</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <PercentileResponseTime>
+                            <Importance>3</Importance>
+                            <ResponseTime>00:00:00.015</ResponseTime>
+                            <Percentile>80</Percentile>
+                        </PercentileResponseTime>
+                    </Goal>
+                </ServiceClass>
+                <ServiceClass>
+                    <Name>IMSHI</Name>
+                    <Description>IMS high priority</Description>
+                    <CreationDate>2023/02/06 16:36:19</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/02/28 10:23:49</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <PercentileResponseTime>
+                            <Importance>2</Importance>
+                            <ResponseTime>00:00:00.020</ResponseTime>
+                            <Percentile>90</Percentile>
+                        </PercentileResponseTime>
+                    </Goal>
+                </ServiceClass>
+                <ServiceClass>
+                    <Name>WASHI</Name>
+                    <Description>Websphere high priority</Description>
+                    <CreationDate>2023/02/20 15:24:11</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/02/20 15:24:11</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <PercentileResponseTime>
+                            <Importance>2</Importance>
+                            <ResponseTime>00:00:00.030</ResponseTime>
+                            <Percentile>90</Percentile>
+                        </PercentileResponseTime>
+                    </Goal>
+                </ServiceClass>
+                <ServiceClass>
+                    <Name>WASLO</Name>
+                    <Description>Websphere low priority</Description>
+                    <CreationDate>2023/02/20 15:24:20</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/02/20 15:24:20</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <AverageResponseTime>
+                            <Importance>4</Importance>
+                            <ResponseTime>00:00:00.030</ResponseTime>
+                        </AverageResponseTime>
+                    </Goal>
+                </ServiceClass>
+            </ServiceClasses>
+        </Workload>
+        <Workload>
+            <Name>STC_WKL</Name>
+            <Description>Started task workloads</Description>
+            <CreationDate>2023/02/06 16:29:15</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 16:29:15</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <ServiceClasses>
+                <ServiceClass>
+                    <Name>CAPPED</Name>
+                    <Description>Limit resource consumption</Description>
+                    <CreationDate>2024/07/29 12:50:18</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2024/07/29 12:50:18</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <ResourceGroupName>RGCAPPED</ResourceGroupName>
+                    <Goal>
+                        <Discretionary />
+                    </Goal>
+                </ServiceClass>
+                <ServiceClass>
+                    <Name>NEWWORK</Name>
+                    <Description>Unclassified work</Description>
+                    <CreationDate>2023/02/06 16:41:30</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/02/06 16:41:49</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <Velocity>
+                            <Importance>3</Importance>
+                            <Level>30</Level>
+                        </Velocity>
+                    </Goal>
+                </ServiceClass>
+                <ServiceClass>
+                    <Name>SERVERS</Name>
+                    <Description>CICS/IMS Tran Managed Regions</Description>
+                    <CreationDate>2023/02/28 10:30:19</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/02/28 10:30:19</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <Velocity>
+                            <Importance>1</Importance>
+                            <Level>50</Level>
+                        </Velocity>
+                    </Goal>
+                </ServiceClass>
+                <ServiceClass>
+                    <Name>STCCRIT</Name>
+                    <Description>Critical started tasks</Description>
+                    <CreationDate>2023/02/06 16:44:43</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/02/06 16:47:00</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>Yes</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <Velocity>
+                            <Importance>1</Importance>
+                            <Level>70</Level>
+                        </Velocity>
+                    </Goal>
+                </ServiceClass>
+                <ServiceClass>
+                    <Name>STCHI</Name>
+                    <Description>High priority systems work</Description>
+                    <CreationDate>2023/02/06 16:47:07</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/02/20 15:29:24</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>Yes</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <Velocity>
+                            <Importance>1</Importance>
+                            <Level>60</Level>
+                        </Velocity>
+                    </Goal>
+                </ServiceClass>
+                <ServiceClass>
+                    <Name>STCLO</Name>
+                    <Description>Low priority systems work</Description>
+                    <CreationDate>2023/02/06 16:48:24</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/02/06 16:49:05</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <Velocity>
+                            <Importance>3</Importance>
+                            <Level>20</Level>
+                        </Velocity>
+                    </Goal>
+                </ServiceClass>
+                <ServiceClass>
+                    <Name>ZCXHI</Name>
+                    <Description>zCX instances</Description>
+                    <CreationDate>2023/02/20 15:27:04</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/02/20 15:30:18</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <Velocity>
+                            <Importance>3</Importance>
+                            <Level>40</Level>
+                        </Velocity>
+                    </Goal>
+                </ServiceClass>
+            </ServiceClasses>
+        </Workload>
+        <Workload>
+            <Name>TSO_WKL</Name>
+            <Description>TSO workloads</Description>
+            <CreationDate>2023/02/06 16:29:30</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 16:29:30</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <ServiceClasses>
+                <ServiceClass>
+                    <Name>TSO</Name>
+                    <Description>TSO user community</Description>
+                    <CreationDate>2023/02/06 16:49:59</CreationDate>
+                    <CreationUser>DELUCA</CreationUser>
+                    <ModificationDate>2023/06/13 18:27:13</ModificationDate>
+                    <ModificationUser>DELUCA</ModificationUser>
+                    <CPUCritical>No</CPUCritical>
+                    <IOPriorityGroup>Normal</IOPriorityGroup>
+                    <HonorPriority>Default</HonorPriority>
+                    <Goal>
+                        <PercentileResponseTime>
+                            <Importance>3</Importance>
+                            <Duration>50</Duration>
+                            <ResponseTime>00:00:00.030</ResponseTime>
+                            <Percentile>90</Percentile>
+                        </PercentileResponseTime>
+                        <Velocity>
+                            <Importance>5</Importance>
+                            <Level>30</Level>
+                        </Velocity>
+                    </Goal>
+                </ServiceClass>
+            </ServiceClasses>
+        </Workload>
+    </Workloads>
+    <ServicePolicies>
+        <ServicePolicy>
+            <Name>PROD</Name>
+            <Description>Default policy</Description>
+            <CreationDate>2023/02/13 14:46:53</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/13 14:46:53</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <ServiceClassOverrides></ServiceClassOverrides>
+            <ResourceGroupOverrides></ResourceGroupOverrides>
+            <TenantResourceGroupOverrides></TenantResourceGroupOverrides>
+        </ServicePolicy>
+    </ServicePolicies>
+    <ReportClasses>
+        <ReportClass>
+            <Name>RCACCTRC</Name>
+            <Description>Account receivables</Description>
+            <CreationDate>2023/02/07 15:18:19</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:18:19</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCBATTCE</Name>
+            <Description>JES transaction class E</Description>
+            <CreationDate>2023/02/07 15:18:44</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:18:44</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCBATTCJ</Name>
+            <Description>JES transaction class J</Description>
+            <CreationDate>2023/02/07 15:19:05</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:19:05</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCBATTCM</Name>
+            <Description>JES transaction class M</Description>
+            <CreationDate>2023/02/07 15:19:20</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:19:20</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCCICSIP</Name>
+            <Description>CICS subsystem instance CICSIP*</Description>
+            <CreationDate>2023/02/13 17:10:23</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/13 17:10:23</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCDBSPAS</Name>
+            <Description>Stored procedure address space</Description>
+            <CreationDate>2023/02/07 18:19:44</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/13 17:02:15</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCDB2IRL</Name>
+            <Description>DB2 IRLMs</Description>
+            <CreationDate>2023/02/07 15:19:33</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:19:33</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCDB2T</Name>
+            <Description>DDF DB2 test</Description>
+            <CreationDate>2023/02/07 18:00:27</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 18:00:27</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCDDFDBC</Name>
+            <Description>DDF DB2P* subsystem instance</Description>
+            <CreationDate>2023/02/07 15:19:50</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:19:50</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCFTP</Name>
+            <Description>FTP report class</Description>
+            <CreationDate>2023/02/07 15:20:02</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:20:02</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCIMSIP</Name>
+            <Description>IMS for subsystem name in IMSID</Description>
+            <CreationDate>2023/02/07 15:22:13</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:22:13</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCINET</Name>
+            <Description>OMVS transaction name INET*</Description>
+            <CreationDate>2023/02/13 17:13:44</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/13 17:13:44</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCIVTNO</Name>
+            <Description>IMS transaction names IVTNO*</Description>
+            <CreationDate>2023/02/07 15:22:55</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:22:55</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCLU1234</Name>
+            <Description>DDF VTAM LU logon</Description>
+            <CreationDate>2023/02/07 15:23:12</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:23:12</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCMON</Name>
+            <Description>Monitor started tasks</Description>
+            <CreationDate>2023/02/28 11:16:19</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/28 11:16:19</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCMQCHIN</Name>
+            <Description>MQ CHIN services started tasks</Description>
+            <CreationDate>2023/02/07 15:23:32</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:23:32</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCMQMSTR</Name>
+            <Description>MQ MSTR services started tasks</Description>
+            <CreationDate>2023/02/07 15:23:47</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:23:47</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCOMVSKN</Name>
+            <Description>Tasks spawned with OMVSKN UID</Description>
+            <CreationDate>2023/02/13 17:12:47</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/13 17:12:47</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCPAYT</Name>
+            <Description>DDF test payroll work</Description>
+            <CreationDate>2023/02/07 15:24:06</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:24:06</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCPBAT</Name>
+            <Description>Production batch</Description>
+            <CreationDate>2023/02/07 15:24:18</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:24:18</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCPDBSTC</Name>
+            <Description>Database started tasks</Description>
+            <CreationDate>2023/02/07 15:24:36</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:24:36</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCPRODON</Name>
+            <Description>Production online work</Description>
+            <CreationDate>2023/02/07 15:24:52</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:24:52</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCSPAS1</Name>
+            <Description>DDF stored procedures</Description>
+            <CreationDate>2023/02/07 15:25:07</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/13 17:01:28</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCSPMSTC</Name>
+            <Description>SPM SYSSTC rule</Description>
+            <CreationDate>2023/02/13 17:18:15</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/13 17:18:15</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCSPMSTM</Name>
+            <Description>SPM SYSTEM rule</Description>
+            <CreationDate>2023/02/13 17:17:57</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/13 17:17:57</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCSRVR</Name>
+            <Description>CICS/IMS tran managed regions</Description>
+            <CreationDate>2023/02/28 11:11:29</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/28 11:11:29</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCSTOR</Name>
+            <Description>Storage backups</Description>
+            <CreationDate>2023/02/07 15:25:29</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:25:29</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCSYSADM</Name>
+            <Description>DDF SYSADM work</Description>
+            <CreationDate>2023/02/07 15:25:45</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:25:45</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCSYSLO</Name>
+            <Description>Low priority system work</Description>
+            <CreationDate>2023/02/07 15:26:12</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:26:12</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCSYSSTC</Name>
+            <Description>SYSSTC classified started tasks</Description>
+            <CreationDate>2023/02/07 15:31:52</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:31:52</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCTBAT</Name>
+            <Description>Test batch</Description>
+            <CreationDate>2023/02/07 15:32:16</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:32:16</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCTDBSTC</Name>
+            <Description>Test databases started tasks</Description>
+            <CreationDate>2023/02/07 15:33:22</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:33:22</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCTONL</Name>
+            <Description>Test onlines</Description>
+            <CreationDate>2023/02/07 18:21:30</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 18:21:30</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCTOR</Name>
+            <Description>CICS Terminal Owning Regions</Description>
+            <CreationDate>2023/02/20 15:47:12</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 15:47:12</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCTRN1</Name>
+            <Description>CICS tran1 in CICSIP* region</Description>
+            <CreationDate>2023/02/07 15:53:17</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:53:17</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCTRN2</Name>
+            <Description>CICS tran2 in CICSIP* region</Description>
+            <CreationDate>2023/02/07 15:53:39</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:53:39</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCTRN3</Name>
+            <Description>CICS tran3 in CICSIP* region</Description>
+            <CreationDate>2023/02/07 15:53:50</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:53:50</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCTRX1</Name>
+            <Description>CICS trans matching name TRX1</Description>
+            <CreationDate>2023/02/07 15:54:09</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:54:09</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCTRX2</Name>
+            <Description>CICS trans matching nameTRX2</Description>
+            <CreationDate>2023/02/07 15:54:22</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 15:54:22</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCTSO</Name>
+            <Description>General TSO use</Description>
+            <CreationDate>2023/02/07 18:24:40</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 18:24:40</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCTSOEMG</Name>
+            <Description>TSO emergencyuse</Description>
+            <CreationDate>2023/02/07 18:24:25</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 18:24:25</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCUASCH</Name>
+            <Description>Unclassified ASCH work</Description>
+            <CreationDate>2023/02/20 16:01:05</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 16:01:05</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCUCICS</Name>
+            <Description>Unclassified CICS</Description>
+            <CreationDate>2023/02/20 15:56:56</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 15:56:56</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCUDDF</Name>
+            <Description>Unclassified DDF work</Description>
+            <CreationDate>2023/02/20 15:57:29</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 15:57:29</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCUIMS</Name>
+            <Description>Unclassified IMS</Description>
+            <CreationDate>2023/02/20 15:57:49</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 15:57:49</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCUIWEB</Name>
+            <Description>Unclassified IWEB work</Description>
+            <CreationDate>2023/02/20 15:58:12</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 15:58:12</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCUJES</Name>
+            <Description>Unclassified JES</Description>
+            <CreationDate>2023/02/20 15:58:19</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 15:58:19</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCULDAP</Name>
+            <Description>LDAP enclave</Description>
+            <CreationDate>2023/06/13 18:32:14</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/06/13 18:32:14</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCULSFM</Name>
+            <Description>Unclassified LAN Server work</Description>
+            <CreationDate>2023/02/20 15:58:29</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 15:58:29</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCUMQ</Name>
+            <Description>Unclassified MQ Series Workflow</Description>
+            <CreationDate>2023/02/20 15:58:55</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 15:58:55</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCUOMVS</Name>
+            <Description>Unclassified OMVS</Description>
+            <CreationDate>2023/02/20 15:59:26</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 15:59:26</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCUSOM</Name>
+            <Description>Unclassified SOMrequests</Description>
+            <CreationDate>2023/02/20 15:59:55</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 15:59:55</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCUSTC</Name>
+            <Description>Unclassified started tasks</Description>
+            <CreationDate>2023/02/20 16:00:01</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 16:00:01</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCUTCP</Name>
+            <Description>TCP independent enclave</Description>
+            <CreationDate>2023/06/13 18:32:01</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/06/13 18:32:01</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCUTSO</Name>
+            <Description>Unclassified TSO</Description>
+            <CreationDate>2023/02/20 16:00:06</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 16:00:06</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCUWAS</Name>
+            <Description>Unclassified Websphere work</Description>
+            <CreationDate>2023/02/20 15:56:47</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 15:56:47</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCWASADM</Name>
+            <Description>Liberty tran class TCADMIN</Description>
+            <CreationDate>2023/02/24 14:15:45</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/24 14:15:45</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCWASBER</Name>
+            <Description>Example WAS collection name</Description>
+            <CreationDate>2023/02/24 14:16:00</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/28 10:42:10</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCWASCIC</Name>
+            <Description>Example WAS collection name</Description>
+            <CreationDate>2023/02/24 14:16:08</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/28 10:42:23</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCWASIC</Name>
+            <Description>Liberty tran class TCIC</Description>
+            <CreationDate>2023/02/24 14:22:02</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/24 14:22:02</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCWASIVP</Name>
+            <Description>Example WAS collection name</Description>
+            <CreationDate>2023/02/24 14:16:34</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/28 10:42:40</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCWASMQ</Name>
+            <Description>Liberty tran class TCMQ</Description>
+            <CreationDate>2023/02/24 14:22:15</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/24 14:22:15</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCWASMYS</Name>
+            <Description>Liberty example collection name</Description>
+            <CreationDate>2023/02/24 14:16:42</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/24 14:16:42</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCWASSTC</Name>
+            <Description>WebSphere Application Server STC</Description>
+            <CreationDate>2023/02/28 11:15:37</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/28 11:15:37</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCWASTCI</Name>
+            <Description>Tran class part of CN BBERWW*</Description>
+            <CreationDate>2023/02/24 14:17:36</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/24 14:17:36</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCWASTRD</Name>
+            <Description>Example WAS collection name</Description>
+            <CreationDate>2023/02/24 14:17:51</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/28 10:44:24</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCWASZCE</Name>
+            <Description>Liberty example collection name</Description>
+            <CreationDate>2023/02/24 14:19:17</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/24 14:19:17</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCWASZCI</Name>
+            <Description>Liberty tran class TCCICS</Description>
+            <CreationDate>2023/02/24 14:18:19</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/24 14:18:19</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+        <ReportClass>
+            <Name>RCZOSCON</Name>
+            <Description>z/OS Connect Servers STCs</Description>
+            <CreationDate>2023/02/07 18:20:22</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/07 18:20:22</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </ReportClass>
+    </ReportClasses>
+    <TenantReportClasses>
+        <TenantReportClass>
+            <Name>RCZCX</Name>
+            <TenantResourceGroupName>RGZCX</TenantResourceGroupName>
+            <Description>z/OS Container Extension work</Description>
+            <CreationDate>2023/02/20 15:38:35</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 15:38:35</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+        </TenantReportClass>
+    </TenantReportClasses>
+    <ClassificationGroups>
+        <ClassificationGroup>
+            <Name>PBAT_TCG</Name>
+            <Description>Production batch classes</Description>
+            <CreationDate>2023/02/06 17:13:02</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 17:13:02</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <QualifierType>TransactionClass</QualifierType>
+            <QualifierNames>
+                <QualifierName>
+                    <Name>A</Name>
+                    <Description>JES class A production jobs</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>B</Name>
+                    <Description>JES class B production jobs</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>C</Name>
+                    <Description>JES class C production jobs</Description>
+                </QualifierName>
+            </QualifierNames>
+        </ClassificationGroup>
+        <ClassificationGroup>
+            <Name>TBAT_TCG</Name>
+            <Description>Test batch classes</Description>
+            <CreationDate>2023/02/06 17:13:57</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 17:13:57</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <QualifierType>TransactionClass</QualifierType>
+            <QualifierNames>
+                <QualifierName>
+                    <Name>X</Name>
+                    <Description>JES class X test jobs</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>Y</Name>
+                    <Description>JES class Ytest jobs</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>Z</Name>
+                    <Description>JES class Z test jobs</Description>
+                </QualifierName>
+            </QualifierNames>
+        </ClassificationGroup>
+        <ClassificationGroup>
+            <Name>PDBL_TNG</Name>
+            <Description>Production database systems</Description>
+            <CreationDate>2023/02/06 17:15:44</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 17:15:44</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <QualifierType>TransactionName</QualifierType>
+            <QualifierNames>
+                <QualifierName>
+                    <Name>DB2P*</Name>
+                    <Description>DB2 production regions</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>ADABAS*</Name>
+                    <Description>ADABAS production regions</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>IDMS*</Name>
+                    <Description>IDMS production regions</Description>
+                </QualifierName>
+            </QualifierNames>
+        </ClassificationGroup>
+        <ClassificationGroup>
+            <Name>PONL_TNG</Name>
+            <Description>Prod online/region managed CICS</Description>
+            <CreationDate>2023/02/06 17:17:33</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/06/07 15:21:34</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <QualifierType>TransactionName</QualifierType>
+            <QualifierNames>
+                <QualifierName>
+                    <Name>CICSPSTC</Name>
+                    <Description>CICS production region STC name</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>IMSP1*</Name>
+                    <Description>IMS production region1 STC name</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>IMSP2*</Name>
+                    <Description>IMS production region2 STC name</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>CICSQSTC</Name>
+                    <Description>CICS QAL region STC name</Description>
+                </QualifierName>
+            </QualifierNames>
+        </ClassificationGroup>
+        <ClassificationGroup>
+            <Name>SRVR_TNG</Name>
+            <Description>CICS/IMS tran managed regions</Description>
+            <CreationDate>2023/02/28 11:12:58</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/28 11:12:58</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <QualifierType>TransactionName</QualifierType>
+            <QualifierNames>
+                <QualifierName>
+                    <Name>CICS*</Name>
+                    <Description>Transaction managed CICS region</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>IMSPA*</Name>
+                    <Description>Transaction managed IMS region A</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>IMSPB*</Name>
+                    <Description>Transaction managed IMS region B</Description>
+                </QualifierName>
+            </QualifierNames>
+        </ClassificationGroup>
+        <ClassificationGroup>
+            <Name>STOR_TNG</Name>
+            <Description>Storage backup tasks</Description>
+            <CreationDate>2023/02/06 17:19:11</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 17:19:11</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <QualifierType>TransactionName</QualifierType>
+            <QualifierNames>
+                <QualifierName>
+                    <Name>DFHSM*</Name>
+                    <Description>STC for HSM</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>ADSM*</Name>
+                    <Description>STC for ADSM</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>USRBKUPS</Name>
+                    <Description>STC for otheruser backups</Description>
+                </QualifierName>
+            </QualifierNames>
+        </ClassificationGroup>
+        <ClassificationGroup>
+            <Name>SYHI_TNG</Name>
+            <Description>High priority system tasks</Description>
+            <CreationDate>2023/02/06 17:20:09</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 17:20:09</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <QualifierType>TransactionName</QualifierType>
+            <QualifierNames>
+                <QualifierName>
+                    <Name>CA*</Name>
+                    <Description>CA tasks</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>MONITOR*</Name>
+                    <Description>OEM monitoring tasks</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>OMEG*</Name>
+                    <Description>OMEGAMON</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>SDSF</Name>
+                    <Description>SDSF STC</Description>
+                </QualifierName>
+            </QualifierNames>
+        </ClassificationGroup>
+        <ClassificationGroup>
+            <Name>SYLO_TNG</Name>
+            <Description>Low priority system tasks</Description>
+            <CreationDate>2023/02/06 17:21:51</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 17:21:51</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <QualifierType>TransactionName</QualifierType>
+            <QualifierNames>
+                <QualifierName>
+                    <Name>PRINT*</Name>
+                    <Description>Printing processes</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>REPORT*</Name>
+                    <Description>Report generator tasks</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>CUSTPGM*</Name>
+                    <Description>Customer programs</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>CUSTSTC</Name>
+                    <Description>Customer started tasks</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>SPECIFIC</Name>
+                    <Description>Customer specific tasks</Description>
+                </QualifierName>
+            </QualifierNames>
+        </ClassificationGroup>
+        <ClassificationGroup>
+            <Name>SYST_TNG</Name>
+            <Description>MISC system tasks for SYSSTC</Description>
+            <CreationDate>2023/02/06 17:23:21</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/20 16:22:04</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <QualifierType>TransactionName</QualifierType>
+            <QualifierNames>
+                <QualifierName>
+                    <Name>PORTMAP</Name>
+                </QualifierName>
+                <QualifierName>
+                    <Name>NFS*</Name>
+                </QualifierName>
+                <QualifierName>
+                    <Name>VMCF</Name>
+                </QualifierName>
+                <QualifierName>
+                    <Name>NAMED</Name>
+                </QualifierName>
+                <QualifierName>
+                    <Name>ROUTED</Name>
+                </QualifierName>
+            </QualifierNames>
+        </ClassificationGroup>
+        <ClassificationGroup>
+            <Name>TDBL_TNG</Name>
+            <Description>Test database systems</Description>
+            <CreationDate>2023/02/06 17:24:04</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 17:24:04</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <QualifierType>TransactionName</QualifierType>
+            <QualifierNames>
+                <QualifierName>
+                    <Name>IMST*</Name>
+                    <Description>IMS test databaseregions</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>DB2T*</Name>
+                    <Description>DB2 test database regions</Description>
+                </QualifierName>
+            </QualifierNames>
+        </ClassificationGroup>
+        <ClassificationGroup>
+            <Name>TONL_TNG</Name>
+            <Description>Non-prod online systems</Description>
+            <CreationDate>2023/02/06 17:27:22</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 17:27:22</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <QualifierType>TransactionName</QualifierType>
+            <QualifierNames>
+                <QualifierName>
+                    <Name>CICST*</Name>
+                    <Description>CICS test regions STC names</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>CICDEV*</Name>
+                    <Description>CICS development STC names</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>CICQAL*</Name>
+                    <Description>CICS quality assurance STC names</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>IMSQAL*</Name>
+                    <Description>IMS quality assurance regions</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>IMSDEV*</Name>
+                    <Description>IMS development STC names</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>IMST*</Name>
+                    <Description>IMS test regions STC names</Description>
+                </QualifierName>
+            </QualifierNames>
+        </ClassificationGroup>
+        <ClassificationGroup>
+            <Name>ZOSC_TNG</Name>
+            <Description>z/OS Connect servers group</Description>
+            <CreationDate>2023/02/06 17:31:56</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 17:31:56</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <QualifierType>TransactionName</QualifierType>
+            <QualifierNames>
+                <QualifierName>
+                    <Name>ZCEE*</Name>
+                    <Description>example z/OS Connect server name</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>MYSERVER</Name>
+                    <Description>example z/OS Connect server name</Description>
+                </QualifierName>
+            </QualifierNames>
+        </ClassificationGroup>
+        <ClassificationGroup>
+            <Name>EMG_UIG</Name>
+            <Description>Emergency use TSO userids</Description>
+            <CreationDate>2023/02/06 17:28:58</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 17:28:58</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <QualifierType>Userid</QualifierType>
+            <QualifierNames>
+                <QualifierName>
+                    <Name>TSOEMG1</Name>
+                    <Description>ID assignedto .. (fill in)</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>TSOEMG2</Name>
+                    <Description>ID assigned to .. (fill in)</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>TSOEMG3</Name>
+                    <Description>ID assigned to .. (fill in)</Description>
+                </QualifierName>
+            </QualifierNames>
+        </ClassificationGroup>
+        <ClassificationGroup>
+            <Name>TSO_UIG</Name>
+            <Description>General use TSO userids</Description>
+            <CreationDate>2023/02/06 17:30:30</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/02/06 17:30:30</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <QualifierType>Userid</QualifierType>
+            <QualifierNames>
+                <QualifierName>
+                    <Name>DEV*</Name>
+                    <Description>Application development TSO IDs</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>SYS*</Name>
+                    <Description>System programmer TSO IDs</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>USERID1</Name>
+                    <Description>ID assigned to .. (fill in)</Description>
+                </QualifierName>
+                <QualifierName>
+                    <Name>USERID2</Name>
+                    <Description>ID assigned to .. (fill in)</Description>
+                </QualifierName>
+            </QualifierNames>
+        </ClassificationGroup>
+    </ClassificationGroups>
+    <Classifications>
+        <Classification>
+            <SubsystemType>ASCH</SubsystemType>
+            <Description>APPC schedules trans programs</Description>
+            <CreationDate>1900/01/01 00:00:00</CreationDate>
+            <ModificationDate>2023/02/20 16:01:44</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>NEWWORK</DefaultServiceClassName>
+            <DefaultReportClassName>RCUASCH</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules />
+        </Classification>
+        <Classification>
+            <SubsystemType>CB</SubsystemType>
+            <Description>WebSphere App Server requests</Description>
+            <CreationDate>1900/01/01 00:00:00</CreationDate>
+            <ModificationDate>2023/02/24 14:38:09</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>NEWWORK</DefaultServiceClassName>
+            <DefaultReportClassName>RCUWAS</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules>
+                <ClassificationRule>
+                    <Description>Example CB collection name</Description>
+                    <QualifierType>CollectionName</QualifierType>
+                    <QualifierValue>BBTRD2*</QualifierValue>
+                    <ServiceClassName>WASHI</ServiceClassName>
+                    <ReportClassName>RCWASTRD</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Example CB collection name</Description>
+                    <QualifierType>CollectionName</QualifierType>
+                    <QualifierValue>BBCICS*</QualifierValue>
+                    <ServiceClassName>WASHI</ServiceClassName>
+                    <ReportClassName>RCWASCIC</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Example CB collection name</Description>
+                    <QualifierType>CollectionName</QualifierType>
+                    <QualifierValue>BBIVP*</QualifierValue>
+                    <ServiceClassName>WASLO</ServiceClassName>
+                    <ReportClassName>RCWASIVP</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Example CB collection name</Description>
+                    <QualifierType>CollectionName</QualifierType>
+                    <QualifierValue>BBERWW*</QualifierValue>
+                    <ServiceClassName>WASLO</ServiceClassName>
+                    <ReportClassName>RCWASBER</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                    <ClassificationRule>
+                        <Description>For tran class part of CN BBERWW</Description>
+                        <QualifierType>TransactionClass</QualifierType>
+                        <QualifierValue>TCITPI</QualifierValue>
+                        <ServiceClassName>WASLO</ServiceClassName>
+                        <ReportClassName>RCWASTCI</ReportClassName>
+                        <StorageCritical>No</StorageCritical>
+                        <RegionGoal>No</RegionGoal>
+                        <ReportingAttribute>None</ReportingAttribute>
+                        <Boost>No</Boost>
+                    </ClassificationRule>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Liberty server CN - mixed case</Description>
+                    <QualifierType>CollectionName</QualifierType>
+                    <QualifierValue>MYSERVER</QualifierValue>
+                    <ServiceClassName>WASHI</ServiceClassName>
+                    <ReportClassName>RCWASMYS</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                    <ClassificationRule>
+                        <Description>TC TCADMIN part of CN MYSERVER</Description>
+                        <QualifierType>TransactionClass</QualifierType>
+                        <QualifierValue>TCADMIN</QualifierValue>
+                        <ServiceClassName>WASLO</ServiceClassName>
+                        <ReportClassName>RCWASADM</ReportClassName>
+                        <StorageCritical>No</StorageCritical>
+                        <RegionGoal>No</RegionGoal>
+                        <ReportingAttribute>None</ReportingAttribute>
+                        <Boost>No</Boost>
+                    </ClassificationRule>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Liberty server CN - mixed case</Description>
+                    <QualifierType>CollectionName</QualifierType>
+                    <QualifierValue>ZCEE*</QualifierValue>
+                    <ServiceClassName>WASHI</ServiceClassName>
+                    <ReportClassName>RCWASZCE</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                    <ClassificationRule>
+                        <Description>TC TCCICS part of CN ZCEE*</Description>
+                        <QualifierType>TransactionClass</QualifierType>
+                        <QualifierValue>TCCICS</QualifierValue>
+                        <ServiceClassName>WASHI</ServiceClassName>
+                        <ReportClassName>RCWASCIC</ReportClassName>
+                        <StorageCritical>No</StorageCritical>
+                        <RegionGoal>No</RegionGoal>
+                        <ReportingAttribute>None</ReportingAttribute>
+                        <Boost>No</Boost>
+                    </ClassificationRule>
+                    <ClassificationRule>
+                        <Description>TC TCMQ part of CN ZCEE*</Description>
+                        <QualifierType>TransactionClass</QualifierType>
+                        <QualifierValue>TCMQ</QualifierValue>
+                        <ServiceClassName>WASHI</ServiceClassName>
+                        <ReportClassName>RCWASMQ</ReportClassName>
+                        <StorageCritical>No</StorageCritical>
+                        <RegionGoal>No</RegionGoal>
+                        <ReportingAttribute>None</ReportingAttribute>
+                        <Boost>No</Boost>
+                    </ClassificationRule>
+                    <ClassificationRule>
+                        <Description>TC TCIC part of CN ZCEE*</Description>
+                        <QualifierType>TransactionClass</QualifierType>
+                        <QualifierValue>TCIC</QualifierValue>
+                        <ServiceClassName>WASLO</ServiceClassName>
+                        <ReportClassName>RCWASIC</ReportClassName>
+                        <StorageCritical>No</StorageCritical>
+                        <RegionGoal>No</RegionGoal>
+                        <ReportingAttribute>None</ReportingAttribute>
+                        <Boost>No</Boost>
+                    </ClassificationRule>
+                </ClassificationRule>
+            </ClassificationRules>
+        </Classification>
+        <Classification>
+            <SubsystemType>CICS</SubsystemType>
+            <Description>CICS transaction level rules</Description>
+            <CreationDate>1900/01/01 00:00:00</CreationDate>
+            <ModificationDate>2023/02/20 16:02:01</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>CICSLO</DefaultServiceClassName>
+            <DefaultReportClassName>RCUCICS</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules>
+                <ClassificationRule>
+                    <Description>CICS production VTAM applid</Description>
+                    <QualifierType>SubsystemInstance</QualifierType>
+                    <QualifierValue>CICSIP*</QualifierValue>
+                    <ServiceClassName>CICSLO</ServiceClassName>
+                    <ReportClassName>RCCICSIP</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                    <ClassificationRule>
+                        <Description>CICS trans only in CICSIP* rgns</Description>
+                        <QualifierType>TransactionName</QualifierType>
+                        <QualifierValue>TRN1</QualifierValue>
+                        <ServiceClassName>CICSHI</ServiceClassName>
+                        <ReportClassName>RCTRN1</ReportClassName>
+                        <StorageCritical>No</StorageCritical>
+                        <RegionGoal>No</RegionGoal>
+                        <ReportingAttribute>None</ReportingAttribute>
+                        <Boost>No</Boost>
+                    </ClassificationRule>
+                    <ClassificationRule>
+                        <Description>CICS trans only in CICSIP* rgns</Description>
+                        <QualifierType>TransactionName</QualifierType>
+                        <QualifierValue>TRN2</QualifierValue>
+                        <ServiceClassName>CICSHI</ServiceClassName>
+                        <ReportClassName>RCTRN2</ReportClassName>
+                        <StorageCritical>No</StorageCritical>
+                        <RegionGoal>No</RegionGoal>
+                        <ReportingAttribute>None</ReportingAttribute>
+                        <Boost>No</Boost>
+                    </ClassificationRule>
+                    <ClassificationRule>
+                        <Description>MOBILE trans in CICSIP* rgns</Description>
+                        <QualifierType>TransactionName</QualifierType>
+                        <QualifierValue>TRN3</QualifierValue>
+                        <ServiceClassName>CICSHI</ServiceClassName>
+                        <ReportClassName>RCTRN3</ReportClassName>
+                        <StorageCritical>No</StorageCritical>
+                        <RegionGoal>No</RegionGoal>
+                        <ReportingAttribute>Mobile</ReportingAttribute>
+                        <Boost>No</Boost>
+                    </ClassificationRule>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>All transactions with this name</Description>
+                    <QualifierType>TransactionName</QualifierType>
+                    <QualifierValue>TRX1</QualifierValue>
+                    <ServiceClassName>CICSHI</ServiceClassName>
+                    <ReportClassName>RCTRX1</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>All transactions with this name</Description>
+                    <QualifierType>TransactionName</QualifierType>
+                    <QualifierValue>TRX2</QualifierValue>
+                    <ServiceClassName>CICSLO</ServiceClassName>
+                    <ReportClassName>RCTRX2</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+            </ClassificationRules>
+        </Classification>
+        <Classification>
+            <SubsystemType>DDF</SubsystemType>
+            <Description>Distributed DDF work</Description>
+            <CreationDate>1900/01/01 00:00:00</CreationDate>
+            <ModificationDate>2023/02/20 16:02:08</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>NEWWORK</DefaultServiceClassName>
+            <DefaultReportClassName>RCUDDF</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules>
+                <ClassificationRule>
+                    <Description>DB2 prod subsystem name</Description>
+                    <QualifierType>SubsystemInstance</QualifierType>
+                    <QualifierValue>DB2P*</QualifierValue>
+                    <ServiceClassName>DDFLO</ServiceClassName>
+                    <ReportClassName>RCDDFDBC</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                    <ClassificationRule>
+                        <Description>Stored procedure proc name</Description>
+                        <QualifierType>ProcedureName</QualifierType>
+                        <QualifierValue>CALLSPA</QualifierValue>
+                        <ServiceClassName>DDFHI</ServiceClassName>
+                        <ReportClassName>RCSPAS1</ReportClassName>
+                        <StorageCritical>No</StorageCritical>
+                        <RegionGoal>No</RegionGoal>
+                        <ReportingAttribute>None</ReportingAttribute>
+                        <Boost>No</Boost>
+                    </ClassificationRule>
+                    <ClassificationRule>
+                        <Description>Userid of system administrator</Description>
+                        <QualifierType>Userid</QualifierType>
+                        <QualifierValue>SYSADM</QualifierValue>
+                        <ServiceClassName>DDFHI</ServiceClassName>
+                        <ReportClassName>RCSYSADM</ReportClassName>
+                        <StorageCritical>No</StorageCritical>
+                        <RegionGoal>No</RegionGoal>
+                        <ReportingAttribute>None</ReportingAttribute>
+                        <Boost>No</Boost>
+                    </ClassificationRule>
+                    <ClassificationRule>
+                        <Description>Plan name - accounts</Description>
+                        <QualifierType>PlanName</QualifierType>
+                        <QualifierValue>ACCTRECV</QualifierValue>
+                        <ServiceClassName>DDFHI</ServiceClassName>
+                        <ReportClassName>RCACCTRC</ReportClassName>
+                        <StorageCritical>No</StorageCritical>
+                        <RegionGoal>No</RegionGoal>
+                        <ReportingAttribute>None</ReportingAttribute>
+                        <Boost>No</Boost>
+                    </ClassificationRule>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>DB2 test subsystem name</Description>
+                    <QualifierType>SubsystemInstance</QualifierType>
+                    <QualifierValue>DB2T*</QualifierValue>
+                    <ServiceClassName>DDFLO</ServiceClassName>
+                    <ReportClassName>RCDB2T</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                    <ClassificationRule>
+                        <Description>Stored procedure name of payroll</Description>
+                        <QualifierType>ProcedureName</QualifierType>
+                        <QualifierValue>PAYABLE</QualifierValue>
+                        <ServiceClassName>DDFLO</ServiceClassName>
+                        <ReportClassName>RCPAYT</ReportClassName>
+                        <StorageCritical>No</StorageCritical>
+                        <RegionGoal>No</RegionGoal>
+                        <ReportingAttribute>None</ReportingAttribute>
+                        <Boost>No</Boost>
+                    </ClassificationRule>
+                    <ClassificationRule>
+                        <Description>LU name of login terminals</Description>
+                        <QualifierType>LUName</QualifierType>
+                        <QualifierValue>LU12345%</QualifierValue>
+                        <ServiceClassName>DDFLO</ServiceClassName>
+                        <ReportClassName>RCLU1234</ReportClassName>
+                        <StorageCritical>No</StorageCritical>
+                        <RegionGoal>No</RegionGoal>
+                        <ReportingAttribute>None</ReportingAttribute>
+                        <Boost>No</Boost>
+                    </ClassificationRule>
+                </ClassificationRule>
+            </ClassificationRules>
+        </Classification>
+        <Classification>
+            <SubsystemType>IMS</SubsystemType>
+            <Description>IMS transaction level rules</Description>
+            <CreationDate>1900/01/01 00:00:00</CreationDate>
+            <ModificationDate>2023/06/07 12:13:39</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>IMSHI</DefaultServiceClassName>
+            <DefaultReportClassName>RCUIMS</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules>
+                <ClassificationRule>
+                    <Description>IMS subsystem name in IMSID</Description>
+                    <QualifierType>SubsystemInstance</QualifierType>
+                    <QualifierValue>IMSIP*</QualifierValue>
+                    <ServiceClassName>IMSHI</ServiceClassName>
+                    <ReportClassName>RCIMSIP</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                    <ClassificationRule>
+                        <Description>Change this to your TX names</Description>
+                        <QualifierType>TransactionName</QualifierType>
+                        <QualifierValue>IVTNO*</QualifierValue>
+                        <ServiceClassName>IMSHI</ServiceClassName>
+                        <ReportClassName>RCIVTNO</ReportClassName>
+                        <StorageCritical>No</StorageCritical>
+                        <RegionGoal>No</RegionGoal>
+                        <ReportingAttribute>None</ReportingAttribute>
+                        <Boost>No</Boost>
+                    </ClassificationRule>
+                </ClassificationRule>
+            </ClassificationRules>
+        </Classification>
+        <Classification>
+            <SubsystemType>IWEB</SubsystemType>
+            <Description>Scalable WebServer transactions</Description>
+            <CreationDate>1900/01/01 00:00:00</CreationDate>
+            <ModificationDate>2023/02/20 16:02:28</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>NEWWORK</DefaultServiceClassName>
+            <DefaultReportClassName>RCUIWEB</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules />
+        </Classification>
+        <Classification>
+            <SubsystemType>JES</SubsystemType>
+            <Description>JES classification rules</Description>
+            <CreationDate>1900/01/01 00:00:00</CreationDate>
+            <ModificationDate>2023/02/20 16:02:37</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>NEWWORK</DefaultServiceClassName>
+            <DefaultReportClassName>RCUJES</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules>
+                <ClassificationRule>
+                    <Description>Low priority batch</Description>
+                    <QualifierType>TransactionClass</QualifierType>
+                    <QualifierValue>J</QualifierValue>
+                    <ServiceClassName>BATLO</ServiceClassName>
+                    <ReportClassName>RCBATTCJ</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Low priority batch</Description>
+                    <QualifierType>TransactionClass</QualifierType>
+                    <QualifierValue>E</QualifierValue>
+                    <ServiceClassName>BATLO</ServiceClassName>
+                    <ReportClassName>RCBATTCE</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Low priority batch</Description>
+                    <QualifierType>TransactionClass</QualifierType>
+                    <QualifierValue>M</QualifierValue>
+                    <ServiceClassName>BATLO</ServiceClassName>
+                    <ReportClassName>RCBATTCM</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Production high priority batch</Description>
+                    <QualifierType>TransactionClassGroup</QualifierType>
+                    <QualifierValue>PBAT_TCG</QualifierValue>
+                    <ServiceClassName>BATHI</ServiceClassName>
+                    <ReportClassName>RCPBAT</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Test batch jobs</Description>
+                    <QualifierType>TransactionClassGroup</QualifierType>
+                    <QualifierValue>TBAT_TCG</QualifierValue>
+                    <ServiceClassName>BATTEST</ServiceClassName>
+                    <ReportClassName>RCTBAT</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+            </ClassificationRules>
+        </Classification>
+        <Classification>
+            <SubsystemType>LDAP</SubsystemType>
+            <Description>LDAP enclave</Description>
+            <CreationDate>2023/06/13 17:04:04</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/06/13 18:32:31</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>STCHI</DefaultServiceClassName>
+            <DefaultReportClassName>RCULDAP</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules />
+        </Classification>
+        <Classification>
+            <SubsystemType>LSFM</SubsystemType>
+            <Description>Lan Server for MVS rules</Description>
+            <CreationDate>1900/01/01 00:00:00</CreationDate>
+            <ModificationDate>2023/02/20 16:02:45</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>NEWWORK</DefaultServiceClassName>
+            <DefaultReportClassName>RCULSFM</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules />
+        </Classification>
+        <Classification>
+            <SubsystemType>MQ</SubsystemType>
+            <Description>MQ Series Workflow requests</Description>
+            <CreationDate>1900/01/01 00:00:00</CreationDate>
+            <ModificationDate>2023/02/20 16:02:54</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>NEWWORK</DefaultServiceClassName>
+            <DefaultReportClassName>RCUMQ</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules />
+        </Classification>
+        <Classification>
+            <SubsystemType>OMVS</SubsystemType>
+            <Description>Unix System Services requests</Description>
+            <CreationDate>1900/01/01 00:00:00</CreationDate>
+            <ModificationDate>2023/02/20 16:03:02</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>NEWWORK</DefaultServiceClassName>
+            <DefaultReportClassName>RCUOMVS</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules>
+                <ClassificationRule>
+                    <Description>Tasks spawned with OMVSKERN UID</Description>
+                    <QualifierType>Userid</QualifierType>
+                    <QualifierValue>OMVSKERN</QualifierValue>
+                    <ServiceClassName>OMVS</ServiceClassName>
+                    <ReportClassName>RCOMVSKN</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Transaction name FTP*</Description>
+                    <QualifierType>TransactionName</QualifierType>
+                    <QualifierValue>FTP*</QualifierValue>
+                    <ServiceClassName>STCHI</ServiceClassName>
+                    <ReportClassName>RCFTP</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Transaction name INET*</Description>
+                    <QualifierType>TransactionName</QualifierType>
+                    <QualifierValue>INET*</QualifierValue>
+                    <ServiceClassName>STCHI</ServiceClassName>
+                    <ReportClassName>RCINET</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+            </ClassificationRules>
+        </Classification>
+        <Classification>
+            <SubsystemType>SOM</SubsystemType>
+            <Description>SOM client object requests</Description>
+            <CreationDate>1900/01/01 00:00:00</CreationDate>
+            <ModificationDate>2023/02/20 16:03:10</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>NEWWORK</DefaultServiceClassName>
+            <DefaultReportClassName>RCUSOM</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules />
+        </Classification>
+        <Classification>
+            <SubsystemType>STC</SubsystemType>
+            <Description>Started Tasks classifications</Description>
+            <CreationDate>1900/01/01 00:00:00</CreationDate>
+            <ModificationDate>2023/06/13 18:28:41</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>NEWWORK</DefaultServiceClassName>
+            <DefaultReportClassName>RCUSTC</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules>
+                <ClassificationRule>
+                    <Description>DB2 IRLM regions</Description>
+                    <QualifierType>TransactionName</QualifierType>
+                    <QualifierValue>DB2*IRLM</QualifierValue>
+                    <ServiceClassName>SYSSTC</ServiceClassName>
+                    <ReportClassName>RCDB2IRL</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Production DB regions</Description>
+                    <QualifierType>TransactionNameGroup</QualifierType>
+                    <QualifierValue>PDBL_TNG</QualifierValue>
+                    <ServiceClassName>STCCRIT</ServiceClassName>
+                    <ReportClassName>RCPDBSTC</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>Yes</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Test application rgns with DB</Description>
+                    <QualifierType>TransactionNameGroup</QualifierType>
+                    <QualifierValue>TDBL_TNG</QualifierValue>
+                    <ServiceClassName>STCLO</ServiceClassName>
+                    <ReportClassName>RCTDBSTC</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>Yes</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Stored procedure address space</Description>
+                    <QualifierType>TransactionName</QualifierType>
+                    <QualifierValue>%%%%SPAS</QualifierValue>
+                    <ServiceClassName>STCHI</ServiceClassName>
+                    <ReportClassName>RCDBSPAS</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>MQ series started task</Description>
+                    <QualifierType>TransactionName</QualifierType>
+                    <QualifierValue>MQ%%MSTR</QualifierValue>
+                    <ServiceClassName>STCCRIT</ServiceClassName>
+                    <ReportClassName>RCMQMSTR</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>Yes</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>MQ series started task</Description>
+                    <QualifierType>TransactionName</QualifierType>
+                    <QualifierValue>MQ%%CHIN</QualifierValue>
+                    <ServiceClassName>STCHI</ServiceClassName>
+                    <ReportClassName>RCMQCHIN</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>Yes</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>SPM rule for SYSTEM classified</Description>
+                    <QualifierType>SubsystemParameter</QualifierType>
+                    <QualifierValue>SYSTEM</QualifierValue>
+                    <ServiceClassName>SYSTEM</ServiceClassName>
+                    <ReportClassName>RCSPMSTM</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>SPM rule for SYSSTC classified</Description>
+                    <QualifierType>SubsystemParameter</QualifierType>
+                    <QualifierValue>SYSSTC</QualifierValue>
+                    <ServiceClassName>SYSSTC</ServiceClassName>
+                    <ReportClassName>RCSPMSTC</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>WebSphere started tasks</Description>
+                    <QualifierType>TransactionName</QualifierType>
+                    <QualifierValue>WAS*</QualifierValue>
+                    <ServiceClassName>STCHI</ServiceClassName>
+                    <ReportClassName>RCWASSTC</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>Yes</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>zCX instance name</Description>
+                    <QualifierType>TransactionName</QualifierType>
+                    <QualifierValue>ZCX*</QualifierValue>
+                    <ServiceClassName>ZCXHI</ServiceClassName>
+                    <ReportClassName>RCZCX</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>TNG for started tasks for SYSSTC</Description>
+                    <QualifierType>TransactionNameGroup</QualifierType>
+                    <QualifierValue>SYST_TNG</QualifierValue>
+                    <ServiceClassName>SYSSTC</ServiceClassName>
+                    <ReportClassName>RCSYSSTC</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>TNG for high priority STCs</Description>
+                    <QualifierType>TransactionNameGroup</QualifierType>
+                    <QualifierValue>SYHI_TNG</QualifierValue>
+                    <ServiceClassName>SYSSTC</ServiceClassName>
+                    <ReportClassName>RCMON</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>CICS Terminal Owning Regions</Description>
+                    <QualifierType>TransactionName</QualifierType>
+                    <QualifierValue>CICTOR*</QualifierValue>
+                    <ServiceClassName>SERVERS</ServiceClassName>
+                    <ReportClassName>RCTOR</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>Both</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>Yes</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>TNG for production online STCs</Description>
+                    <QualifierType>TransactionNameGroup</QualifierType>
+                    <QualifierValue>PONL_TNG</QualifierValue>
+                    <ServiceClassName>STCHI</ServiceClassName>
+                    <ReportClassName>RCPRODON</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>Yes</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>Yes</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>CICS/IMS tran managed regions</Description>
+                    <QualifierType>TransactionNameGroup</QualifierType>
+                    <QualifierValue>SRVR_TNG</QualifierValue>
+                    <ServiceClassName>SERVERS</ServiceClassName>
+                    <ReportClassName>RCSRVR</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>Yes</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>STCs not assigned SYSSTC/SYSTEM</Description>
+                    <QualifierType>TransactionNameGroup</QualifierType>
+                    <QualifierValue>STOR_TNG</QualifierValue>
+                    <ServiceClassName>STCLO</ServiceClassName>
+                    <ReportClassName>RCSTOR</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>TNG for low priority STCs</Description>
+                    <QualifierType>TransactionNameGroup</QualifierType>
+                    <QualifierValue>SYLO_TNG</QualifierValue>
+                    <ServiceClassName>STCLO</ServiceClassName>
+                    <ReportClassName>RCSYSLO</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>z/OS Connect servers group</Description>
+                    <QualifierType>TransactionNameGroup</QualifierType>
+                    <QualifierValue>ZOSC_TNG</QualifierValue>
+                    <ServiceClassName>STCHI</ServiceClassName>
+                    <ReportClassName>RCZOSCON</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>TNG for test online STCs</Description>
+                    <QualifierType>TransactionNameGroup</QualifierType>
+                    <QualifierValue>TONL_TNG</QualifierValue>
+                    <ServiceClassName>STCLO</ServiceClassName>
+                    <ReportClassName>RCTONL</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>Yes</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+            </ClassificationRules>
+        </Classification>
+        <Classification>
+            <SubsystemType>TCP</SubsystemType>
+            <Description>TCP independent enclave</Description>
+            <CreationDate>2023/06/13 17:07:51</CreationDate>
+            <CreationUser>DELUCA</CreationUser>
+            <ModificationDate>2023/06/13 18:32:41</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>STCHI</DefaultServiceClassName>
+            <DefaultReportClassName>RCUTCP</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules />
+        </Classification>
+        <Classification>
+            <SubsystemType>TSO</SubsystemType>
+            <Description>TSO classification rules</Description>
+            <CreationDate>1900/01/01 00:00:00</CreationDate>
+            <ModificationDate>2023/02/20 16:03:34</ModificationDate>
+            <ModificationUser>DELUCA</ModificationUser>
+            <DefaultServiceClassName>NEWWORK</DefaultServiceClassName>
+            <DefaultReportClassName>RCUTSO</DefaultReportClassName>
+            <EWLMClassification>Never</EWLMClassification>
+            <ClassificationRules>
+                <ClassificationRule>
+                    <Description>Userids for emergency TSO use</Description>
+                    <QualifierType>UseridGroup</QualifierType>
+                    <QualifierValue>EMG_UIG</QualifierValue>
+                    <ServiceClassName>SYSSTC</ServiceClassName>
+                    <ReportClassName>RCTSOEMG</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+                <ClassificationRule>
+                    <Description>Userids for general TSO use</Description>
+                    <QualifierType>UseridGroup</QualifierType>
+                    <QualifierValue>TSO_UIG</QualifierValue>
+                    <ServiceClassName>TSO</ServiceClassName>
+                    <ReportClassName>RCTSO</ReportClassName>
+                    <StorageCritical>No</StorageCritical>
+                    <RegionGoal>No</RegionGoal>
+                    <ReportingAttribute>None</ReportingAttribute>
+                    <Boost>No</Boost>
+                </ClassificationRule>
+            </ClassificationRules>
+        </Classification>
+    </Classifications>
+    <ServiceParameter>
+        <ServiceCoefficients>
+            <CPU>1.0</CPU>
+            <IOC>0.0</IOC>
+            <MSO>0.0000</MSO>
+            <SRB>1.0</SRB>
+        </ServiceCoefficients>
+        <ServiceOptions>
+            <IOPriorityManagement>No</IOPriorityManagement>
+            <DynamicAliasManagement>No</DynamicAliasManagement>
+            <IOPriorityGroupsEnabled>No</IOPriorityGroupsEnabled>
+            <DeactivateDiscretionaryGoalManagement>No</DeactivateDiscretionaryGoalManagement>
+        </ServiceOptions>
+    </ServiceParameter>
+    <ApplicationEnvironments>
+        <ApplicationEnvironment>
+            <Name>MQWFEXEAE</Name>
+            <Description>MQ SERIES WORKFLOW EXE SERVER</Description>
+            <SubsystemType>MQ</SubsystemType>
+            <Limit>NoLimit</Limit>
+            <ProcedureName>MQWFSRVP</ProcedureName>
+            <StartParameter>WLMAE=MQWFEXAE,WLMSN=&amp;IWMSSNM, SRVEP=FMCEMAIN,SRVNO=1</StartParameter>
+        </ApplicationEnvironment>
+        <ApplicationEnvironment>
+            <Name>SPASAE</Name>
+            <Description>WLM stored procedures</Description>
+            <SubsystemType>DB2</SubsystemType>
+            <Limit>NoLimit</Limit>
+            <ProcedureName>DBC1WLM2</ProcedureName>
+            <StartParameter>DB2SSN=DBC1,NUMTCB=X,APPLENV=SPASAE</StartParameter>
+        </ApplicationEnvironment>
+    </ApplicationEnvironments>
+    <Resources>
+        <Resource>
+            <Name>DB2_PROD</Name>
+            <Description>User defined element name</Description>
+        </Resource>
+    </Resources>
+    <SchedulingEnvironments>
+        <SchedulingEnvironment>
+            <Name>BATCHUPDATE</Name>
+            <Description>Off shift batch updates to DB</Description>
+            <ResourceNames>
+                <ResourceName>
+                    <Name>DB2_PROD</Name>
+                    <RequiredState>On</RequiredState>
+                </ResourceName>
+            </ResourceNames>
+        </SchedulingEnvironment>
+    </SchedulingEnvironments>
+    <Extensions />
+</ServiceDefinition>

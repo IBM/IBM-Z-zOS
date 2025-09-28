@@ -7,7 +7,7 @@
 #and written by the PFA_COMMON_STORAGE_USAGE check only. Its
 #use with data from any other source will result in errors.
 #
-#Copyright 2021 IBM Corp.                                          
+#Copyright 2025 IBM Corp.                                           @01C
 #                                                                   
 #Licensed under the Apache License, Version 2.0 (the "License");   
 #you may not use this file except in compliance with the License.  
@@ -20,6 +20,17 @@
 #"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      
 #either express or implied. See the License for the specific       
 #language governing permissions and limitations under the License. 
+#
+# Change Activity
+# $01 - Fixed issues with system not checking for "OS/390" when   @01A
+#         deciding whether a gui call can be called "plt.show"
+#       Added support for passing the sysname.Data when the 
+#         systemName.5day.data is not available.
+#       Adjusted minimum y axis value to show some seperation
+#         when the value for y being plotted is very close to the 
+#         x-axis
+#       Fixed missing Legend Labels for invocation with ECSA+ESQA
+#       Fixed overlapping ECSA heading with category ECSA+ESQA title
 #####################################################################
 
 import sys
@@ -46,6 +57,7 @@ SQUAD_A_USERKEYS = {0:'ECSA',1:'ESQA',2:'ECSA+ESQA'}
 SQUAD_B_USERKEYS = {0:'CSA',1:'SQA',2:'CSA+SQA'}
 SQUAD_A_KEYS = {0:'E',1:'Q',2:'A'}
 SQUAD_B_KEYS = {0:'C',1:'S',2:'B'}
+file5d_fp = 0                                                                                                                      # @01A
 
 #Parse our command line arguments.
 if(len(sys.argv) == 4):
@@ -87,6 +99,9 @@ if(not os.path.exists(capacity_filepath)):
 if key not in user_keys:
     raise Exception("The specified storage_location is not allowed. Valid storage locations are:" + str([key for key in user_keys]))
 
+if "5day" in data_filepath:                                                                                                        # @01A
+    file5d_fp = 1                                                                                                                  # @01A
+
 #Load up our data and assign correct header values so we can narrow it down to the pieces we want.
 data_file = pd.read_csv(data_filepath,
                     sep="/|,",
@@ -125,15 +140,19 @@ def graph_data(the_data):
     fig, ax = plt.subplots()
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
     ax.plot(the_data['Date_Time'],the_data['Capacity'],'--r', label='Capacity')
-    ax.plot(the_data['Date_Time'],the_data['Current_Usage']/1024,'-b', label='Current Usage')
+    if file5d_fp == 1:                                                                                                             # @01A
+        ax.plot(the_data['Date_Time'],the_data['Current_Usage']/1024,'-b', label='Current Usage')
+    else:                                                                                                                          # @01A  
+        ax.plot(the_data['Date_Time'],the_data['Current_Usage'],'-b', label='Current Usage')                                       # @01A
     plt.xlabel('Month-Day Time')
     fig.suptitle(check_name + "\n" + user_key, fontsize=16)
     fig.autofmt_xdate()
     plt.yticks(the_y_values, y_ticks)
-    ax.set_ylim(0,the_data['Capacity'].max()*1.10)
-    ax.legend(bbox_to_anchor=(1.41, 1),loc="upper right")
+    ax.set_ylim(the_data['Capacity'].max()*-.01,the_data['Capacity'].max()*1.10)                                                   # @01C
+    legend = ax.legend(bbox_to_anchor=(1.41, 1),loc="upper right")                                                                 # @01C 
+    adjust_figure_size(legend,fig)                                                                                                 # @01A 
     fig.subplots_adjust(right=0.75)
-    if system != 'z/OS':
+    if system != 'OS/390':                                                                                                         # @01C
         plt.show();
     else:
         fig.savefig(PDF_FILENAME)
@@ -145,9 +164,12 @@ def graph_total_data(the_data,squad_userkeys):
     for i in range(len(the_data)):
         y_values[i], y_ticks[i] = process_yvalues_yticks(the_data[i])    
         axes[i].xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
-        axes[i].set_ylim(0,the_data[i]['Capacity'].max()*1.10)
+        axes[i].set_ylim(the_data[i]['Capacity'].max()*-.01,the_data[i]['Capacity'].max()*1.10)                                    # @01C
         axes[i].plot(the_data[i]['Date_Time'],the_data[i]['Capacity'],'--r', label='Capacity')
-        axes[i].plot(the_data[i]['Date_Time'],the_data[i]['Current_Usage']/1024,'-b', label='Current Usage')
+        if file5d_fp == 1:                                                                                                         # @01A
+            axes[i].plot(the_data[i]['Date_Time'],the_data[i]['Current_Usage']/1024,'-b', label='Current Usage')
+        else:                                                                                                                      # @01A 
+            axes[i].plot(the_data[i]['Date_Time'],the_data[i]['Current_Usage'],'-b', label='Current Usage')                        # @01A
         axes[i].set_title(squad_userkeys[i])
         axes[i].set_yticks(y_values[i], y_ticks[i])    
         plt.sca(axes[i])
@@ -156,13 +178,31 @@ def graph_total_data(the_data,squad_userkeys):
     for tick in axes[0].get_xticklabels():
         tick.set_visible(True)
     plt.xlabel('Month-Day Time')
-    fig.suptitle(check_name + "\n" + user_key, fontsize=16)
+    fig.suptitle(check_name + " - " + user_key + "\n" + "\n" , fontsize=16)                                                        # @01C
     fig.autofmt_xdate()    
-    axes[0].legend(bbox_to_anchor=(1.41, 1),loc="upper right")
-    if system != 'z/OS':
+                                                                                                                                   # @01D                                                                     
+    legend = axes[0].legend(bbox_to_anchor=(1.41, 1),loc="upper right")                                                            # @01A
+    adjust_figure_size(legend,fig)
+    fig.subplots_adjust(right=0.75)                                                                                                # @01A
+    if system != 'OS/390':                                                                                                         # @01C
         plt.show();
     else:
         fig.savefig(PDF_FILENAME)
+
+def adjust_figure_size(legend,fig):
+    # Dynamically adjust figure size to accommodate the legend                                                                     # @01A
+    renderer = fig.canvas.get_renderer()                                                                                           # @01A
+    legend_bbox = legend.get_window_extent(renderer)  # Get the legend's bounding box                                              # @01A
+    legend_width = legend_bbox.width / fig.dpi        # Convert legend width from pixels to inches                                 # @01A
+
+    # Get the current figure size                                                                                                  # @01A
+    fig_width, fig_height = fig.get_size_inches()                                                                                  # @01A
+
+    # Calculate the new figure width to fit the legend                                                                             # @01A
+    new_fig_width = fig_width + legend_width                                                                                       # @01A
+
+    # Update the figure size                                                                                                       # @01A
+    fig.set_size_inches(new_fig_width, fig_height)                                                                                 # @01A
 
 def process_yvalues_yticks(data_file):
     y_values = [0,(data_file['Capacity'].max())*.25,(data_file['Capacity'].max())*.50,(data_file['Capacity'].max())*.75,(data_file['Capacity'].max())]
@@ -193,5 +233,5 @@ else:
     the_data = process_data(data_file, capacity_file, key, user_key)
     graph_data(the_data)
 
-if system == 'z/OS':
+if system == 'OS/390':                                                                                                             # @01C
     print(PDF_FILENAME + ' has been created and is ready to be downloaded and viewed.')

@@ -8,35 +8,24 @@ The materials in this repository are organized by type and release level.
 The following major categories are used:
 
 * [IBM Education Assistant modules for learning about z/OS](zOS-Education)
-
-* [z/OSMF Workflows](zOS-Workflow)
-
 * [SMF Tools](SMF-Tools)
-
 * [zOS Archetypes](zOS-Archetypes)
-
 * [zOS Automation](zOS-Automation)
-
+* [zOS Container Platform](zOS-Container-Platform)
 * [zOS CPM](zOS-CPM)
-
+* [zOS DataGatherer](zOS-DataGatherer)
 * [zOS HCD HCM](zOS-HCD_HCM)
-
 * [zOS Health Checks](zOS-HealthChecks)
-
+* [zOS PFA](zOS-PFA)
+* [zOS PKI](zOS-PKI)
 * [zOS Print](zOS-Print)
-
 * [zOS RACF](zOS-RACF)
-
+* [zOS Requirements-Satisfied](zOS-Requirements-Satisfied)
 * [zOS RMF](zOS-RMF)
-
 * [zOS Tools and Toys](zOS-Tools-and-Toys)
-
 * [zOS Tools/DLOG Formatter](zOS-Tools/DLOG-Formatter)
-
 * [zOS WLM](zOS-WLM)
-
 * [zOS Workflow](zOS-Workflow)
-
 * [zOSMF](zOSMF)
 
 
