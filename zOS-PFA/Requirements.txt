@@ -1,0 +1,38 @@
+#####
+#
+# Requirements.txt file for pip install of the necessary dependencies for 
+# the PFA_COMMON_STORAGE_USAGE, PFA_PRIVATE_STORAGE_EXHAUSTION, and 
+# PFA_JES2_RESOURCE_EXHAUSTION checks' python scripts.    When installing 
+# with a requirements.txt file on z/OS, ensure it is created from z/OS.  
+# For example from the OMVS shell, issue these commands
+#
+#       	1. touch requirements.txt  
+#        	2. chtag -mc ISO8859-1 requirements.txt  
+#        	3. oedit requirements.txt and copy data from here to create the file.
+#
+# This is the list of packages that are needed for using the PFA python scripts.  This is a
+# subset list created from the list provided with the Python AI Toolkit for IBM z/OS 
+#
+# Example use:  pip install --no-deps -r <toolkit_requirements.txt>
+#
+# pip command options:
+# --index-url https://downloads.pyaitoolkit.ibm.net/repository/python_ai_toolkit_zos/simple
+# --trusted-host downloads.pyaitoolkit.ibm.net
+# --only-binary :all:
+
+cycler==0.11.0 --hash=sha256:9a5d8a7d291a226322e0ba5ce133e7055ffb89846bfcf194e8f27215bf97f17b
+defusedxml==0.7.1.post3 --hash=sha256:b9fcbc583c42560d13747fcff66a17e2360708e672618f2bb3a92881f26c1da9
+dateutils==0.6.12 --hash=sha256:29eae2fb476f45e679250e20c443d17df11c5653b1ce52ae5cb134bcbcfe1960
+fonttools==4.50.0 --hash=sha256:4c1dd3c1006f92711807eae37235143e6f1fce39f33bc6843998adced5dca741
+kiwisolver==1.4.5 --hash=sha256:5fca12edf5b64120e8ebf08929bd047025e78a7522fb4ca2fbf51cf8e38a845c
+matplotlib-inline==0.1.6 --hash=sha256:f1f41aab5328aa5aaea9b16d083b128102f8712542f819fe7e6a420ff581b311
+matplotlib==3.5.0.post4 --hash=sha256:96a77082ba078746c25a8dc2f61800fe1c0d22666eafe7885ad9d1fbf050be4b
+numpy==1.26.0 --hash=sha256:c549358bea31eba0809cea3b0675fc5817f995966d6d23543919cda922db863d
+packaging==23.0 --hash=sha256:714ac14496c3e68c99c29b00845f7a2b85f3bb6f1078fd9f72fd20f0570002b2
+pandas-datareader==0.10.0 --hash=sha256:199000ff3a98924c9366d957bc66d663dc0636bc0277bfa4630214b2a7b9393c
+pandas==1.5.1.post3 --hash=sha256:6830019e5d42f074636b63a9ef672275d853279f2bf82794b5660e14c65d32e6
+pillow==10.3.0.post0 --hash=sha256:c1ae4770fe2726288e8a193121c10f43765007c67a43e1ff982054071584a2d4
+python-dateutil==2.8.2 --hash=sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9
+pyparsing==3.0.10 --hash=sha256:61ce52c4f7808471604fff914cb827e41fd04f2a14623125fcee3892637f295a
+pytz==2022.4 --hash=sha256:6eb3220e93b321d88847ef5da93ac8036cca1ad821d3dc6e956139acc91c1264
+six==1.16.0 --hash=sha256:31b9420324b64686ad1e85d1a981456eeca115dc8503e168ecae830f8f83d86e

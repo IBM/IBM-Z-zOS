@@ -7,7 +7,7 @@
 #and written by the PFA_PRIVATE_STORAGE_EXHAUSTION check only. Its
 #use with data from any other source will result in errors.
 #
-#Copyright 2021 IBM Corp.                                          
+#Copyright 2025 IBM Corp.                                           @01C
 #                                                                   
 #Licensed under the Apache License, Version 2.0 (the "License");   
 #you may not use this file except in compliance with the License.  
@@ -20,6 +20,14 @@
 #"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      
 #either express or implied. See the License for the specific       
 #language governing permissions and limitations under the License. 
+#
+# Change Activity
+# $01 - Fixed issues with system not checking for "OS/390" when   @01A
+#         deciding whether a gui call can be called "plt.show"
+#       Dynamically Resize figure to fix Legend drawing outside of view
+#       Adjusted minimum y axis value to show some seperation
+#         when the value for y being plotted is very close to the 
+#         x-axis
 #####################################################################
 
 import sys
@@ -169,15 +177,28 @@ plt.xlabel('Month-Day Time')
 fig.suptitle(check_name + "\n" + jobName + '/' + asid + '/' + user_key, fontsize=16)
 fig.autofmt_xdate()
 plt.yticks(y_values, y_ticks)
-ax.set_ylim(0,our_data['Capacity'].max()*1.10)
-ax.legend(bbox_to_anchor=(1.41, 1),loc="upper right")
+ax.set_ylim(our_data['Capacity'].max()*-.01,our_data['Capacity'].max()*1.10)                                                       # @01C
+legend = ax.legend(bbox_to_anchor=(1.41, 1),loc="upper right")                                                                     # @01C
 #fig.tight_layout()
-fig.subplots_adjust(right=0.75)
 
-if system != 'z/OS':
+# Dynamically adjust figure size to accommodate the legend                                                                         # @01A
+renderer = fig.canvas.get_renderer()                                                                                               # @01A
+legend_bbox = legend.get_window_extent(renderer)  # Get the legend's bounding box                                                  # @01A
+legend_width = legend_bbox.width / fig.dpi        # Convert legend width from pixels to inches                                     # @01A
+
+# Get the current figure size                                                                                                      # @01A
+fig_width, fig_height = fig.get_size_inches()                                                                                      # @01A
+
+# Calculate the new figure width to fit the legend                                                                                 # @01A
+new_fig_width = fig_width + legend_width                                                                                           # @01A
+
+# Update the figure size                                                                                                           # @01A
+fig.set_size_inches(new_fig_width, fig_height)                                                                                     # @01A
+fig.subplots_adjust(right=0.75)
+if system != 'OS/390':                                                                                                             # @01C
     plt.show();
 else:
     fig.savefig(PDF_FILENAME)
 
-if system == 'z/OS':
+if system == 'OS/390':                                                                                                             # @01C
     print(PDF_FILENAME + ' has been created and is ready to be downloaded and viewed.')
