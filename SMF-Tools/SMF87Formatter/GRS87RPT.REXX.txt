@@ -122,6 +122,8 @@ process_smf_data: procedure expose __.
          SMF87REQ_TCB=binary_x(line,SMF87DEF_Req_Off+Offset(32),4)
          SMF87REQ_PSW=binary_x(line,SMF87DEF_Req_Off+Offset(84),8)
          SMF87REQ_TimeStart=binary_d(line,SMF87DEF_Req_Off+Offset(45),8) /* 8 bytes of TOD, from 1 byte into ETOD */
+         SMF87REQ_RC=binary_x(line,SMF87DEF_Req_Off+Offset(76),4) 
+         SMF87REQ_RSN=binary_x(line,SMF87DEF_Req_Off+Offset(80),4)
          SMF87REQ_TimeComp =binary_d(line,SMF87DEF_Req_Off+Offset(61),8) /* 8 bytes of TOD, from 1 byte into ETOD */
  
          SMF87DATA_FL1=binary_x(line,SMF87DEF_DATA_Off+Offset(12),1)
