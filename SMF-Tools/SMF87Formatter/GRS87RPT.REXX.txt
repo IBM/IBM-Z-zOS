@@ -1,4 +1,6 @@
 /*REXX-----------------------------------------------------------------
+  Updated : Mickey Virdi in 03/21/2024 to add the RC and RSN
+            for GRS formatter                               
  ENQ Report from SMF87 Records
  
  Copyright 2017 IBM Corp.                                          
@@ -120,6 +122,8 @@ process_smf_data: procedure expose __.
          SMF87REQ_TCB=binary_x(line,SMF87DEF_Req_Off+Offset(32),4)
          SMF87REQ_PSW=binary_x(line,SMF87DEF_Req_Off+Offset(84),8)
          SMF87REQ_TimeStart=binary_d(line,SMF87DEF_Req_Off+Offset(45),8) /* 8 bytes of TOD, from 1 byte into ETOD */
+         SMF87REQ_RC=binary_x(line,SMF87DEF_Req_Off+Offset(76),4) 
+         SMF87REQ_RSN=binary_x(line,SMF87DEF_Req_Off+Offset(80),4)
          SMF87REQ_TimeComp =binary_d(line,SMF87DEF_Req_Off+Offset(61),8) /* 8 bytes of TOD, from 1 byte into ETOD */
  
          SMF87DATA_FL1=binary_x(line,SMF87DEF_DATA_Off+Offset(12),1)
@@ -174,6 +178,8 @@ process_smf_data: procedure expose __.
                     SMF87DATA_Scope||__.0dlm||,
                     SMF87DATA_RnameLen||__.0dlm||,
                     SMF87DATA_ReqType||__.0dlm||,
+                    SMF87REQ_RC||__.0dlm||,                                    
+                    SMF87REQ_RSN||__.0dlm||,                                   
                     SMF87DATA_Qname||__.0dlm||,
                     SMF87DATA_Rname
              if __.0IncludeTimes then
@@ -191,9 +197,10 @@ process_smf_data: procedure expose __.
   end
   GRS_out.0 = count
   say GRS_out.0' Records written'
-  GRS_out.1 = 'DATE'||__.0dlm||'TIME'||__.0dlm||'SMF'||__.0dlm||'SYS'||__.0dlm||'ASID'||__.0dlm||'TCB'||__.0dlm||,
-               'PSW'||__.0dlm||'F1'||__.0dlm||'F2'||__.0dlm||'F2-e'||__.0dlm||'Sc'||__.0dlm||'rln'||__.0dlm||'typ'||__.0dlm||'Qname'||__.0dlm||'Rname'
-  if __.0IncludeTimes then GRS_out.1 = GRS_out.1||__.0dlm||'obtain_time'||__.0dlm||'release_time'
+  GRS_out.1 = 'DATE    '||__.0dlm||'TIME'||__.0dlm||'    SYS'||__.0dlm||' JOBNAME '||__.0dlm||'ASID'||__.0dlm||'TCB     '||__.0dlm||
+               'PSW             '||__.0dlm||'F1'||__.0dlm||'F2      '||__.0dlm||'F2-e '||__.0dlm||'Sc'||__.0dlm||,                  
+               'rln'||__.0dlm||'typ'||__.0dlm||'RC     '||__.0dlm||'RSN     '||__.0dlm'Qname'||__.0dlm||'   Rname                   
+  if __.0IncludeTimes then GRS_out.1 = GRS_out.1||__.0dlm||'REQUEST START TIME         '||__.0dlm||'REQUEST COMP TIME' 
  
   "Execio * Diskw OUTDS (finis stem grs_out."
  
