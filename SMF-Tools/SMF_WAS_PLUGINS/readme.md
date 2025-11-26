@@ -265,6 +265,10 @@ started/ended in a given minute (because the server was idle, the server was dow
 spanned multiple minutes) then there won't be rows for those minutes. So if you are looking at
 thread usage over time, be careful about gaps.
 
+- **ZCAPIProvider** - This plugin formats the z/OS Connect API provider User Data (SM120BAS type 103) from the User Data section (SM120BDH) and prints all the fields. It also prints key fields from the standard header and CPU fields from the request information. When configured, z/OS Connect will write User Data type 103 from version 3.0.99 onwards. 
+
+- **ZCAPIRequester** - This plugin formats the z/OS Connect API requester User Data (SM120BAS type 104) from the User Data section (SM120BDH) and prints all the fields. It also prints key fields from the standard header and CPU fields from the request information. When configured, z/OS Connect will write User Data type 104 from version 3.0.99 onwards.
+
 
 
 
