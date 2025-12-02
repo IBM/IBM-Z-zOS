@@ -9,19 +9,21 @@ parse ARG RexxRc,RexxReason,ExitCaller,CPPLaddr,CmdImage,newPhrase,  ,
           instData,groupName,instAddr,outputMsg                                 
                                                                                 
 /*********************************************************************/         
-/* PROPRIETARY STATEMENT                                             */         
+/*********************************************************************/         
 /*                                                                   */         
-/* Licensed Materials - Property of IBM                              */         
-/* 5655-ZOS                                                          */         
-/* Copyright IBM Corp. 2007, 2025                                    */         
+/* Copyright 2007, 2025 IBM Corp.                                    */         
 /*                                                                   */         
-/* Status = HRF77F0                                                  */         
+/* Licensed under the Apache License, Version 2.0 (the "License");   */         
+/* you may not use this file except in compliance with the License.  */         
+/* You may obtain a copy of the License at                           */         
 /*                                                                   */         
-/* END_OF_PROPRIETARY_STATEMENT                                      */         
-/*-------------------------------------------------------------------*/         
+/* http://www.apache.org/licenses/LICENSE-2.0                        */         
 /*                                                                   */         
-/* *01* EXTERNAL CLASSIFICATION: OTHER                               */         
-/* *01* END OF EXTERNAL CLASSIFICATION:                              */         
+/* Unless required by applicable law or agreed to in writing,        */         
+/* software distributed under the License is distributed on an       */         
+/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,      */         
+/* either express or implied. See the License for the specific       */         
+/* language governing permissions and limitations under the License. */         
 /*                                                                   */         
 /*-------------------------------------------------------------------*/         
 /*                                                                   */         
@@ -120,7 +122,7 @@ irrphrex_version = "V6"
 /*                3  - Phrase contains disallowed characters         */         
 /*                4  - Phrase contains leading blanks                */         
 /*                5  - Phrase contains trailing blanks               */         
-/*                6  - Phrase contains part of user s name           */         
+/*                6  - Phrase contains part of user's name           */         
 /*                7  - Phrase is only trivially different from       */         
 /*                     previous value                                */         
 /*                8  - Phrase does not contain enough character      */         
@@ -205,14 +207,32 @@ debug = 'off'
 /*   By default, this exec will enforce the built-ins exactly as     */         
 /*   RACF would. You must disable the rules you do not want (by      */         
 /*   changing 'no' to 'yes' for the user ID check, or changing a     */         
-/*   numeric value to 0. Of course, numeric values can be changed    */         
+/*   numeric value to 0). Of course, numeric values can be changed   */         
 /*   to *modify* the check instead of deleting it.                   */         
+/*                                                                   */         
+/*   If disabling the Phr_alphas_required or Phr_nonalphas_required  */         
+/*   rules, note that you may need to adjust the following check     */         
+/*   (Phr_req_types) as well.                                        */         
 /*                                                                   */         
 Phr_user_ID_allowed    = 'no'     /* User ID allowed in phrase       */         
 Phr_alphas_required    = 2        /* Min number of letters required  */         
 Phr_nonalphas_required = 2        /* Min num of nonletters required  */         
 Phr_max_repeat_chars   = 2        /* Max times a char may repeat     */         
 /*                                                                   */         
+/*-------------------------------------------------------------------*/         
+/* * Minimum number of character types represented in the phrase.    */         
+/*   The types are defined above (numbers, upper and lower case      */         
+/*   letters, and special characters).  For example, setting         */         
+/*   Phr_req_types to 4 requires the user to specify at least one    */         
+/*   number, one lower case letter, one upper case letter, and       */         
+/*   one special character. Setting the value to 3 would require     */         
+/*   at least one character from 3 of the 4 character types.         */         
+/*                                                                   */         
+/*   By default, the built-in phrase syntax rules require at least   */         
+/*   2 alphabetic and 2 non-alphabetic characters.                   */         
+/*                                                                   */         
+Phr_req_types = 2                                                               
+                                                                                
 /*-------------------------------------------------------------------*/         
 /*   Message to be returned to ICHPWX11.  When RexxRc = 4 (a         */         
 /*   quality check failed), and the outputMsg variable is not        */         
@@ -321,20 +341,6 @@ Lower_letters = 'abcdefghijklmnopqrstuvwxyz'
 Upper_letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'                                    
 special = '$@#.<+ |&!*-%_>?:='                                                  
 /*Phr_allowed_chars = numbers||Lower_letters||Upper_letters||special */         
-/*                                                                   */         
-/*-------------------------------------------------------------------*/         
-/* * Minimum number of character types represented in the phrase.    */         
-/*   The types are defined above (numbers, upper and lower case      */         
-/*   letters, and special characters).  For example, setting         */         
-/*   Phr_req_types to 4 requires the user to specify at least one    */         
-/*   number, one lower case letter, one upper case letter, and       */         
-/*   one special character. Setting the value to 3 would require     */         
-/*   at least one character from 3 of the 4 character types.         */         
-/*                                                                   */         
-/*   By default, the built-in phrase syntax rules require at least   */         
-/*   2 alphabetic and 2 non-alphabetic characters.                   */         
-/*                                                                   */         
-Phr_req_types = 2                                                               
                                                                                 
 /*-------------------------------------------------------------------*/         
 /* * Leading and trailing blanks allowed or not. These can cause     */         
@@ -530,7 +536,7 @@ End
 /*   These variables associate descriptive text with each value of   */         
 /*   RexxReason so that a more helpful message can be issued upon    */         
 /*   failure in debug mode.  You might also choose to return these   */         
-/*   messages to ICHPWX01 in the outputMsg output argument. If so,   */         
+/*   messages to ICHPWX11 in the outputMsg output argument. If so,   */         
 /*   modify the messages as desired, and uncomment the lines         */         
 /*   immediately before the return statement (search for             */         
 /*   "outputMsg").                                                   */         
@@ -973,7 +979,7 @@ If Phr_dict.0 /= 'PHR_DICT.0' &,          /* Stem defined and        */
 /*********************************************************************/         
                                                                                 
  /********************************************************************/         
- /* Check for upper- or lower-case user ID in phrase                 */         
+ /* Check for upper- or lower-case user ID in phrase (built-in)      */         
  /********************************************************************/         
 If Phr_user_ID_allowed = 'no' then do                                           
                                                                                 
@@ -991,7 +997,7 @@ If Phr_user_ID_allowed = 'no' then do
 End                                                                             
                                                                                 
  /********************************************************************/         
- /* Check for minimum number of letters                              */         
+ /* Check for minimum number of letters (built-in)                   */         
  /********************************************************************/         
 If Phr_alphas_required /= 'PHR_ALPHAS_REQUIRED' &,                              
    Phr_alphas_required >  0                     Then do                         
@@ -1014,7 +1020,7 @@ If Phr_alphas_required /= 'PHR_ALPHAS_REQUIRED' &,
 End                                                                             
                                                                                 
  /********************************************************************/         
- /* Check for minimum number of non-letters                          */         
+ /* Check for minimum number of non-letters (built-in)               */         
  /********************************************************************/         
 If Phr_nonalphas_required /= 'PHR_NONALPHAS_REQUIRED' &,                        
    Phr_nonalphas_required >  0                        Then do                   
@@ -1038,7 +1044,7 @@ If Phr_nonalphas_required /= 'PHR_NONALPHAS_REQUIRED' &,
 End                                                                             
                                                                                 
  /********************************************************************/         
- /* Check for repeating characters                                   */         
+ /* Check for repeating characters (built-in)                        */         
  /********************************************************************/         
 If Phr_max_repeat_chars   /= 'PHR_MAX_REPEAT_CHARS'   &,                        
    Phr_max_repeat_chars   >  0                  Then do                         
@@ -1230,6 +1236,21 @@ Perform_list:
    End                                                                          
    rc = AXRMLWTO(Out_line,'ConnectId','d')                                      
  End                                                                            
+ /******************************************************************/           
+ /* It will also be helpful to display if RACF is bypassing the    */           
+ /* built-in syntax rules. The RCVTPSYN bit will be on if so.      */           
+ /* This processing is decribed in the prolog.                     */           
+ /******************************************************************/           
+ /* Get RCVTPSYN value (x'40' bit) from RCVTOPT1                   */           
+ RCVTOPT1 = Storage(D2x(rcvt_addr+502),1)         /* RCVTOPT1      */           
+ RCVTPSYN = C2d(BITAND(RCVTOPT1,'40'x))           /* Isolate '40'x */           
+ If RCVTPSYN = 64 Then RCVTPSYN = 'yes'           /* '40'x = 64    */           
+ Else                  RCVTPSYN = 'no'                                          
+ If RCVTPSYN = 'yes' Then                                                       
+   Out_line = 'Built-in syntax rules are being bypassed in RACF'                
+ Else                                                                           
+   Out_line = 'Built-in syntax rules are not being bypassed in RACF'            
+ rc = AXRMLWTO(Out_line,'ConnectId','d')                                        
                                                                                 
  /******************************************************************/           
  /* Now issue a header line for IRRPHREX settings.                 */           
@@ -1604,7 +1625,7 @@ End
    End /* There is a stem */                                                    
  End /* All stems processed */                                                  
                                                                                 
- /*Phr_user_ID_allowed = 'no' */                                                
+ /*Phr_user_ID_allowed = 'no'   (built-in) */                                   
  If Phr_user_ID_allowed /= 'PHR_USER_ID_ALLOWED' Then Do                        
    Select                                                                       
     When format = 'c' Then                                                      
@@ -1622,7 +1643,7 @@ End
      rc = AXRMLWTO(Out_line,'ConnectId','d')                                    
  End                                                                            
                                                                                 
- /*Phr_alphas_required = 2 */                                                   
+ /*Phr_alphas_required = 2  (built-in)    */                                    
  If Phr_alphas_required /= 'PHR_ALPHAS_REQUIRED' Then Do                        
    Select                                                                       
     When format = 'c' Then                                                      
@@ -1647,7 +1668,7 @@ End
      rc = AXRMLWTO(Out_line,'ConnectId','d')                                    
  End                                                                            
                                                                                 
- /*Phr_nonalphas_required = 2 */                                                
+ /*Phr_nonalphas_required = 2  (built-in) */                                    
  If Phr_nonalphas_required /= 'PHR_NONALPHAS_REQUIRED' Then Do                  
    Select                                                                       
     When format = 'c' Then                                                      
@@ -1672,7 +1693,7 @@ End
      rc = AXRMLWTO(Out_line,'ConnectId','d')                                    
  End                                                                            
                                                                                 
- /*Phr_max_repeat_chars = 2 */                                                  
+ /*Phr_max_repeat_chars = 2 (built-in)     */                                   
  If Phr_max_repeat_chars /= 'PHR_MAX_REPEAT_CHARS' Then Do                      
    Select                                                                       
     When format = 'c' Then                                                      
