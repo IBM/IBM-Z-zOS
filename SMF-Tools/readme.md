@@ -12,11 +12,19 @@ Though the materials provided herein are not supported by the IBM Service organi
 ## Build
 
 1. Install [Apache Maven](https://maven.apache.org/) and make sure `mvn` is on your `PATH`
-2. Compile and package from this folder:
+2. Clone this repository:
+   ```
+   git clone https://github.com/IBM/IBM-Z-zOS
+   ```
+3. Change directory to this folder:
+   ```
+   cd IBM-Z-zOS/SMF-Tools
+   ```
+4. Compile and package:
    ```
    mvn clean install
    ```
-3. Use the executable JAR at `SMF_JAR/target/smftools.jar` on a z/OS system:
+5. Use the executable JAR at `SMF_JAR/target/smftools.jar` on a z/OS system:
    ```
    java -jar smftools.jar ...
    ```
