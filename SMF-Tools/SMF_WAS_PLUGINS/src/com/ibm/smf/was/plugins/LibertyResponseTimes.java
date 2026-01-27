@@ -136,14 +136,14 @@ public class LibertyResponseTimes implements SMFFilter {
 	}	
 	@Override
 	public void processingComplete() {
-		smf_printstream.println("Requests,AvgResponse(ms),AvgCPU(ms),AvgBytesSent,URI");
+		smf_printstream.println("Requests,AvgResponse(ms),AvgCPU(ms),SumCPU(ms),AvgBytesSent,URI");
 		
 		Iterator uridIT = table.keySet().iterator();
 		while (uridIT.hasNext()) {
 		   URIData urid = (URIData)table.get(uridIT.next());
 		   smf_printstream.println(urid.getData());  
 		}
-		smf_printstream.println(totalRequests+","+totalResponseTime/totalRequests+","+totalCPU/totalRequests+","+totalBytesSent/totalRequests+",Overall");
+		smf_printstream.println(totalRequests+","+totalResponseTime/totalRequests+","+totalCPU/totalRequests+","+totalCPU+","+totalBytesSent/totalRequests+",Overall");
 	}
 
 	
@@ -166,7 +166,7 @@ public class LibertyResponseTimes implements SMFFilter {
 		}
 		
 		public String getData() {
-			return new String(totalRequests+","+totalResponseTime/totalRequests+","+totalCPU/totalRequests+","+totalBytesSent/totalRequests+","+uri);
+			return new String(totalRequests+","+totalResponseTime/totalRequests+","+totalCPU/totalRequests+","+totalCPU+","+totalBytesSent/totalRequests+","+uri);
 		}
 		
 	}
