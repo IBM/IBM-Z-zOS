@@ -192,7 +192,10 @@ main(argc, argv)
 		sockerrno = errno;
 	}
 
-	setuid(getuid());
+	if (setuid(getuid()) != 0) {
+		perror("setuid failed");
+		exit(1);
+	}
 
 	preload = 0;
 #ifndef MVSOEPORT
@@ -305,6 +308,7 @@ main(argc, argv)
 		to->sin_family = hp->h_addrtype;
 		bcopy(hp->h_addr, (caddr_t)&to->sin_addr, hp->h_length);
 		(void)strncpy(hnamebuf, hp->h_name, sizeof(hnamebuf) - 1);
+		hnamebuf[sizeof(hnamebuf) - 1] = '\0';
 		hostname = hnamebuf;
 	}
 
@@ -529,6 +533,13 @@ pr_pack(buf, cc, from)
 	/* Check the IP header */
 	ip = (struct ip *)buf;
 	hlen = ip->ip_hl << 2;
+	if (hlen < 20 || hlen > 60) {
+		if (options & F_VERBOSE)
+			(void)fprintf(stderr,
+			  "ping: invalid IP header length (%d bytes) from %s\n", hlen,
+			  inet_ntoa(*(struct in_addr *)&from->sin_addr.s_addr));
+		return;
+	}
 	if (cc < hlen + ICMP_MINLEN) {
 		if (options & F_VERBOSE)
 			(void)fprintf(stderr,
@@ -1034,21 +1045,11 @@ pr_addr(l)
 
 	if ((options & F_NUMERIC) ||
 	    !(hp = gethostbyaddr((char *)&l, 4, AF_INET)))
-#ifdef MVSOEPORT
-		(void)sprintf(buf, "%s",
-		    inet_ntoa(*(struct in_addr *)&l));
-#else
 		(void)snprintf(buf, sizeof(buf), "%s",
 		    inet_ntoa(*(struct in_addr *)&l));
-#endif
 	else
-#ifdef MVSOEPORT
-		(void)sprintf(buf, "%s (%s)", hp->h_name,
-		    inet_ntoa(*(struct in_addr *)&l));
-#else
 		(void)snprintf(buf, sizeof(buf), "%s (%s)", hp->h_name,
 		    inet_ntoa(*(struct in_addr *)&l));
-#endif
 	return(buf);
 }
 
