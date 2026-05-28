@@ -4,6 +4,8 @@ A Python command-line tool for calling Tivoli Enterprise Monitoring Server (TEMS
 
 ## Quick Start
 
+Before you begin, ensure that you have Python >= 3.10 installed on your machine, otherwise the necessary dependency cannot be installed.
+
 ```bash
 # 1. Create virtual environment
 python3 -m venv venv
@@ -51,7 +53,7 @@ Credentials are loaded in this order (highest to lowest precedence):
    echo "TEMS_USERID=admin" >> ~/.env
    echo "TEMS_PASSWORD=secret" >> ~/.env
    chmod 600 ~/.env
-   
+
    # Run without credentials
    python call_tems.py --hostname tems.example.com --path /api/v1/system/nodes
    ```
