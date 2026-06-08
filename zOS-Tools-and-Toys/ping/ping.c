@@ -745,7 +745,7 @@ in_cksum(addr, len)
 
 	/* mop up an odd byte, if necessary */
 	if (nleft == 1) {
-		*(u_char *)(&answer) = *(u_char *)w ;
+		answer = (u_short)((*w) & 0x00FF);
 		sum += answer;
 	}
 
