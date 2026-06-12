@@ -2528,9 +2528,11 @@ Reason Code Meaning
 ____________________________________________________________________________________________________
 **0022(X'16)** - Dynamic Allocation of the internal work files failed. Select EzNoSQL APIs allocate
 temporary work files which must be allocated on DASD volumes mounted storage (STRG).  If there are
-no available storage volumes, the API will fail.
+no available storage volumes, the API will fail. As of OA69376, this error can also mean a database
+is not found.
 
-Ensure storage volumes with at least one track per concurrent create or destroy APIs are online. ____________________________________________________________________________________________________
+        Ensure storage volumes with at least one track per concurrent create or destroy APIs are online. 
+____________________________________________________________________________________________________
 **0023(X'17)** - Connection token could not be obtained. The znsq_open() API could not obtain 
 storage for a connection token. This error would most likely be related to a memory shortage.
 
