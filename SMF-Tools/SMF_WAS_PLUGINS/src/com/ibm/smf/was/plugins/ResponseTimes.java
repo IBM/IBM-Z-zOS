@@ -18,6 +18,7 @@ package com.ibm.smf.was.plugins;
 
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -33,10 +34,11 @@ import com.ibm.smf.twas.request.NetworkDataSection;
 import com.ibm.smf.twas.request.PlatformNeutralRequestInfoSection;
 import com.ibm.smf.twas.request.RequestActivitySmfRecord;
 import com.ibm.smf.twas.request.ZosRequestInfoSection;
+import com.ibm.smf.utilities.ConversionUtilities;
+import com.ibm.smf.utilities.Histogram;
+import com.ibm.smf.utilities.STCK;
 import com.ibm.smf.was.common.ClassificationDataSection;
 import com.ibm.smf.was.common.WASConstants;
-import com.ibm.smf.utilities.ConversionUtilities;
-import com.ibm.smf.utilities.STCK;
 
 /**
  * Reports on response and CPU times for the SMF data provided
@@ -60,6 +62,9 @@ public class ResponseTimes implements SMFFilter {
 	private TimeType useTime = TimeType.NONE;
 	private IntervalType useTimeInterval = IntervalType.PER_MINUTE;
 	private Breakdown useTimeBreakdown = Breakdown.NONE;
+	private static final boolean HISTOGRAM = Boolean.getBoolean("HISTOGRAM");
+	private static final int HISTOGRAM_BUCKETS = Integer.getInteger("HISTOGRAM_BUCKETS", 10);
+	private Map<String, ArrayList<Long>> histogramData = new HashMap<>();
 	
 	enum TimeType {
 		NONE, RECEIVED, QUEUED, DISPATCH_START, DISPATCH_END, RESPONDED, 
@@ -218,6 +223,15 @@ public class ResponseTimes implements SMFFilter {
 	      
 	      //Accumulate CPU offload time in milliseconds
     	  offloadCpu = sec.m_dispatchServantCpuOffload/1000;
+    	  
+    	  if (HISTOGRAM) {
+    	      ArrayList<Long> data = histogramData.get(requestTypeString);
+    	      if (data == null) {
+    	          data = new ArrayList<>();
+    	          histogramData.put(requestTypeString, data);
+    	      }
+    	      data.add(responseTime);
+    	  }
 	     }
 	     
 		 // From the classification section
@@ -235,7 +249,7 @@ public class ResponseTimes implements SMFFilter {
 	            int type = cds.m_dataType;
 	            if (type == ClassificationDataSection.TypeURI){
 	            	uri = cds.m_theData;
-	            } 
+	            }
 	    	 }
 	     }
 	     
@@ -349,33 +363,43 @@ public class ResponseTimes implements SMFFilter {
 
 	@Override
 	public void processingComplete() {
-		if (useTime == TimeType.NONE) {
-			printHeader();
-			
-			Map<String, URIData> table = nonTimeTable;
-			Iterator<String> uridIT = table.keySet().iterator();
-			while (uridIT.hasNext()) {
-			   URIData urid = (URIData)table.get(uridIT.next());
-			   smf_printstream.println(urid.getData());  
-			}
-			float averageOffloadPercent = 0;
-			if (totalCPU>0) {
-				averageOffloadPercent = ((float)totalOffloadCPU/(float)totalCPU);
-			}
-			smf_printstream.println(totalRequests+","+totalResponseTime/totalRequests+","+maxResponseTime+","+totalQueueTime/totalRequests+","+totalDispatchTime/totalRequests+","+totalCPU/totalRequests+","+totalOffloadCPU/totalRequests+","+averageOffloadPercent+","+totalBytesReceived/totalRequests+","+totalBytesSent/totalRequests+",Overall");
-		} else {
-			smf_printstream.print("Time,");
-			if (useTimeBreakdown == Breakdown.NONE) {
-				printHeader();
-				processTimeTable(null, timeTable);
-			} else {
-				smf_printstream.print("Server,");
-				printHeader();
-				for (Entry<String, Map<Long, Map<String, URIData>>> entry : breakdownTable.entrySet()) {
-					processTimeTable(entry.getKey(), entry.getValue());
-				}
-			}
-		}
+	    if (!HISTOGRAM) {
+	        if (useTime == TimeType.NONE) {
+	            printHeader();
+	            
+	            Map<String, URIData> table = nonTimeTable;
+	            Iterator<String> uridIT = table.keySet().iterator();
+	            while (uridIT.hasNext()) {
+	               URIData urid = (URIData)table.get(uridIT.next());
+	               smf_printstream.println(urid.getData());  
+	            }
+	            float averageOffloadPercent = 0;
+	            if (totalCPU>0) {
+	                averageOffloadPercent = ((float)totalOffloadCPU/(float)totalCPU);
+	            }
+	            smf_printstream.println(totalRequests+","+totalResponseTime/totalRequests+","+maxResponseTime+","+totalQueueTime/totalRequests+","+totalDispatchTime/totalRequests+","+totalCPU/totalRequests+","+totalOffloadCPU/totalRequests+","+averageOffloadPercent+","+totalBytesReceived/totalRequests+","+totalBytesSent/totalRequests+",Overall");
+	        } else {
+	            smf_printstream.print("Time,");
+	            if (useTimeBreakdown == Breakdown.NONE) {
+	                printHeader();
+	                processTimeTable(null, timeTable);
+	            } else {
+	                smf_printstream.print("Server,");
+	                printHeader();
+	                for (Entry<String, Map<Long, Map<String, URIData>>> entry : breakdownTable.entrySet()) {
+	                    processTimeTable(entry.getKey(), entry.getValue());
+	                }
+	            }
+	        }
+	    } else {
+	        for (Entry<String, ArrayList<Long>> entry : histogramData.entrySet()) {
+	            smf_printstream.println("Histogram of response times (milliseconds) for " + entry.getKey());
+	            Histogram histogram = new Histogram(entry.getValue().stream().mapToLong(Long::longValue).toArray(), HISTOGRAM_BUCKETS);
+	            histogram.print(smf_printstream);
+	            smf_printstream.println("=============");
+	            smf_printstream.println("");
+	        }
+	    }
 	}
 
 	private void processTimeTable(String breakdownKey, Map<Long, Map<String, URIData>> t) {
@@ -400,7 +424,9 @@ public class ResponseTimes implements SMFFilter {
 	}
 	
 	private void printHeader() {
-		smf_printstream.println("Requests,AvgResponse,MaxResponse,AvgQueue,AvgDisp,AvgCPU,AvgOffload,AvgOffload%,AvgBytesRcvd,AvgBytesSent,URI");
+	    if (!HISTOGRAM) {
+	        smf_printstream.println("Requests,AvgResponse,MaxResponse,AvgQueue,AvgDisp,AvgCPU,AvgOffload,AvgOffload%,AvgBytesRcvd,AvgBytesSent,URI");
+	    }
 	}
 	
 	public class URIData {
