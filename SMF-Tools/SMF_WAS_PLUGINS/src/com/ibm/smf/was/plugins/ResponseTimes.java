@@ -64,6 +64,7 @@ public class ResponseTimes implements SMFFilter {
 	private Breakdown useTimeBreakdown = Breakdown.NONE;
 	private static final boolean HISTOGRAM = Boolean.getBoolean("HISTOGRAM");
 	private static final int HISTOGRAM_BUCKETS = Integer.getInteger("HISTOGRAM_BUCKETS", 10);
+    private static final long HISTOGRAM_MAXIMUM = Long.getLong("HISTOGRAM_MAXIMUM", -1);
 	private Map<String, ArrayList<Long>> histogramData = new HashMap<>();
 	
 	enum TimeType {
@@ -224,7 +225,7 @@ public class ResponseTimes implements SMFFilter {
 	      //Accumulate CPU offload time in milliseconds
     	  offloadCpu = sec.m_dispatchServantCpuOffload/1000;
     	  
-    	  if (HISTOGRAM) {
+    	  if (HISTOGRAM && (HISTOGRAM_MAXIMUM == -1 || responseTime < HISTOGRAM_MAXIMUM)) {
     	      ArrayList<Long> data = histogramData.get(requestTypeString);
     	      if (data == null) {
     	          data = new ArrayList<>();
