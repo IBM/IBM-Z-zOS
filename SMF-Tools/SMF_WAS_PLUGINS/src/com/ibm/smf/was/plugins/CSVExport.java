@@ -71,6 +71,9 @@ public class CSVExport implements SMFFilter {
 	public void processRecord(SmfRecord record) 
 	{
 		
+	 if (!(record instanceof RequestActivitySmfRecord)) {
+	     return;
+	 }
 	 // cast to a subtype 9 and declare generic variables
 	 RequestActivitySmfRecord rec = (RequestActivitySmfRecord)record;
 	 Triplet zOSRequestTriplet;
