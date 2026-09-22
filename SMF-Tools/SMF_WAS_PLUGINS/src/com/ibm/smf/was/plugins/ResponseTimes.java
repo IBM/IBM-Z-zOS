@@ -47,15 +47,6 @@ import com.ibm.smf.was.common.WASConstants;
 public class ResponseTimes implements SMFFilter {
 
 	private SmfPrintStream smf_printstream = null;
-	private long totalCPU = 0;
-	private long totalOffloadCPU = 0;
-	private long totalRequests = 0;
-	private long totalResponseTime = 0;
-	private long totalQueueTime = 0;
-	private long totalDispatchTime = 0;
-	private long totalBytesReceived = 0;
-	private long totalBytesSent = 0;
-	private long maxResponseTime = 0;
 	private Map<Long, Map<String, URIData>> timeTable = new HashMap<>();
 	private Map<String, URIData> nonTimeTable = new HashMap<>();
 	private Map<String, Map<Long, Map<String, URIData>>> breakdownTable = new HashMap<>();
@@ -66,6 +57,7 @@ public class ResponseTimes implements SMFFilter {
 	private static final int HISTOGRAM_BUCKETS = Integer.getInteger("HISTOGRAM_BUCKETS", 10);
     private static final long HISTOGRAM_MAXIMUM = Long.getLong("HISTOGRAM_MAXIMUM", -1);
 	private Map<String, ArrayList<Long>> histogramData = new HashMap<>();
+	private URIData totals = new URIData("Overall");
 	
 	enum TimeType {
 		NONE, RECEIVED, QUEUED, DISPATCH_START, DISPATCH_END, RESPONDED, 
@@ -273,16 +265,16 @@ public class ResponseTimes implements SMFFilter {
 	     }
 	     
 	     
-	     totalResponseTime = totalResponseTime + responseTime;
-	     if (responseTime > maxResponseTime) {
-	    	 maxResponseTime = responseTime;
+	     totals.totalResponseTime = totals.totalResponseTime + responseTime;
+	     if (responseTime > totals.maxResponseTime) {
+	         totals.maxResponseTime = responseTime;
 	     }
-	     totalQueueTime = totalQueueTime + queueTime;
-	     totalDispatchTime = totalDispatchTime + dispatchTime;	     
-		 totalCPU = totalCPU + cpuTime;
-		 totalOffloadCPU = totalOffloadCPU + offloadCpu;
-		 totalBytesReceived = totalBytesReceived + bytesReceived;
-		 totalBytesSent = totalBytesSent + bytesSent;
+	     totals.totalQueueTime = totals.totalQueueTime + queueTime;
+	     totals.totalDispatchTime = totals.totalDispatchTime + dispatchTime;	     
+	     totals.totalCPU = totals.totalCPU + cpuTime;
+	     totals.totalOffloadCPU = totals.totalOffloadCPU + offloadCpu;
+	     totals.totalBytesReceived = totals.totalBytesReceived + bytesReceived;
+	     totals.totalBytesSent = totals.totalBytesSent + bytesSent;
 	  
 	     // find or create the hashmap entry for this URI and update
 		 Map<String, URIData> table = getTable(breakdownKey, receiveTime, queuedTime, dispatchStart, dispatchEnd, responded);
@@ -293,7 +285,7 @@ public class ResponseTimes implements SMFFilter {
 		 }
 		 urid.update(responseTime, queueTime, dispatchTime, cpuTime,offloadCpu,bytesReceived,bytesSent);
 	     
-         ++totalRequests;
+         totals.totalRequests++;
 		}
 	}
 	
@@ -374,11 +366,7 @@ public class ResponseTimes implements SMFFilter {
 	               URIData urid = (URIData)table.get(uridIT.next());
 	               smf_printstream.println(urid.getData());  
 	            }
-	            float averageOffloadPercent = 0;
-	            if (totalCPU>0) {
-	                averageOffloadPercent = ((float)totalOffloadCPU/(float)totalCPU);
-	            }
-	            smf_printstream.println(totalRequests+","+totalResponseTime/totalRequests+","+maxResponseTime+","+totalQueueTime/totalRequests+","+totalDispatchTime/totalRequests+","+totalCPU/totalRequests+","+totalOffloadCPU/totalRequests+","+averageOffloadPercent+","+totalBytesReceived/totalRequests+","+totalBytesSent/totalRequests+",Overall");
+	            smf_printstream.println(totals.getData());
 	        } else {
 	            smf_printstream.print("Time,");
 	            if (useTimeBreakdown == Breakdown.NONE) {
