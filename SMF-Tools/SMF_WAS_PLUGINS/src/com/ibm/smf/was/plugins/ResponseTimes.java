@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -47,15 +48,6 @@ import com.ibm.smf.was.common.WASConstants;
 public class ResponseTimes implements SMFFilter {
 
 	private SmfPrintStream smf_printstream = null;
-	private long totalCPU = 0;
-	private long totalOffloadCPU = 0;
-	private long totalRequests = 0;
-	private long totalResponseTime = 0;
-	private long totalQueueTime = 0;
-	private long totalDispatchTime = 0;
-	private long totalBytesReceived = 0;
-	private long totalBytesSent = 0;
-	private long maxResponseTime = 0;
 	private Map<Long, Map<String, URIData>> timeTable = new HashMap<>();
 	private Map<String, URIData> nonTimeTable = new HashMap<>();
 	private Map<String, Map<Long, Map<String, URIData>>> breakdownTable = new HashMap<>();
@@ -66,6 +58,8 @@ public class ResponseTimes implements SMFFilter {
 	private static final int HISTOGRAM_BUCKETS = Integer.getInteger("HISTOGRAM_BUCKETS", 10);
     private static final long HISTOGRAM_MAXIMUM = Long.getLong("HISTOGRAM_MAXIMUM", -1);
 	private Map<String, ArrayList<Long>> histogramData = new HashMap<>();
+	private URIData totals = new URIData("Overall");
+	private static final boolean MORESTATISTICS = Boolean.getBoolean("MORESTATISTICS");
 	
 	enum TimeType {
 		NONE, RECEIVED, QUEUED, DISPATCH_START, DISPATCH_END, RESPONDED, 
@@ -273,16 +267,16 @@ public class ResponseTimes implements SMFFilter {
 	     }
 	     
 	     
-	     totalResponseTime = totalResponseTime + responseTime;
-	     if (responseTime > maxResponseTime) {
-	    	 maxResponseTime = responseTime;
+	     totals.totalResponseTime = totals.totalResponseTime + responseTime;
+	     if (responseTime > totals.maxResponseTime) {
+	         totals.maxResponseTime = responseTime;
 	     }
-	     totalQueueTime = totalQueueTime + queueTime;
-	     totalDispatchTime = totalDispatchTime + dispatchTime;	     
-		 totalCPU = totalCPU + cpuTime;
-		 totalOffloadCPU = totalOffloadCPU + offloadCpu;
-		 totalBytesReceived = totalBytesReceived + bytesReceived;
-		 totalBytesSent = totalBytesSent + bytesSent;
+	     totals.totalQueueTime = totals.totalQueueTime + queueTime;
+	     totals.totalDispatchTime = totals.totalDispatchTime + dispatchTime;	     
+	     totals.totalCPU = totals.totalCPU + cpuTime;
+	     totals.totalOffloadCPU = totals.totalOffloadCPU + offloadCpu;
+	     totals.totalBytesReceived = totals.totalBytesReceived + bytesReceived;
+	     totals.totalBytesSent = totals.totalBytesSent + bytesSent;
 	  
 	     // find or create the hashmap entry for this URI and update
 		 Map<String, URIData> table = getTable(breakdownKey, receiveTime, queuedTime, dispatchStart, dispatchEnd, responded);
@@ -293,7 +287,7 @@ public class ResponseTimes implements SMFFilter {
 		 }
 		 urid.update(responseTime, queueTime, dispatchTime, cpuTime,offloadCpu,bytesReceived,bytesSent);
 	     
-         ++totalRequests;
+         totals.totalRequests++;
 		}
 	}
 	
@@ -374,11 +368,7 @@ public class ResponseTimes implements SMFFilter {
 	               URIData urid = (URIData)table.get(uridIT.next());
 	               smf_printstream.println(urid.getData());  
 	            }
-	            float averageOffloadPercent = 0;
-	            if (totalCPU>0) {
-	                averageOffloadPercent = ((float)totalOffloadCPU/(float)totalCPU);
-	            }
-	            smf_printstream.println(totalRequests+","+totalResponseTime/totalRequests+","+maxResponseTime+","+totalQueueTime/totalRequests+","+totalDispatchTime/totalRequests+","+totalCPU/totalRequests+","+totalOffloadCPU/totalRequests+","+averageOffloadPercent+","+totalBytesReceived/totalRequests+","+totalBytesSent/totalRequests+",Overall");
+	            smf_printstream.println(totals.getData());
 	        } else {
 	            smf_printstream.print("Time,");
 	            if (useTimeBreakdown == Breakdown.NONE) {
@@ -426,7 +416,11 @@ public class ResponseTimes implements SMFFilter {
 	
 	private void printHeader() {
 	    if (!HISTOGRAM) {
-	        smf_printstream.println("Requests,AvgResponse,MaxResponse,AvgQueue,AvgDisp,AvgCPU,AvgOffload,AvgOffload%,AvgBytesRcvd,AvgBytesSent,URI");
+	        if (MORESTATISTICS) {
+	            smf_printstream.println("Requests,AvgResponse(ms),MedianResponse(ms),ModeResponse(ms),StdDevResponse(ms),MaxResponse(ms),AvgQueue(ms),AvgDisp(ms),AvgCPU,AvgOffload,AvgOffload%Div100,AvgBytesRcvd,AvgBytesSent,URI");
+	        } else {
+	            smf_printstream.println("Requests,AvgResponse(ms),MaxResponse(ms),AvgQueue(ms),AvgDisp(ms),AvgCPU,AvgOffload,AvgOffload%Div100,AvgBytesRcvd,AvgBytesSent,URI");
+	        }
 	    }
 	}
 	
@@ -441,6 +435,7 @@ public class ResponseTimes implements SMFFilter {
 		private long totalBytesSent = 0;
 		private long maxResponseTime = 0;
 		private String uri;
+		private List<Integer> responseTimes;
 		
 		public URIData (String s){
 			uri = s;
@@ -459,12 +454,59 @@ public class ResponseTimes implements SMFFilter {
 			 totalBytesSent = totalBytesSent + bytesSent;
 	         ++totalRequests;
          
+	         if (MORESTATISTICS) {
+	             if (responseTimes == null) {
+	                 responseTimes = new ArrayList<>();
+	             }
+	             // We truncate to save memory since an integer can represent up to about 25 days of wallclock time in milliseconds
+	             responseTimes.add((int)responseTime);
+	         }
 		}
 		
 		public String getData() {
 			float averageOffloadPercent = 0;
 			if (totalCPU>0) {
 				averageOffloadPercent = ((float)totalOffloadCPU/(float)totalCPU);
+			}
+			if (MORESTATISTICS) {
+                long median = -1, mode = -1, stdDev = -1;
+			    if (responseTimes != null) {
+	                int[] sorted = responseTimes.stream().mapToInt(Integer::intValue).toArray();
+	                Arrays.sort(sorted);
+	                int n = sorted.length;
+
+	                // Median
+	                if (n % 2 == 0) {
+	                    median = ((long)sorted[n / 2 - 1] + (long)sorted[n / 2]) / 2;
+	                } else {
+	                    median = sorted[n / 2];
+	                }
+
+	                // Mode (most frequent value; ties broken by first encountered)
+	                Map<Integer, Integer> freq = new HashMap<>();
+	                for (int v : sorted) {
+	                    freq.merge(v, 1, Integer::sum);
+	                }
+	                mode = sorted[0];
+	                int maxFreq = 0;
+	                for (Map.Entry<Integer, Integer> e : freq.entrySet()) {
+	                    if (e.getValue() > maxFreq) {
+	                        maxFreq = e.getValue();
+	                        mode = e.getKey();
+	                    }
+	                }
+
+	                // Standard deviation (population)
+	                double mean = (double)totalResponseTime / n;
+	                double variance = 0.0;
+	                for (int v : sorted) {
+	                    double diff = v - mean;
+	                    variance += diff * diff;
+	                }
+	                stdDev = Math.round(Math.sqrt(variance / n));
+
+			    }
+				return new String(totalRequests+","+totalResponseTime/totalRequests+","+median+","+mode+","+stdDev+","+maxResponseTime+","+totalQueueTime/totalRequests+","+totalDispatchTime/totalRequests+","+totalCPU/totalRequests+","+totalOffloadCPU/totalRequests+","+averageOffloadPercent+","+totalBytesReceived/totalRequests+","+totalBytesSent/totalRequests+","+uri);
 			}
 			return new String(totalRequests+","+totalResponseTime/totalRequests+","+maxResponseTime+","+totalQueueTime/totalRequests+","+totalDispatchTime/totalRequests+","+totalCPU/totalRequests+","+totalOffloadCPU/totalRequests+","+averageOffloadPercent+","+totalBytesReceived/totalRequests+","+totalBytesSent/totalRequests+","+uri);
 		}
